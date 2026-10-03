@@ -6,6 +6,8 @@ Read the [two-page brief](demo-summary.md) first. [Function briefs](function-bri
 
 ## 1. The recommendation
 
+Lead with **useful work in fractions of a cent**. Testril is being built around small purchases, paid materialization, and reuse; conventional API access and billing can sit above that foundation. This direction matters: tiny payments are part of the product economics, not merely another checkout option.
+
 Make Testril memorable through a useful result and a surprising economic consequence:
 
 > **Buy the answer. Inspect the evidence. Earn when the data gets reused.**
@@ -16,7 +18,7 @@ When function creation ships, add:
 
 Build a connected series around three experiences: an investigation, a second customer paying to reuse its data, and eventually a customer creating the missing metric. Those experiences generate product walkthroughs, engineering examples, and short marketing films. We do not need nine unrelated applications to tell nine stories.
 
-The first flagship is **Follow the Money**: a developer gives an agent a treasury address, token, block window, and spending limit; receives an explanation of an outflow; opens the evidence; and exports a result they can put in a product. The next episode shows someone else buying the same materialized data and the original payer's earned balance increasing.
+Open the series with **One Cent, Many Decisions**, a short demonstration of selective paid checks inside a one-cent read allowance. The first workflow flagship is **Follow the Money**: a developer gives an agent a treasury address, token, block window, and spending limit; receives an explanation of an outflow; opens the evidence; and exports a result they can put in a product. The next episode shows someone else buying the same materialized data and the original payer's earned balance increasing.
 
 This makes the engineer the protagonist: “I delivered the answer, I can defend it, I can ship it, and the data I funded can earn from reuse.”
 
@@ -35,13 +37,17 @@ Start with one real, bounded customer workflow. Full Dune/Allium/Nansen replacem
 
 ## 2. Competitive reality and positioning
 
-Agent access and machine payments are already competitive expectations. Dune offers MCP and stablecoin-funded per-query access through MPP. Allium offers MCP plus machine-payment access through its CLI/Skills. Nansen offers x402 access to its analytics. These are vendor-described capabilities; we did not benchmark their services. [Dune MCP](https://dune.com/blog/dune-mcp), [Dune payments](https://dune.com/blog/dune-stripe-and-tempo-frictionless-onchain-data-access-for-ai-agents), [Allium AgentHub](https://agent.allium.so/), [Nansen x402](https://nansen.ai/post/how-nansen-enabled-pay-per-call-onchain-data-access-with-x402-and-payai).
+**Sub-cent purchasing is a leading differentiator in its own right.** A one-cent or five-cent charge for every call changes what is economical to build: selective probes, conditional follow-ups, and frequent narrow checks accumulate cost even when each returns little data. Testril should show an agent buying only the next useful piece of evidence, with each charge visible in fractions of a cent.
 
-The differentiated hypothesis to prove is **the combination of demand-driven computation, inspectable lineage, small purchases, and materializer earnings**. Research here does not establish that no competitor can reproduce any individual feature.
+The architectural positioning is **a data economy built around tiny transactions, with familiar APIs and billing above it**. The competitive contrast is adding machine payments to existing API products. That describes our product direction; it is not a claim about competitors' undocumented internal architecture. Payment protocol support alone says little about the smallest useful purchase a provider actually sells.
+
+Published pricing supports the distinction. Nansen advertises **$0.01 basic / $0.05 premium calls**. Allium lists **$0.01 SQL submission**, **$0.02 price endpoints**, and **$0.03 wallet endpoints**, with separately priced results. Dune documents per-request MPP access; the reviewed page does not establish its minimum query price. Cite each verified offering rather than assigning a universal floor to every vendor. [Nansen pricing](https://nansen.ai/post/how-nansen-enabled-pay-per-call-onchain-data-access-with-x402-and-payai), [Allium pricing](https://docs.allium.so/ai/machine-payments/endpoints-pricing), [Dune MPP](https://docs.dune.com/docs/agents/mpp).
+
+At Testril's observed rates, a prepared 100-block read costs **$0.00012 (0.012 cents)**. Fifty such purchases total **$0.006 (0.6 cents)**. This gives the first demo a concrete economic reveal before function creation ships. Provenance and materializer earnings then show what else the same underlying product makes possible. Section 8 defines the comparison and preparation costs.
 
 | USP | Customer-facing promise | What the demo must actually show |
 | --- | --- | --- |
-| Very small payments | Buy the useful unit of work at a price you approve | Quote, enforced budget, delivered answer, exact charged amount; separately disclose setup/materialization |
+| Very small payments | Make many useful decisions within a one-cent allowance | Distinct selective checks, sub-cent quotes and receipts, accumulated cost, enforced budget; separately disclose preparation |
 | Functions created on request | Extend the data product when your question needs new computation | Catalog miss → new validated executable function → persistent identity → result → independent reuse |
 | Earnings from materialization | Useful data can offset its preparation cost through other buyers | Separate payer/reader, actual eligible paid read, observed earnings delta, eventual payout |
 | Provenance | Defend the number with its sources and calculation | Scope, source block references, function identity, transformation, independently checked example |
@@ -82,7 +88,7 @@ Current source also shows an ungated REST data path despite broader parity langu
 
 | ID | Demo / hook | Primary audience | Leading USPs | Required functions | Priority |
 | --- | --- | --- | --- | --- | --- |
-| P0 | **A Penny, a Useful Answer** — a funded agent buys a small, checkable result | Developers trying Testril | Small payments, provenance | Existing balance and transfer volume | First technical release; short teaser |
+| P0 | **One Cent, Many Decisions** — an agent makes useful selective checks within a penny | Agent/app developers | Sub-cent purchases, provenance | Existing transfer volume; exact balance optional | Opening marketing episode and first runnable release |
 | P1 | **Follow the Money** — explain the treasury outflow before the meeting | Builders, protocol operations | Useful answer, provenance, bounded spend | F01 transfer edges; existing exact balance if available | First flagship |
 | P2 | **The Second Customer Pays You** — another app buys your prepared data | Builders, data sponsors | Materialization earnings, payments | Reuse P1 or existing transfer volume | Second flagship episode |
 | P3 | **Show Me the Evidence** — challenge a chart and reproduce the number | Engineers, data teams | Provenance | Reuse P1 | Film/export mode inside P1 |
@@ -92,19 +98,21 @@ Current source also shows an ungated REST data path despite broader parity langu
 | G2 | **Did the Campaign Stick?** — change a retention definition and get a defensible cohort | Growth/data teams | Creation, provenance | F01/F05 plus generated G02; stateful engine | Second post-2 episode |
 | G3 | **Ask → Build → Earn** — a new metric becomes a reusable paid data product | Platform buyers, investors | All four | Compose G1 and P2 | Capstone; earn it through earlier releases |
 
-### P0. A Penny, a Useful Answer
+### P0. One Cent, Many Decisions
 
-**Situation.** A developer wants to try a treasury balance or token-activity check without signing a monthly data contract. The result is a scoped fact, not an investment recommendation.
+**Situation.** A developer needs to locate unusual token activity within prepared historical coverage. The agent checks narrow windows, follows promising activity, and stops when it has enough evidence or reaches its allowance. Cheap selective follow-ups make this interaction practical.
 
-**45–60 second sequence.** Open a known, already materialized example. Show the question and available evaluation allowance. Inspect the current quote, pay, and show the answer, exact block scope, cost, and a source drawer. Repeat with a different covered window. Try an over-budget request and show the client stopping before signing.
+**60–90 second sequence.** Open with “Give this agent one cent to investigate.” Show the sponsor's prepared coverage and its separate cost. Set an explicit transfer-count threshold; inspect short windows and choose follow-ups from the returned counts. A timeline reveals the checked windows and the reason for each next step. Keep the question, result, exact scope, charge, and remaining allowance together. End with the useful finding and total, then show an over-budget request stopped before signing.
 
-**Useful output.** A compact JSON result plus a small chart with “as of finalized block …”; a readable script that repeats the same purchase.
+**Economic reveal.** At current rates, fifty separate 100-block cached reads cost $0.006. This is a budget illustration to validate in rehearsal, not a requirement to make fifty calls. Film a genuinely useful sequence and display its actual count and receipts. Alongside it, an explicitly labeled pricing model shows the same number of paid requests at one-cent and five-cent floors. It is not a measured competitor workflow.
 
-**Build.** Payment helper, budget enforcement, quote/receipt display, exact decimal formatting, and one chart. No new backend function is required. Verify the deployed balance function exposes an exact raw amount before using it for reconciliation; otherwise use integer transfer volume for this first example.
+**Useful output.** A timeline of activity checks, the selected windows with source references, and a runnable consumer that chooses its next request from the previous result. Report “no threshold crossing found in checked windows” when appropriate; do not imply complete coverage of unqueried history or infer treasury flows from token-wide volume.
 
-**Honest reveal.** The allowance and the charge are distinct. “A penny” is an evaluation budget for small cached reads, not the cost of arbitrary cold indexing. Prepared coverage names its sponsor and preparation cost.
+**Build.** Existing transfer volume, a small deterministic selection policy, payment helper, budget enforcement, exact decimal charge display, and one chart. No new backend function or runtime function creation is required. An LLM may explain the evidence; the narrow selection example remains runnable without one. Publish optional LLM and reference-RPC costs separately from Testril read charges.
 
-**Pass / next step.** A new developer completes one result without assistance; an oversized quote sends no signature. CTA: “Run this with your token.”
+**Honest reveal.** “One cent” is the cached-read allowance. Funding, cold preparation, and retention are separate. Never pad the sequence with redundant reads to manufacture a cost ratio. When the entire required scope is known, compare a bulk read too; selective purchasing earns its place when later scope depends on earlier results or early stopping saves work.
+
+**Pass / next step.** A new developer reproduces a useful multi-step result unaided, every decision has a receipt, and an oversized quote sends no signature. CTA: “What could your agent check if each step cost a fraction of a cent?”
 
 ### P1. Follow the Money — the first flagship
 
@@ -231,7 +239,7 @@ No portfolio item silently assumes price feeds, native-asset traces, Solana, ide
 
 ## 6. Turn the wallet into useful capability
 
-The positive story is **a programmable purchasing identity with a visible allowance**: the same buyer can authorize scoped work, inspect receipts, and receive eligible materialization earnings. Its usefulness must outweigh its setup cost.
+The positive story is **a programmable purchasing identity with a visible allowance**: the same buyer can authorize scoped work, inspect receipts, and receive eligible materialization earnings. The visible payoff is an agent making many small, independently authorized purchases from one allowance, then receiving eligible earnings when it supplies useful data. Show that value before asking the visitor to set up a wallet.
 
 Offer three entrances to the same demo:
 
@@ -260,6 +268,8 @@ These are a small client's behavioral requirements, not an invitation to build a
 ## 7. Recommendation on the SaaS layer
 
 **Build it as a distribution layer over the same paid product.** Conventional buyers get familiar procurement and REST integration; wallet-native buyers retain direct programmable access. Choosing a card should not change a metric's semantics or destroy its provenance.
+
+Preserve the direction of the stack: **tiny protocol purchases first; conventional commercial packaging above them**. Keep sub-cent precision in the tenant usage ledger and aggregate at invoice time. Do not introduce a one-cent minimum per underlying read. A disclosed service fee or subscription can cover gateway costs without rounding every tiny operation upward.
 
 The primary benefit is broader adoption. x402-only access otherwise selects for developers willing to manage a wallet before evaluating the answer. Card/API access can ship entirely in the pre-2 phase.
 
@@ -312,6 +322,19 @@ These formulas describe one bound function and omit any additional authoring lin
 
 Consequently, “investigate for a few cents” can be true for a small or prepared scope and false for a cold broad one. State the exact scope and preparation sponsor. Do not disguise a smaller Arbitrum block interval as a full day. Existing `blocks_per_day` is an estimate, not a timestamp conversion; use actual verified boundaries for dated stories.
 
+### Show the economic granularity
+
+| Illustrative request sequence | Testril cached-read charges | At $0.01 per request | At $0.05 per request |
+| --- | ---: | ---: | ---: |
+| One 100-block read | $0.00012 | $0.01 | $0.05 |
+| Fifty separate 100-block reads | $0.006 | $0.50 | $2.50 |
+
+The last two columns model call-price floors; they are not measured equivalent competitor queries. Named comparisons need matching scope, output, freshness, batching, pagination, and setup. x402 itself does not impose those floors, and competing providers can change their offers. Our claim rests on the useful paid units Testril actually delivers.
+
+For fifty distinct 100-block windows of one bound function, preparing all 5,000 blocks from cold costs $0.60 at these rates, before retention and external costs. Disclose that sponsor investment. A single read of all 5,000 contiguous prepared blocks costs $0.00502, less than fifty small reads. Use selective calls when each answer determines what to buy next; measure unused scope and early stops as well as request count.
+
+Render charges with sufficient precision: $0.00012 must never appear as “$0.00” or “free.” Keep per-read prices distinct from the recommended escrow top-up and the separate $0.01 reward-claim threshold. Low read prices do not imply equally small onchain deposits or payouts.
+
 For a 1,000-block range with one eligible materializer, the current source's 50% share of the variable read fee yields $0.0005 per full-range paid read. That offsets a $0.12 initial materialization after **240** such reads, before any other costs and only while eligible. Revenue is not profit. The base read fee contributes no reward, partial coverage changes allocation, and an unstated latest-block read has no variable-line reward. These are illustrative mechanics, not promised returns or measured demand.
 
 Use 100–1,000 block scopes for development. For the earning story, retain a known fixture long enough to rehearse by explicitly purchasing extra cache-days. A cold range must actually have holes: inspecting coverage before the show prevents promising a new supplier right on already-funded data.
@@ -335,7 +358,7 @@ Use Testril's existing visual identity: olive, cream, muted gold, and approved b
 
 Each flagship produces a 15–30 second result clip, 60–90 second story, three-minute walkthrough, runnable public example, and a result/evidence artifact. The developer version includes the full purchase flow and failure behavior. The short film may cut waiting time, labeled with actual elapsed time.
 
-Release P1 with a concrete case and a “bring your question” invitation; follow with P3's engineering walkthrough and P2's reuse reveal. Put short result clips where target builders already discuss agent integrations, the reproducible walkthrough beside the repository, and the case file in direct customer sessions. Use the same result and measured costs across all versions. The conversion offer is one bounded working session ending in an agreed metric, price, and evidence artifact, followed by an integration pilot. Distribution and customer outreach are proposed marketing work; this planning task sends no messages or campaigns.
+Release P0 with the measured sub-cent purchase sequence and readable script. Introduce P1 through a concrete case and a “bring your question” invitation, then release P3's engineering walkthrough and P2's reuse reveal. Put short result clips where target builders already discuss agent integrations, the reproducible walkthrough beside the repository, and the case file in direct customer sessions. Use the same result and measured costs across all versions. The conversion offer is one bounded working session ending in an agreed metric, price, and evidence artifact, followed by an integration pilot. Distribution and customer outreach are proposed marketing work; this planning task sends no messages or campaigns.
 
 ### Fixture and rehearsal contract
 
@@ -363,7 +386,7 @@ These are planning ranges in **active builder-days**, excluding backend platform
 
 | Phase | Work / owner role | Planning range | Exit evidence |
 | --- | --- | --- | --- |
-| 0 | Baseline, real fixture, reference calculation, wallet purchase harness / demo engineer + backend owner | 2–4 days | Known paid path and mode; matched reference; cold/warm costs; P0 runnable |
+| 0 | Baseline, real fixture, reference calculation, wallet purchase harness / demo engineer + backend owner | 2–4 days | Known paid path and mode; matched reference; cold/warm costs; P0 selective sequence and sub-cent receipts |
 | 1 | F01 + exact balance support / backend engineer | 1–3 days if current engine supports the shape | Function brief acceptance; additional engine work separately estimated |
 | 1 | P1 case file and P3 evidence / demo engineer | 4–7 days | Reconciled case, export, verifier, readable integration |
 | 2 | P2 reuse and earnings / demo engineer + backend owner | 2–4 days | Independent buyer, correct attribution, honest accrual/payout mode |
@@ -380,7 +403,7 @@ The native-function work already has an ordered engine/subgraph/library roadmap 
 
 Recruit five developers from agent/app teams and three protocol/data operators. Ask each to bring one actual task. Observe setup, what they trust, which result they can use, and whether they return with a second question. Praise is weaker evidence than a repeat task or integration.
 
-Track the funnel: viewed result → opened evidence → ran example → first successful paid result → changed scope → returned within seven days → requested integration. Track wallet abandonment separately from product-value rejection. Record actual payer/sponsor, total spend, support time, successful payments, and repeat reads from independent users.
+Track the funnel: viewed result → opened evidence → ran example → first successful paid result → changed scope → returned within seven days → requested integration. Ask what they would build with cheaper fine-grained checks; test whether they can name a changed workflow, not just repeat the price. Track wallet abandonment separately from product-value rejection. Record actual payer/sponsor, total spend, support time, successful payments, and repeat reads from independent users.
 
 Proposed early continuation gate: at least three of five developers complete the first run without live assistance; at least two return with a second real task; at least one asks to integrate or pilot. Small samples guide iteration, not market-size claims. If users admire the animation but cannot name a use, change the case. If value is clear but wallet setup kills adoption, prioritize P5. If the first question repeatedly exceeds the catalog, prioritize the relevant fixed functions and the authoring product.
 

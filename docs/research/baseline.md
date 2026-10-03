@@ -64,8 +64,12 @@ These are primary vendor materials checked on 3 October, not independently measu
 | --- | --- | --- |
 | [Dune MCP, 3 March 2026](https://dune.com/blog/dune-mcp) | Dune exposes its warehouse to agents through MCP | MCP alone is not a differentiator |
 | [Dune MPP, 18 March 2026](https://dune.com/blog/dune-stripe-and-tempo-frictionless-onchain-data-access-for-ai-agents) | Stablecoin-funded, per-query agent access | Avoid saying competitors always require subscriptions |
-| [Allium AgentHub](https://agent.allium.so/) | Hosted MCP and CLI/Skills access including x402/Tempo payments | Compete on the useful workflow and economics, not payment availability alone |
-| [Nansen x402, 16 April 2026](https://nansen.ai/post/how-nansen-enabled-pay-per-call-onchain-data-access-with-x402-and-payai) | Wallet/market analytics sold through x402; advertised $0.01 and $0.05 tiers | A lower unit read price is not a like-for-like task comparison |
+| [Allium pricing](https://docs.allium.so/ai/machine-payments/endpoints-pricing) | SQL submission $0.01; price endpoints $0.02; wallet endpoints $0.03; SQL results priced separately | Published paid units support the sub-cent positioning; SQL submission is not the complete query cost |
+| [Nansen x402, 16 April 2026](https://nansen.ai/post/how-nansen-enabled-pay-per-call-onchain-data-access-with-x402-and-payai) | Wallet/market analytics sold through x402; advertised $0.01 and $0.05 tiers | Sub-cent useful purchases are a distinct proposition; verify matched workflows for whole-task savings claims |
+
+The product owner's positioning is that Testril builds around tiny transactions and adds conventional access above them, while rivals add machine payments to existing APIs. The plan adopts this direction. The published rates above support the pricing distinction without establishing every vendor's architecture or a universal minimum. [Dune's MPP documentation](https://docs.dune.com/docs/agents/mpp) describes escrow and vouchers but does not specify a minimum query price; x402 and MPP support alone do not establish economic granularity.
+
+Testril's fifty-read illustration uses its observed rate formula: 50 × ($0.00002 + 100 × $0.000001) = $0.006. The $0.50/$2.50 alternatives model fifty requests at one-cent/five-cent floors. They are not executed competitor benchmarks. Cold preparation of 5,000 distinct blocks of one function adds $0.60. A single contiguous 5,000-block cached read costs $0.00502; selective calls must justify their usefulness through conditional scope or early stopping.
 
 None of these pages establishes absence of rival lineage or reuse mechanisms. Claims of exclusivity, superior accuracy, or whole-task cost advantage need direct comparative evidence.
 

@@ -35,6 +35,8 @@ The local balance JSON includes exact `balance_raw` alongside an approximate hum
 
 For balance change across `[a,b)`, compare `balanceOf` at blocks `a−1` and `b−1`, not `a` and `b`. A point snapshot is its own one-block materialization/read. Never fetch every intervening balance just to compute two endpoints.
 
+P0 needs no new function: choose each narrow transfer-volume window using the preceding result and a stated stopping rule. Verify coverage for every charged window; distinguish an empty covered window from missing data. Preserve exact sub-cent receipts and compare a bulk read when all required scope is known.
+
 ## F01. `erc20_transfer_edges` — first backend request
 
 **Customer question:** Which counterparties explain this treasury's token movement?
