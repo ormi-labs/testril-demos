@@ -35,7 +35,7 @@ def footer(canvas, document):
     canvas.line(44, 37, width - 44, 37)
     canvas.setFillColor(OLIVE)
     canvas.setFont("Helvetica", 8)
-    canvas.drawString(44, 24, "TESTRIL  /  DEMO STRATEGY  /  3 OCTOBER 2026")
+    canvas.drawString(44, 24, "TESTRIL  /  DEMO PLAN  /  3 OCTOBER 2026")
     canvas.drawRightString(width - 44, 24, str(document.page))
     canvas.restoreState()
 
@@ -73,7 +73,7 @@ def main():
     document = SimpleDocTemplate(
         str(ROOT / "demo-summary.pdf"), pagesize=A4,
         leftMargin=44, rightMargin=44, topMargin=38, bottomMargin=48,
-        title="Testril demos: the decision brief", author="Ormilabs",
+        title="Testril demo plan", author="Ormilabs",
     )
     document.build(story, onFirstPage=footer, onLaterPages=footer)
 

@@ -6,7 +6,7 @@ MCP server: `https://dev.testril.ai/mcp`
 
 ## Demo plan
 
-Start with the [two-page brief](docs/demo-summary.pdf) ([Markdown](docs/demo-summary.md)). The [full strategy](docs/demo-strategy.md) covers the demo series, delivery order, payments, and SaaS proposal; [function briefs](docs/function-briefs.md) specify the backend work.
+Start with the [two-page brief](docs/demo-summary.pdf) ([Markdown](docs/demo-summary.md)). The [detailed plan](docs/demo-strategy.md) describes what to build, in what order, and how to verify it. [Function requirements](docs/function-briefs.md) specify the backend work.
 
 To refresh the PDF, install `reportlab` in a Python environment and run `python docs/render_summary.py`.
 

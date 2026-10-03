@@ -1,418 +1,372 @@
-# Testril demo strategy
+# Testril demo plan: implementation details
 
-**Working proposal · 3 October 2026**
+**Proposal · 3 October 2026**
 
-Read the [two-page brief](demo-summary.md) first. [Function briefs](function-briefs.md) specify the backend requests; the [research baseline](research/baseline.md) separates observed behavior, repository implementation, and future capability. Prices and competitive observations are dated, not enduring promises.
+Start with the [two-page summary](demo-summary.md). The [function requirements](function-briefs.md) specify backend changes. The [research notes](research/baseline.md) record deployment observations, code references, and competitor pricing. Recheck prices and deployment behavior before building or recording a demo.
 
-## 1. The recommendation
+## 1. Purpose and audience
 
-Lead with **useful work in fractions of a cent**. Testril is being built around small purchases, paid materialization, and reuse; conventional API access and billing can sit above that foundation. This direction matters: tiny payments are part of the product economics, not merely another checkout option.
+Build examples that engineers can run, understand, and adapt to their applications. Each demo must produce a useful result, show its cost, and provide enough information to check it.
 
-Make Testril memorable through a useful result and a surprising economic consequence:
+The first users should be agent and application developers working with protocol treasury or operations teams. Start with a short token-activity check, then a treasury investigation. Reuse the investigation's data to demonstrate materialization earnings and result verification. Add demos that generate new functions once generation is implemented.
 
-> **Buy the answer. Inspect the evidence. Earn when the data gets reused.**
+Four capabilities determine the work:
 
-When function creation ships, add:
+| Capability | What the demo must demonstrate |
+| --- | --- |
+| Very small payments | Useful reads costing less than one cent, with quotes, receipts, and enforced spending limits |
+| Functions created on request | A missing computation is generated, tested, registered, executed, and reused by another client |
+| Earnings from materialization | A separate customer's paid read increases the eligible materialization holder's earnings |
+| Provenance | A result identifies its sources and calculation; an independent check can reproduce it |
 
-> **And when the metric doesn't exist, create it.**
+**Materialization** means preparing and storing computed data for later reads. **Binding** supplies a function's parameters, such as chain and token address. **Provenance** records the sources used to produce a result. These operations do not by themselves establish that the result is correct; the verification demo also checks the calculation.
 
-Build a connected series around three experiences: an investigation, a second customer paying to reuse its data, and eventually a customer creating the missing metric. Those experiences generate product walkthroughs, engineering examples, and short marketing films. We do not need nine unrelated applications to tell nine stories.
+| User | Task | Required output |
+| --- | --- | --- |
+| Application developer | Add an onchain data check to a product | Small runnable client, predictable spending, usable response |
+| Treasury or operations team | Explain a token balance change | Incoming and outgoing amounts, counterparties, reconciliation |
+| Data engineer or analyst | Answer a question requiring new computation | Reusable function, precise definition, reproducible result |
+| Data supplier or sponsor | Fund useful data for other readers | Preparation cost, paid reuse, earnings, payout records |
 
-Open the series with **One Cent, Many Decisions**, a short demonstration of selective paid checks inside a one-cent read allowance. The first workflow flagship is **Follow the Money**: a developer gives an agent a treasury address, token, block window, and spending limit; receives an explanation of an outflow; opens the evidence; and exports a result they can put in a product. The next episode shows someone else buying the same materialized data and the original payer's earned balance increasing.
+Replacing Dune, Allium, and Nansen remains the long-term objective. These demos cover a few tasks. Broader replacement requires more data and functions, reliable service, and established definitions. Wallet intelligence also requires credible entity labels and attribution; the initial demos use addresses and labels supplied by the customer.
 
-This makes the engineer the protagonist: “I delivered the answer, I can defend it, I can ship it, and the data I funded can earn from reuse.”
+## 2. Small payments and competitor pricing
 
-### Audience and first commercial foothold
+Make payments below one cent visible in the first demo. An agent that chooses its next request from the previous result may need many small reads. Charging one or five cents for each request can make those checks expensive even when each returns little data.
 
-The working priority is **agent and application developers**, with protocol treasury and operations teams supplying the first concrete problem. Broader data teams are a subsequent audience. This is a proposed priority, not customer research already completed.
+Testril is being built around small paid operations, materialization, and reuse. A conventional API and card billing can sit above those operations. Competing products have added machine payments to existing APIs. The relevant comparison is the smallest useful purchase they sell, not whether they support a payment protocol.
 
-| Audience | Job to finish | Reason to try Testril | Demo evidence |
+Published prices checked on 3 October:
+
+| Provider | Published offering | Price |
+| --- | --- | --- |
+| [Nansen](https://nansen.ai/post/how-nansen-enabled-pay-per-call-onchain-data-access-with-x402-and-payai) | Basic / premium calls | $0.01 / $0.05 |
+| [Allium](https://docs.allium.so/ai/machine-payments/endpoints-pricing) | SQL submission / price endpoints / wallet endpoints | $0.01 / $0.02 / $0.03; SQL results priced separately |
+| [Dune](https://docs.dune.com/docs/agents/mpp) | Per-request access through MPP | Minimum query price not established by the reviewed page |
+
+At Testril's observed rates, one cached 100-block read costs **$0.00012 (0.012¢)**. Fifty cost **$0.006 (0.6¢)**. Section 8 includes preparation costs and a comparison with one-cent and five-cent request prices.
+
+These figures demonstrate a difference in purchase size. A claim about total savings requires equivalent tasks: the same data, scope, freshness, batching, pagination, and output. x402 itself does not impose a one-cent minimum. The cited sources also do not establish that competitors lack provenance or reuse features.
+
+## 3. Current implementation and prerequisites
+
+On 3 October, `dev.testril.ai/mcp` reported version **0.2.2**, payment mode **`cdp`**, and configured data chains **Ethereum, Arbitrum One, and Base Sepolia**. It listed `erc20_balance`, `erc20_transfer_volume`, and `erc721_owner`. See the [captured responses](research/2026-10-03-live-baseline.json).
+
+Only free metadata calls were made. Paid reads, materialization, payouts, and the deployment's payment network remain untested. The code describes binding, materialization, paid reads, and source-block provenance; verify the complete sequence on the deployment used for the demos.
+
+Function creation is not implemented. Adding a function ourselves, selecting one from the catalog, or changing its parameters does not demonstrate creation on request. Older JSON-authoring documentation and newer plans for static Rust functions must be checked against the deployed implementation.
+
+Several proposed functions depend on engine work: additional row types, dependent function calls, stored state, timestamps, and provenance linking outputs to individual inputs. Estimate missing engine features separately from adding a function.
+
+The inspected REST data route does not enforce the same payment checks as MCP. Use paid MCP reads for these demos and for the proposed gateway until that discrepancy is resolved.
+
+Every demonstration must identify whether it uses synthetic data, a recording, live testnet payments, or live mainnet payments. Data-chain configuration does not establish the payment network.
+
+## 4. Demo specifications
+
+**P0–P5** can be built before function creation. **G1–G3** require it. Some demos share an application: P3 adds verification to P1, and G3 combines G1 with P2.
+
+| ID | Demo | Dependencies | Order |
 | --- | --- | --- | --- |
-| Agent/application developer | Add a useful onchain investigation to a product | Bounded purchases, inspectable results, small readable integration | Forkable example, receipt, replayable calculation |
-| Protocol operations/treasury | Explain where a token balance went | Exact scope, counterparties, reconciliation, evidence | One-page case file and transaction/block drill-down |
-| Data engineer/analyst | Answer a new request without owning another pipeline | Reusable materialization; later, new server-side computations | Independent reuse and a reproducible function revision |
-| Ecosystem/data sponsor | Make important data available to others | Visible demand and a share of eligible read fees | Separate buyer and supplier accounts, earnings, payout evidence |
+| P0 | Sub-cent data reads | Existing transfer volume | First |
+| P1 | Treasury outflow analysis | F01 transfer edges; exact balance snapshots | First release |
+| P2 | Materialization earnings | P1 data or existing transfer volume; reward accounting | First release |
+| P3 | Result verification | P1; independent reference data | Part of P1 |
+| P4 | Pool activity and liquidity | F02 swaps; F03 pool state | After evidence of DeFi customer interest |
+| P5 | REST access and card billing | Existing data; payment and billing gateway | After evidence that wallet setup prevents adoption |
+| G1 | Generate a deposit classification function | F04/F05 vault data; generated G01; generation system | First generation demo |
+| G2 | Generate a repeat-deposit function | F05; generated G02; state and timestamps | After G1 |
+| G3 | Generate a function and earn from reused data | G1 and P2 | After both work |
 
-Start with one real, bounded customer workflow. Full Dune/Allium/Nansen replacement remains a direction requiring coverage, history, reliability, semantics, and distribution. Earn replacement of one workflow before claiming replacement of the platform.
+### P0. Sub-cent data reads
 
-## 2. Competitive reality and positioning
+**Task.** Locate token activity exceeding a supplied transfer-count threshold within prepared historical data. Read short block ranges, choose the next range from the previous result, and stop when the question is answered or the allowance is exhausted.
 
-**Sub-cent purchasing is a leading differentiator in its own right.** A one-cent or five-cent charge for every call changes what is economical to build: selective probes, conditional follow-ups, and frequent narrow checks accumulate cost even when each returns little data. Testril should show an agent buying only the next useful piece of evidence, with each charge visible in fractions of a cent.
+**Demonstration, 60–90 seconds.** Set a one-cent read allowance. Show who prepared the data and what preparation cost. Run the checks and display each range, result, charge, and remaining allowance. Show why each next request was chosen. End with the result and total cost, then attempt an over-budget request and show that the client refuses to sign it.
 
-The architectural positioning is **a data economy built around tiny transactions, with familiar APIs and billing above it**. The competitive contrast is adding machine payments to existing API products. That describes our product direction; it is not a claim about competitors' undocumented internal architecture. Payment protocol support alone says little about the smallest useful purchase a provider actually sells.
+**Implementation.** Use existing transfer volume, a small deterministic rule for choosing ranges, a payment helper, and a timeline. The example should run without an LLM; optional narration can be added. It needs no new backend function.
 
-Published pricing supports the distinction. Nansen advertises **$0.01 basic / $0.05 premium calls**. Allium lists **$0.01 SQL submission**, **$0.02 price endpoints**, and **$0.03 wallet endpoints**, with separately priced results. Dune documents per-request MPP access; the reviewed page does not establish its minimum query price. Cite each verified offering rather than assigning a universal floor to every vendor. [Nansen pricing](https://nansen.ai/post/how-nansen-enabled-pay-per-call-onchain-data-access-with-x402-and-payai), [Allium pricing](https://docs.allium.so/ai/machine-payments/endpoints-pricing), [Dune MPP](https://docs.dune.com/docs/agents/mpp).
+At current rates, fifty 100-block reads cost $0.006. This is a calculation to validate during testing, not a target call count. Use only requests the task needs. If the complete required range is known, compare a bulk read; small requests are useful when later scope depends on earlier answers or the client can stop early.
 
-At Testril's observed rates, a prepared 100-block read costs **$0.00012 (0.012 cents)**. Fifty such purchases total **$0.006 (0.6 cents)**. This gives the first demo a concrete economic reveal before function creation ships. Provenance and materializer earnings then show what else the same underlying product makes possible. Section 8 defines the comparison and preparation costs.
+**Output and acceptance.** Export the checked ranges, results, receipts, and source references. A new developer can reproduce the sequence unaided. Every paid read stays within the budget. Missing coverage must not appear as zero activity. A negative result applies only to checked ranges. Token-wide transfer volume cannot identify a treasury's counterparties.
 
-| USP | Customer-facing promise | What the demo must actually show |
+### P1. Treasury outflow analysis
+
+**Task.** Explain a treasury's token balance change over a finalized block range. Use one ordinary ERC-20, one chain, one range, and an optional set of team-owned addresses.
+
+**Demonstration, three minutes.**
+
+1. Enter the treasury, token, range, and spending limit. Approve separate charges for preparation and reads.
+2. Show incoming amounts, outgoing amounts, net movement, and ranked counterparties in a flow diagram.
+3. Add the supplied team addresses and separate internal transfers from external movement.
+4. Open a number to inspect its raw inputs, source blocks, and calculation. Keep any unexplained remainder visible.
+5. Export the result and runnable client. Show the total charged.
+
+**Implementation.** Add F01 `erc20_transfer_edges`. Read two exact balance snapshots. Calculate sums and classifications with ordinary client code; an LLM may select calls or describe the result but must not perform the accounting or invent wallet labels.
+
+For `[a,b)`, compare end-of-block balances at `a−1` and `b−1` with incoming minus outgoing Transfer amounts. Both snapshots need coverage. Self-transfers cancel. Rebasing, fee-on-transfer, and other nonstandard tokens need separate handling; choose an ordinary token for the first example. Keep raw amounts as integers and apply token decimals only for display.
+
+**Output and acceptance.** Export inputs, calculations, receipts, and source references. An independent calculation must reproduce the totals and exclusions. Address labels need a named source or customer input. This demo does not infer intent, compute tax P&L, or convert all token movements to historical dollar values.
+
+### P2. Materialization earnings
+
+**Task.** Show what happens when another customer pays to read data that the first customer funded. Reuse requires the same bound function and covered range.
+
+**Demonstration, two minutes.** Show the supplier's preparation purchase beside a separate reader application. The reader buys a read and exports a report or runs a useful check. Display the supplier's earnings before and after, the reader's charge, and the coverage expiry. Retrying the same paid request must not create another earning event.
+
+**Implementation.** Use separate payer and reader accounts. Reuse the claim and accounting interface from `testril-claim` where appropriate, after verifying its fields against the deployment. Use a dedicated test deployment or purchase-level records to distinguish the demo's earnings from unrelated traffic.
+
+A 1,000-block read currently allocates about $0.0005 to a sole eligible materializer. Twenty separately paid reads reach the $0.01 claim threshold, subject to eligibility and rounding. Show accrual directly, or disclose a previously accumulated balance when demonstrating a claim. A payout requires a funded rewards wallet and a verified transaction. Identify testnet payments and operator-funded traffic.
+
+**Acceptance.** Costs, eligible coverage, earnings changes, and payout receipts reconcile. Reading the prepared interval causes no new materialization. The demo establishes the earning mechanism; profitable demand still requires independent customers. Materialization rights do not confer copyright over public chain data.
+
+### P3. Result verification
+
+**Task.** Reproduce the treasury calculation from its recorded sources. Implement this as an export and verification mode in P1.
+
+**Demonstration, 90 seconds.** Open a result, inspect the source blocks and calculation, fetch the reference logs and state, and recompute it. Alter a displayed amount and show the failed comparison. Change a source hash and show the separate source check failing.
+
+**Implementation.** Export chain and contract, block range, function version or definition hash, parameters, returned values, provenance responses, client calculation version, receipts, and verification instructions. Preserve the inputs to every derived result. Hash the output and calculation manifest separately from Testril's source-block digest.
+
+The existing digest identifies a set of source blocks; it does not prove the arithmetic. A hash detects a change only relative to a trusted reference. Independent recomputation still depends on the reference RPC. The current provenance expansion limit is 10,000 contributing blocks; larger checks need supported partitioning.
+
+**Acceptance.** Unchanged inputs reproduce the answer; altered values or source hashes fail their respective checks. Report which checks passed. Do not describe this as a zero-knowledge proof or a check of unqueried chain history.
+
+### P4. Pool activity and liquidity
+
+**Task.** Compare swap activity and active liquidity for one known Uniswap v3 pool over a short historical interval.
+
+**Demonstration, two minutes.** Plot swaps and liquidity snapshots, inspect blocks where they differ, and export a rule for monitoring finalized data.
+
+**Implementation.** Add F02 `uniswap_v3_swaps` and F03 `uniswap_v3_liquidity_state`, with exact token metadata. Active liquidity is not total deposited value. Explaining liquidity-provider withdrawals requires an additional mint/burn event function; the first two functions alone cannot establish the cause of a change.
+
+**Acceptance.** Swap records match reference events; snapshots match contract calls at the recorded blocks. Display the delay caused by finality. This example analyzes historical or finalized data and does not predict exploits or observe the mempool.
+
+### P5. REST access and card billing
+
+**Task.** Let a customer use the treasury result through a normal HTTP endpoint without managing wallet code.
+
+**Demonstration, two minutes.** Select the dataset and spending cap, obtain an API key, run a short `curl` example, and inspect the result and usage record. Compare data and provenance with direct Testril access.
+
+**Implementation.** Add per-customer credentials, a server-side payer, paid MCP calls, usage records, idempotency, a spending cap, and an endpoint bound to an existing function. Label any test card checkout or synthetic gateway responses. Section 7 describes billing and earnings ownership.
+
+**Acceptance.** Both access methods return equivalent data and provenance for the same scope. Retried requests are billed once. Requests exceeding the allowance are rejected before payment.
+
+### G1. Generate a deposit classification function
+
+**Task.** A vault team wants to group deposits by the owner's USDC balance at the end of the preceding block, excluding supplied operational addresses. The catalog does not contain that computation. This classifies addresses by a defined token balance; it does not infer people's wealth or identity.
+
+**Demonstration, four minutes.**
+
+1. Show the missing function. Agree owner versus sender, balance block, group boundaries, exclusions, and output units.
+2. Approve a creation budget. Generate and register a new executable function.
+3. Test a known example, threshold equality, excluded owner, and same-block balance change. Show an unsupported request being refused.
+4. Quote preparation and reading separately, run a short interval, and inspect the result and input references.
+5. Use a second client to discover and call the same function without regenerating it.
+
+**Implementation.** F04/F05 provide vault data and reference cases. G01 is created during the demonstration. The runtime must support the required historical calls and preserve input references. If it cannot express the rule, choose a supported new computation.
+
+**Acceptance.** New code or a new executable definition persists under a versioned identity. Inputs and outputs have explicit types; execution is deterministic and resource-limited; tests pass before paid work. The result can be reproduced and reused. Existing `llm_tokens` pricing does not establish the future creation price.
+
+Disclose any supported prompt restrictions and human code review. Show actual elapsed time, including labeled cuts in a recording. An off-server script or a parameter change to an existing function does not satisfy this demo.
+
+### G2. Generate a repeat-deposit function
+
+**Task.** Determine whether a campaign's depositors return. Define a repeat deposit as one on a later UTC day within seven days, exclude supplied operational addresses, and report withdrawals through a specified cutoff. Agree whether “first deposit” means first ever or first during the campaign.
+
+**Demonstration, three minutes.** Generate the rule, show the result, change a meaningful part of its definition, generate a new version, and compare both results and their inputs. Mark owners with less than seven days of observation as incomplete rather than failed retention.
+
+**Implementation.** G02 needs stored owner state, sufficient initial history, block timestamps, deposit/withdraw inputs, and provenance for derived results. Share transfers and delegated transactions require explicit accounting rules. This version measures repeat deposits and observed cash flows, not retained capital or unique people.
+
+**Acceptance.** An independent calculation matches both versions. Observation cutoffs and exclusions are correct, and prior versions remain reproducible. This is a generation demo because it creates a previously unavailable computation during the session; prebuilding the rule would only demonstrate analysis.
+
+### G3. Generate a function and earn from reused data
+
+Combine G1 and P2 after both work. Record a five-minute demonstration: request a missing computation, generate and test it, fund preparation, read it from a second application, inspect the materialization holder's earnings, and verify the result.
+
+The earning right currently attaches to materialization. Royalties for function authors, generated-code licensing, and code ownership require separate decisions. Invite interested teams to supply an actual missing metric for a follow-up integration.
+
+## 5. Backend and client work
+
+The first backend request is **F01 transfer edges**, plus confirmation of exact balance snapshots. Existing transfer volume supports P0 and an initial P2 while F01 is built. It has no sender/recipient fields and cannot substitute for F01.
+
+| Backend work | Required by | Client work |
 | --- | --- | --- |
-| Very small payments | Make many useful decisions within a one-cent allowance | Distinct selective checks, sub-cent quotes and receipts, accumulated cost, enforced budget; separately disclose preparation |
-| Functions created on request | Extend the data product when your question needs new computation | Catalog miss → new validated executable function → persistent identity → result → independent reuse |
-| Earnings from materialization | Useful data can offset its preparation cost through other buyers | Separate payer/reader, actual eligible paid read, observed earnings delta, eventual payout |
-| Provenance | Defend the number with its sources and calculation | Scope, source block references, function identity, transformation, independently checked example |
+| Verify existing balance and transfer volume | P0, P2 | Payment handling, range selection, formatting |
+| F01 transfer edges | P1, P3 | Wallet filtering, sums, rankings, diagram, verification and export |
+| F02 swaps and F03 liquidity state | P4 | Compare one pool's activity and state |
+| F04 vault state and F05 deposit/withdraw events | G1, G2 | Definition inputs and report |
+| Function generation and G01 | G1 | Confirm definition, display tests and results |
+| Stateful generation, timestamps, and G02 | G2 | Compare versions and observation periods |
 
-Avoid “we have chat,” “no SQL,” “another dashboard,” or “we accept USDC” as the central reveal. Avoid claims that competitors cannot audit data. Compare complete tasks with matched scope, including cold preparation, client processing, and onboarding costs.
+Publish client calculations and identify them as client work. Large datasets may require stored aggregate functions. None of these demos assumes external price feeds, native-asset traces, Solana support, identity labels, arbitrary cross-chain joins, or historical P&L. Those require additional sources and functions.
 
-### How the series advances the replacement ambition
+The [function requirements](function-briefs.md) specify schemas, source calls, test cases, and engine dependencies. Use the core repository's review process; estimate missing engine features separately and agree priorities with their owners.
 
-| Workflow we want to win | First demonstrable foothold | What a broader replacement still needs |
+## 6. Wallet setup and payment handling
+
+The wallet lets an application authorize many small purchases within a budget and receive eligible earnings. Demonstrate those operations before requiring visitors to configure a wallet.
+
+| Option | User experience | Payer and ownership |
 | --- | --- | --- |
-| Dune-style analysis and reporting | A reproducible treasury case, then a newly defined metric | Broad useful catalog, long histories, shared definitions, recurring reports, dependable aggregate serving |
-| Allium-style application data delivery | A conventional endpoint serving the same answer and evidence | Stable schemas, service reliability, throughput, billing/support, wider normalized coverage |
-| Nansen-style wallet and protocol intelligence | Address-level flows and explicitly defined behavioral cohorts | Credible entity labels and attribution, price/cost-basis inputs where needed, stronger market coverage and validation |
+| Recording | See the result immediately | No live payments implied |
+| Sponsor-funded trial | Run a fixed example within an allowance | Sponsor pays and holds resulting materialization rights |
+| User-funded wallet | Choose the payment network and approve a budget | User pays and holds eligible rights; deposits need separate approval |
 
-This is a progression of customer jobs to win. The demos do not establish parity with those platforms' entire catalogs or proprietary datasets.
+A sponsored visitor does not automatically receive the sponsor's materialization rights. Offer wallet setup when the visitor chooses to fund work or receive earnings.
 
-## 3. What can be promised now
+### Client requirements
 
-On 3 October, `dev.testril.ai/mcp` reported version **0.2.2**, payment mode **`cdp`**, three functions, and configured data chains **Ethereum, Arbitrum One, and Base Sepolia**. Its function catalog contained `erc20_balance`, `erc20_transfer_volume`, and `erc721_owner`. Free metadata calls succeeded; we did not purchase data, test payout, or establish the deployment's payment network. See the [captured observations](research/2026-10-03-live-baseline.json).
+- Enforce per-operation, session, and total spending limits outside the LLM. Reserve funds for concurrent requests before signing.
+- Keep keys in a wallet or signer process. Do not ask public users to paste private keys. Reuse narrow, tested signing code from the existing demo site where useful.
+- Use the network, asset, and receiver from the server's quote. Data chain and payment chain are separate.
+- Support the advertised batch-settlement scheme: escrow plus cumulative off-chain vouchers. A generic x402 `exact` implementation is insufficient. See the [scheme specification](https://github.com/x402-foundation/x402/blob/main/specs/schemes/batch-settlement/scheme_batch_settlement_evm.md).
+- Serialize voucher updates per channel and resolve uncertain payment outcomes before retrying. A request's authorized charge must not become the entire deposit.
+- Display deposits, charges, unused escrow, and payouts separately. A voucher is not a new onchain transfer for each read.
+- Implement `payment_required → pay_quote → verb(payment_id)`. MCP tool responses do not necessarily follow an HTTP middleware retry pattern.
+- Refresh expired quotes and recheck budgets. Current quotes expire after 120 seconds.
+- Explain withdrawal initiation, delay, and finalization. There is no current MCP withdrawal tool; do not promise instant withdrawal or use of this escrow with unrelated providers.
 
-The product baseline is explicit binding, materialization, paid reads, metadata inspection, and source-block provenance. Working demos and acceptance tests still need to establish the complete purchase-to-delivery path on the chosen deployment.
+Keep the first client small. Extract shared code only when another demo needs the same behavior.
 
-Three independent readiness axes matter:
+## 7. Card billing and REST gateway
 
-1. **Function availability:** existing catalog; new functions implemented by us; customer-requested function generation. Only the last is USP 2.
-2. **Access:** direct wallet, sponsored evaluation, or proposed card/API gateway. The gateway does not require USP 2.
-3. **Execution evidence:** synthetic fixture, recorded real run, live testnet settlement, or live mainnet settlement. Name the mode on screen.
-
-Some repository prose still describes earlier JSON authoring, while the current function roadmap moves toward static Rust functions and defers runtime generation. Follow the user's stated product boundary: **USP 2 is not shipping**. A language model choosing or binding a prewritten function is a pre-2 experience.
-
-The planned native-function engine, function dependencies, richer entity storage, timestamp windows, and per-cell input lineage are separate dependencies. A new function may be quick once its inputs and output shape are supported; an engine feature is not a quick function addition. The [function briefs](function-briefs.md) identify that distinction.
-
-Current source also shows an ungated REST data path despite broader parity language elsewhere. All commercial demo reads must go through the paid MCP path until REST behavior is verified and reconciled. This is a concrete product prerequisite for the gateway, not a reason to defer the first MCP demo.
-
-## 4. The portfolio
-
-**P = before function creation. G = after function creation.** Effort is relative and conditional on the dependency gates below. A marketing episode may reuse an application already built.
-
-| ID | Demo / hook | Primary audience | Leading USPs | Required functions | Priority |
-| --- | --- | --- | --- | --- | --- |
-| P0 | **One Cent, Many Decisions** — an agent makes useful selective checks within a penny | Agent/app developers | Sub-cent purchases, provenance | Existing transfer volume; exact balance optional | Opening marketing episode and first runnable release |
-| P1 | **Follow the Money** — explain the treasury outflow before the meeting | Builders, protocol operations | Useful answer, provenance, bounded spend | F01 transfer edges; existing exact balance if available | First flagship |
-| P2 | **The Second Customer Pays You** — another app buys your prepared data | Builders, data sponsors | Materialization earnings, payments | Reuse P1 or existing transfer volume | Second flagship episode |
-| P3 | **Show Me the Evidence** — challenge a chart and reproduce the number | Engineers, data teams | Provenance | Reuse P1 | Film/export mode inside P1 |
-| P4 | **Did Liquidity Leave?** — distinguish trading activity from liquidity withdrawal | DeFi builders, protocol teams | Useful custom data, provenance | F02 swaps and F03 pool liquidity state | Optional vertical after first feedback |
-| P5 | **Ship the Endpoint** — turn the case file into a normal product API | Application teams | Easy integration; payment flexibility | Reuse P1 plus gateway | Pilot after repeat demand |
-| G1 | **The Metric That Didn't Exist** — a customer invents a vault metric in the room | Developers, analysts | Creation, provenance, payment | F04/F05 vault foundations; generated G01 | First post-2 flagship |
-| G2 | **Did the Campaign Stick?** — change a retention definition and get a defensible cohort | Growth/data teams | Creation, provenance | F01/F05 plus generated G02; stateful engine | Second post-2 episode |
-| G3 | **Ask → Build → Earn** — a new metric becomes a reusable paid data product | Platform buyers, investors | All four | Compose G1 and P2 | Capstone; earn it through earlier releases |
-
-### P0. One Cent, Many Decisions
-
-**Situation.** A developer needs to locate unusual token activity within prepared historical coverage. The agent checks narrow windows, follows promising activity, and stops when it has enough evidence or reaches its allowance. Cheap selective follow-ups make this interaction practical.
-
-**60–90 second sequence.** Open with “Give this agent one cent to investigate.” Show the sponsor's prepared coverage and its separate cost. Set an explicit transfer-count threshold; inspect short windows and choose follow-ups from the returned counts. A timeline reveals the checked windows and the reason for each next step. Keep the question, result, exact scope, charge, and remaining allowance together. End with the useful finding and total, then show an over-budget request stopped before signing.
-
-**Economic reveal.** At current rates, fifty separate 100-block cached reads cost $0.006. This is a budget illustration to validate in rehearsal, not a requirement to make fifty calls. Film a genuinely useful sequence and display its actual count and receipts. Alongside it, an explicitly labeled pricing model shows the same number of paid requests at one-cent and five-cent floors. It is not a measured competitor workflow.
-
-**Useful output.** A timeline of activity checks, the selected windows with source references, and a runnable consumer that chooses its next request from the previous result. Report “no threshold crossing found in checked windows” when appropriate; do not imply complete coverage of unqueried history or infer treasury flows from token-wide volume.
-
-**Build.** Existing transfer volume, a small deterministic selection policy, payment helper, budget enforcement, exact decimal charge display, and one chart. No new backend function or runtime function creation is required. An LLM may explain the evidence; the narrow selection example remains runnable without one. Publish optional LLM and reference-RPC costs separately from Testril read charges.
-
-**Honest reveal.** “One cent” is the cached-read allowance. Funding, cold preparation, and retention are separate. Never pad the sequence with redundant reads to manufacture a cost ratio. When the entire required scope is known, compare a bulk read too; selective purchasing earns its place when later scope depends on earlier results or early stopping saves work.
-
-**Pass / next step.** A new developer reproduces a useful multi-step result unaided, every decision has a receipt, and an oversized quote sends no signature. CTA: “What could your agent check if each step cost a fraction of a cent?”
-
-### P1. Follow the Money — the first flagship
-
-**Situation.** A protocol team sees a token balance fall and needs an answer before a meeting. Its developer supplies a treasury wallet, one standard ERC-20, a finalized historical window, and optional team-owned addresses.
-
-**The first screen.** “Where did this treasury's USDC go?” A visible budget sits beside Run. Use a real case chosen for an understandable pattern, not a promise that an anomaly exists. No finding is scripted before inspecting the data.
-
-**Three-minute storyboard.**
-
-1. **0:00–0:20 — the question.** Choose the case, state its exact scope, and approve the quote. Cached and new work have separate lines.
-2. **0:20–1:00 — the answer.** A flow diagram and ranked counterparties explain gross outflow, inflow, and net movement. A balance change ties the story to something the team recognizes.
-3. **1:00–1:40 — the useful twist.** Toggle the supplied operational-wallet set. Separate internal transfers from external outflow. Addresses remain addresses unless a documented source or the customer supplied their labels.
-4. **1:40–2:15 — the challenge.** Click a number. Show exact integer inputs, window, function identity, source blocks, and the calculation. An unexplained remainder stays visible.
-5. **2:15–3:00 — the developer wins.** Export the case file and the small consumer example. Change an address or threshold using the same fixed function. End with the total actually charged.
-
-**Build.** F01 `erc20_transfer_edges`; two point-in-time balance reads for reconciliation; a small deterministic client reducer; flow diagram; evidence/export drawer. The LLM may select calls and narrate verified calculations, but it does not add numbers or assign wallet identities.
-
-**Reconciliation rule.** For `[a,b)`, compare end-of-block balances at `a−1` and `b−1` against incoming minus outgoing Transfer amounts. Both point snapshots must be materialized. Self-transfers cancel. This exact equality is valid for the selected ordinary token; rebasing, fee-on-transfer, and nonstandard balance mechanics require explicit handling or a different fixture.
-
-**Scope discipline.** One chain, one token, one window, one user-supplied wallet group. No “all stablecoins,” guessed exchange labels, wallet identity intelligence, tax P&L, or claim that movement proves intent. Raw amounts stay integers; token decimals are metadata; a USDC-denominated chart is not a historical USD valuation engine.
-
-**Pass / CTA.** Independent reproduction matches the chosen result and explains every excluded category. At least one target developer can use the case file in an existing workflow. CTA: “Bring one treasury question; we'll run it together.”
-
-### P2. The Second Customer Pays You
-
-**Situation.** The first team funded data preparation. A separate reader needs the same function, parameters, and range. Mere similarity of business questions is insufficient for reuse.
-
-**Two-minute sequence.** Split the screen between the supplier's purchase and a reader's application. Show what the supplier paid and the covered range. The reader pays for a stated read. The supplier's actual earned/unclaimed amount increments; coverage and its earning expiry remain inspectable. Show that replaying that same paid request does not create another earning event.
-
-**Use a real work product.** The second reader exports a reporting card or runs a budgeted monitor over the same materialized data. A refresh button that only exists to pump revenue is a weaker story.
-
-**Claim moment.** A 1,000-block read currently allocates approximately $0.0005 to a sole eligible supplier. Twenty separately paid such reads reach $0.01, subject to rounding and eligibility. Either show honest sub-cent accrual, or use a clearly labeled prior-demo balance and let the live read cross the claim floor. A payout clip requires a funded rewards wallet and an observed successful transaction. Never imply a testnet payment is real revenue.
-
-**Existing assets.** Reuse or deep-link the wallet/accounting experience in `testril-claim`; adapt its integration and precision handling where useful. Verify the deployed purchase-level fields instead of assuming its README or another branch matches the server.
-
-**Pass / CTA.** Distinct reader and supplier accounts, documented funding origin, exact before/after accounting, no new materialization for the reused interval, and a receipt for any claimed payout. Operator-funded demo traffic is labeled as demonstration activity. CTA: “Which dataset would your users pay to reuse?”
-
-Use a dedicated rehearsal deployment or attributable purchase-level accounting so unrelated concurrent traffic cannot be mistaken for the reader's earnings delta. The original payer supplies availability, not copyright ownership of public chain facts.
-
-### P3. Show Me the Evidence
-
-**Situation.** A colleague challenges the flow chart. The engineer opens a compact evidence bundle rather than defending an AI paragraph.
-
-**90-second sequence.** Open a result → inspect block references and computation → rerun a small independent reference calculation → deliberately change the local display amount → rerun verification and observe the mismatch.
-
-**Verification layers.** The existing provenance digest binds an enumerated source-block set; it does not independently prove a numeric result correct. A result hash can detect changes relative to a trusted receipt, but a self-authored hash is not attestation. The stronger demonstration re-fetches the relevant chain logs/state at pinned blocks and recomputes the same result. State which checks passed: block consistency, source consistency, arithmetic reproduction. Reference RPC trust remains part of the result.
-
-**Deliverable.** An evidence bundle containing chain/contract, `[from_block,to_block)`, function version or inspected definition hash, parameters, returned values, provenance responses, client calculation version, receipt, and verification instructions. Hash values and the calculation manifest separately from Testril's source-block digest. For a derived answer, preserve all contributing source bundles.
-
-**Pass / CTA.** Untouched data reproduces; a changed number fails arithmetic comparison; a changed source hash fails the source check. This is an audit trail with reproducibility, not a zero-knowledge proof or a completeness guarantee about all onchain activity. CTA: “Verify this result yourself.”
-
-### P4. Did Liquidity Leave?
-
-**Situation.** A DeFi product needs to explain activity in one known Uniswap v3 pool. A volume spike alone cannot establish whether active liquidity fell.
-
-**Two-minute sequence.** Select the historical pool incident → compare swap activity with active-liquidity snapshots → drill into the blocks where the series diverge → export a finalized-data alert rule.
-
-**Build.** F02 `uniswap_v3_swaps` and F03 `uniswap_v3_liquidity_state`; exact token metadata; a deterministic comparison view. Prefer a single pool and a short interval. Active liquidity is not total TVL; swaps alone do not identify LP withdrawal or economic causality. If explaining mint/burn causality is required, request a separate position-event function before making that claim.
-
-**Pass / CTA.** Swaps agree with reference events; snapshots agree with pinned contract calls; the display states finality lag. This is historical diagnosis or finalized-data monitoring, not a mempool signal, execution bot, or promise to warn before an exploit. CTA: “Put this pool check in your product.”
-
-### P5. Ship the Endpoint
-
-**Situation.** A builder likes the answer but needs a normal authenticated HTTP endpoint, predictable spend, and no wallet code in their application.
-
-**Two-minute sequence.** Select the P1 dataset → enable a capped usage allowance → obtain an API credential → paste a small `curl` example into a familiar app → compare the JSON and provenance with the direct-wallet result → inspect usage and remaining allowance.
-
-**Build.** A bounded gateway pilot: tenant credential, server-held payer, upstream MCP purchase loop, usage ledger, idempotency, spending cap, and a read endpoint pinned to an existing bound function. Card checkout may initially use a visibly labeled test environment. A fixture gateway is a concept demonstration, not a shipping SaaS offering.
-
-**Pass / CTA.** The same scope produces equivalent data and evidence by both access paths; a retried customer request is billed once; the next over-cap request is refused. CTA: “Connect one endpoint to your application.” The detailed ownership and billing proposal is in §7.
-
-### G1. The Metric That Didn't Exist
-
-**Situation.** A vault's campaign targets smaller depositors, but headline deposit volume cannot show whether it reached them. The team asks: “For this vault, split deposits by the owner's USDC balance immediately before the deposit's block, excluding our operational addresses.” That balance is a defined onchain segment, not a person's wealth or identity. The catalog deliberately lacks that computation. Simply binding a new vault address would not demonstrate creation.
-
-**Four-minute sequence.**
-
-1. Show the catalog miss and a precise proposed definition: owner versus sender, balance block, cohort boundaries, exclusions, and output units.
-2. Confirm the computation and maximum creation cost. Generate a new executable function with a new identity.
-3. Show meaningful validation: known example, boundary value, excluded wallet, same-block deposit, and unsupported-source refusal.
-4. Quote and materialize a narrow window; return the cohort result and input lineage.
-5. A fresh client discovers and uses the new function without regenerating it. A second paid read can feed the earnings episode.
-
-**Build.** F04/F05 seed vault context and fixtures. G01 is generated during the demo, with historical state reads supported by the generation/runtime contract. If that contract cannot safely express the rule, say so and choose a supported new computation rather than presenting an off-server script as a Testril function.
-
-**Creation acceptance gate.** New durable code/definition, explicit parameters and output types, deterministic execution, enforced resource limits, validation before paid work, versioned identity, reproducible provenance, and independent reuse. Creation cost, preparation cost, and read cost are separate. The current `llm_tokens` rate is not a committed price for the future authoring product.
-
-**Honesty under pressure.** A rehearsed recording is labeled; a supported prompt family is disclosed; elapsed generation time remains visible. If a human must review code, show that review or a time cut. Include an unsupported request so the audience sees the boundary. CTA: “Bring the metric your current data product can't express.”
-
-### G2. Did the Campaign Stick?
-
-**Situation.** A protocol asks whether a campaign attracted repeat depositors or temporary activity. Its analyst changes the definition in the room: repeat deposit on a later UTC day, exclude supplied operational addresses, and evaluate net withdrawals through a stated observation cutoff.
-
-**Three-minute sequence.** State the rule and observation horizon → create the cohort computation → show eligible and censored cohorts separately → change a meaningful part of the rule → generate a new version → compare definitions and results with their input lineage.
-
-**Build.** G02 stateful cohort computation, complete baseline history, UTC block timestamps, owner-level attribution, and traceable dependencies. Vault-share transfers, partial withdrawals, and assets-versus-shares need a chosen accounting convention. Do not call partial observations failed retention or addresses unique humans.
-
-**Why post-2.** Cohort analysis can be prebuilt before USP 2. This episode belongs here because the customer authors a previously unavailable rule during the demonstration. Rebinding an existing threshold is not its reveal.
-
-**Pass / CTA.** An independent fixture calculation matches both versions; immature cohorts are censored; prior versions remain reproducible. CTA: “Replace one disputed growth metric with an agreed, reproducible definition.”
-
-### G3. Ask → Build → Earn
-
-Combine G1 and P2 into a five-minute launch film: customer asks for a missing metric; Testril builds and validates it; one party funds preparation; a second customer buys the resulting data; the supplier sees its share; both customers can inspect the evidence. Use actual observations from earlier working demos.
-
-Do not imply that a function author earns code royalties. Today's earning right attaches to eligible materialization. Author compensation, exclusivity, licensing, and ownership of generated code are separate product decisions. The closing ask is a design partnership around a real missing metric, not passive-income speculation.
-
-## 5. Functions, client work, and backend gates
-
-The initial request is deliberately small: **F01 transfer edges**, plus confirmation that exact raw balance snapshots are available. The existing transfer-volume function supports P0/P2 while F01 is built. It cannot identify senders or recipients, and must not be presented as a substitute for F01.
-
-| Backend delivery | What it unlocks | What remains client-side |
-| --- | --- | --- |
-| Existing balance / transfer-volume / owner | P0, initial P2 | Formatting, bounded comparisons, payment flow |
-| F01 transfer edges | P1 and P3 | Wallet-group filtering, net sums, rankings, diagram, evidence export |
-| F02 swaps + F03 liquidity state | P4 | One-pool comparison and alert presentation |
-| F04 vault state + F05a deposits / F05b withdrawals | Seed cases for G1/G2 | Definition UI and compact report |
-| Safe function-generation product + G01 | G1 | Definition confirmation and validation display |
-| Stateful generation + G02 + input lineage | G2 | Cohort comparison and censoring presentation |
-
-Client calculation is acceptable for the bounded early demonstrations, but label it accurately and publish the calculation. Do not claim server-side aggregate answers, low agent token usage, or complete transformation provenance if the application does the missing work. For large datasets, a stored aggregate function becomes a real backend requirement.
-
-No portfolio item silently assumes price feeds, native-asset traces, Solana, identity labels, address-cluster intelligence, arbitrary cross-chain joins, or historical P&L. Each would require its own data/source work. Detailed semantics, edge cases, fixtures, and capability dependencies are in the [function briefs](function-briefs.md).
-
-## 6. Turn the wallet into useful capability
-
-The positive story is **a programmable purchasing identity with a visible allowance**: the same buyer can authorize scoped work, inspect receipts, and receive eligible materialization earnings. The visible payoff is an agent making many small, independently authorized purchases from one allowance, then receiving eligible earnings when it supplies useful data. Show that value before asking the visitor to set up a wallet.
-
-Offer three entrances to the same demo:
-
-| Entrance | Experience | Ownership and limits |
-| --- | --- | --- |
-| Watch / recorded case | Immediate result and evidence, no wallet setup | Clearly recorded; no live payments or earnings implied |
-| Sponsored live trial | Click Run; a small sponsor-funded allowance buys real work | Server-held signer, per-session and global caps, fixed safe examples; sponsor is the payer |
-| Bring a wallet | User funds/chooses the configured payment network and approves a budget | User controls payment and eligible earning rights; separate consent for escrow deposit |
-
-A sponsored visitor is not silently given ownership of the sponsor's title. For P2, use clearly identified independent reader and supplier roles. A provider onboarding flow can offer a wallet connection only when the user elects to supply data or receive earnings.
-
-### Payment-client requirements
-
-- Display maximum spend before signing; enforce per-operation, per-session, total, and concurrent-request reservations outside the LLM. A prompt is not a spending control.
-- Keep keys in a signer process or wallet; expose narrow operations to the agent. Do not ask public demo users to paste private keys into a web form or chat. Reuse tested signing logic from the existing demo site where appropriate, not its entire investor-room application.
-- Inspect available channels and use the server's quoted network/asset/receiver. Data chain and payment chain are separate; never assume Ethereum data means Ethereum payment.
-- Support the advertised batch-settlement path. A generic x402 `exact` example does not establish compatibility with Testril's sub-cent flow. The batch scheme uses escrow plus cumulative off-chain vouchers, reducing per-request chain settlement. [Official scheme](https://github.com/x402-foundation/x402/blob/main/specs/schemes/batch-settlement/scheme_batch_settlement_evm.md).
-- Serialize voucher updates per channel, reserve spend before issuing concurrent work, and reconcile uncertain outcomes before retrying. Never sign the entire deposit as a tiny request's charge ceiling.
-- Show **deposited**, **authorized/charged**, **unspent escrow**, and **paid out** distinctly. A deposit is not a query expense. A voucher is not a separate onchain transfer on every read.
-- Handle Testril's `payment_required → pay_quote → verb(payment_id)` tool flow. Do not assume an MCP tool response is an HTTP 402 middleware retry.
-- Quotes expire after 120 seconds in the current implementation. Refresh an expired quote and recheck the budget; do not blindly pay twice after an uncertain response.
-- Explain the current escrow withdrawal path: initiation, delay, finalization; no current MCP withdrawal tool. Do not promise instant automatic cash-out or reuse of the same escrow with unrelated providers.
-
-These are a small client's behavioral requirements, not an invitation to build a wallet platform. Ship one readable working path first. Reuse a tiny helper only after the second demo exposes the same need.
-
-## 7. Recommendation on the SaaS layer
-
-**Build it as a distribution layer over the same paid product.** Conventional buyers get familiar procurement and REST integration; wallet-native buyers retain direct programmable access. Choosing a card should not change a metric's semantics or destroy its provenance.
-
-Preserve the direction of the stack: **tiny protocol purchases first; conventional commercial packaging above them**. Keep sub-cent precision in the tenant usage ledger and aggregate at invoice time. Do not introduce a one-cent minimum per underlying read. A disclosed service fee or subscription can cover gateway costs without rounding every tiny operation upward.
-
-The primary benefit is broader adoption. x402-only access otherwise selects for developers willing to manage a wallet before evaluating the answer. Card/API access can ship entirely in the pre-2 phase.
-
-### Minimal useful pilot
+Build a gateway for customers who want API keys and card billing. It should purchase through the same paid Testril interface and preserve the data's meaning and provenance. This work does not depend on function generation.
 
 ```text
-Customer app ── API credential ──> Testril gateway ── paid MCP / x402 ──> Testril
-                                      │
-                               tenant usage ledger
-                                      │
-                            card credit / subscription
+Customer application → API key → Gateway → paid MCP / x402 → Testril
+                                   │
+                            per-customer usage
+                                   │
+                       card credit or subscription
 ```
 
-The first gateway exposes a pinned, existing function and bounded scope; it does not accept arbitrary expensive jobs. A synchronous read returns data and an evidence reference. Cold preparation becomes an explicitly priced asynchronous job with status, cancellation semantics, and a spend ceiling. Endpoint names and versioning are a design decision for implementation, not a claim about today's `/v1` routes.
+Keep sub-cent precision in usage records and combine charges at billing time. Do not introduce a one-cent minimum per underlying read. A disclosed service fee or subscription can cover gateway costs.
 
-Start with a paid allowance or prepaid usage credit and an optional recurring plan with included usage. Aggregate card charges rather than attempting a card transaction for each micro-read. Overage is opt-in and capped. Model card processing, hosting, support, RPC, LLM usage, settlement overhead, working capital, refunds, and abuse before setting a retail price. Testril's underlying data charges remain separately measurable.
+### First version
 
-### Resolve the supplier question explicitly
+Expose one existing bound function with explicit limits. A cached read returns data and a provenance reference. Preparation runs as a separately quoted asynchronous job with status, cancellation rules, and a spending limit. Endpoint names and versions remain implementation decisions.
 
-**Recommended MVP:** the gateway funds materialization, holds the resulting onchain claim right, and sells a data service. A tenant receives a materialization rebate as **service credit** only if that product promise is explicitly implemented. It is not automatically an NFT owner or a USDC recipient. Maintain an auditable mapping of customer charges, upstream purchases, eligible earnings, credits, and payouts.
+Start with prepaid credit or a paid allowance. Offer recurring plans after measuring use. Overage must be optional and capped. Include card processing, hosting, support, RPC, LLM, settlement, refunds, abuse, and working-capital costs when setting prices.
 
-**Optional later mode:** a dedicated customer-controlled or delegated payer wallet lets the customer hold the protocol entitlement directly. That is an additional custody, authorization, and support product; it is not necessary to make a normal REST read work.
+### Who receives materialization earnings
 
-Do not quietly retain supplier earnings while marketing them as the customer's. Equally, a subscription invoice does not automatically create read rewards: only qualifying upstream paid reads do. If the gateway serves a cached response ten times after one upstream purchase, it must not report ten Testril earning events. Decide whether the gateway buys each served read or offers separately described cached delivery before pricing it.
+For the first version, the gateway funds materialization and holds the right to earnings. If customers receive a rebate, record it explicitly as service credit. Maintain records linking customer charges, upstream purchases, earnings, credits, and payouts.
 
-### Operational acceptance
+A later version could use dedicated customer-controlled or delegated wallets. That adds custody and authorization work. Do not promise direct ownership or USDC payouts before implementing it.
 
-Credential isolation, request idempotency, concurrent budget reservations, rate limits, tenant ledgers, deterministic retry/reconciliation, evidence preservation, actual upstream payment, and clear failure responses are launch requirements. Do not turn the currently ungated REST path into an apparent x402-backed service. Spend limits apply before any signature; a browser-controlled request cannot choose the payer, receiver, or arbitrary upstream endpoint.
+Only qualifying paid Testril reads create rewards. Ten gateway cache hits following one upstream purchase are not ten earning events. Decide how cached responses are sold and describe that behavior in billing documentation.
 
-Run a pilot with a few developers who otherwise reject wallet onboarding. Measure first successful request, onboarding abandonment, repeat usage, support time, and contribution margin. Advance to subscriptions and broader endpoints on evidence of repeat use. The gateway can outgrow this demos repository when it has independent operational ownership and release needs.
+### Required checks
 
-## 8. Economics the demos must display
+Test credential isolation, idempotency, concurrent spending limits, rate limits, usage records, retry reconciliation, preserved provenance, and actual upstream payment. The browser must not choose an arbitrary payer, receiver, or upstream endpoint. Use paid MCP rather than the currently uncharged REST route.
 
-Live published rates on 3 October were:
+Trial the gateway with a few developers who otherwise reject wallet setup. Measure time to first request, failed setup, repeated use, support cost, and margin. Move it to a separate repository when it needs its own operational ownership and releases.
+
+## 8. Costs and earnings
+
+Published rates observed on 3 October:
 
 ```text
-materialize = unpaid hole-blocks × $0.00012
-extra hold = unpaid hole-blocks × extra days × $0.000001
-stated read = $0.00002 + requested blocks × $0.000001
+materialization = blocks missing coverage × $0.00012
+extra retention = blocks missing coverage × extra days × $0.000001
+read of an explicit range = $0.00002 + requested blocks × $0.000001
 ```
 
-These formulas describe one bound function and omit any additional authoring line. Multiple functions and separate reads add their own charges. New source-aware pricing is planned; runtime quotes are authoritative.
+The formulas apply to one bound function and exclude any creation charge. Multiple functions and reads add charges. Planned pricing changes may alter these figures; use actual quotes for each run. “Cold” below means data needs preparation; “cached” means coverage already exists.
 
-| One bound function | New materialization, 24h included | One cached stated read |
+| Range | New materialization, 24h included | One cached read |
 | --- | ---: | ---: |
 | 100 blocks | $0.012 | $0.00012 |
 | 1,000 blocks | $0.12 | $0.00102 |
 | 7,200 blocks, reported Ethereum day estimate | $0.864 | $0.00722 |
 | 321,190 blocks, reported Arbitrum day estimate | $38.5428 | $0.32121 |
 
-Consequently, “investigate for a few cents” can be true for a small or prepared scope and false for a cold broad one. State the exact scope and preparation sponsor. Do not disguise a smaller Arbitrum block interval as a full day. Existing `blocks_per_day` is an estimate, not a timestamp conversion; use actual verified boundaries for dated stories.
+A small cached request and a full day of new preparation have very different costs. Show the actual scope and payer. Use verified block timestamps for dated examples; `blocks_per_day` is only an estimate.
 
-### Show the economic granularity
+### Comparing request prices
 
-| Illustrative request sequence | Testril cached-read charges | At $0.01 per request | At $0.05 per request |
+| Request sequence | Testril cached reads | At $0.01 per request | At $0.05 per request |
 | --- | ---: | ---: | ---: |
 | One 100-block read | $0.00012 | $0.01 | $0.05 |
-| Fifty separate 100-block reads | $0.006 | $0.50 | $2.50 |
+| Fifty 100-block reads | $0.006 | $0.50 | $2.50 |
 
-The last two columns model call-price floors; they are not measured equivalent competitor queries. Named comparisons need matching scope, output, freshness, batching, pagination, and setup. x402 itself does not impose those floors, and competing providers can change their offers. Our claim rests on the useful paid units Testril actually delivers.
+The last two columns are arithmetic examples, not executed competitor benchmarks. Preparing 5,000 distinct blocks from cold costs $0.60 before retention or external costs. One contiguous 5,000-block cached read costs $0.00502, less than fifty small reads. Use separate reads when earlier results determine later requests or allow the client to stop early.
 
-For fifty distinct 100-block windows of one bound function, preparing all 5,000 blocks from cold costs $0.60 at these rates, before retention and external costs. Disclose that sponsor investment. A single read of all 5,000 contiguous prepared blocks costs $0.00502, less than fifty small reads. Use selective calls when each answer determines what to buy next; measure unused scope and early stops as well as request count.
+Display enough decimal places: $0.00012 must not appear as “$0.00” or “free.” Read prices, recommended escrow deposits, and the $0.01 reward-claim threshold are separate amounts.
 
-Render charges with sufficient precision: $0.00012 must never appear as “$0.00” or “free.” Keep per-read prices distinct from the recommended escrow top-up and the separate $0.01 reward-claim threshold. Low read prices do not imply equally small onchain deposits or payouts.
+### Materialization earnings
 
-For a 1,000-block range with one eligible materializer, the current source's 50% share of the variable read fee yields $0.0005 per full-range paid read. That offsets a $0.12 initial materialization after **240** such reads, before any other costs and only while eligible. Revenue is not profit. The base read fee contributes no reward, partial coverage changes allocation, and an unstated latest-block read has no variable-line reward. These are illustrative mechanics, not promised returns or measured demand.
+For a 1,000-block read with one eligible materializer, the current 50% share of the variable read fee yields $0.0005. It takes **240** such reads to offset $0.12 in preparation, before other costs and only while eligible. The base fee earns no reward; partial coverage changes the allocation; a latest-block read without a stated range has no variable-fee reward.
 
-Use 100–1,000 block scopes for development. For the earning story, retain a known fixture long enough to rehearse by explicitly purchasing extra cache-days. A cold range must actually have holes: inspecting coverage before the show prevents promising a new supplier right on already-funded data.
+Use 100–1,000 block ranges during development. Purchase enough extra retention to keep test data available. Inspect coverage before attempting to demonstrate new materialization: already-funded data cannot be presented as a new supplier purchase.
 
-### Suggested rehearsal envelopes
+### Proposed test budgets
 
-- P0: up to $0.01 in cached data-read charges; preparation and any escrow top-up disclosed separately.
-- P1: initially one 1,000-block F01 range, two one-block balance snapshots, and a $0.50 data-work cap. This is a planning envelope, not a price promise; reference-RPC and LLM costs are additional and tracked.
-- P2: the same prepared range; twenty 1,000-block reads cost $0.0204 and allocate approximately $0.01 to its sole eligible holder. Artificially buying one's own traffic spends more than it earns and is not evidence of demand.
-- P4/G1/G2: no fixed marketing price until the exact function graph and warm/cold scenarios are quoted and measured. The first generation demo has a separate authoring cap.
+- P0: $0.01 for cached reads; preparation and escrow funding shown separately.
+- P1: one 1,000-block F01 range, two one-block balance snapshots, and a $0.50 data-work cap. Track reference-RPC and LLM costs separately.
+- P2: twenty 1,000-block reads cost $0.0204 and allocate about $0.01 to the sole eligible holder. Buying one's own traffic costs more than it earns and does not establish demand.
+- P4/G1/G2: quote the actual function dependencies before publishing prices. Generation needs its own spending cap.
 
-No financial transactions were executed to develop this plan. Rehearsal budgets above are recommendations for implementation, not standing authorization to spend.
+No transactions were executed for this plan. These are proposed implementation budgets, not approval to spend funds.
 
-## 9. Production of the demos
+## 9. Interface, testing, and publication
 
-### One understandable result before machinery
+### Interface and recordings
 
-Open on the customer's problem and a visible answer. Keep the quote and total cost near the result. Let the audience expand provenance, raw responses, and signatures as needed. The initial frame is not an MCP tool picker, NFT inventory, or terminal log.
+Show the question, result, and cost first. Put source references, raw responses, and signatures in expandable details. Use Testril's existing olive, cream, and muted-gold colors. Keep each interface focused on its task.
 
-Use Testril's existing visual identity: olive, cream, muted gold, and approved brand assets. Prefer a focused flow chart, two-party earnings view, and evidence drawer over a giant multi-tab dashboard. Technical transparency is available on demand rather than imposed on every viewer.
+For each main demo, publish a short result clip, a one-minute overview, a complete walkthrough, runnable code, and reproducible output. Include the purchase sequence and failure handling in the developer documentation. Label cuts in recordings and report actual elapsed time.
 
-Each flagship produces a 15–30 second result clip, 60–90 second story, three-minute walkthrough, runnable public example, and a result/evidence artifact. The developer version includes the full purchase flow and failure behavior. The short film may cut waiting time, labeled with actual elapsed time.
+Publish P0 first, then P1 with P3's verifier, then P2's earnings example. Link recordings to the corresponding code and results. Invite developers to bring one real question for a follow-up session with an agreed definition, budget, and verifiable output. This is proposed publication and outreach work; no outreach has been performed.
 
-Release P0 with the measured sub-cent purchase sequence and readable script. Introduce P1 through a concrete case and a “bring your question” invitation, then release P3's engineering walkthrough and P2's reuse reveal. Put short result clips where target builders already discuss agent integrations, the reproducible walkthrough beside the repository, and the case file in direct customer sessions. Use the same result and measured costs across all versions. The conversion offer is one bounded working session ending in an agreed metric, price, and evidence artifact, followed by an integration pilot. Distribution and customer outreach are proposed marketing work; this planning task sends no messages or campaigns.
+### Data and verification
 
-### Fixture and rehearsal contract
+Choose a short public Ethereum example with archive-RPC access. Maintain a synthetic fixture with known expected values and a separate historical example. Record chain, contracts, decimals, block ranges, UTC times, function versions, reference results, payment network, payment mode, coverage expiry, and cold/cached costs in each fixture manifest.
 
-Choose a public Ethereum case first, subject to archive-RPC access and an interesting short window. Maintain one synthetic fixture with explicit expected values for correctness and a separately labeled historical case for credibility. A synthetic treasury is not evidence about a real protocol.
+Measure response size as well as block count. For the first treasury example, target at most 5,000 transfer-edge rows and reduce them before LLM narration. Narrow the range if needed. Larger cases may need a filtered or aggregate function.
 
-Each case manifest records chain, contracts and verified interfaces, decimals, exact half-open block ranges, readable UTC times, function identities, expected output, independent reference, payment network, settlement mode, coverage state, expiry, and warm/cold cost. Fixture selection is a deliverable of phase 0; no specific historical finding or address is asserted by this plan.
+Test cached reads, cold preparation, peer failure, missing coverage, expired quotes, budget refusal, and uncertain payment retries. Do not replace failed live results with fixtures without a visible mode change. Record dates on fallback recordings and as-of times on finalized data.
 
-Measure output cardinality as well as block count. A token-wide F01 window can contain many counterparties even when it is short. Target at most 5,000 edge rows in the first fixture, reduce them deterministically before narration, and narrow the window if the payload exceeds the demo's measured budget. Larger investigations need a scoped or stored-aggregate function; an inexpensive quote does not imply a small response.
+Measure preparation and read latency, quote/payment stages, total task cost, external RPC cost, LLM use, and time to first result. Report ranges and medians from repeated runs. Initial targets: a cached treasury result within 30 seconds, a new developer's first paid result within ten minutes, and clear refusal before signing an over-budget request. These are targets, not measured performance.
 
-Rehearse a warm success, cold job, failed peer, uncovered range, expired quote, over-budget refusal, and an uncertain payment retry. Never fill a failed live chart with fixture data without an explicit mode switch. Recorded fallback shows recording date and mode. Finalized data is labeled with an as-of time, never called real-time if its lag makes that misleading.
+### Repository organization
 
-Measure cold and warm latency, complete task cost, quote/pay/read stages, external reference costs, LLM tokens, and time to first result. Use several runs and report range/median initially; do not present a percentile from a tiny sample. Proposed usability targets: result visible within 30 seconds on the warmed flagship; fresh developer gets a first paid result in ten minutes; payment refusal is clear before signing. These are acceptance targets to validate, not measured performance claims.
+Place each runnable demo's source, fixtures, tests, and README in `demos/<name>/`. P3 belongs with the treasury demo; P2 can use a separate small reader or supplier example. Each README explains purpose, prerequisites, configuration, commands, expected output, and verification. State funding and simulation requirements before the run command.
 
-### Public repository shape
+Split repositories when demos need incompatible setup, independent releases, or separate service ownership. Avoid a shared framework readers must learn before understanding an example.
 
-Keep application source, fixture manifest, checks, and README in each `demos/<name>/`. Suggested first directory: `demos/follow-the-money/`; P3 is a mode of it. A separate small supplier example can power P2 and connect to the existing claim UI.
+## 10. Work estimates and decisions
 
-Each README should answer: what this demonstrates, prerequisites, three or fewer main run commands, configuration, what success looks like, and how to reproduce the reference result. State funding needs and simulation modes before the run command. Prefer a short runnable example over a generic client framework. The overview indexes outcomes; technical design belongs in supporting documents.
+These preliminary estimates are **engineer-days**, not elapsed calendar time. They exclude backend platform changes, deployment approvals, and customer scheduling. One engineer can build the first set sequentially, with backend review as needed.
 
-Split a demo into a separate repository when it acquires an independent release schedule, incompatible setup, a production service owner, or dependencies that make the rest harder to run. Multiple folders alone are not a reason to split.
-
-## 10. Delivery sequence and decisions
-
-These are planning ranges in **active builder-days**, excluding backend platform work, deployment approvals, protocol upgrades, and customer scheduling. They are not calendar commitments. One engineer can build the first cluster sequentially; backend/function review is separately needed.
-
-| Phase | Work / owner role | Planning range | Exit evidence |
+| Phase | Work and responsible role | Estimate | Completion criteria |
 | --- | --- | --- | --- |
-| 0 | Baseline, real fixture, reference calculation, wallet purchase harness / demo engineer + backend owner | 2–4 days | Known paid path and mode; matched reference; cold/warm costs; P0 selective sequence and sub-cent receipts |
-| 1 | F01 + exact balance support / backend engineer | 1–3 days if current engine supports the shape | Function brief acceptance; additional engine work separately estimated |
-| 1 | P1 case file and P3 evidence / demo engineer | 4–7 days | Reconciled case, export, verifier, readable integration |
-| 2 | P2 reuse and earnings / demo engineer + backend owner | 2–4 days | Independent buyer, correct attribution, honest accrual/payout mode |
-| 2 | Packaging and customer walkthroughs / demo engineer + marketing owner | 2–3 days | Recordings, concise READMEs, five observed evaluation sessions |
-| 3a | P4 vertical / function + demo engineers | Estimate after native engine gate | Swaps/state reference match and audience demand |
-| 3b | P5 gateway pilot / service engineer | 7–12 days for a narrow prototype | Capped conventional REST workflow; billing/retry tests; card mode disclosed |
-| 4 | G1 then G2 then G3 / authoring platform owner + demo engineer | Unestimated until authoring/runtime gates exist | New durable computation, meaningful tests, traceable inputs, independent reuse |
+| 0 | Fixture, reference calculation, payment client, P0 / demo engineer and backend owner | 2–4 days | Verified paid reads, correct reference result, costs and receipts displayed |
+| 1 | F01 and exact balances / backend engineer | 1–3 days if the engine supports the output | Function tests pass; any engine work separately estimated |
+| 1 | P1 and P3 / demo engineer | 4–7 days | Reconciled treasury result, export, verifier, runnable client |
+| 2 | P2 / demo engineer and backend owner | 2–4 days | Separate buyer, correct earnings, verified accrual or payout |
+| 2 | Documentation, recordings, user trials / demo engineer and marketing owner | 2–3 days | Runnable READMEs, recordings, five observed developer trials |
+| 3a | P4 / function and demo engineers | Estimate after engine requirements are checked | Reference agreement and a customer use case |
+| 3b | P5 / service engineer | 7–12 days for a narrow prototype | Capped REST access; billing and retry checks; card mode identified |
+| 4 | G1, G2, G3 / generation owner and demo engineer | Estimate when generation requirements are defined | New persistent functions, meaningful tests, reproducible inputs, independent reuse |
 
-**Recommended commitment:** phases 0–2, roughly **11–21 active builder-days including the conditional F01 slice**, then choose P4 or P5 using feedback. Backend migration work is outside this range. Do not wait for function creation to release the pre-2 cluster.
+Start with phases 0–2: **11–21 engineer-days**, including F01 if the engine already supports its output. If F01 is blocked, release P0 and an earnings demo using existing transfer volume. The treasury demo still requires F01. Choose P4 or P5 after user trials.
 
-The native-function work already has an ordered engine/subgraph/library roadmap in the core repository. Present F01 as a small, justified demo-priority request to its owners; do not silently reorder that roadmap or fork the engine. If it cannot land quickly, publish P0/P2 with existing transfer volume while P1 waits. The complete treasury explanation remains gated on F01.
+### User trials
 
-### Marketing experiments and continuation gates
+Recruit five application developers and three protocol or data operators. Ask them to bring a real task. Observe whether they can set up the example, understand its result, verify it, and adapt it.
 
-Recruit five developers from agent/app teams and three protocol/data operators. Ask each to bring one actual task. Observe setup, what they trust, which result they can use, and whether they return with a second question. Praise is weaker evidence than a repeat task or integration.
+Record successful first reads, repeated use, new tasks, integration requests, support time, and failures during wallet setup. Ask what cheaper small reads would let them build. Track actual payers and sponsors; repeated operator-funded reads do not establish customer demand.
 
-Track the funnel: viewed result → opened evidence → ran example → first successful paid result → changed scope → returned within seven days → requested integration. Ask what they would build with cheaper fine-grained checks; test whether they can name a changed workflow, not just repeat the price. Track wallet abandonment separately from product-value rejection. Record actual payer/sponsor, total spend, support time, successful payments, and repeat reads from independent users.
+A proposed reason to continue is that three of five developers complete setup unaided, two return within a week with another task, and one asks to integrate. These small samples guide revisions; they do not measure market size. If the task is unhelpful, change it. If wallet setup is the main obstacle, prioritize P5. If missing functions are the obstacle, prioritize those functions and generation.
 
-Proposed early continuation gate: at least three of five developers complete the first run without live assistance; at least two return with a second real task; at least one asks to integrate or pilot. Small samples guide iteration, not market-size claims. If users admire the animation but cannot name a use, change the case. If value is clear but wallet setup kills adoption, prioritize P5. If the first question repeatedly exceeds the catalog, prioritize the relevant fixed functions and the authoring product.
+### Decisions needed
 
-### Decisions for review
+1. Choose the first treasury case and users, or prioritize P4 if a DeFi customer supplies a more useful case.
+2. Assign F01 and exact-balance verification; confirm whether the current engine supports them.
+3. Select the reference RPC, payment network, testnet/mainnet mode, and test budget.
+4. Decide sponsored-trial limits and who receives gateway earnings or credits.
+5. Agree the tests that must pass before showing function creation.
 
-1. Confirm the first audience and treasury-investigation flagship, or choose P4 if a real DeFi customer supplies a stronger case.
-2. Assign a core owner to the F01/exact-balance request and determine whether the existing engine can support it before the native-function migration.
-3. Choose a real case and reference source; name the payment network and live/testnet mode for rehearsals.
-4. Decide the sponsored-trial allowance and the gateway's supplier entitlement/credit policy.
-5. Agree the observable gate for USP 2; reject a rebranded binding demo as its launch.
-
-The next implementation unit should be phase 0's fixture and paid purchase harness, followed by F01's accepted contract. All other portfolio items remain scoped options until those results and customer feedback justify them.
+The next implementation step is phase 0: select the data, reproduce its expected result, and make a verified paid read. Then implement the agreed F01 requirements.

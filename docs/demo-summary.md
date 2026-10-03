@@ -1,57 +1,59 @@
-# Testril demos: the decision brief
+# Testril demo plan
 
-**Proposal · 3 October 2026 · Two-page review**
+**Review summary · 3 October 2026**
 
-## The story to own
+## Purpose
 
-**Buy the answer. Inspect the evidence. Earn when the data gets reused.** When function creation ships: **if the metric doesn't exist, create it.**
+Help engineers evaluate Testril through runnable demos: sub-cent payments, materialization earnings, and result verification now; function creation when implemented.
 
-Start with agent/application developers solving a protocol team's concrete problem. Make the engineer look good: they deliver a useful answer, defend the number, and put it in a product. Full replacement of Dune, Allium, and Nansen is the direction; the first win is replacing one valuable workflow.
+Testril charges for preparing and storing computed data (**materialization**), then reading it. The materialization payer can earn from later reads. **Provenance** records source data; checking the calculation requires independent verification.
 
-**Lead with useful work in fractions of a cent.** Competitors are adding machine payments to existing API products; Testril starts with tiny purchases, paid materialization, and reuse. Familiar billing can sit above that foundation. Nansen advertises 1¢/5¢ calls; Allium lists 1¢ SQL submission and 2¢/3¢ data calls. The opportunity is economically practical fine-grained agent work. [Pricing evidence](research/baseline.md).
+Small payments should be central to the demos. Testril is built around tiny purchases; conventional APIs and billing can be added above them. Competitors are adding machine payments to existing APIs. Nansen lists 1¢/5¢ calls; Allium lists 1¢ SQL submission and 2¢/3¢ data calls. [Sources and limits of this comparison](research/baseline.md).
 
-## Before function creation: release a connected series
+## First release
 
-**Opening: One Cent, Many Decisions.** Use existing transfer volume to investigate token activity through selective narrow reads. Show each result, next decision, receipt, and remaining allowance. At current rates, fifty 100-block cached reads total **$0.006: 0.6 cents**. Rehearse a useful sequence; disclose preparation separately. This demonstrates tiny purchases before new functions ship.
+**P0. Sub-cent data reads.** Use the existing transfer-volume function to check token activity in short block ranges. Choose each next range from the previous result. Show the result, charge, and remaining budget at every step. Fifty 100-block cached reads would cost **$0.006 (0.6¢)** at the observed rates. Use as many checks as the task needs; show preparation costs separately.
 
-**1. Follow the Money — the flagship.** “Where did this treasury's USDC go?” Give the agent a wallet, window, and spending limit. A flow diagram explains counterparties and net movement. Separate internal transfers using the team's supplied addresses. Click a number to inspect its evidence; export the case file and runnable integration. Start with one token on one chain. Required addition: **transfer edges by block**, with exact amounts and counterparties; verify exact balance snapshots for reconciliation.
+**P1. Treasury outflow analysis.** Answer “Where did this treasury's USDC go?” for one token, chain, and block range. Show incoming and outgoing transfers, counterparties, and the balance change. Use supplied team addresses to separate internal transfers. Export the result and a runnable client example. Requires a new **transfer-edge function**, which returns amounts between pairs of addresses, and exact balance snapshots.
 
-**2. The Second Customer Pays You.** A different app buys a read of the same prepared data. Show the original materializer's actual earned balance increasing, beside what both parties paid. Reuse the claim dashboard for an eventual payout. Show real customer roles; label operator-funded demonstration traffic. This proves the earning mechanism, not profitable demand.
+**P2. Materialization earnings.** A second application pays to read data prepared for P1. Show the original payer's earnings before and after that read, alongside both customers' costs. Use separate accounts. Verify an actual payout before showing one. Label traffic funded by the demo operator; it demonstrates accounting, not customer demand.
 
-**3. Show Me the Evidence.** Reproduce the flagship's calculation from pinned sources; deliberately alter a displayed amount and expose the mismatch. This is an evidence/export mode of the flagship, not another application. A source-block digest alone does not prove the arithmetic.
+**P3. Result verification.** Add verification and export to P1. Fetch the source logs and state at the recorded blocks, recalculate the result, then deliberately alter a displayed amount and show the failed comparison. A source-block digest alone cannot verify the arithmetic.
 
-**Later episodes:** **Did Liquidity Leave?** for DeFi customers; **Ship the Endpoint** for conventional REST. These need pool functions or a gateway, respectively.
+## Optional additions before function creation
 
-## After function creation: make the missing metric the reveal
+**P4. Pool activity and liquidity:** compare one Uniswap v3 pool's swaps and active liquidity; requires two functions. **P5. REST access and card billing:** add an API-key gateway that handles Testril payments. Choose between these based on user trials.
 
-**4. The Metric That Didn't Exist.** A vault team invents a deposit-cohort rule. Show a catalog miss, a precise definition, newly generated code, meaningful validation, a quote, and the answer. A fresh client then reuses the new function. Selecting an existing function or changing its parameters does not qualify.
+## After function creation is implemented
 
-**5. Did the Campaign Stick?** Create and revise a repeat-depositor definition, showing observation cutoffs and traceable results. This needs stateful computation and timestamps as well as generation.
+**G1. Generate a deposit classification function.** Ask Testril to group vault deposits by each owner's token balance at the previous block. Show generated code, tests, costs, and results, then reuse it from another client. Requires vault functions and generation support.
 
-**6. Ask → Build → Earn.** Combine creation with a second customer's paid reuse. This is the capstone once both halves work. Today's earnings attach to materialization; code-author royalties are a separate decision.
+**G2. Generate a repeat-deposit function.** Define and revise a rule for deposits repeated on a later UTC day within seven days. Show incomplete observation periods separately. Requires stored state, history, and timestamps as well as generation.
+
+**G3. Generate a function and earn from reused data.** Combine G1 and P2 once both work. Materialization holders earn; author royalties would require another feature.
 
 <!-- pagebreak -->
 
-## Make the wallet useful; make the first encounter easy
+## Wallet setup and spending limits
 
-Present it as a programmable purchasing identity: a visible allowance, scoped authorization, receipts, and eligible earnings. Offer **watch**, **sponsored live trial**, and **bring a wallet**. A visitor can experience value before funding a wallet. The sponsor remains the payer and entitlement holder unless a different arrangement is explicitly implemented.
+Offer a recording, a sponsor-funded live trial, and a user-funded wallet option. Let visitors run a useful example before setting up a wallet. The wallet authorizes a sequence of small purchases within a budget and receives eligible materialization earnings.
 
-Enforce budgets in the signer/client, outside the LLM. Handle batch escrow and vouchers correctly; show deposited funds separately from charges. Never require a pasted private key in the public web demo.
+Enforce spending limits in client code outside the LLM. Show escrow deposits separately from read charges and unused funds. Use a wallet or server-side signer; the public demo must not ask for a private key. A sponsored trial leaves the sponsor holding any resulting materialization rights unless ownership transfer is implemented.
 
-## Build the SaaS layer
+## Card billing and REST proposal
 
-**Yes: a card/API gateway is a valuable distribution layer and can precede function creation.** The customer receives an API key, a normal endpoint, and capped usage. The gateway purchases through the same paid Testril path and preserves evidence. Preserve sub-cent usage accounting and aggregate card billing; do not impose a one-cent floor on each underlying read. Begin with an allowance pilot before subscriptions.
+Build a small gateway for customers who want API keys and card payments. It should buy through Testril's paid MCP interface and return the same data and provenance as direct access. Keep sub-cent precision in usage records and combine charges for billing. Do not round each underlying read up to one cent.
 
-Resolve ownership early. Recommended MVP: the gateway holds the materialization entitlement; any customer rebate is explicitly tracked service credit. A dedicated customer wallet can follow. Customer invoices and gateway cache hits do not automatically create Testril read rewards.
+Start with prepaid credit and a spending cap. Price subscriptions after measuring usage and operating costs. For the first version, the gateway funds materialization and holds the right to earnings. Any customer rebate must be recorded explicitly as service credit. Serving a gateway cache hit does not create another Testril reward.
 
-## What to build first
+## Implementation and verification
 
-Commit to **One Cent, Many Decisions**, **Follow the Money**, its evidence mode, and **The Second Customer Pays You**. Planning range: **11–21 active builder-days**, conditional on the small transfer-edge addition; core engine migration work is extra. Release this before waiting for function creation. Detailed function briefs cover inputs, outputs, semantics, reference fixtures, and platform gates.
+Build **P0–P3 first**. The preliminary estimate is **11–21 engineer-days**, including the transfer-edge function if the current engine supports it. Backend engine changes are additional work. The detailed plan assigns work and completion criteria; the function requirements specify inputs, outputs, and test cases.
 
-Current endpoint: three functions, CDP mode, Ethereum/Arbitrum/Base Sepolia data configuration. Paid execution and payout still require rehearsal. The fifty-read example illustrates billing granularity, not a matched competitor benchmark; use bulk reads when the whole scope is known. At current rates, one 1,000-block cached read is **$0.00102**; preparing those blocks costs **$0.12**. Display both. Label testnet, recorded, synthetic, and sponsored runs accurately.
+The inspected endpoint lists three functions and Ethereum, Arbitrum, and Base Sepolia data support. Paid execution, payment network, latency, and payouts still need verification. At observed rates, preparing 1,000 blocks costs **$0.12** and reading that cached range costs **$0.00102**. These are data charges; track LLM and reference-RPC costs separately. The fifty-read example is arithmetic, not a measured competitor benchmark. Prefer a bulk read when the whole required range is known.
 
-Recruit five developers for observed runs. Proposed continuation gate: three finish unaided, two return with a real second task, and one requests an integration or pilot. Measure wallet abandonment separately. Package each flagship as a short film, a runnable example, and an evidence-backed result.
+For each working demo, publish runnable code, a short recording, and reproducible output. Test setup with five developers. A proposed reason to continue is that three finish unaided, two return with another task, and one requests an integration. Record failures and wallet setup abandonment.
 
-**Decisions:** confirm the first audience/case; assign the transfer-edge function owner; choose rehearsal payment mode and allowance; agree gateway entitlement policy; define the observable release gate for function creation.
+**Decisions needed:** choose the first real treasury case; assign the transfer-edge implementation; choose the demo payment network and budget; agree who receives gateway earnings; define the tests required before demonstrating function creation.
 
-[Full strategy](demo-strategy.md) · [Function briefs](function-briefs.md) · [Dated evidence](research/baseline.md)
+[Detailed plan](demo-strategy.md) · [Function requirements](function-briefs.md) · [Research notes](research/baseline.md)
