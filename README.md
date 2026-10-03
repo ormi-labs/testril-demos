@@ -6,7 +6,7 @@ MCP server: `https://dev.testril.ai/mcp`
 
 ## Demo plan
 
-Start with the [two-page brief](docs/demo-summary.pdf) ([Markdown](docs/demo-summary.md)). The [detailed plan](docs/demo-strategy.md) describes what to build, in what order, and how to verify it. [Download specifications](docs/demo-deliverables.md) describe the proposed applications and exports, with a [treasury screen sketch](docs/treasury-preview.svg). [Function requirements](docs/function-briefs.md) specify the backend work.
+Start with the [two-page brief](docs/demo-summary.pdf) ([Markdown](docs/demo-summary.md)). The [detailed plan](docs/demo-strategy.md) describes what to build, in what order, and how to verify it. [Download specifications](docs/demo-deliverables.md) describe the proposed applications and exports, with a [treasury screen sketch](docs/treasury-preview.svg). [Function requirements](docs/function-briefs.md) specify the backend work. The [first-release build specification](docs/specs/first-release-data-functions.md) is ready to hand to an implementing agent.
 
 To refresh the PDF, install `reportlab` in a Python environment and run `python docs/render_summary.py`.
 

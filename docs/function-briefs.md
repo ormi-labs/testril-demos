@@ -4,6 +4,8 @@
 
 This document specifies the existing functions to verify and the new functions to implement. Proposed names may change to match the core catalog. See the [demo plan](demo-strategy.md) for their uses and the [research notes](research/baseline.md) for the inspected implementation.
 
+For the first-release backend assignment, hand the implementing agent the self-contained [build specification](specs/first-release-data-functions.md). It defines the transfer-edge contract, exact-balance verification, paid serving requirements, acceptance cases, and handover. The sections below summarize this and later function work.
+
 ## Application mapping
 
 P0 uses the `sub-cent-reads` CLI. F01 and exact balance snapshots support `treasury-analysis`, including its verification and supplier earnings views. The independent `paid-reader` CLI consumes the same bound function and covered range; it does not import the treasury application. F02/F03 support an optional pool application. F04/F05 and generated G01/G02 support a later vault application. Demonstration identifiers do not imply one application per function or capability. See the [download specifications](demo-deliverables.md).
