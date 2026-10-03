@@ -6,6 +6,12 @@ This document specifies the existing functions to verify and the new functions t
 
 For the first-release backend assignment, hand the implementing agent the self-contained [build specification](specs/first-release-data-functions.md). It defines the transfer-edge contract, exact-balance verification, paid serving requirements, acceptance cases, and handover. The sections below summarize this and later function work.
 
+## First-release scope
+
+**Build only one new function: `erc20_transfer_edges` (F01).** Verify the existing `erc20_balance` and `erc20_transfer_volume` functions and correct them only if necessary.
+
+**F02 onward is later work, not part of the first-release build assignment.** The Uniswap functions F02/F03 support the optional pool activity and liquidity demo (P4). Vault and generated functions support later demos. Their inclusion here does not authorize or require building them now.
+
 ## Application mapping
 
 P0 uses the `sub-cent-reads` CLI. F01 and exact balance snapshots support `treasury-analysis`, including its verification and supplier earnings views. The independent `paid-reader` CLI consumes the same bound function and covered range; it does not import the treasury application. F02/F03 support an optional pool application. F04/F05 and generated G01/G02 support a later vault application. Demonstration identifiers do not imply one application per function or capability. See the [download specifications](demo-deliverables.md).
@@ -13,8 +19,8 @@ P0 uses the `sub-cent-reads` CLI. F01 and exact balance snapshots support `treas
 ## Implementation order
 
 1. **First release:** F01 transfer edges and confirmation of exact balance snapshots. Existing transfer volume supports the first payment/earnings demonstration while F01 is built.
-2. **Pool demo:** F02 swaps and F03 liquidity state, only after confirming native-engine support and customer demand.
-3. **Vault functions:** F04 vault state and F05a/F05b vault flows provide understandable reference cases. They do not themselves implement function generation.
+2. **Later, optional pool demo:** F02 swaps and F03 liquidity state, only after confirming native-engine support and customer demand.
+3. **Later vault demos:** F04 vault state and F05a/F05b vault flows provide understandable reference cases. They do not themselves implement function generation.
 4. **After function creation is implemented:** G01 and G02 are example computations generated during a session. Shipping them as fixed catalog functions would be useful but would not demonstrate creation on request.
 
 Function additions use the core project's existing build/review process. If a function needs unsupported source calls, row types, dependencies, or query operations, estimate that engine work separately. Verify support on the target deployment before implementation.
@@ -74,7 +80,7 @@ Also test repeated identical endpoints in one block, multiple logs in a transact
 
 **Completion criteria:** synthetic results match; one real window reconciles exactly or names a token-specific exception; the paid response exposes enough keys/fields to reproduce the result; provenance expands the cited blocks; a second reader reuses the same identity and coverage.
 
-## F02. `uniswap_v3_swaps`
+## F02. `uniswap_v3_swaps` — optional later pool demo
 
 **Purpose:** Return this pool's swaps during the selected interval.
 
@@ -88,7 +94,7 @@ Also test repeated identical endpoints in one block, multiple logs in a transact
 
 **Acceptance:** both trade directions, multiple swaps per transaction, quiet blocks, duplicate/retried log delivery, signed extrema within supported bounds, and exact match to reference logs. Price presentation follows exact decimal/rational conversion and names token orientation. No multi-pool discovery or external prices in this first version.
 
-## F03. `uniswap_v3_liquidity_state`
+## F03. `uniswap_v3_liquidity_state` — optional later pool demo
 
 **Purpose:** Compare the pool's active liquidity and price state across selected blocks.
 
@@ -104,7 +110,7 @@ Also test repeated identical endpoints in one block, multiple logs in a transact
 
 **Acceptance:** reference calls agree; tick crossings are visible; unavailable archive state fails explicitly; unchanged adjacent snapshots remain distinguishable from absent coverage. Attribution to LP withdrawals additionally needs a mint/burn position-event function. F03 alone establishes the state change, not its cause.
 
-## F04. `erc4626_vault_state`
+## F04. `erc4626_vault_state` — later vault demos
 
 **Purpose:** Return the vault's reported assets and shares at selected blocks.
 
@@ -118,7 +124,7 @@ Also test repeated identical endpoints in one block, multiple logs in a transact
 
 **Acceptance:** empty vault, deposit/withdraw transition, donated assets, differing share/asset decimals, conversion rounding, and reference call agreement. Avoid claiming a universal vault adapter from one verified implementation.
 
-## F05a / F05b. `erc4626_deposits` and `erc4626_withdrawals`
+## F05a / F05b. `erc4626_deposits` and `erc4626_withdrawals` — later vault demos
 
 **Purpose:** Return deposit and withdrawal participants, amounts, and blocks.
 
@@ -132,7 +138,7 @@ Also test repeated identical endpoints in one block, multiple logs in a transact
 
 These functions support G1/G2 fixtures. They are also independently useful fixed functions before generation is implemented if a customer needs vault reporting earlier.
 
-## G01. Generated deposit classification
+## G01. Generated deposit classification — after function creation ships
 
 **Function to generate during the demo:** group vault Deposit events into cohorts (groups) by the owner's balance of a named ERC-20 at the end of the preceding block, exclude a supplied operational-address set, and emit count/assets/shares per cohort per block.
 
@@ -146,7 +152,7 @@ These functions support G1/G2 fixtures. They are also independently useful fixed
 
 **Acceptance:** boundary equality; excluded owner; sender/owner difference; multiple deposits by one owner; a balance change earlier in the deposit block that must not alter the prior-block cohort; failed historical balance lookup; independent hand-computed reference. Another client can discover and reuse the new function after the creator leaves.
 
-## G02. Generated repeat-deposit rule
+## G02. Generated repeat-deposit rule — after function creation ships
 
 **Function to generate during the demo:** identify owners first depositing within a stated campaign, count a repeat deposit on a later UTC day within seven days, and report withdrawals through a stated observation cutoff. A revised definition creates a new version.
 

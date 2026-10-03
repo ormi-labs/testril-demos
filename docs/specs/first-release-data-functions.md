@@ -4,7 +4,15 @@
 
 ## Assignment
 
-Implement `erc20_transfer_edges` in the Testril core repository and verify exact historical output from `erc20_balance`. Verify the existing `erc20_transfer_volume` behavior needed by the small activity example. Deliver the changes through a PR with reproducible examples and relevant test results.
+**`erc20_transfer_edges` is the only new data function to build for the first release.** Verify the existing `erc20_balance` and `erc20_transfer_volume` functions; make corrections only where needed to satisfy this specification. Deliver the changes through a PR with reproducible examples and relevant test results.
+
+| Function | First-release work |
+| --- | --- |
+| `erc20_transfer_edges` | Build |
+| `erc20_balance` | Verify exact historical output; expose `balance_raw` if missing |
+| `erc20_transfer_volume` | Verify existing count, volume, and coverage behavior |
+| `uniswap_v3_swaps`, `uniswap_v3_liquidity_state` | Outside this assignment; optional later pool demo |
+| Vault functions and generated functions | Outside this assignment; later demos |
 
 This document is sufficient to start work without the demo-planning conversation. It specifies backend data functions and their paid serving behavior. Frontend applications, new billing products, function generation, pool/vault functions, and pricing redesign are outside this assignment.
 
