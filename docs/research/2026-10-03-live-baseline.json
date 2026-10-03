@@ -1,0 +1,80 @@
+{
+  "observed_on": "2026-10-03",
+  "endpoint": "https://dev.testril.ai/mcp",
+  "method": "MCP initialize, tools/list, health_check, and free inspect calls; no paid operations",
+  "observations": {
+    "health_check": {
+      "bound_functions": 4,
+      "chains": [
+        1,
+        84532,
+        42161
+      ],
+      "functions": 3,
+      "ok": true,
+      "outcome": "success",
+      "payment": "cdp",
+      "version": "0.2.2"
+    },
+    "functions": {
+      "functions": [
+        "erc20_balance",
+        "erc20_transfer_volume",
+        "erc721_owner"
+      ],
+      "outcome": "success",
+      "subject": "functions"
+    },
+    "pricing": {
+      "outcome": "success",
+      "rates": [
+        {
+          "label": "rpc_ops",
+          "unit_price": 0.0
+        },
+        {
+          "label": "llm_tokens",
+          "unit_price": 0.0001
+        },
+        {
+          "label": "materialize_blocks",
+          "unit_price": 0.00012
+        },
+        {
+          "label": "query_read",
+          "unit_price": 2e-05
+        },
+        {
+          "label": "query_blocks",
+          "unit_price": 1e-06
+        },
+        {
+          "label": "extra_cache_days",
+          "unit_price": 1e-06
+        }
+      ],
+      "subject": "pricing"
+    },
+    "chains": {
+      "chains": [
+        {
+          "blocks_per_day": 7200,
+          "chain_id": 1,
+          "finalized_head": 26108672
+        },
+        {
+          "blocks_per_day": 321190,
+          "chain_id": 42161,
+          "finalized_head": 511164381
+        },
+        {
+          "blocks_per_day": 43200,
+          "chain_id": 84532,
+          "finalized_head": 47611244
+        }
+      ],
+      "outcome": "success",
+      "subject": "chains"
+    }
+  }
+}
