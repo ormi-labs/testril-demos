@@ -2,58 +2,64 @@
 
 **Review summary · 3 October 2026**
 
-## Purpose
+## What we should build
 
-Help engineers evaluate Testril through runnable demos: sub-cent payments, materialization earnings, and result verification now; function creation when implemented.
+Start with **one treasury web application and two small command-line examples**, released as three independent source downloads. The website and recordings show them together; developers can choose the example they need. The demonstrations below describe capabilities, not separate applications for every feature.
 
-Testril charges for preparing and storing computed data (**materialization**), then reading it. The materialization payer can earn from later reads. **Provenance** records source data; checking the calculation requires independent verification.
+Testril charges for preparing and storing computed data (**materialization**), then reading it. The materialization payer can earn from later reads. **Provenance** identifies the sources; independent recalculation checks the result.
 
-Small payments should be central to the demos. Testril is built around tiny purchases; conventional APIs and billing can be added above them. Competitors are adding machine payments to existing APIs. Nansen lists 1¢/5¢ calls; Allium lists 1¢ SQL submission and 2¢/3¢ data calls. [Sources and limits of this comparison](research/baseline.md).
+## What the main application looks like
 
-## First release
+The treasury application answers “Where did this treasury's USDC go?” The input form asks for a treasury address, token, block range, optional team addresses, and spending limit. The resulting page contains a balance summary, transfer diagram, ranked counterparties, costs, and expandable source details.
 
-**P0. Sub-cent data reads.** Use the existing transfer-volume function to check token activity in short block ranges. Choose each next range from the previous result. Show the result, charge, and remaining budget at every step. Fifty 100-block cached reads would cost **$0.006 (0.6¢)** at the observed rates. Use as many checks as the task needs; show preparation costs separately.
+**Illustrative result using synthetic data:** opening balance **1,000 USDC**, incoming **50**, outgoing **100**, closing **950**, change **−50**. The counterparty table shows outgoing **100 to B**, incoming **30 from B**, and incoming **20 from C**. A self-transfer is excluded from those totals. Reconciliation shows that the balance change matches incoming minus outgoing.
 
-**P1. Treasury outflow analysis.** Answer “Where did this treasury's USDC go?” for one token, chain, and block range. Show incoming and outgoing transfers, counterparties, and the balance change. Use supplied team addresses to separate internal transfers. Export the result and a runnable client example. Requires a new **transfer-edge function**, which returns amounts between pairs of addresses, and exact balance snapshots.
+Clicking a number opens its contributing rows and source blocks. **Verify** independently fetches the reference data and recalculates the totals; changing an amount causes a visible mismatch. The page displays actual preparation and read charges separately. An earnings panel shows what the materialization holder earned when the separate reader purchases the same covered data.
 
-**P2. Materialization earnings.** A second application pays to read data prepared for P1. Show the original payer's earnings before and after that read, alongside both customers' costs. Use separate accounts. Verify an actual payout before showing one. Label traffic funded by the demo operator; it demonstrates accounting, not customer demand.
+See the [proposed screen](treasury-preview.svg) and [download specifications](demo-deliverables.md). The illustration is a design proposal, not a live Testril result.
 
-**P3. Result verification.** Add verification and export to P1. Fetch the source logs and state at the recorded blocks, recalculate the result, then deliberately alter a displayed amount and show the failed comparison. A source-block digest alone cannot verify the arithmetic.
+## The three first-release downloads
 
-## Optional additions before function creation
+**1. Token activity script (P0).** A terminal table shows each checked block range, transfer count, read charge, and remaining allowance. The final output identifies activity above a chosen threshold. Developers get a small payment client and a clear rule for choosing the next range. First modification: change the token or threshold. Uses existing transfer volume; no new function is needed.
 
-**P4. Pool activity and liquidity:** compare one Uniswap v3 pool's swaps and active liquidity; requires two functions. **P5. REST access and card billing:** add an API-key gateway that handles Testril payments. Choose between these based on user trials.
+**2. Treasury application (P1 + P3, with the P2 supplier view).** Download the web application, its command-line client, calculation code, and verifier. First modification: analyze another treasury or change the supplied team addresses. Requires **F01 transfer edges**, which returns amounts between pairs of addresses, and exact balance snapshots. Verification and earnings are parts of this application.
 
-## After function creation is implemented
+**3. Paid reader script (P2).** A second account purchases data already prepared by the supplier. The terminal shows its result, charge, and receipt; the supplier's earnings panel shows the corresponding increase. The script accepts a bound-function identifier and range and runs without the treasury application. First modification: read another covered interval. Label operator-funded traffic and verify any payout shown.
 
-**G1. Generate a deposit classification function.** Ask Testril to group vault deposits by each owner's token balance at the previous block. Show generated code, tests, costs, and results, then reuse it from another client. Requires vault functions and generation support.
+## What developers download
 
-**G2. Generate a repeat-deposit function.** Define and revise a rule for deposits repeated on a later UTC day within seven days. Show incomplete observation periods separately. Requires stored state, history, and timestamps as well as generation.
+**Download source** provides a versioned archive with source, a terse README, pinned dependencies, placeholder configuration, sample data, and all required assets. Each archive must run after extraction into an empty directory, without sibling projects or repository-level tooling.
 
-**G3. Generate a function and earn from reused data.** Combine G1 and P2 once both work. Materialization holders earn; author royalties would require another feature.
+**Export this run** provides the inputs, returned data, calculated report, receipts, function identity, source references, and verification instructions for that particular result. It contains no credentials. Data exports and source downloads have different purposes and separate controls.
 
 <!-- pagebreak -->
 
-## Wallet setup and spending limits
+## Demos after function creation
 
-Offer a recording, a sponsor-funded live trial, and a user-funded wallet option. Let visitors run a useful example before setting up a wallet. The wallet authorizes a sequence of small purchases within a budget and receives eligible materialization earnings.
+Build a separate **vault analysis application** when creation on request works. Its screen contains a definition editor, generated code and tests, quotes, and a result table. G1 classifies deposits by the owner's token balance at the previous block. G2 defines repeat deposits on a later UTC day within seven days and compares revised definitions; incomplete observation periods remain explicit.
 
-Enforce spending limits in client code outside the LLM. Show escrow deposits separately from read charges and unused funds. Use a wallet or server-side signer; the public demo must not ask for a private key. A sponsored trial leaves the sponsor holding any resulting materialization rights unless ownership transfer is implemented.
+Developers download the application and exported generated definitions, with their versions and required runtime. Include a small consumer that reuses a generated function from another client. G3 combines that reuse with materialization earnings. These require vault functions, generation support, and, for G2, stored state and timestamps. Selecting a prewritten function is not creation on request.
 
-## Card billing and REST proposal
+Pool analysis (P4) and a REST/card gateway (P5) are optional separate projects. Add them when user trials show a need; keep their setup out of the treasury download.
 
-Build a small gateway for customers who want API keys and card payments. It should buy through Testril's paid MCP interface and return the same data and provenance as direct access. Keep sub-cent precision in usage records and combine charges for billing. Do not round each underlying read up to one cent.
+## Small payments and wallet setup
 
-Start with prepaid credit and a spending cap. Price subscriptions after measuring usage and operating costs. For the first version, the gateway funds materialization and holds the right to earnings. Any customer rebate must be recorded explicitly as service credit. Serving a gateway cache hit does not create another Testril reward.
+Make the charge for each operation visible. At observed rates, fifty 100-block cached reads would total **$0.006 (0.6¢)**. Preparing 5,000 distinct blocks would add **$0.60**. These are illustrative data charges, not a measured competitor benchmark. Use only useful checks and prefer a bulk read when the whole required range is known.
 
-## Implementation and verification
+Testril starts with tiny purchases; familiar APIs and billing can sit above them. Competitors have added machine payments to existing APIs, with published cent-scale prices. [Pricing sources](research/baseline.md).
 
-Build **P0–P3 first**. The preliminary estimate is **11–21 engineer-days**, including the transfer-edge function if the current engine supports it. Backend engine changes are additional work. The detailed plan assigns work and completion criteria; the function requirements specify inputs, outputs, and test cases.
+Provide local sample mode, recordings, sponsor-funded live trials, and user-funded access. Sample mode lets developers see the expected output before obtaining a wallet. Live spending limits are enforced outside the LLM. Show deposits separately from charges; use a wallet or signer, never a private-key web form. Sponsored materialization rights remain with the sponsor unless transferred explicitly.
 
-The inspected endpoint lists three functions and Ethereum, Arbitrum, and Base Sepolia data support. Paid execution, payment network, latency, and payouts still need verification. At observed rates, preparing 1,000 blocks costs **$0.12** and reading that cached range costs **$0.00102**. These are data charges; track LLM and reference-RPC costs separately. The fifty-read example is arithmetic, not a measured competitor benchmark. Prefer a bulk read when the whole required range is known.
+## Card billing and REST
 
-For each working demo, publish runnable code, a short recording, and reproducible output. Test setup with five developers. A proposed reason to continue is that three finish unaided, two return with another task, and one requests an integration. Record failures and wallet setup abandonment.
+A gateway can give customers API keys and card billing while purchasing through Testril's paid MCP interface. Preserve sub-cent usage records and combine charges for billing. Start with prepaid credit and spending caps; price subscriptions after measuring costs. The first gateway holds materialization rights; any customer rebate is explicit service credit. Gateway cache hits do not create Testril read rewards.
 
-**Decisions needed:** choose the first real treasury case; assign the transfer-edge implementation; choose the demo payment network and budget; agree who receives gateway earnings; define the tests required before demonstrating function creation.
+## Work and release criteria
 
-[Detailed plan](demo-strategy.md) · [Function requirements](function-briefs.md) · [Research notes](research/baseline.md)
+Build the three first-release downloads before the vault application. Preliminary estimate: **12–23 engineer-days**, including F01 if the engine supports its output and time for standalone archives and documentation. Backend engine changes are additional. Verify paid execution, exact fields, payment network, latency, and payouts on the demo deployment.
+
+Ask five external developers to extract an archive, run its sample, configure live access, and make the suggested modification. Record failures and repeat use. Before public distribution, choose an explicit license and review the release contents and history for secrets.
+
+**Decisions needed:** choose the real treasury example, assign F01, select the payment network and budget, agree gateway earnings ownership, and define function-creation acceptance tests.
+
+[Detailed plan](demo-strategy.md) · [Download specifications](demo-deliverables.md) · [Function requirements](function-briefs.md)

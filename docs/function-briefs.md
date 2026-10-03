@@ -4,6 +4,10 @@
 
 This document specifies the existing functions to verify and the new functions to implement. Proposed names may change to match the core catalog. See the [demo plan](demo-strategy.md) for their uses and the [research notes](research/baseline.md) for the inspected implementation.
 
+## Application mapping
+
+P0 uses the `sub-cent-reads` CLI. F01 and exact balance snapshots support `treasury-analysis`, including its verification and supplier earnings views. The independent `paid-reader` CLI consumes the same bound function and covered range; it does not import the treasury application. F02/F03 support an optional pool application. F04/F05 and generated G01/G02 support a later vault application. Demonstration identifiers do not imply one application per function or capability. See the [download specifications](demo-deliverables.md).
+
 ## Implementation order
 
 1. **First release:** F01 transfer edges and confirmation of exact balance snapshots. Existing transfer volume supports the first payment/earnings demonstration while F01 is built.

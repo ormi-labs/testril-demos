@@ -2,13 +2,15 @@
 
 **Proposal · 3 October 2026**
 
-Start with the [two-page summary](demo-summary.md). The [function requirements](function-briefs.md) specify backend changes. The [research notes](research/baseline.md) record deployment observations, code references, and competitor pricing. Recheck prices and deployment behavior before building or recording a demo.
+Start with the [two-page summary](demo-summary.md). The [application and download specifications](demo-deliverables.md) describe the screens, source archives, and run exports; the [treasury screen sketch](treasury-preview.svg) illustrates the proposed main result. The [function requirements](function-briefs.md) specify backend changes. The [research notes](research/baseline.md) record deployment observations, code references, and competitor pricing. Recheck prices and deployment behavior before building or recording a demo.
 
 ## 1. Purpose and audience
 
 Build examples that engineers can run, understand, and adapt to their applications. Each demo must produce a useful result, show its cost, and provide enough information to check it.
 
-The first users should be agent and application developers working with protocol treasury or operations teams. Start with a short token-activity check, then a treasury investigation. Reuse the investigation's data to demonstrate materialization earnings and result verification. Add demos that generate new functions once generation is implemented.
+The first users should be agent and application developers working with protocol treasury or operations teams. Release three independently runnable downloads: a token-activity CLI, a treasury web application with its own client and verifier, and a separate paid-reader CLI. The treasury application combines analysis, result verification, and the supplier earnings view. A website index and recording present these together. Later, add a separate vault analysis application for function creation.
+
+The first result should be a usable report, not just a successful API response. A synthetic treasury example starts at 1,000 USDC, receives 50, sends 100, and closes at 950. Its transfer diagram and counterparty table explain the −50 change; selecting an amount opens its source details. The developer can verify the report, export that run, or download the runnable application. The [screen sketch](treasury-preview.svg) shows this proposed layout.
 
 Four capabilities determine the work:
 
@@ -64,7 +66,16 @@ Every demonstration must identify whether it uses synthetic data, a recording, l
 
 ## 4. Demo specifications
 
-**P0–P5** can be built before function creation. **G1–G3** require it. Some demos share an application: P3 adds verification to P1, and G3 combines G1 with P2.
+**P0–P5** can be demonstrated before function creation. **G1–G3** require it. These identifiers refer to demonstrations, not nine separately built applications. The first release has three source downloads; P1/P3 and the P2 supplier view belong in the treasury application. G1/G2 belong in a later vault application, and G3 combines it with an independent reader.
+
+| Runnable project | Included demonstrations | Result developers see |
+| --- | --- | --- |
+| `sub-cent-reads` | P0 | Terminal activity table with each charge and remaining budget |
+| `treasury-analysis` | P1, P3, supplier side of P2 | Treasury report, source inspection, verification, costs, earnings |
+| `paid-reader` | Reader side of P2 | Returned data, a small report, charge, receipt |
+| `vault-analysis`, later | G1, G2, supplier side of G3 | Metric definition, generated function and tests, result tables, revision comparison |
+| `pool-analysis`, optional | P4 | Swap activity and active-liquidity charts |
+| `rest-gateway`, optional | P5 | Authenticated HTTP result, preserved evidence, usage record |
 
 | ID | Demo | Dependencies | Order |
 | --- | --- | --- | --- |
@@ -84,7 +95,7 @@ Every demonstration must identify whether it uses synthetic data, a recording, l
 
 **Demonstration, 60–90 seconds.** Set a one-cent read allowance. Show who prepared the data and what preparation cost. Run the checks and display each range, result, charge, and remaining allowance. Show why each next request was chosen. End with the result and total cost, then attempt an over-budget request and show that the client refuses to sign it.
 
-**Implementation.** Use existing transfer volume, a small deterministic rule for choosing ranges, a payment helper, and a timeline. The example should run without an LLM; optional narration can be added. It needs no new backend function.
+**Implementation.** Use existing transfer volume, a small deterministic rule for choosing ranges, a payment helper, and a timeline. Make this a small CLI. Its terminal table lists range, transfer count, read charge, and remaining allowance; the final line identifies the qualifying range or gives a scoped negative result. It writes the run data and receipts to disk. The example should run without an LLM; optional narration can be added. It needs no new backend function.
 
 At current rates, fifty 100-block reads cost $0.006. This is a calculation to validate during testing, not a target call count. Use only requests the task needs. If the complete required range is known, compare a bulk read; small requests are useful when later scope depends on earlier answers or the client can stop early.
 
@@ -102,6 +113,8 @@ At current rates, fifty 100-block reads cost $0.006. This is a calculation to va
 4. Open a number to inspect its raw inputs, source blocks, and calculation. Keep any unexplained remainder visible.
 5. Export the result and runnable client. Show the total charged.
 
+**Visible result.** The browser report contains opening/closing balances, incoming/outgoing totals, net change, a transfer diagram, ranked counterparties, preparation/read costs, and source details. The synthetic example shows outgoing 100 to B, incoming 30 from B, and incoming 20 from C. Self-transfers cancel. The same report includes verification and supplier earnings views. “Export this run” downloads the report and recorded evidence; “Download source” obtains the application and CLI/verifier from a versioned release.
+
 **Implementation.** Add F01 `erc20_transfer_edges`. Read two exact balance snapshots. Calculate sums and classifications with ordinary client code; an LLM may select calls or describe the result but must not perform the accounting or invent wallet labels.
 
 For `[a,b)`, compare end-of-block balances at `a−1` and `b−1` with incoming minus outgoing Transfer amounts. Both snapshots need coverage. Self-transfers cancel. Rebasing, fee-on-transfer, and other nonstandard tokens need separate handling; choose an ordinary token for the first example. Keep raw amounts as integers and apply token decimals only for display.
@@ -114,6 +127,8 @@ For `[a,b)`, compare end-of-block balances at `a−1` and `b−1` with incoming 
 
 **Demonstration, two minutes.** Show the supplier's preparation purchase beside a separate reader application. The reader buys a read and exports a report or runs a useful check. Display the supplier's earnings before and after, the reader's charge, and the coverage expiry. Retrying the same paid request must not create another earning event.
 
+**Visible result.** Run `paid-reader` as a separate CLI beside the treasury application. The reader prints the returned rows or report, actual charge, and receipt. The supplier application refreshes its actual Testril earnings. The reader accepts the bound-function identity and covered range, or a public dataset reference exported by the supplier. It works without the treasury web server or sibling code.
+
 **Implementation.** Use separate payer and reader accounts. Reuse the claim and accounting interface from `testril-claim` where appropriate, after verifying its fields against the deployment. Use a dedicated test deployment or purchase-level records to distinguish the demo's earnings from unrelated traffic.
 
 A 1,000-block read currently allocates about $0.0005 to a sole eligible materializer. Twenty separately paid reads reach the $0.01 claim threshold, subject to eligibility and rounding. Show accrual directly, or disclose a previously accumulated balance when demonstrating a claim. A payout requires a funded rewards wallet and a verified transaction. Identify testnet payments and operator-funded traffic.
@@ -125,6 +140,8 @@ A 1,000-block read currently allocates about $0.0005 to a sole eligible material
 **Task.** Reproduce the treasury calculation from its recorded sources. Implement this as an export and verification mode in P1.
 
 **Demonstration, 90 seconds.** Open a result, inspect the source blocks and calculation, fetch the reference logs and state, and recompute it. Alter a displayed amount and show the failed comparison. Change a source hash and show the separate source check failing.
+
+**Visible result.** The treasury report displays separate source and arithmetic check statuses, with an explanation of failures. A verifier CLI included in its source download accepts a run export and checks it without the web application running. Preserve the exact calculation version needed to reproduce it.
 
 **Implementation.** Export chain and contract, block range, function version or definition hash, parameters, returned values, provenance responses, client calculation version, receipts, and verification instructions. Preserve the inputs to every derived result. Hash the output and calculation manifest separately from Testril's source-block digest.
 
@@ -164,6 +181,8 @@ The existing digest identifies a set of source blocks; it does not prove the ari
 4. Quote preparation and reading separately, run a short interval, and inspect the result and input references.
 5. Use a second client to discover and call the same function without regenerating it.
 
+**Visible result.** A separate vault application shows the confirmed definition beside generated code or executable definition, tests, quotes, and a deposit-group table. Rows identify balance group, deposit count, deposited assets, and shares for the selected interval. Source details identify the deposits and historical balances used. Export the generated definition with its identity, schema, version, tests, and runtime requirements. The source download includes the application and a small independent consumer of a registered function.
+
 **Implementation.** F04/F05 provide vault data and reference cases. G01 is created during the demonstration. The runtime must support the required historical calls and preserve input references. If it cannot express the rule, choose a supported new computation.
 
 **Acceptance.** New code or a new executable definition persists under a versioned identity. Inputs and outputs have explicit types; execution is deterministic and resource-limited; tests pass before paid work. The result can be reproduced and reused. Existing `llm_tokens` pricing does not establish the future creation price.
@@ -175,6 +194,8 @@ Disclose any supported prompt restrictions and human code review. Show actual el
 **Task.** Determine whether a campaign's depositors return. Define a repeat deposit as one on a later UTC day within seven days, exclude supplied operational addresses, and report withdrawals through a specified cutoff. Agree whether “first deposit” means first ever or first during the campaign.
 
 **Demonstration, three minutes.** Generate the rule, show the result, change a meaningful part of its definition, generate a new version, and compare both results and their inputs. Mark owners with less than seven days of observation as incomplete rather than failed retention.
+
+**Visible result.** Add a second task to the vault application. Show one row per defined group with observed deposits, withdrawals, repeat-deposit counts, and incomplete observation status. Compare two definitions and their results side by side, with explicit versions and cutoffs. G3 uses this application with another payer; it does not require another application.
 
 **Implementation.** G02 needs stored owner state, sufficient initial history, block timestamps, deposit/withdraw inputs, and provenance for derived results. Share transfers and delegated transactions require explicit accounting rules. This version measures repeat deposits and observed cash flows, not retained capital or unique people.
 
@@ -330,15 +351,23 @@ Test cached reads, cold preparation, peer failure, missing coverage, expired quo
 
 Measure preparation and read latency, quote/payment stages, total task cost, external RPC cost, LLM use, and time to first result. Report ranges and medians from repeated runs. Initial targets: a cached treasury result within 30 seconds, a new developer's first paid result within ten minutes, and clear refusal before signing an over-budget request. These are targets, not measured performance.
 
-### Repository organization
+### Repository organization and source releases
 
-Place each runnable demo's source, fixtures, tests, and README in `demos/<name>/`. P3 belongs with the treasury demo; P2 can use a separate small reader or supplier example. Each README explains purpose, prerequisites, configuration, commands, expected output, and verification. State funding and simulation requirements before the run command.
+Use `demos/sub-cent-reads/`, `demos/treasury-analysis/`, and `demos/paid-reader/` for the first release. Later projects get their own directories. Each contains its own source, fixtures, tests, assets, configuration, pinned dependencies, and README. A developer must be able to extract a source archive into an empty directory and run it without root tooling, sibling packages, or the hosted demonstration service.
+
+Publish a versioned archive for each project and identify its source revision. The index explains what each example produces and what the developer can change first. Include sample mode so developers can see the intended output before funding a wallet. Keep live payment setup and required source-RPC access explicit. Public distribution requires an explicit license and a release/history review for secrets.
+
+### Per-run exports
+
+Keep “Download source” separate from “Export this run.” A source release contains the maintained runnable project. A run export contains the selected inputs, exact returned data, calculated report, function identity, receipts, provenance, calculation version, and verification outcomes. It contains no credentials. The matching source release supplies the verifier; the export explains reference-RPC requirements and trust assumptions. Export raw integers without losing precision. See the [download specifications](demo-deliverables.md) for the proposed files.
+
+An exported public dataset reference lets the independent reader identify a bound function and covered range. It is not a permission token, wallet credential, or source archive.
 
 Split repositories when demos need incompatible setup, independent releases, or separate service ownership. Avoid a shared framework readers must learn before understanding an example.
 
 ## 10. Work estimates and decisions
 
-These preliminary estimates are **engineer-days**, not elapsed calendar time. They exclude backend platform changes, deployment approvals, and customer scheduling. One engineer can build the first set sequentially, with backend review as needed.
+These preliminary estimates are **engineer-days**, not elapsed calendar time. They exclude backend platform changes, deployment approvals, and customer scheduling. One engineer can build the first set sequentially, with backend review as needed. The archive/export work increases the earlier estimate because independent downloads require their own configuration, sample data, documentation, and release checks.
 
 | Phase | Work and responsible role | Estimate | Completion criteria |
 | --- | --- | --- | --- |
@@ -346,20 +375,20 @@ These preliminary estimates are **engineer-days**, not elapsed calendar time. Th
 | 1 | F01 and exact balances / backend engineer | 1–3 days if the engine supports the output | Function tests pass; any engine work separately estimated |
 | 1 | P1 and P3 / demo engineer | 4–7 days | Reconciled treasury result, export, verifier, runnable client |
 | 2 | P2 / demo engineer and backend owner | 2–4 days | Separate buyer, correct earnings, verified accrual or payout |
-| 2 | Documentation, recordings, user trials / demo engineer and marketing owner | 2–3 days | Runnable READMEs, recordings, five observed developer trials |
+| 2 | Independent source archives, run exports, documentation, recordings, user trials / demo engineer and marketing owner | 3–5 days | Extracted archives run without siblings; exports reproduce; recordings and five observed trials |
 | 3a | P4 / function and demo engineers | Estimate after engine requirements are checked | Reference agreement and a customer use case |
 | 3b | P5 / service engineer | 7–12 days for a narrow prototype | Capped REST access; billing and retry checks; card mode identified |
 | 4 | G1, G2, G3 / generation owner and demo engineer | Estimate when generation requirements are defined | New persistent functions, meaningful tests, reproducible inputs, independent reuse |
 
-Start with phases 0–2: **11–21 engineer-days**, including F01 if the engine already supports its output. If F01 is blocked, release P0 and an earnings demo using existing transfer volume. The treasury demo still requires F01. Choose P4 or P5 after user trials.
+Start with phases 0–2: **12–23 engineer-days**, including F01 if the engine already supports its output. If F01 is blocked, release P0 and an earnings demo using existing transfer volume. The treasury demo still requires F01. Choose P4 or P5 after user trials.
 
 ### User trials
 
-Recruit five application developers and three protocol or data operators. Ask them to bring a real task. Observe whether they can set up the example, understand its result, verify it, and adapt it.
+Recruit five application developers and three protocol or data operators. Ask them to bring a real task. Observe each developer extract a source archive into an empty directory, run the sample, configure live access, verify a run export, and make the suggested modification. They should not need the hosted UI or other examples' source trees.
 
 Record successful first reads, repeated use, new tasks, integration requests, support time, and failures during wallet setup. Ask what cheaper small reads would let them build. Track actual payers and sponsors; repeated operator-funded reads do not establish customer demand.
 
-A proposed reason to continue is that three of five developers complete setup unaided, two return within a week with another task, and one asks to integrate. These small samples guide revisions; they do not measure market size. If the task is unhelpful, change it. If wallet setup is the main obstacle, prioritize P5. If missing functions are the obstacle, prioritize those functions and generation.
+A proposed reason to continue is that three of five developers run an extracted example and modify it unaided, two return within a week with another task, and one asks to integrate. These small samples guide revisions; they do not measure market size. If the task is unhelpful, change it. If wallet setup is the main obstacle, prioritize P5. If missing functions are the obstacle, prioritize those functions and generation.
 
 ### Decisions needed
 

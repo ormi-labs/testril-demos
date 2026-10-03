@@ -1,0 +1,94 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="840" viewBox="0 0 1200 840" role="img" aria-labelledby="title description">
+  <title id="title">Proposed treasury report</title>
+  <desc id="description">Synthetic example: treasury A opens with 1,000 USDC, receives 50, sends 100, and closes at 950. A counterparty diagram and table explain the change. Source verification, costs, earnings, a run export, and a separate source download are visible.</desc>
+  <rect width="1200" height="840" fill="#f7f6ef"/>
+  <g font-family="Arial, Helvetica, sans-serif" fill="#283125">
+    <text x="32" y="40" font-size="15" font-weight="bold">PROPOSED SCREEN · SYNTHETIC DATA · NO LIVE PAYMENTS</text>
+    <text x="32" y="80" font-size="29" font-weight="bold">Treasury analysis</text>
+    <text x="32" y="108" font-size="16">Treasury A · USDC · Fixture blocks 100–1099</text>
+    <rect x="884" y="56" width="284" height="48" rx="6" fill="#e8ecdf"/>
+    <text x="902" y="85" font-size="16">Mode: local sample</text>
+
+    <rect x="32" y="132" width="1136" height="80" rx="6" fill="#fff" stroke="#cbd0c1"/>
+    <text x="50" y="155" font-size="13" fill="#626b59">INPUTS</text>
+    <text x="50" y="184" font-size="16">Treasury: A</text>
+    <text x="244" y="184" font-size="16">Token: USDC</text>
+    <text x="440" y="184" font-size="16">Range: [100, 1100)</text>
+    <text x="672" y="184" font-size="16">Team addresses: A</text>
+    <text x="956" y="184" font-size="15">Spend limit: $0.50</text>
+
+    <rect x="32" y="228" width="736" height="103" rx="6" fill="#fff" stroke="#cbd0c1"/>
+    <text x="50" y="253" font-size="14" fill="#626b59">Opening balance</text>
+    <text x="50" y="291" font-size="26" font-weight="bold">1,000</text>
+    <text x="248" y="253" font-size="14" fill="#626b59">Closing balance</text>
+    <text x="248" y="291" font-size="26" font-weight="bold">950</text>
+    <text x="446" y="253" font-size="14" fill="#626b59">Change</text>
+    <text x="446" y="291" font-size="26" font-weight="bold">−50 USDC</text>
+    <text x="626" y="253" font-size="14" fill="#626b59">Reconciles</text>
+    <text x="626" y="291" font-size="19" font-weight="bold">Yes</text>
+
+    <rect x="32" y="347" width="736" height="214" rx="6" fill="#fff" stroke="#cbd0c1"/>
+    <text x="50" y="378" font-size="18" font-weight="bold">Transfers explaining the balance change</text>
+    <rect x="78" y="435" width="132" height="52" rx="6" fill="#e8ecdf"/>
+    <text x="92" y="467" font-size="17">C: sends 20</text>
+    <rect x="350" y="435" width="138" height="52" rx="6" fill="#333929"/>
+    <text x="368" y="467" font-size="17" fill="#fff">Treasury A</text>
+    <rect x="620" y="435" width="100" height="52" rx="6" fill="#e8ecdf"/>
+    <text x="650" y="467" font-size="17">B</text>
+    <path d="M 210 461 L 338 461" stroke="#536344" stroke-width="3" fill="none"/>
+    <path d="M 327 454 L 339 461 L 327 468" stroke="#536344" stroke-width="3" fill="none"/>
+    <text x="266" y="448" font-size="15">20</text>
+    <path d="M 488 450 L 608 450" stroke="#536344" stroke-width="3" fill="none"/>
+    <path d="M 597 443 L 609 450 L 597 457" stroke="#536344" stroke-width="3" fill="none"/>
+    <text x="536" y="437" font-size="15">100</text>
+    <path d="M 620 476 L 502 476" stroke="#9b8657" stroke-width="3" fill="none"/>
+    <path d="M 513 469 L 501 476 L 513 483" stroke="#9b8657" stroke-width="3" fill="none"/>
+    <text x="541" y="501" font-size="15">30</text>
+    <text x="50" y="540" font-size="15">Self-transfer of 50 cancels. Incoming 50 − outgoing 100 = −50 USDC.</text>
+
+    <rect x="32" y="577" width="736" height="170" rx="6" fill="#fff" stroke="#cbd0c1"/>
+    <text x="50" y="608" font-size="18" font-weight="bold">Counterparties</text>
+    <text x="50" y="640" font-size="14">Address</text>
+    <text x="252" y="640" font-size="14">Incoming</text>
+    <text x="442" y="640" font-size="14">Outgoing</text>
+    <text x="631" y="640" font-size="14">Net</text>
+    <path d="M 50 650 L 748 650" stroke="#d6dacd"/>
+    <text x="50" y="678" font-size="17">B</text>
+    <text x="252" y="678" font-size="17">30</text>
+    <text x="442" y="678" font-size="17">100</text>
+    <text x="631" y="678" font-size="17">−70</text>
+    <text x="50" y="711" font-size="17">C</text>
+    <text x="252" y="711" font-size="17">20</text>
+    <text x="442" y="711" font-size="17">0</text>
+    <text x="631" y="711" font-size="17">+20</text>
+
+    <rect x="788" y="228" width="380" height="224" rx="6" fill="#fff" stroke="#cbd0c1"/>
+    <text x="806" y="259" font-size="18" font-weight="bold">Selected amount: outgoing 100</text>
+    <text x="806" y="291" font-size="16">A → B · Fixture block 100</text>
+    <text x="806" y="320" font-size="16">Function: erc20_transfer_edges</text>
+    <text x="806" y="349" font-size="16">Source blocks: inspect references</text>
+    <text x="806" y="378" font-size="16">Independent check: not run</text>
+    <rect x="806" y="395" width="108" height="38" rx="5" fill="#333929"/>
+    <text x="832" y="420" font-size="16" fill="#fff">Verify</text>
+    <text x="928" y="420" font-size="13">Live check requires RPC access</text>
+
+    <rect x="788" y="468" width="380" height="122" rx="6" fill="#fff" stroke="#cbd0c1"/>
+    <text x="806" y="499" font-size="18" font-weight="bold">Costs</text>
+    <text x="806" y="527" font-size="16">Preparation: $0.120240</text>
+    <text x="806" y="552" font-size="16">Data reads: $0.001062</text>
+    <text x="806" y="577" font-size="12">Illustrative charges; live values come from receipts</text>
+
+    <rect x="788" y="606" width="380" height="141" rx="6" fill="#fff" stroke="#cbd0c1"/>
+    <text x="806" y="637" font-size="18" font-weight="bold">Materialization earnings</text>
+    <text x="806" y="667" font-size="16">Accrued: $0.000500 (illustrative)</text>
+    <text x="806" y="692" font-size="14">One separate 1,000-block paid read</text>
+    <text x="806" y="715" font-size="13">Paid out: $0 · Claim threshold: $0.01</text>
+    <text x="806" y="736" font-size="12">Live earnings must come from supplier records</text>
+
+    <rect x="32" y="766" width="173" height="42" rx="5" fill="#333929"/>
+    <text x="51" y="793" font-size="16" fill="#fff">Export this run</text>
+    <rect x="220" y="766" width="195" height="42" rx="5" fill="#e8ecdf" stroke="#a3ad91"/>
+    <text x="242" y="793" font-size="16">Download source</text>
+    <text x="440" y="792" font-size="14">Run export: data + evidence. Source download: runnable project.</text>
+  </g>
+</svg>
