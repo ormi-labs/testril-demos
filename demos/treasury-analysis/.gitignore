@@ -1,14 +1,8 @@
-.DS_Store
 .env
 .env.*
 !.env.example
-*.log
 node_modules/
-dist/
-build/
-target/
-.venv/
-__pycache__/
-*.pyc
 test-results/
 playwright-report/
+*.log
+.DS_Store

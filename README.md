@@ -12,7 +12,13 @@ To refresh the PDF, install `reportlab` in a Python environment and run `python 
 
 ## Demos
 
-No runnable demos yet. The first release is planned as three independent downloads: `sub-cent-reads` (CLI), `treasury-analysis` (web application, client, and verifier), and `paid-reader` (CLI). Each will live in `demos/<name>/` with its own setup and run instructions. Runnable releases will be linked here.
+| Demo | Run | Status |
+| --- | --- | --- |
+| [Treasury analysis](demos/treasury-analysis/README.md) | `cd demos/treasury-analysis && npm ci && npm start` | Runnable fictional sample, CLI, verifier, and source/run downloads. Live integration awaits transfer edges and a paid client. |
+
+The treasury interface follows the approved derivative style guide from `testril-website`. It runs locally with Node.js 22.13+ on macOS or Linux. See its README for exact prerequisites, expected results, and checks. Preview the [desktop](docs/screenshots/treasury-desktop.png) and [mobile](docs/screenshots/treasury-mobile.png) screens as PNGs.
+
+`sub-cent-reads` and `paid-reader` remain planned independent CLI downloads. No hosted demo or public release has been published.
 
 ## Contributing
 
