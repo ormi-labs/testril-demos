@@ -30,7 +30,7 @@ Open **http://127.0.0.1:4173**. Optional: copy `.env.example` to `.env` to chang
    balance for mock source evidence; close the modal with Escape or Close.
 4. **Payment History** shows read costs and receipts. It stays current even when
    its tab is hidden. Switching tabs, replay, and provenance inspection are free.
-5. **Reset demo**, in the header, returns funds to Treasury and clears Transfer
+5. **Reset demo**, below the header, returns funds to Treasury and clears Transfer
    History. Payment History and accumulated charges are retained.
 
 Each transfer refreshes three balance reads and one history read. A separate mock

@@ -1,4 +1,4 @@
-import { decimalAmount, feeAmount, parseUsdc } from "./amounts.js";
+import { decimalAmount, feeAmount } from "./amounts.js";
 import { replayBalances } from "./replay.js";
 import { transferDiagram } from "./transfer-diagram.js";
 
@@ -56,24 +56,15 @@ function lock(value) {
     $(id).disabled = value;
   for (const balance of document.querySelectorAll("[data-balance]"))
     balance.disabled = value;
-  if (!value && state) updateAvailable();
+  if (!value && state) updateRecipients();
 }
-function updateAvailable() {
+function updateRecipients() {
   if ($("from").value === $("to").value)
     $("to").value = state.wallets.find(
       (wallet) => wallet.id !== $("from").value,
     ).id;
   for (const option of $("to").options)
     option.disabled = option.value === $("from").value;
-  $("available").textContent =
-    `${decimalAmount(state.balances[$("from").value])} USDC available`;
-  let amount;
-  try {
-    amount = decimalAmount(parseUsdc($("amount").value));
-  } catch {
-    /* The amount can be incomplete while editing. */
-  }
-  $("transfer").textContent = amount ? `Send ${amount} USDC` : "Send USDC";
 }
 function renderState() {
   $("wallets").replaceChildren(
@@ -142,7 +133,7 @@ function renderState() {
         : [element("li", "All funds were already in the treasury.")]),
     );
   renderReplay();
-  updateAvailable();
+  updateRecipients();
 }
 function stop() {
   clearInterval(timer);
@@ -281,12 +272,7 @@ async function action(kind) {
   if (busy) return;
   stop();
   lock(true);
-  status(
-    kind === "transfer"
-      ? "Sending and refreshing histories…"
-      : "Returning funds…",
-  );
-  if (kind === "transfer") $("transfer").textContent = "Sending…";
+  status("");
   try {
     const input = { revision: state.revision };
     if (kind === "transfer")
@@ -300,11 +286,6 @@ async function action(kind) {
     step = state.transferCount;
     renderState();
     stop();
-    status(
-      kind === "reset"
-        ? "Reset. Treasury has 1 USDC."
-        : "Sent. Balances updated.",
-    );
   } catch (error) {
     status(error.message, true);
   } finally {
@@ -345,8 +326,7 @@ $("transfer-form").addEventListener("submit", (event) => {
   event.preventDefault();
   action("transfer");
 });
-$("from").addEventListener("change", updateAvailable);
-$("amount").addEventListener("input", updateAvailable);
+$("from").addEventListener("change", updateRecipients);
 $("reset").addEventListener("click", () => action("reset"));
 $("play").addEventListener("click", play);
 $("restart-replay").addEventListener("click", () => {

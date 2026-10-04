@@ -28,34 +28,71 @@ body {
   text-decoration: none;
   color: var(--ink);
 }
-.header-actions {
-  display: flex;
-  align-items: center;
-  gap: 24px;
-}
-.header-actions .identity {
-  text-align: right;
-}
-.header-actions #reset {
-  font-size: 13px;
-}
 .identity span {
   display: block;
   font-size: 11px;
   font-weight: 400;
   color: var(--muted);
 }
-.intro {
-  padding: 36px 0 28px;
+.demo-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 12px;
 }
-.intro-meta {
+.demo-toolbar #reset {
+  font-size: 13px;
+}
+.identity {
+  text-align: right;
+}
+.demo-context {
   display: flex;
   align-items: center;
-  gap: 16px;
-  color: var(--muted);
+  gap: 24px;
   font-size: 12px;
-  margin-bottom: 20px;
+  color: var(--muted);
 }
+.mode-switch {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border: 0;
+  margin: 0;
+  padding: 0;
+}
+.mode-switch label {
+  margin: 0;
+  font-size: 12px;
+  cursor: pointer;
+}
+.mode-switch label:has(input:checked) {
+  color: var(--accent);
+  font-weight: 600;
+}
+.mode-switch label:has(input:disabled) {
+  opacity: 0.55;
+  cursor: default;
+}
+.mode-switch label:focus-within {
+  outline: 2px solid var(--accent);
+  outline-offset: 4px;
+}
+.sr-only,
+.mode-switch input[type="radio"] {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  margin: 0;
+  white-space: nowrap;
+}
+.intro {
+  padding: 8px 0 28px;
+}
+
 h1 {
   font-size: 58px;
   line-height: 1.06;
@@ -141,10 +178,19 @@ p {
   grid-template-columns: 1fr 1fr;
   gap: 16px 12px;
 }
-.amount-control,
-#available,
-#transfer {
+.amount-control {
   grid-column: 1 / -1;
+}
+.amount-send {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.amount-send input {
+  flex: 1;
+}
+.amount-send #transfer {
+  flex: 0 0 84px;
 }
 label {
   display: block;
@@ -201,13 +247,10 @@ button:disabled {
   padding: 8px;
   font-size: 12px;
 }
-#available {
-  margin-top: -8px;
-}
 #status {
   font-size: 12px;
   min-height: 18px;
-  margin: 12px 0 0;
+  margin: 0 0 12px;
   color: var(--muted);
 }
 #status:empty {
@@ -594,10 +637,7 @@ a {
   .identity {
     font-size: 12px;
   }
-  .header-actions {
-    gap: 12px;
-  }
-  .header-actions #reset {
+  .demo-toolbar #reset {
     font-size: 11px;
     padding: 8px;
   }
@@ -607,15 +647,13 @@ a {
   .history-tabs [role="tab"] {
     font-size: 13px;
   }
+  .demo-context {
+    gap: 16px;
+  }
   .intro {
-    padding: 24px 0;
+    padding: 8px 0 24px;
   }
-  .intro-meta {
-    font-size: 10px;
-    justify-content: space-between;
-    gap: 8px;
-    margin-bottom: 16px;
-  }
+
   h1 {
     font-size: 42px;
   }

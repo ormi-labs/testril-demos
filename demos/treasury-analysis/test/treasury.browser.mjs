@@ -3,8 +3,10 @@ async function send(page, from, to, amount) {
   await page.locator("#from").selectOption(from);
   await page.locator("#to").selectOption(to);
   await page.locator("#amount").fill(amount);
+  const count = Number(await page.locator("#transfer-count").textContent());
   await page.locator("#transfer").click();
-  await expect(page.locator("#status")).toContainText("Balances updated");
+  await expect(page.locator("#transfer-count")).toHaveText(String(count + 1));
+  await expect(page.locator("#status")).toBeEmpty();
 }
 async function scrub(page, step) {
   await expect(page.locator("#replay-step")).toBeEnabled();
@@ -34,11 +36,26 @@ test("requested layout, empty history and keyboard balance provenance", async ({
   await expect(page.locator("#empty-history")).toBeVisible();
   await expect(page.locator("#payments")).toBeHidden();
   await expect(
-    page.locator("#all, #show, .step-number, #balance-block, .reader-label"),
+    page.locator(
+      "#all, #show, #available, .step-number, #balance-block, .reader-label",
+    ),
   ).toHaveCount(0);
   const logo = await page.getByAltText("Testril").boundingBox();
   const identity = await page.locator(".identity").boundingBox();
   expect(logo.x).toBeLessThan(identity.x);
+  await expect(page.locator("#transfer")).toHaveText("Send");
+  await expect(
+    page.getByRole("radio", { name: "Mock", exact: true }),
+  ).toBeChecked();
+  await expect(
+    page.getByRole("radio", { name: "Live", exact: true }),
+  ).toBeDisabled();
+  const amount = await page.locator("#amount").boundingBox();
+  const sendButton = await page.locator("#transfer").boundingBox();
+  expect(Math.abs(amount.y - sendButton.y)).toBeLessThan(1);
+  const header = await page.locator(".masthead").boundingBox();
+  const reset = await page.locator("#reset").boundingBox();
+  expect(reset.y).toBeGreaterThanOrEqual(header.y + header.height);
   await page.locator("#wallet-a").focus();
   await page.keyboard.press("Enter");
   await expect(

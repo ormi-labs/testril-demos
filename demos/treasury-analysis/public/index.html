@@ -12,20 +12,40 @@
   <body>
     <header class="measure masthead">
       <img src="/assets/wordmark.svg" width="132" height="28" alt="Testril" />
-      <div class="header-actions">
-        <button id="reset" type="button" class="secondary" disabled>
-          Reset demo</button
-        ><a href="/" class="identity"
-          >Wallet transfers<span>A Testril demo</span></a
-        >
-      </div>
+      <a href="/" class="identity"
+        >Wallet transfers<span>A Testril demo</span></a
+      >
     </header>
+    <div class="measure demo-toolbar">
+      <div class="demo-context">
+        <span>Arbitrum</span>
+        <fieldset class="mode-switch">
+          <legend class="sr-only">Data mode</legend>
+          <label
+            ><input
+              type="radio"
+              name="data-mode"
+              value="mock"
+              checked
+            />Mock</label
+          >
+          <span aria-hidden="true">|</span>
+          <label title="Live integration is not available yet"
+            ><input
+              type="radio"
+              name="data-mode"
+              value="live"
+              disabled
+            />Live</label
+          >
+        </fieldset>
+      </div>
+      <button id="reset" type="button" class="secondary" disabled>
+        Reset demo
+      </button>
+    </div>
     <main class="measure">
       <section class="intro" aria-labelledby="question">
-        <div class="intro-meta">
-          <span>1 USDC · 3 wallets · Arbitrum</span
-          ><span class="badge">Mock · no real funds</span>
-        </div>
         <h1 id="question">Move Money</h1>
         <p class="subtitle">Track balances and transfers</p>
       </section>
@@ -34,6 +54,7 @@
           <div class="section-top">
             <h2 id="transfer-heading">Send USDC</h2>
           </div>
+          <p id="status" role="status" aria-live="polite"></p>
           <form id="transfer-form">
             <div class="form-grid">
               <div>
@@ -45,24 +66,22 @@
                 ><select id="to" name="to" required disabled></select>
               </div>
               <div class="amount-control">
-                <label for="amount">Amount · USDC</label
-                ><input
-                  id="amount"
-                  name="amount"
-                  inputmode="decimal"
-                  aria-describedby="available status"
-                  value="0.25"
-                  required
-                  disabled
-                />
+                <label for="amount">Amount · USDC</label>
+                <div class="amount-send">
+                  <input
+                    id="amount"
+                    name="amount"
+                    inputmode="decimal"
+                    aria-describedby="status"
+                    value="0.25"
+                    required
+                    disabled
+                  />
+                  <button id="transfer" type="submit" disabled>Send</button>
+                </div>
               </div>
-              <span id="available" class="small muted"></span>
-              <button id="transfer" type="submit" disabled>
-                Send 0.25 USDC
-              </button>
             </div>
           </form>
-          <p id="status" role="status" aria-live="polite">Loading…</p>
         </section>
         <section class="balances-section" aria-labelledby="balances-heading">
           <div class="section-top"><h2 id="balances-heading">Balances</h2></div>
