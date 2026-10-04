@@ -7,7 +7,6 @@ async function send(page, from, to, amount) {
   await expect(page.locator("#status")).toContainText("Balances updated");
 }
 async function scrub(page, step) {
-  await expect(page.locator("#history")).toBeVisible();
   await expect(page.locator("#replay-step")).toBeEnabled();
   await page.locator("#replay-step").evaluate((input, value) => {
     input.value = value;
@@ -18,122 +17,98 @@ test.beforeEach(async ({ page }) => {
   await page.goto("/");
   await expect(page.locator("#balance-treasury")).toHaveText("1");
 });
-test("transfers, incremental replay, keyboard provenance and reset", async ({
+
+test("requested layout, empty history and keyboard balance provenance", async ({
   page,
 }) => {
-  await send(page, "treasury", "a", ".25");
-  await send(page, "a", "b", ".1");
-  await expect(page.locator("#balance-treasury")).toHaveText("0.75");
-  await expect(page.locator("#balance-a")).toHaveText("0.15");
-  await expect(page.locator("#balance-b")).toHaveText("0.1");
-  await expect(page.locator("#spent")).toHaveText("0.000090");
-  await page.locator("#show").click();
-  await expect(page.locator(".transfer-edge button")).toHaveCount(1);
-  await page.locator("#play").click();
-  await scrub(page, 2);
-  await expect(page.locator(".transfer-edge button")).toHaveCount(2);
-  await expect(page.locator(".transfer-edge button").first()).toContainText(
-    "Block 100000001",
-  );
-  await expect(page.locator(".transfer-edge button").first()).toContainText(
-    "UTC",
-  );
-  await page.locator(".transfer-edge button").first().focus();
+  await expect(
+    page.getByRole("heading", { name: "Move Money", exact: true }),
+  ).toBeVisible();
+  await expect(
+    page.getByText("Track balances and transfers", { exact: true }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("heading", { name: "Balances", exact: true }),
+  ).toBeVisible();
+  await expect(page.locator("#transfer")).toBeInViewport();
+  await expect(page.locator("#empty-history")).toBeVisible();
+  await expect(page.locator("#payments")).toBeHidden();
+  await expect(
+    page.locator("#all, #show, .step-number, #balance-block, .reader-label"),
+  ).toHaveCount(0);
+  const logo = await page.getByAltText("Testril").boundingBox();
+  const identity = await page.locator(".identity").boundingBox();
+  expect(logo.x).toBeLessThan(identity.x);
+  await page.locator("#wallet-a").focus();
   await page.keyboard.press("Enter");
   await expect(
-    page.getByRole("dialog", { name: "Transfer provenance" }),
+    page.getByRole("dialog", { name: "Balance provenance" }),
   ).toBeVisible();
-  expect(
-    await page
-      .locator("#provenance")
-      .evaluate((dialog) => dialog.matches(":modal")),
-  ).toBe(true);
   await expect(page.locator("#provenance-content")).toContainText(
-    "250000 raw units",
+    "0 USDC · 0 raw units",
   );
-  await expect(page.locator("#spent")).toHaveText("0.000102");
+  await expect(page.locator("#provenance-content")).toContainText(
+    "erc20.token_balance",
+  );
   await page.keyboard.press("Escape");
-  await expect(page.locator("#provenance")).toBeHidden();
-  await page.locator("#reset").click();
-  await expect(page.locator("#balance-treasury")).toHaveText("1");
-  await expect(page.locator("#balance-a")).toHaveText("0");
-  await expect(page.locator("#balance-b")).toHaveText("0");
-  await expect(page.locator("#spent")).toHaveText("0.000132");
-  await expect(page.locator("#history")).toBeHidden();
-  await page.locator("#payment-details").click();
-  await page.locator("#reset-evidence summary").click();
-  await expect(page.locator("#reset-sweeps li")).toHaveCount(2);
-  await page.locator("#close-payments").click();
-  await page.locator("#show").click();
-  await expect(page.locator("#empty-history")).toBeVisible();
-  await expect(page.locator("#spent")).toHaveText("0.000132");
-});
-test("invalid transfer spends nothing; refresh resumes cached balances", async ({
-  page,
-}) => {
-  await page.locator("#amount").fill("2");
-  await page.locator("#transfer").click();
-  await expect(page.locator("#status")).toHaveClass(/error/);
-  await expect(page.locator("#spent")).toHaveText("0.000030");
-  await send(page, "treasury", "b", ".3");
-  await page.reload();
-  await expect(page.locator("#balance-b")).toHaveText("0.3");
-  await expect(page.locator("#spent")).toHaveText("0.000060");
-});
-test("reduced motion pauses; stale replay stays separate from current balances", async ({
-  page,
-}) => {
-  await page.emulateMedia({ reducedMotion: "reduce" });
-  await send(page, "treasury", "a", ".25");
-  await page.locator("#show").click();
-  await expect(page.locator("#step-label")).toHaveText("0 / 1");
-  await expect(page.locator("#play")).toHaveText("Play");
-  await scrub(page, 1);
-  await send(page, "treasury", "b", ".1");
-  await expect(page.locator("#history-stale")).toBeVisible();
-  await expect(page.locator("#balance-treasury")).toHaveText("0.65");
-  await expect(page.locator("#transfer-diagram")).toContainText("0.75 USDC");
-  await page.locator(".transfer-edge button").click();
-  await expect(
-    page.getByRole("dialog", { name: "Transfer provenance" }),
-  ).toBeVisible();
-  expect(
-    await page
-      .locator("#provenance")
-      .evaluate((dialog) => dialog.matches(":modal")),
-  ).toBe(true);
+  await expect(page.locator("#wallet-a")).toBeFocused();
   expect(
     await page.evaluate(
       () => document.documentElement.scrollWidth <= innerWidth,
     ),
   ).toBe(true);
-  await page.getByRole("button", { name: "Close provenance" }).click();
-  await expect(page.locator("#provenance")).toBeHidden();
-  const download = page.waitForEvent("download");
-  await page.locator("#export").click();
-  expect((await download).suggestedFilename()).toBe(
-    "wallet-transfers-run.tar.gz",
-  );
 });
 
-test("each transfer has a separate chronological row, including reverse transfers", async ({
+test("both histories refresh automatically; provenance and tabs add no charges", async ({
   page,
 }) => {
-  await page.emulateMedia({ reducedMotion: "reduce" });
+  await send(page, "treasury", "a", ".25");
+  await expect(page.locator(".transfer-edge button")).toHaveCount(1);
+  await expect(page.locator("#payment-count")).toHaveText("3");
+  await page.locator("#wallet-a").click();
+  await expect(page.locator("#provenance-content")).toContainText(
+    "0.25 USDC · 250000 raw units",
+  );
+  await expect(page.locator("#provenance-content")).toContainText("100000001");
+  await page.locator("#close-provenance").click();
+  await page.locator("#payment-tab").click();
+  await expect(page.locator("#spent")).toBeVisible();
+  await expect(page.locator("#spent")).toHaveText("0.000071");
+  await expect(page.locator("#receipt-rows tr")).toHaveCount(3);
+  await send(page, "a", "b", ".1");
+  await expect(page.locator("#receipt-rows tr")).toHaveCount(5);
+  await expect(page.locator("#spent")).toHaveText("0.000113");
+  await expect(page.locator("#transfer-count")).toHaveText("2");
+  await page.locator("#transfer-tab").click();
+  await expect(page.locator(".transfer-edge button")).toHaveCount(2);
+  await expect(page.locator("#balance-treasury")).toHaveText("0.75");
+  await expect(page.locator("#balance-a")).toHaveText("0.15");
+  await expect(page.locator("#balance-b")).toHaveText("0.1");
+  await page.locator(".transfer-edge button").first().click();
+  await expect(
+    page.getByRole("dialog", { name: "Transfer provenance" }),
+  ).toBeVisible();
+  await expect(page.locator("#provenance-content")).toContainText(
+    "250000 raw units",
+  );
+  await page.keyboard.press("Escape");
+  await expect(page.locator("#spent")).toHaveText("0.000113");
+  await page.locator("#transfer-tab").focus();
+  await page.keyboard.press("ArrowRight");
+  await expect(page.locator("#payment-tab")).toBeFocused();
+  await expect(page.locator("#payments")).toBeVisible();
+  await page.keyboard.press("Home");
+  await expect(page.locator("#history")).toBeVisible();
+});
+
+test("replay uses separate chronological rows; reset clears transfers and retains payments", async ({
+  page,
+}) => {
   await send(page, "treasury", "a", ".4");
   await send(page, "a", "treasury", ".1");
   await send(page, "treasury", "a", ".2");
   await send(page, "a", "b", ".15");
   await send(page, "b", "a", ".05");
-  await page.locator("#show").click();
-  await scrub(page, 2);
-  await expect(page.locator(".diagram-wallet")).toHaveCount(3);
-  await expect(page.locator(".transfer-edge button")).toHaveCount(2);
-  await expect(page.locator('[data-wallet="treasury"]')).toContainText(
-    "0.7 USDC",
-  );
-  await scrub(page, 5);
-  await expect(page.locator(".diagram-wallet")).toHaveCount(3);
   await expect(page.locator(".transfer-edge button")).toHaveCount(5);
   const rows = await page
     .locator(".diagram-row button")
@@ -146,50 +121,44 @@ test("each transfer has a separate chronological row, including reverse transfer
     );
   rows.forEach((row, index) => {
     expect(row.name).toMatch(new RegExp(`^Transfer ${index + 1}:`));
-    if (index > 0) expect(row.top).toBeGreaterThan(rows[index - 1].bottom);
+    if (index) expect(row.top).toBeGreaterThan(rows[index - 1].bottom);
   });
-  const reverse = page.getByRole("button", {
-    name: "Transfer 2: Counterparty A to Treasury, 0.1 USDC. Show provenance.",
-    exact: true,
-  });
-  await reverse.click();
-  await expect(page.getByRole("dialog")).toContainText("100000 raw units");
-  await page.keyboard.press("Tab");
-  expect(
-    await page.evaluate(() =>
-      document.querySelector("#provenance").contains(document.activeElement),
-    ),
-  ).toBe(true);
-  await page.keyboard.press("Escape");
-  await expect(reverse).toBeFocused();
-  await expect(page.locator("#spent")).toHaveText("0.000195");
+  await page.locator("#play").click();
+  await expect(page.locator(".transfer-edge button")).toHaveCount(1);
+  await page.locator("#play").click();
+  await scrub(page, 2);
+  await expect(page.locator('[data-wallet="treasury"]')).toContainText(
+    "0.7 USDC",
+  );
+  await expect(page.locator("#balance-treasury")).toHaveText("0.5");
+  await expect(page.locator("#spent")).toHaveText("0.000245");
+  await page.locator("#reset").click();
+  await expect(page.locator("#balance-treasury")).toHaveText("1");
+  await expect(page.locator("#empty-history")).toBeVisible();
+  await expect(page.locator(".transfer-edge button")).toHaveCount(0);
+  await page.locator("#payment-tab").click();
+  await expect(page.locator("#spent")).toHaveText("0.000275");
+  await expect(page.locator("#receipt-rows tr")).toHaveCount(12);
+  await page.locator("#reset-evidence summary").click();
+  await expect(page.locator("#reset-sweeps li")).toHaveCount(2);
 });
 
-test("landing makes the first action visible and keeps accounting out of the way", async ({
+test("invalid transfer preserves histories; refresh resumes cached reads and downloads work", async ({
   page,
 }) => {
-  await expect(
-    page.getByRole("heading", { name: "Move USDC. Track every transfer." }),
-  ).toBeVisible();
-  await expect(
-    page.getByRole("button", { name: "Send 0.25 USDC", exact: true }),
-  ).toBeInViewport();
-  await expect(page.locator("#payments")).toBeHidden();
-  await expect(page.locator("#history")).toBeHidden();
-  await page.locator("#amount").fill(".000001");
-  await expect(page.locator("#transfer")).toHaveText("Send 0.000001 USDC");
-  await page.locator("#all").click();
-  await expect(page.locator("#transfer")).toHaveText("Send 1 USDC");
-  await page.locator("#payment-details").click();
-  await expect(
-    page.getByRole("dialog", { name: "Read payments" }),
-  ).toBeVisible();
-  await expect(page.locator("#payment-spent")).toHaveText("0.000030");
-  await page.keyboard.press("Escape");
-  await expect(page.locator("#payment-details")).toBeFocused();
-  expect(
-    await page.evaluate(
-      () => document.documentElement.scrollWidth <= innerWidth,
-    ),
-  ).toBe(true);
+  await page.locator("#amount").fill("2");
+  await page.locator("#transfer").click();
+  await expect(page.locator("#status")).toHaveClass(/error/);
+  await expect(page.locator("#spent")).toHaveText("0.000030");
+  await expect(page.locator("#empty-history")).toBeVisible();
+  await send(page, "treasury", "b", ".3");
+  await page.reload();
+  await expect(page.locator("#balance-b")).toHaveText("0.3");
+  await expect(page.locator(".transfer-edge button")).toHaveCount(1);
+  await expect(page.locator("#spent")).toHaveText("0.000071");
+  const download = page.waitForEvent("download");
+  await page.locator("#export").click();
+  expect((await download).suggestedFilename()).toBe(
+    "wallet-transfers-run.tar.gz",
+  );
 });

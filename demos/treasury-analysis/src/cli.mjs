@@ -1,10 +1,5 @@
 import { readFile, writeFile } from "node:fs/promises";
-import {
-  createDemo,
-  transferDemo,
-  showTransfers,
-  exportDemo,
-} from "./demo.mjs";
+import { createDemo, transferDemo, exportDemo } from "./demo.mjs";
 import { decimalAmount } from "../public/amounts.js";
 import { replayBalances } from "../public/replay.js";
 
@@ -16,7 +11,6 @@ try {
     demo = transferDemo(demo, { from: "treasury", to: "a", amount: "0.25" });
     demo = transferDemo(demo, { from: "treasury", to: "b", amount: "0.1" });
     demo = transferDemo(demo, { from: "a", to: "b", amount: "0.05" });
-    demo = showTransfers(demo).demo;
     run = exportDemo(demo);
     if (filename)
       await writeFile(filename, `${JSON.stringify(run, null, 2)}\n`);

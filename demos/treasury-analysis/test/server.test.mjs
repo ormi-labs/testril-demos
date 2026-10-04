@@ -34,7 +34,7 @@ test("sessions isolate state and reject stale mutations, secret inputs and forei
   assert.deepEqual(results.map((result) => result.status).sort(), [200, 409]);
   const cached = await (await fetch(route)).json();
   assert.equal(cached.balances.a, "250000");
-  assert.equal(cached.payment.spentRaw, "60");
+  assert.equal(cached.payment.spentRaw, "71");
   assert.equal(
     (
       await post(`${route}/transfer`, {
@@ -62,12 +62,15 @@ test("sessions isolate state and reject stale mutations, secret inputs and forei
   );
   const second = await (await post(`${url}/api/sessions`, {})).json();
   assert.equal(second.balances.a, "0");
-  const history = await (
-    await post(`${route}/history`, { revision: 1 })
+  assert.equal(cached.historyRead.transfers.length, 1);
+  const balance = await (
+    await fetch(`${route}/balance-provenance?wallet=a`)
   ).json();
-  assert.equal(history.history.transfers.length, 1);
+  assert.equal(balance.source.balanceRaw, "250000");
+  assert.equal(balance.source.blockHash, cached.balanceRead.blockHash);
+  assert.equal((await (await fetch(route)).json()).payment.spentRaw, "71");
   const reset = await (
-    await post(`${route}/reset`, { revision: history.state.revision })
+    await post(`${route}/reset`, { revision: cached.revision })
   ).json();
   assert.equal(reset.balances.treasury, "1000000");
   assert.equal(reset.transferCount, 0);
@@ -101,7 +104,7 @@ test("downloads extract and replay without repository dependencies", async (t) =
   const manifest = JSON.parse(
     await readFile(join(source, "SOURCE.json"), "utf8"),
   );
-  assert.equal(manifest.version, "0.2.0");
+  assert.equal(manifest.version, "0.3.0");
   assert.equal(
     manifest.files["README.md"],
     createHash("sha256")

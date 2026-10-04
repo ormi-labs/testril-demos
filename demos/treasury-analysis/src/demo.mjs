@@ -5,6 +5,7 @@ import {
   readBalances,
   readTransfers,
   transferProvenance,
+  balanceProvenance,
 } from "./mock-testril.mjs";
 import { parseUsdc, rawAmount } from "../public/amounts.js";
 
@@ -37,9 +38,16 @@ function chargeRead(demo, result, kind) {
   };
 }
 
-function updateBalances(demo) {
-  const result = readBalances(demo.chain);
-  return { ...chargeRead(demo, result, "balances"), balanceRead: result };
+function refreshReads(demo) {
+  const balanceRead = readBalances(demo.chain);
+  const historyRead = readTransfers(demo.chain, demo.startIndex);
+  // Compose both reads before committing: a failed refresh spends nothing.
+  const updated = chargeRead(
+    chargeRead(demo, balanceRead, "balances"),
+    historyRead,
+    "transfers",
+  );
+  return { ...updated, balanceRead, historyRead };
 }
 
 export function createDemo({
@@ -48,7 +56,7 @@ export function createDemo({
   paymentRaw = fixture.payment.initialRaw,
 } = {}) {
   rawAmount(paymentRaw);
-  return updateBalances({
+  return refreshReads({
     id,
     revision: 0,
     cycle: 1,
@@ -70,19 +78,7 @@ export function transferDemo(demo, { from, to, amount }) {
   const amountRaw = parseUsdc(amount);
   const chain = move(demo.chain, from, to, amountRaw);
   // Build the new state before committing it: a failed mock read spends nothing.
-  return updateBalances({ ...demo, chain, revision: demo.revision + 1 });
-}
-
-export function showTransfers(demo) {
-  const history = readTransfers(demo.chain, demo.startIndex);
-  const updated = chargeRead(demo, history, "transfers");
-  return {
-    demo: {
-      ...updated,
-      revision: updated === demo ? demo.revision : demo.revision + 1,
-    },
-    history,
-  };
+  return refreshReads({ ...demo, chain, revision: demo.revision + 1 });
 }
 
 export function resetDemo(demo) {
@@ -96,7 +92,7 @@ export function resetDemo(demo) {
     chain = move(chain, wallet.id, "treasury", amountRaw, "reset");
     sweeps.push(chain.transfers.at(-1));
   }
-  return updateBalances({
+  return refreshReads({
     ...demo,
     chain,
     cycle: demo.cycle + 1,
@@ -130,6 +126,7 @@ export function publicState(demo) {
     })),
     balances: { ...demo.balanceRead.balances },
     balanceRead: demo.balanceRead,
+    historyRead: demo.historyRead,
     transferCount: demo.chain.transfers.length - demo.startIndex,
     payment: demo.payment,
     receipts: demo.receipts,
@@ -142,11 +139,14 @@ export function provenanceFor(demo, id) {
   const transfer = demo.chain.transfers
     .slice(demo.startIndex)
     .find((transfer) => transfer.id === id);
-  if (!transfer)
-    throw new Error(
-      "This transfer is not in the current run. Show transfers again.",
-    );
+  if (!transfer) throw new Error("This transfer is not in the current run.");
   return transferProvenance(transfer);
+}
+
+export function balanceProvenanceFor(demo, walletId) {
+  const wallet = fixture.wallets.find((wallet) => wallet.id === walletId);
+  if (!wallet) throw new Error("Choose one of the three demo wallets.");
+  return balanceProvenance(demo.balanceRead, wallet);
 }
 
 export function exportDemo(demo) {
@@ -164,9 +164,13 @@ export function exportDemo(demo) {
     transfers: demo.chain.transfers.slice(demo.startIndex),
     balances: demo.balanceRead.balances,
     balanceRead: demo.balanceRead,
+    historyRead: demo.historyRead,
     payment: demo.payment,
     receipts: demo.receipts,
     lastReset: demo.lastReset,
+    balanceProvenance: fixture.wallets.map((wallet) =>
+      balanceProvenance(demo.balanceRead, wallet),
+    ),
     provenance: demo.chain.transfers
       .slice(demo.startIndex)
       .map(transferProvenance),

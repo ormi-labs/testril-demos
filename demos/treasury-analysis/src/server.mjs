@@ -6,7 +6,7 @@ import {
   createDemo,
   transferDemo,
   resetDemo,
-  showTransfers,
+  balanceProvenanceFor,
   publicState,
   provenanceFor,
   exportDemo,
@@ -96,7 +96,7 @@ export function createApp() {
         return response.end(archive);
       }
       const match = url.pathname.match(
-        /^\/api\/sessions\/([a-f0-9-]+)(?:\/(transfer|reset|history|export|provenance))?$/,
+        /^\/api\/sessions\/([a-f0-9-]+)(?:\/(transfer|reset|export|provenance|balance-provenance))?$/,
       );
       if (match) {
         const [, id, action] = match;
@@ -112,6 +112,11 @@ export function createApp() {
             200,
             provenanceFor(demo, url.searchParams.get("transfer")),
           );
+        if (request.method === "GET" && action === "balance-provenance")
+          return send(
+            200,
+            balanceProvenanceFor(demo, url.searchParams.get("wallet")),
+          );
         if (request.method === "GET" && action === "export") {
           const archive = await exportRun(exportDemo(demo));
           response.writeHead(200, {
@@ -123,7 +128,7 @@ export function createApp() {
         }
         if (
           request.method === "POST" &&
-          ["transfer", "reset", "history"].includes(action)
+          ["transfer", "reset"].includes(action)
         ) {
           const input = await body(request);
           demo = sessions.get(id);
@@ -145,11 +150,6 @@ export function createApp() {
                 "This view is out of date. The latest balances are now shown; try again.",
               state: publicState(demo),
             });
-          if (action === "history") {
-            const { demo: updated, history } = showTransfers(demo);
-            sessions.set(id, updated);
-            return send(200, { state: publicState(updated), history });
-          }
           const updated =
             action === "transfer" ? transferDemo(demo, input) : resetDemo(demo);
           sessions.set(id, updated);

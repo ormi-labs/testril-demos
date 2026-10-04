@@ -3,13 +3,13 @@ import { replayBalances } from "./replay.js";
 import { transferDiagram } from "./transfer-diagram.js";
 
 const $ = (id) => document.getElementById(id);
-const storageKey = "testril-wallet-demo-v2";
+const storageKey = "testril-wallet-demo-v3";
 let state;
 let busy = false;
-let history;
 let step = 0;
 let timer;
 let selected;
+let provenanceTrigger;
 const name = (id) => state.wallets.find((wallet) => wallet.id === id).name;
 const time = (timestamp) =>
   `${new Date(timestamp).toISOString().slice(11, 19)} UTC`;
@@ -20,7 +20,6 @@ function element(tag, text, className) {
   if (className) node.className = className;
   return node;
 }
-
 async function api(path, input) {
   const response = await fetch(
     path,
@@ -36,6 +35,7 @@ async function api(path, input) {
   if (!response.ok) {
     if (result.state) {
       state = result.state;
+      step = state.historyRead.transfers.length;
       renderState();
     }
     throw new Error(result.error ?? "Request failed.");
@@ -52,8 +52,10 @@ function lock(value) {
   busy = value;
   $("transfer-form").setAttribute("aria-busy", String(value));
   for (const control of $("transfer-form").elements) control.disabled = value;
-  for (const id of ["show", "reset", "play", "restart-replay", "replay-step"])
+  for (const id of ["reset", "play", "restart-replay", "replay-step"])
     $(id).disabled = value;
+  for (const balance of document.querySelectorAll("[data-balance]"))
+    balance.disabled = value;
   if (!value && state) updateAvailable();
 }
 function updateAvailable() {
@@ -69,20 +71,28 @@ function updateAvailable() {
   try {
     amount = decimalAmount(parseUsdc($("amount").value));
   } catch {
-    /* Keep the action usable while editing. */
+    /* The amount can be incomplete while editing. */
   }
   $("transfer").textContent = amount ? `Send ${amount} USDC` : "Send USDC";
 }
 function renderState() {
   $("wallets").replaceChildren(
     ...state.wallets.map((wallet) => {
-      const card = element("article", undefined, "panel wallet");
+      const card = element("button", undefined, "panel wallet");
+      card.type = "button";
+      card.dataset.balance = wallet.id;
+      card.id = `wallet-${wallet.id}`;
+      card.disabled = busy;
+      card.setAttribute(
+        "aria-label",
+        `${wallet.name} balance: ${decimalAmount(state.balances[wallet.id])} USDC. Show provenance.`,
+      );
       const balance = element(
         "strong",
         decimalAmount(state.balances[wallet.id]),
       );
       balance.id = `balance-${wallet.id}`;
-      const value = element("div", undefined, "wallet-value");
+      const value = element("span", undefined, "wallet-value");
       value.append(balance, element("small", "USDC"));
       value.classList.toggle(
         "precise-value",
@@ -92,17 +102,15 @@ function renderState() {
       meter.min = 0;
       meter.max = 1;
       meter.value = Number(state.balances[wallet.id]) / 1000000;
-      meter.setAttribute("aria-label", `${wallet.name}: share of the 1 USDC`);
-      card.append(element("h3", wallet.name, "wallet-name"), value, meter);
+      meter.setAttribute("aria-hidden", "true");
+      card.append(element("span", wallet.name, "wallet-name"), value, meter);
+      card.addEventListener("click", () => inspect("balance", wallet));
       return card;
     }),
   );
-  $("balance-block").textContent = `Block ${state.balanceRead.block}`;
-  $("run-label").textContent = `Run ${state.cycle}`;
-  $("show").textContent = `Show transfers (${state.transferCount})`;
-  $("show").classList.toggle("has-transfers", state.transferCount > 0);
+  $("transfer-count").textContent = state.transferCount;
+  $("payment-count").textContent = state.receipts.length;
   $("spent").textContent = feeAmount(state.payment.spentRaw);
-  $("payment-spent").textContent = feeAmount(state.payment.spentRaw);
   $("payment-left").textContent = feeAmount(state.payment.remainingRaw);
   $("read-count").textContent = state.payment.requestCount;
   $("receipt-rows").replaceChildren(
@@ -110,8 +118,8 @@ function renderState() {
       const row = element("tr");
       row.append(
         ...[
-          receipt.id,
-          receipt.kind,
+          time(receipt.timestamp),
+          receipt.kind === "balances" ? "Balances" : "Transfer history",
           receipt.requestCount,
           feeAmount(receipt.chargeRaw),
         ].map((value) => element("td", value)),
@@ -131,114 +139,136 @@ function renderState() {
               `${name(transfer.from)} → Treasury: ${decimalAmount(transfer.amountRaw)} USDC · ${time(transfer.timestamp)} · block ${transfer.block}`,
             ),
           )
-        : [
-            element(
-              "li",
-              "All funds were already in the treasury. No return transfers were needed.",
-            ),
-          ]),
+        : [element("li", "All funds were already in the treasury.")]),
     );
-  if (history)
-    $("history-stale").hidden =
-      history.transfers.length === state.transferCount;
+  renderReplay();
   updateAvailable();
 }
 function stop() {
   clearInterval(timer);
   timer = undefined;
-  $("play").textContent = "Play";
+  $("play").textContent =
+    state && step === state.transferCount ? "Replay" : "Play";
 }
 function closeProvenance() {
   $("provenance").close();
-  $("provenance").hidden = true;
-  const previous = selected;
   selected = undefined;
-  if (history) renderReplay();
-  if (previous)
-    document.querySelector(`[data-transfer="${previous}"]`)?.focus();
-}
-function closeHistory() {
-  stop();
-  closeProvenance();
-  history = undefined;
-  $("history").hidden = true;
+  if (state) renderReplay();
+  if (provenanceTrigger) document.querySelector(provenanceTrigger)?.focus();
+  provenanceTrigger = undefined;
 }
 function renderReplay() {
+  const history = state.historyRead;
   const balances = replayBalances(
     state.initialBalances,
     history.transfers,
     step,
   );
+  const empty = history.transfers.length === 0;
+  $("transfer-diagram").hidden = empty;
+  $("transfer-help").hidden = empty;
+  $("replay-caption").hidden = empty;
+  $("empty-history").hidden = !empty;
+  $("replay-controls").hidden = empty;
   $("transfer-diagram").replaceChildren(
-    transferDiagram({
-      wallets: state.wallets,
-      balances,
-      transfers: history.transfers,
-      visibleCount: step,
-      selected,
-      onSelect: inspect,
-    }),
+    ...(empty
+      ? []
+      : [
+          transferDiagram({
+            wallets: state.wallets,
+            balances,
+            transfers: history.transfers,
+            visibleCount: step,
+            selected,
+            onSelect: (transfer) => inspect("transfer", transfer),
+          }),
+        ]),
   );
   $("replay-caption").textContent =
-    `Replay balances · step ${step} of ${history.transfers.length}`;
+    step === history.transfers.length
+      ? "Latest balances and transfers"
+      : `Replay balances · step ${step} of ${history.transfers.length}`;
   $("step-label").textContent = `${step} / ${history.transfers.length}`;
+  $("replay-step").max = history.transfers.length;
   $("replay-step").value = step;
-  $("replay-start").hidden = step > 0 || history.transfers.length === 0;
-  $("empty-history").hidden = history.transfers.length !== 0;
-  $("replay-controls").hidden = history.transfers.length === 0;
 }
 function play() {
-  if (!history?.transfers.length || busy) return;
+  if (!state.transferCount || busy) return;
   if (timer) {
     stop();
     return;
   }
-  if (step === history.transfers.length) step = 0;
   closeProvenance();
+  if (step === state.transferCount) step = 0;
   renderReplay();
   $("play").textContent = "Pause";
   timer = setInterval(() => {
     step += 1;
     renderReplay();
-    if (step === history.transfers.length) stop();
+    if (step === state.transferCount) stop();
   }, 800);
 }
-async function inspect(transfer) {
+async function inspect(kind, item) {
   if (busy) return;
   stop();
-  selected = transfer.id;
-  renderReplay();
+  provenanceTrigger =
+    kind === "balance" ? `#wallet-${item.id}` : `[data-transfer="${item.id}"]`;
+  if (kind === "transfer") {
+    selected = item.id;
+    renderReplay();
+  }
   lock(true);
   try {
-    const result = await api(
-      `${endpoint("provenance")}?transfer=${encodeURIComponent(transfer.id)}`,
-    );
-    const list = element("dl");
-    for (const [label, value] of [
+    const path =
+      kind === "balance"
+        ? `${endpoint("balance-provenance")}?wallet=${item.id}`
+        : `${endpoint("provenance")}?transfer=${item.id}`;
+    const result = await api(path);
+    const rows =
+      kind === "balance"
+        ? [
+            ["Wallet", result.source.wallet],
+            ["Address", result.source.address],
+            [
+              "Balance",
+              `${decimalAmount(result.source.balanceRaw)} USDC · ${result.source.balanceRaw} raw units`,
+            ],
+            ["Source block", result.source.block],
+          ]
+        : [
+            ["From", result.source.from],
+            ["To", result.source.to],
+            [
+              "Amount",
+              `${decimalAmount(result.source.amountRaw)} USDC · ${result.source.amountRaw} raw units`,
+            ],
+            [
+              "Block range",
+              `[${result.range.fromBlock}, ${result.range.toBlock})`,
+            ],
+            ["Transaction hash", result.source.transactionHash],
+            ["Log index", result.source.logIndex],
+          ];
+    rows.push(
       ["Function", `${result.function.name} · ${result.function.version}`],
       [
         "Network / token",
         `${result.chain.name} (${result.chain.id}) / ${result.token.symbol}`,
       ],
-      ["Block range", `[${result.range.fromBlock}, ${result.range.toBlock})`],
+      ["Token contract", result.token.address],
       ["Time", result.source.timestamp],
-      ["From", result.source.from],
-      ["To", result.source.to],
-      [
-        "Amount",
-        `${decimalAmount(result.source.amountRaw)} USDC · ${result.source.amountRaw} raw units`,
-      ],
       ["Block hash", result.source.blockHash],
-      ["Transaction hash", result.source.transactionHash],
-      ["Log index", result.source.logIndex],
       ["Calculation", result.calculation.description],
-    ])
+    );
+    const list = element("dl");
+    for (const [label, value] of rows)
       list.append(element("dt", label), element("dd", value, "hash"));
+    $("provenance-heading").textContent =
+      kind === "balance" ? "Balance provenance" : "Transfer provenance";
     $("provenance-content").replaceChildren(
       list,
       element("p", result.note, "small muted"),
     );
-    $("provenance").hidden = false;
     $("provenance").showModal();
     $("provenance-heading").focus({ preventScroll: true });
   } catch (error) {
@@ -253,13 +283,10 @@ async function action(kind) {
   lock(true);
   status(
     kind === "transfer"
-      ? "Sending and reading balances…"
-      : kind === "reset"
-        ? "Returning funds…"
-        : "Reading transfers…",
+      ? "Sending and refreshing histories…"
+      : "Returning funds…",
   );
   if (kind === "transfer") $("transfer").textContent = "Sending…";
-  let loadedHistory = false;
   try {
     const input = { revision: state.revision };
     if (kind === "transfer")
@@ -268,65 +295,62 @@ async function action(kind) {
         to: $("to").value,
         amount: $("amount").value,
       });
-    const result = await api(endpoint(kind), input);
-    state = kind === "history" ? result.state : result;
-    if (kind === "reset") closeHistory();
+    state = await api(endpoint(kind), input);
+    selected = undefined;
+    step = state.transferCount;
     renderState();
-    if (kind === "history") {
-      closeProvenance();
-      history = result.history;
-      loadedHistory = true;
-      step = 0;
-      $("history").hidden = false;
-      $("history-stale").hidden = true;
-      $("history-scope").textContent = `Run ${state.cycle} · Arbitrum`;
-      $("history-note").textContent =
-        `${history.transfers.length} transfers · ${feeAmount(history.chargeRaw)} USDC read`;
-      $("replay-step").max = history.transfers.length;
-      renderReplay();
-      $("history-heading").focus({ preventScroll: true });
-      $("history").scrollIntoView({
-        block: "start",
-        behavior: matchMedia("(prefers-reduced-motion: reduce)").matches
-          ? "instant"
-          : "smooth",
-      });
-    }
+    stop();
     status(
       kind === "reset"
         ? "Reset. Treasury has 1 USDC."
-        : kind === "history"
-          ? "History ready."
-          : "Sent. Balances updated.",
+        : "Sent. Balances updated.",
     );
   } catch (error) {
     status(error.message, true);
   } finally {
     lock(false);
   }
-  if (
-    loadedHistory &&
-    history &&
-    !matchMedia("(prefers-reduced-motion: reduce)").matches
-  )
-    play();
+}
+function activateTab(id) {
+  stop();
+  if (state) {
+    step = state.transferCount;
+    renderReplay();
+    stop();
+  }
+  for (const tab of document.querySelectorAll('[role="tab"]')) {
+    const active = tab.id === id;
+    tab.setAttribute("aria-selected", String(active));
+    tab.tabIndex = active ? 0 : -1;
+    $(tab.getAttribute("aria-controls")).hidden = !active;
+  }
+}
+const tabs = [$("transfer-tab"), $("payment-tab")];
+for (const tab of tabs) {
+  tab.addEventListener("click", () => activateTab(tab.id));
+  tab.addEventListener("keydown", (event) => {
+    if (!["ArrowLeft", "ArrowRight", "Home", "End"].includes(event.key)) return;
+    event.preventDefault();
+    const target =
+      event.key === "Home"
+        ? tabs[0]
+        : event.key === "End"
+          ? tabs[1]
+          : tabs.find((candidate) => candidate !== tab);
+    activateTab(target.id);
+    target.focus();
+  });
 }
 $("transfer-form").addEventListener("submit", (event) => {
   event.preventDefault();
   action("transfer");
 });
 $("from").addEventListener("change", updateAvailable);
-$("all").addEventListener("click", () => {
-  $("amount").value = decimalAmount(state.balances[$("from").value]);
-  updateAvailable();
-});
 $("amount").addEventListener("input", updateAvailable);
-$("show").addEventListener("click", () => action("history"));
 $("reset").addEventListener("click", () => action("reset"));
 $("play").addEventListener("click", play);
 $("restart-replay").addEventListener("click", () => {
   stop();
-  closeProvenance();
   step = 0;
   renderReplay();
   play();
@@ -337,17 +361,9 @@ $("replay-step").addEventListener("input", () => {
   closeProvenance();
   step = next;
   renderReplay();
-});
-$("close-history").addEventListener("click", () => {
-  closeHistory();
-  $("show").focus();
+  stop();
 });
 $("close-provenance").addEventListener("click", closeProvenance);
-$("payment-details").addEventListener("click", () => {
-  $("payments").showModal();
-  $("payment-heading").focus({ preventScroll: true });
-});
-$("close-payments").addEventListener("click", () => $("payments").close());
 $("provenance").addEventListener("cancel", (event) => {
   event.preventDefault();
   closeProvenance();
@@ -364,7 +380,7 @@ try {
     try {
       state = await api(`/api/sessions/${encodeURIComponent(saved)}`);
     } catch {
-      /* An expired mock session starts fresh. */
+      /* Expired sessions start fresh. */
     }
   }
   state ??= await api("/api/sessions", {});
@@ -382,7 +398,9 @@ try {
       }),
     );
   $("to").value = "a";
+  step = state.transferCount;
   renderState();
+  stop();
   lock(false);
   status("");
 } catch (error) {

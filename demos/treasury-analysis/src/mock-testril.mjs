@@ -66,3 +66,31 @@ export function transferProvenance(transfer) {
     },
   };
 }
+
+export function balanceProvenance(read, wallet) {
+  return {
+    mode: "mock",
+    note: "Fictional balance snapshot. This block hash cannot be checked on Arbitrum; no source verification was performed.",
+    function: { name: read.function, version: "mock-v1" },
+    chain: fixture.chain,
+    token: fixture.token,
+    binding: {
+      chainId: fixture.chain.id,
+      tokenAddress: fixture.token.address,
+      walletAddress: wallet.address,
+    },
+    source: {
+      wallet: wallet.name,
+      address: wallet.address,
+      block: read.block,
+      blockHash: read.blockHash,
+      timestamp: read.timestamp,
+      balanceRaw: read.balances[wallet.id],
+    },
+    calculation: {
+      description:
+        "Display the balance snapshot's raw token units divided by 1,000,000.",
+      decimals: fixture.token.decimals,
+    },
+  };
+}

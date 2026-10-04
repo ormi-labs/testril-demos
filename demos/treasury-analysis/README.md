@@ -1,4 +1,4 @@
-# Wallet transfers
+# Move Money
 
 Move **1 USDC** between Treasury, Counterparty A, and Counterparty B. Read their
 balances with Testril, replay the transfers, and select an arrow to inspect provenance.
@@ -25,28 +25,25 @@ Open **http://127.0.0.1:4173**. Optional: copy `.env.example` to `.env` to chang
 
 1. Transfer **0.25** from Treasury to A, then **0.10** from A to B.
 2. Expect balances **0.75 / 0.15 / 0.10 USDC**.
-3. Select **Show transfers**. Replay reveals arrows with UTC times and block numbers.
-   The diagram keeps Treasury in the middle and counterparties on either side,
-   with one row per transfer in chronological order.
-   Pause, scrub, or replay again; select an arrow to open mock source evidence in a modal.
-   Close it with Escape or the Close button.
-   On phones, scroll the diagram horizontally.
-4. Select **Reset demo**. Return transfers restore **1 / 0 / 0** and start a fresh history.
+3. **Transfer History** updates after each transfer, with one row per event, UTC
+   times, and block numbers. Use Replay to watch it build. Click an arrow or a
+   balance for mock source evidence; close the modal with Escape or Close.
+4. **Payment History** shows read costs and receipts. It stays current even when
+   its tab is hidden. Switching tabs, replay, and provenance inspection are free.
+5. **Reset demo**, in the header, returns funds to Treasury and clears Transfer
+   History. Payment History and accumulated charges are retained.
 
-The first screen puts transfers and balances in one workspace. **Show transfers**
-opens the replay; **Read details** opens payment receipts and the last reset evidence.
-
-Each balance refresh makes three simulated paid reads. History is read on demand;
-replay and provenance inspection are free. A separate mock payment wallet covers
-reads; its accumulated charges survive reset. Rates are illustrative. Refreshing
-resumes the tab’s session; restarting the server clears sessions. Data preparation
-is assumed, so this version has no materialization or supplier earnings.
+Each transfer refreshes three balance reads and one history read. A separate mock
+payment wallet covers their illustrative charges. Refreshing resumes the tab’s
+cached session; restarting the server clears sessions. Data preparation is assumed,
+so this version has no materialization or supplier earnings. On phones, scroll the
+transfer diagram horizontally.
 
 ## Downloads and CLI
 
 **Download source** exports this standalone project, locked tools, and a digest
 manifest, excluding local configuration and installed dependencies. **Export this run**
-contains transfers, balances, receipts, and fictional provenance.
+contains transfers, balances, receipts, and fictional transfer and balance provenance.
 
 ```sh
 node src/cli.mjs sample run.json

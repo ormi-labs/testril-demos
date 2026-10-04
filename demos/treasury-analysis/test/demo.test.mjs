@@ -4,7 +4,7 @@ import {
   createDemo,
   transferDemo,
   resetDemo,
-  showTransfers,
+  balanceProvenanceFor,
   provenanceFor,
   exportDemo,
 } from "../src/demo.mjs";
@@ -22,8 +22,8 @@ test("exact transfers conserve funds; each balance refresh charges three reads",
     a: "249999",
     b: "1",
   });
-  assert.equal(demo.payment.spentRaw, "90");
-  assert.equal(demo.payment.requestCount, 9);
+  assert.equal(demo.payment.spentRaw, "113");
+  assert.equal(demo.payment.requestCount, 11);
   assert.equal(
     demo.chain.transfers[1].block,
     demo.chain.transfers[0].block + 1,
@@ -54,8 +54,9 @@ test("invalid transfers and empty payer leave original state intact", () => {
 });
 test("history charges only for a read; provenance and replay are free", () => {
   const empty = createDemo();
-  assert.equal(showTransfers(empty).demo.payment.spentRaw, "30");
-  const { demo, history } = showTransfers(send(empty, "treasury", "a", ".25"));
+  assert.equal(empty.payment.spentRaw, "30");
+  const demo = send(empty, "treasury", "a", ".25");
+  const history = demo.historyRead;
   assert.equal(demo.payment.spentRaw, "71");
   const source = provenanceFor(demo, history.transfers[0].id);
   assert.equal(source.source.amountRaw, "250000");
@@ -71,7 +72,7 @@ test("reset returns both counterparties, clears history and retains charges", ()
   assert.deepEqual(reset.balanceRead.balances, initial);
   assert.equal(reset.lastReset.sweeps.length, 2);
   assert.equal(reset.lastReset.returnedRaw, "400000");
-  assert.equal(reset.payment.spentRaw, "120");
+  assert.equal(reset.payment.spentRaw, "143");
   assert.equal(reset.cycle, 2);
   assert.deepEqual(exportDemo(reset).transfers, []);
   assert.throws(() => provenanceFor(reset, demo.chain.transfers[0].id));
@@ -81,4 +82,25 @@ test("reset returns both counterparties, clears history and retains charges", ()
     replayBalances(initial, exportDemo(next).transfers, 1),
     next.balanceRead.balances,
   );
+});
+
+test("balance provenance describes the latest snapshot without a fabricated transaction", () => {
+  const initialDemo = createDemo();
+  assert.equal(balanceProvenanceFor(initialDemo, "a").source.balanceRaw, "0");
+  const demo = send(initialDemo, "treasury", "a", ".25");
+  const evidence = balanceProvenanceFor(demo, "a");
+  assert.equal(evidence.source.balanceRaw, "250000");
+  assert.equal(evidence.source.blockHash, demo.balanceRead.blockHash);
+  assert.equal(evidence.source.block, demo.chain.block);
+  assert.equal(evidence.function.name, "erc20.token_balance");
+  assert.equal(evidence.source.transactionHash, undefined);
+  assert.equal(demo.payment.spentRaw, "71");
+  assert.throws(() => balanceProvenanceFor(demo, "unknown"));
+  assert.equal(exportDemo(demo).balanceProvenance.length, 3);
+});
+test("a failed automatic history read does not commit the transfer or either charge", () => {
+  const demo = createDemo({ paymentRaw: "70" });
+  const before = JSON.stringify(demo);
+  assert.throws(() => send(demo, "treasury", "a", ".25"), /payment wallet/);
+  assert.equal(JSON.stringify(demo), before);
 });

@@ -8,7 +8,7 @@ MCP server: `https://dev.testril.ai/mcp`
 
 | Demo | Run | Status |
 | --- | --- | --- |
-| [Wallet transfers](demos/treasury-analysis/README.md) | `cd demos/treasury-analysis && npm ci && npm start` | Interactive mock: move 1 USDC between three wallets, read balances, replay transfers, inspect provenance, reset, and download the source. |
+| [Move Money](demos/treasury-analysis/README.md) | `cd demos/treasury-analysis && npm ci && npm start` | Interactive mock: move 1 USDC between three wallets, inspect balance and transfer provenance, follow automatically updated transfer/payment histories, replay, reset, and download the source. |
 
 The interface follows Testril’s approved derivative style guide. It runs locally with Node.js 22.13+ on macOS or Linux. Preview the landing screen on [desktop](docs/screenshots/treasury-landing-desktop.png) and [mobile](docs/screenshots/treasury-landing-mobile.png), the [transfer replay](docs/screenshots/treasury-desktop.png), and the [provenance modal](docs/screenshots/treasury-provenance-desktop.png).
 
