@@ -1,5 +1,6 @@
 import { decimalAmount, feeAmount } from "./amounts.js";
 import { replayBalances } from "./replay.js";
+import { transferDiagram } from "./transfer-diagram.js";
 
 const $ = (id) => document.getElementById(id);
 const storageKey = "testril-wallet-demo-v2";
@@ -138,8 +139,8 @@ function stop() {
   $("play").textContent = "Play";
 }
 function closeProvenance() {
+  $("provenance").close();
   $("provenance").hidden = true;
-  $("history-layout").classList.remove("with-provenance");
   const previous = selected;
   selected = undefined;
   if (history) renderReplay();
@@ -152,90 +153,26 @@ function closeHistory() {
   history = undefined;
   $("history").hidden = true;
 }
-function svgNode(tag, attributes, text) {
-  const node = document.createElementNS("http://www.w3.org/2000/svg", tag);
-  for (const [key, value] of Object.entries(attributes))
-    node.setAttribute(key, value);
-  if (text) node.textContent = text;
-  return node;
-}
-function transferRow(transfer, index) {
-  const button = element(
-    "button",
-    undefined,
-    `transfer-row${selected === transfer.id ? " selected" : ""}`,
-  );
-  button.type = "button";
-  button.dataset.transfer = transfer.id;
-  button.setAttribute(
-    "aria-label",
-    `Transfer ${index + 1}: ${name(transfer.from)} to ${name(transfer.to)}, ${decimalAmount(transfer.amountRaw)} USDC. Show provenance.`,
-  );
-  button.append(
-    element(
-      "span",
-      `${index + 1}. ${name(transfer.from)} → ${name(transfer.to)}`,
-      "route",
-    ),
-  );
-  button.append(
-    element(
-      "span",
-      `${decimalAmount(transfer.amountRaw)} USDC`,
-      "transfer-amount",
-    ),
-  );
-  const svg = svgNode("svg", {
-    viewBox: "0 0 480 32",
-    preserveAspectRatio: "none",
-    "aria-hidden": "true",
-  });
-  const positions = { treasury: 80, a: 240, b: 400 };
-  const start = positions[transfer.from];
-  const end = positions[transfer.to];
-  const direction = end > start ? 1 : -1;
-  svg.append(
-    svgNode("path", {
-      d: `M ${start} 16 H ${end - direction * 8}`,
-      class: "arrow-line",
-    }),
-    svgNode("path", {
-      d: `M ${end - direction * 10} 10 L ${end} 16 L ${end - direction * 10} 22 Z`,
-      class: "arrow-head",
-    }),
-  );
-  const meta = element("span", undefined, "transfer-meta");
-  meta.append(
-    element("span", time(transfer.timestamp)),
-    element("span", `Block ${transfer.block}`),
-  );
-  button.append(svg, meta);
-  button.addEventListener("click", () => inspect(transfer));
-  return button;
-}
 function renderReplay() {
   const balances = replayBalances(
     state.initialBalances,
     history.transfers,
     step,
   );
-  $("replay-wallets").replaceChildren(
-    ...state.wallets.map((wallet) => {
-      const card = element("div", undefined, "replay-wallet");
-      card.append(
-        element("span", wallet.name),
-        element("strong", `${decimalAmount(balances[wallet.id])} USDC`),
-      );
-      return card;
+  $("transfer-diagram").replaceChildren(
+    transferDiagram({
+      wallets: state.wallets,
+      balances,
+      transfers: history.transfers,
+      visibleCount: step,
+      selected,
+      onSelect: inspect,
     }),
   );
   $("replay-caption").textContent =
     `Replay balances · after step ${step} of ${history.transfers.length}. Latest balances remain above.`;
   $("step-label").textContent = `${step} / ${history.transfers.length}`;
   $("replay-step").value = step;
-  $("transfer-rows").replaceChildren(
-    ...history.transfers.slice(0, step).map(transferRow),
-  );
   $("replay-start").hidden = step > 0 || history.transfers.length === 0;
   $("empty-history").hidden = history.transfers.length !== 0;
   $("replay-controls").hidden = history.transfers.length === 0;
@@ -292,7 +229,7 @@ async function inspect(transfer) {
       element("p", result.note, "small muted"),
     );
     $("provenance").hidden = false;
-    $("history-layout").classList.add("with-provenance");
+    $("provenance").showModal();
     $("provenance-heading").focus({ preventScroll: true });
   } catch (error) {
     status(error.message, true);
@@ -387,8 +324,9 @@ $("close-history").addEventListener("click", () => {
   $("show").focus();
 });
 $("close-provenance").addEventListener("click", closeProvenance);
-document.addEventListener("keydown", (event) => {
-  if (event.key === "Escape" && !$("provenance").hidden) closeProvenance();
+$("provenance").addEventListener("cancel", (event) => {
+  event.preventDefault();
+  closeProvenance();
 });
 
 try {

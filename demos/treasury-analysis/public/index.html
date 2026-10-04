@@ -125,19 +125,25 @@
         <div id="history-layout" class="history-layout">
           <div class="panel illustration">
             <p id="replay-caption" class="small muted"></p>
-            <div id="replay-wallets" class="replay-wallets"></div>
+            <div
+              id="transfer-diagram"
+              class="diagram-scroll"
+              role="region"
+              aria-label="Wallet transfer illustration"
+              tabindex="0"
+            ></div>
             <p id="empty-history" class="empty" hidden>
               No transfers yet. Send some USDC, then show transfers again.
             </p>
             <p id="replay-start" class="empty">
               Press Play to reveal each transfer.
             </p>
-            <div id="transfer-rows" class="transfer-rows"></div>
             <p class="small muted illustration-help">
-              Select a transfer arrow to inspect its provenance.
+              Select a transfer arrow to inspect its provenance. On small
+              screens, scroll the diagram horizontally.
             </p>
           </div>
-          <aside
+          <dialog
             id="provenance"
             class="panel provenance"
             hidden
@@ -158,7 +164,7 @@
               Mock source evidence · not verified on Arbitrum
             </p>
             <div id="provenance-content"></div>
-          </aside>
+          </dialog>
         </div>
       </section>
 

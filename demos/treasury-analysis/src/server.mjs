@@ -28,6 +28,7 @@ const staticFiles = new Set([
   "app.js",
   "amounts.js",
   "replay.js",
+  "transfer-diagram.js",
   "style.css",
   "assets/tokens.css",
   "assets/favicon.svg",

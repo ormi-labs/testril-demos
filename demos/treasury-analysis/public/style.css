@@ -272,39 +272,8 @@ input[type="range"] {
   gap: 20px;
   align-items: start;
 }
-.history-layout.with-provenance {
-  grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr);
-}
 .illustration {
   background: var(--visual);
-}
-.replay-wallets {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 8px;
-  margin: 16px 0 24px;
-}
-.replay-wallet {
-  border: 1px solid var(--map-stroke);
-  border-radius: 5px;
-  background: var(--map-fill);
-  padding: 12px 8px;
-  text-align: center;
-}
-.replay-wallet span {
-  display: block;
-  font-size: 12px;
-}
-.replay-wallet strong {
-  display: block;
-  font-weight: 400;
-  font-size: 23px;
-  margin-top: 4px;
-  font-variant-numeric: tabular-nums;
-}
-.replay-wallet small {
-  color: var(--muted);
-  font-size: 10px;
 }
 .empty {
   color: var(--muted);
@@ -312,62 +281,91 @@ input[type="range"] {
   padding: 20px 0;
   text-align: center;
 }
-.transfer-rows {
-  display: grid;
-  gap: 12px;
+.diagram-scroll {
+  overflow-x: auto;
+  margin: 20px 0;
 }
-.transfer-row {
+.transfer-diagram {
   display: block;
   width: 100%;
-  text-align: left;
-  border-color: var(--visual-line);
-  background: var(--panel);
-  color: var(--ink);
-  padding: 12px 16px;
+  min-width: 760px;
 }
-.transfer-row.selected {
-  border-color: var(--accent);
-  outline: 1px solid var(--accent);
+.diagram-wallet rect {
+  fill: var(--map-fill);
+  stroke: var(--map-stroke);
 }
-.transfer-row:hover {
-  border-color: var(--accent);
-  opacity: 1;
+.diagram-wallet text {
+  fill: var(--ink);
+  font-family: Arial, Helvetica, sans-serif;
 }
-.transfer-row .route {
-  font-size: 12px;
+.diagram-wallet-name {
+  font-size: 15px;
 }
-.transfer-amount {
-  display: block;
-  font-size: 13px;
-  text-align: center;
-  margin-top: 8px;
+.diagram-wallet-balance {
+  font-size: 23px;
 }
-.transfer-row svg {
-  width: 100%;
-  height: 32px;
-  display: block;
+.treasury-node rect {
+  fill: var(--accent);
+  stroke: var(--accent);
 }
-.transfer-row .arrow-line {
+.treasury-node text {
+  fill: var(--button-ink);
+}
+.diagram-line {
+  fill: none;
   stroke: var(--map-stroke);
   stroke-width: 1.5;
-  vector-effect: non-scaling-stroke;
-  fill: none;
+  cursor: pointer;
 }
-.transfer-row .arrow-head {
+.diagram-arrow {
   fill: var(--map-stroke);
+  cursor: pointer;
 }
-.transfer-meta {
-  display: flex;
-  justify-content: space-between;
-  gap: 12px;
-  font: 11px monospace;
+.transfer-edge.selected .diagram-line,
+.transfer-edge:focus-within .diagram-line,
+.transfer-edge:hover .diagram-line {
+  stroke: var(--accent);
+  stroke-width: 3;
+}
+.diagram-transfer {
+  display: grid;
+  grid-template-rows: 24px 18px 1fr 18px;
+  width: 100%;
+  height: 96px;
+  padding: 4px;
+  border: 1px solid transparent;
+  border-radius: 5px;
+  background: transparent;
+  color: var(--ink);
+  text-align: center;
+}
+.diagram-transfer:hover {
+  opacity: 1;
+  border-color: var(--map-stroke);
+}
+.diagram-amount {
+  font-size: 16px;
+}
+.diagram-time,
+.diagram-block {
+  font: 12px/18px monospace;
   color: var(--muted);
+}
+.diagram-block {
+  grid-row: 4;
 }
 .illustration-help {
   margin-bottom: 0;
 }
 .provenance {
-  min-width: 0;
+  width: min(640px, calc(100% - 36px));
+  max-height: calc(100dvh - 48px);
+  margin: auto;
+  overflow-y: auto;
+  color: var(--ink);
+}
+.provenance::backdrop {
+  background: rgb(37 43 37 / 45%);
 }
 .provenance .section-top {
   margin-bottom: 8px;
@@ -478,9 +476,6 @@ a {
   .form-grid {
     grid-template-columns: 1fr 1fr;
   }
-  .history-layout.with-provenance {
-    grid-template-columns: minmax(0, 1fr);
-  }
 }
 @media (max-width: 600px) {
   .measure {
@@ -548,26 +543,6 @@ a {
   }
   .replay-controls label {
     width: 100%;
-  }
-  .replay-wallet {
-    padding: 10px 3px;
-  }
-  .replay-wallet span {
-    font-size: 10px;
-  }
-  .replay-wallet strong {
-    font-size: 19px;
-  }
-  .transfer-row {
-    padding: 12px 8px;
-  }
-  .transfer-row .route {
-    font-size: 11px;
-  }
-  .transfer-meta {
-    flex-direction: column;
-    gap: 4px;
-    font-size: 10px;
   }
   .payment-grid {
     grid-template-columns: 1fr;
