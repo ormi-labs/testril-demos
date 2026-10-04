@@ -1,0 +1,36 @@
+{
+  "mode": "mock",
+  "chain": { "name": "Arbitrum", "id": 42161, "firstBlock": 100000000 },
+  "token": {
+    "symbol": "USDC",
+    "decimals": 6,
+    "address": "0x4444444444444444444444444444444444444444"
+  },
+  "wallets": [
+    {
+      "id": "treasury",
+      "name": "Treasury",
+      "address": "0x1111111111111111111111111111111111111111",
+      "initialRaw": "1000000"
+    },
+    {
+      "id": "a",
+      "name": "Counterparty A",
+      "address": "0x2222222222222222222222222222222222222222",
+      "initialRaw": "0"
+    },
+    {
+      "id": "b",
+      "name": "Counterparty B",
+      "address": "0x3333333333333333333333333333333333333333",
+      "initialRaw": "0"
+    }
+  ],
+  "payment": {
+    "address": "0x9999999999999999999999999999999999999999",
+    "initialRaw": "10000",
+    "balanceReadRaw": "10",
+    "transferReadBaseRaw": "10",
+    "transferReadPerRowRaw": "1"
+  }
+}

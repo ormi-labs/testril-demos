@@ -1,14 +1,22 @@
 import { createServer } from "node:http";
 import { readFile } from "node:fs/promises";
-import { randomUUID } from "node:crypto";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import { join } from "node:path";
-import { buildSample, defaultInputs, reference } from "./sample.mjs";
-import { verifySample } from "./verify.mjs";
-import { discover } from "./mcp.mjs";
+import {
+  createDemo,
+  transferDemo,
+  resetDemo,
+  showTransfers,
+  publicState,
+  provenanceFor,
+  exportDemo,
+} from "./demo.mjs";
 import { exportRun, exportSource } from "./archive.mjs";
 
 const root = fileURLToPath(new URL("..", import.meta.url));
+const { version } = JSON.parse(
+  await readFile(join(root, "package.json"), "utf8"),
+);
 const types = {
   ".html": "text/html",
   ".js": "text/javascript",
@@ -19,6 +27,7 @@ const staticFiles = new Set([
   "index.html",
   "app.js",
   "amounts.js",
+  "replay.js",
   "style.css",
   "assets/tokens.css",
   "assets/favicon.svg",
@@ -38,8 +47,8 @@ async function body(request) {
   }
 }
 
-export function createApp({ endpoint = "https://dev.testril.ai/mcp" } = {}) {
-  const runs = new Map();
+export function createApp() {
+  const sessions = new Map();
   return createServer(async (request, response) => {
     response.setHeader("X-Content-Type-Options", "nosniff");
     response.setHeader("Referrer-Policy", "no-referrer");
@@ -54,7 +63,6 @@ export function createApp({ endpoint = "https://dev.testril.ai/mcp" } = {}) {
     };
     try {
       const host = request.headers.host;
-      // Local server only. Reject foreign hosts/origins, including DNS rebinding.
       if (
         !host ||
         !/^127\.0\.0\.1:\d+$/.test(host) ||
@@ -64,68 +72,99 @@ export function createApp({ endpoint = "https://dev.testril.ai/mcp" } = {}) {
       )
         return send(403, { error: "Use the local 127.0.0.1 address." });
       const url = new URL(request.url, `http://${host}`);
-      if (request.method === "GET" && url.pathname === "/api/config")
-        return send(200, {
-          inputs: defaultInputs,
-          accounts: reference.accounts.map(({ address, label }) => ({
-            address,
-            label,
-          })),
-        });
-      if (request.method === "POST" && url.pathname === "/api/run") {
-        const run = buildSample(await body(request));
-        const id = randomUUID();
-        if (runs.size >= 50) runs.delete(runs.keys().next().value);
-        runs.set(id, run);
-        return send(200, { id, run });
-      }
-      if (request.method === "POST" && url.pathname === "/api/verify") {
-        const { id } = await body(request);
-        const run = runs.get(id);
-        if (!run)
-          return send(404, { error: "Run expired. Run the sample again." });
-        run.verification = verifySample(run);
-        return send(200, run.verification);
-      }
-      if (request.method === "GET" && url.pathname === "/api/discover")
-        return send(200, await discover(endpoint));
-      if (request.method === "GET" && url.pathname === "/api/export") {
-        const run = runs.get(url.searchParams.get("id"));
-        if (!run)
-          return send(404, { error: "Run expired. Run the sample again." });
-        const archive = await exportRun(run);
-        response.writeHead(200, {
-          "Content-Type": "application/gzip",
-          "Content-Disposition": 'attachment; filename="treasury-run.tar.gz"',
-        });
-        return response.end(archive);
+      if (request.method === "POST" && url.pathname === "/api/sessions") {
+        const input = await body(request);
+        if (
+          !input ||
+          typeof input !== "object" ||
+          Array.isArray(input) ||
+          Object.keys(input).length
+        )
+          throw new Error("Session creation requires an empty object.");
+        const demo = createDemo();
+        if (sessions.size >= 64) sessions.delete(sessions.keys().next().value);
+        sessions.set(demo.id, demo);
+        return send(201, publicState(demo));
       }
       if (request.method === "GET" && url.pathname === "/api/source") {
         const archive = await exportSource(root);
         response.writeHead(200, {
           "Content-Type": "application/gzip",
-          "Content-Disposition":
-            'attachment; filename="treasury-analysis-0.1.0.tar.gz"',
+          "Content-Disposition": `attachment; filename="treasury-analysis-${version}.tar.gz"`,
         });
         return response.end(archive);
       }
+      const match = url.pathname.match(
+        /^\/api\/sessions\/([a-f0-9-]+)(?:\/(transfer|reset|history|export|provenance))?$/,
+      );
+      if (match) {
+        const [, id, action] = match;
+        let demo = sessions.get(id);
+        if (!demo)
+          return send(404, {
+            error: "Mock session expired. Reload to start again.",
+          });
+        if (request.method === "GET" && !action)
+          return send(200, publicState(demo));
+        if (request.method === "GET" && action === "provenance")
+          return send(
+            200,
+            provenanceFor(demo, url.searchParams.get("transfer")),
+          );
+        if (request.method === "GET" && action === "export") {
+          const archive = await exportRun(exportDemo(demo));
+          response.writeHead(200, {
+            "Content-Type": "application/gzip",
+            "Content-Disposition":
+              'attachment; filename="wallet-transfers-run.tar.gz"',
+          });
+          return response.end(archive);
+        }
+        if (
+          request.method === "POST" &&
+          ["transfer", "reset", "history"].includes(action)
+        ) {
+          const input = await body(request);
+          demo = sessions.get(id);
+          if (!demo)
+            return send(404, {
+              error: "Mock session expired. Reload to start again.",
+            });
+          if (!input || typeof input !== "object" || Array.isArray(input))
+            throw new Error("Invalid request.");
+          const allowed =
+            action === "transfer"
+              ? ["revision", "from", "to", "amount"]
+              : ["revision"];
+          if (Object.keys(input).some((key) => !allowed.includes(key)))
+            throw new Error("Unexpected input fields.");
+          if (input.revision !== demo.revision)
+            return send(409, {
+              error:
+                "This view is out of date. The latest balances are now shown; try again.",
+              state: publicState(demo),
+            });
+          if (action === "history") {
+            const { demo: updated, history } = showTransfers(demo);
+            sessions.set(id, updated);
+            return send(200, { state: publicState(updated), history });
+          }
+          const updated =
+            action === "transfer" ? transferDemo(demo, input) : resetDemo(demo);
+          sessions.set(id, updated);
+          return send(200, publicState(updated));
+        }
+      }
       const path = url.pathname === "/" ? "index.html" : url.pathname.slice(1);
       if (request.method === "GET" && staticFiles.has(path)) {
-        const content = await readFile(join(root, "public", path));
         response.writeHead(200, {
           "Content-Type": types[path.slice(path.lastIndexOf("."))],
         });
-        return response.end(content);
+        return response.end(await readFile(join(root, "public", path)));
       }
       send(404, { error: "Not found." });
     } catch (error) {
-      // Discovery errors must never echo provider URLs, credentials, or response bodies.
-      const isDiscovery = request.url === "/api/discover";
-      send(isDiscovery ? 502 : 400, {
-        error: isDiscovery
-          ? "Could not inspect Testril. Check the server's MCP configuration and try again."
-          : error.message,
-      });
+      send(400, { error: error.message });
     }
   });
 }
@@ -137,8 +176,7 @@ if (
   const port = Number(process.env.PORT ?? 4173);
   if (!Number.isInteger(port) || port < 1 || port > 65535)
     throw new Error("PORT must be between 1 and 65535.");
-  const app = createApp({ endpoint: process.env.TESTRIL_MCP_URL });
-  app.listen(port, "127.0.0.1", () =>
-    console.log(`Treasury sample: http://127.0.0.1:${port}`),
+  createApp().listen(port, "127.0.0.1", () =>
+    console.log(`Wallet transfers mock: http://127.0.0.1:${port}`),
   );
 }

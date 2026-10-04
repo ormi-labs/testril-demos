@@ -104,32 +104,23 @@ export async function exportSource(root) {
 }
 
 export async function exportRun(run) {
-  const directory = await mkdtemp(join(tmpdir(), "treasury-run-"));
+  const directory = await mkdtemp(join(tmpdir(), "wallet-run-"));
   try {
-    const runDirectory = join(directory, "run");
-    await mkdir(runDirectory);
+    const destination = join(directory, "run");
+    await mkdir(destination);
     await writeFile(
-      join(runDirectory, "README.md"),
-      `# Treasury run\n\nMode: ${run.mode}. Sample values, block hashes and prices are fictional. No payments occurred.\n\nExtract the matching treasury-analysis 0.1.0 source and run:\n\n\`node src/cli.mjs verify /path/to/run/run.json\`\n\nThe sample verifier uses an independent event/state fixture; it does not verify Ethereum. Live verification requires an archive RPC with EIP-1898 support and trusts that provider for completeness.\n\nJSON integers are decimal strings. Function and block references are in provenance.json; scope is in inputs.json.\n`,
+      join(destination, "README.md"),
+      "# Wallet transfers run\n\nAll transfers, reads, payments, addresses, times and hashes are mocked. No real funds moved.\n\nExtract the matching treasury-analysis 0.2.0 source and run:\n\n`node src/cli.mjs replay /path/to/run/run.json`\n\nReplay checks arithmetic; it does not verify Arbitrum or Testril. Amounts are raw six-decimal USDC integer strings. Reset starts a new transfer history; read charges cover the entire mock session and are not refunded.\n",
     );
-    for (const name of [
-      "inputs",
-      "data",
-      "report",
-      "receipts",
-      "provenance",
-      "calculation",
-      "verification",
-    ]) {
-      await writeFile(
-        join(runDirectory, `${name}.json`),
-        `${JSON.stringify(run[name], null, 2)}\n`,
-      );
-    }
     await writeFile(
-      join(runDirectory, "run.json"),
+      join(destination, "run.json"),
       `${JSON.stringify(run, null, 2)}\n`,
     );
+    for (const name of ["transfers", "balances", "receipts", "provenance"])
+      await writeFile(
+        join(destination, `${name}.json`),
+        `${JSON.stringify(run[name], null, 2)}\n`,
+      );
     return await tarArchive(directory, ["run"]);
   } finally {
     await rm(directory, { recursive: true, force: true });

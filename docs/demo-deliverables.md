@@ -2,7 +2,7 @@
 
 **Proposed implementation · 3 October 2026**
 
-This document describes the planned release. It supplements the [summary](demo-summary.md) and [implementation plan](demo-strategy.md). The [treasury sample](../demos/treasury-analysis/README.md) is now runnable: report, sample verification, CLI, and independent source/run downloads. Live paid data, materialization, and supplier earnings remain unimplemented. The other examples remain planned.
+This document describes the planned release. It supplements the [summary](demo-summary.md) and [implementation plan](demo-strategy.md). The [current wallet demo](../demos/treasury-analysis/README.md) is an interactive mock: transfer 1 USDC between three wallets, read balances, replay transfers, inspect fictional provenance, and reset. Source/run downloads and an arithmetic replay CLI are available. This replaces the initial static sample; the broader report below remains a future proposal. Live paid data, materialization, and supplier earnings remain unimplemented. The other examples remain planned.
 
 ## First-release structure
 

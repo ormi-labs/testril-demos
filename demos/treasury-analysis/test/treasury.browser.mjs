@@ -1,102 +1,95 @@
 import { test, expect } from "@playwright/test";
-
-test("report, verification and distinct downloads work without a wallet", async ({
+async function send(page, from, to, amount) {
+  await page.locator("#from").selectOption(from);
+  await page.locator("#to").selectOption(to);
+  await page.locator("#amount").fill(amount);
+  await page.locator("#transfer").click();
+  await expect(page.locator("#status")).toContainText("Mock transfer complete");
+}
+async function scrub(page, step) {
+  await page.locator("#replay-step").evaluate((input, value) => {
+    input.value = value;
+    input.dispatchEvent(new Event("input", { bubbles: true }));
+  }, String(step));
+}
+test.beforeEach(async ({ page }) => {
+  await page.goto("/");
+  await expect(page.locator("#balance-treasury")).toHaveText("1");
+});
+test("transfers, incremental replay, keyboard provenance and reset", async ({
   page,
 }) => {
-  const errors = [];
-  page.on("pageerror", (error) => errors.push(error.message));
-  await page.goto("/");
-  await expect(page.getByRole("status").first()).toContainText(
-    "Sample complete",
+  await send(page, "treasury", "a", ".25");
+  await send(page, "a", "b", ".1");
+  await expect(page.locator("#balance-treasury")).toHaveText("0.75");
+  await expect(page.locator("#balance-a")).toHaveText("0.15");
+  await expect(page.locator("#balance-b")).toHaveText("0.1");
+  await expect(page.locator("#spent")).toHaveText("0.000090");
+  await page.locator("#show").click();
+  await expect(page.locator(".transfer-row")).toHaveCount(1);
+  await page.locator("#play").click();
+  await scrub(page, 2);
+  await expect(page.locator(".transfer-row")).toHaveCount(2);
+  await expect(page.locator(".transfer-row").first()).toContainText(
+    "Block 100000001",
   );
-  await expect(page.locator("#closing")).toHaveText("950");
-  await expect(page.locator("#net")).toHaveText("−50");
-  await expect(
-    page.getByRole("heading", {
-      name: "The treasury’s balance fell by 50 USDC.",
-    }),
-  ).toBeVisible();
-  await expect(page.locator("#reads")).toHaveText("$0.001062");
-  await page.getByRole("button", { name: "Verify sample" }).click();
-  await expect(page.locator("#verification")).toContainText(
-    "Sample checks passed",
+  await expect(page.locator(".transfer-row").first()).toContainText("UTC");
+  await page.locator(".transfer-row").first().focus();
+  await page.keyboard.press("Enter");
+  await expect(page.locator("#provenance")).toBeVisible();
+  await expect(page.locator("#provenance-content")).toContainText(
+    "250000 raw units",
   );
-  const download = page.waitForEvent("download");
-  await page.getByRole("link", { name: /Export this run/ }).click();
-  expect((await download).suggestedFilename()).toBe("treasury-run.tar.gz");
-  const source = page.waitForEvent("download");
-  await page.getByRole("link", { name: /Download source/ }).click();
-  expect((await source).suggestedFilename()).toBe(
-    "treasury-analysis-0.1.0.tar.gz",
-  );
-  expect(errors).toEqual([]);
+  await expect(page.locator("#spent")).toHaveText("0.000102");
+  await page.keyboard.press("Escape");
+  await expect(page.locator("#provenance")).toBeHidden();
+  await page.locator("#reset").click();
+  await expect(page.locator("#balance-treasury")).toHaveText("1");
+  await expect(page.locator("#balance-a")).toHaveText("0");
+  await expect(page.locator("#balance-b")).toHaveText("0");
+  await expect(page.locator("#spent")).toHaveText("0.000132");
+  await expect(page.locator("#history")).toBeHidden();
+  await page.locator("#reset-evidence summary").click();
+  await expect(page.locator("#reset-sweeps li")).toHaveCount(2);
+  await page.locator("#show").click();
+  await expect(page.locator("#empty-history")).toBeVisible();
+  await expect(page.locator("#spent")).toHaveText("0.000132");
+});
+test("invalid transfer spends nothing; refresh resumes cached balances", async ({
+  page,
+}) => {
+  await page.locator("#amount").fill("2");
+  await page.locator("#transfer").click();
+  await expect(page.locator("#status")).toHaveClass(/error/);
+  await expect(page.locator("#spent")).toHaveText("0.000030");
+  await send(page, "treasury", "b", ".3");
+  await page.reload();
+  await expect(page.locator("#balance-b")).toHaveText("0.3");
+  await expect(page.locator("#spent")).toHaveText("0.000060");
+});
+test("reduced motion pauses; stale replay stays separate from current balances", async ({
+  page,
+}) => {
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await send(page, "treasury", "a", ".25");
+  await page.locator("#show").click();
+  await expect(page.locator("#step-label")).toHaveText("0 / 1");
+  await expect(page.locator("#play")).toHaveText("Play");
+  await scrub(page, 1);
+  await send(page, "treasury", "b", ".1");
+  await expect(page.locator("#history-stale")).toBeVisible();
+  await expect(page.locator("#balance-treasury")).toHaveText("0.65");
+  await expect(page.locator("#replay-wallets")).toContainText("0.75 USDC");
+  await page.locator(".transfer-row").click();
+  await expect(page.locator("#provenance")).toBeVisible();
   expect(
     await page.evaluate(
-      () => document.documentElement.scrollWidth <= window.innerWidth,
+      () => document.documentElement.scrollWidth <= innerWidth,
     ),
   ).toBe(true);
-});
-
-test("changed settings differ from the completed report and team movement", async ({
-  page,
-}) => {
-  await page.goto("/");
-  await expect(page.locator("#closing")).toHaveText("950");
-  await page.getByLabel("Include Team B").check();
-  await expect(page.locator("#status")).toContainText("Settings changed");
-  await expect(page.locator("#team-report")).toBeHidden();
-  await page.getByRole("button", { name: "Run sample" }).click();
-  await expect(page.locator("#team-summary")).toContainText(
-    "Net team movement: +20 USDC",
+  const download = page.waitForEvent("download");
+  await page.locator("#export").click();
+  expect((await download).suggestedFilename()).toBe(
+    "wallet-transfers-run.tar.gz",
   );
-  await expect(page.locator("#net")).toHaveText("−50");
-  await page
-    .getByRole("combobox", { name: "Treasury", exact: true })
-    .selectOption("0x2222222222222222222222222222222222222222");
-  await page.getByRole("button", { name: "Run sample" }).click();
-  await expect(page.locator("#closing")).toHaveText("570");
-  await expect(page.locator("#result-heading")).toContainText("rose by 70");
-});
-
-test("an insufficient budget preserves the completed report", async ({
-  page,
-}) => {
-  await page.goto("/");
-  await expect(page.locator("#closing")).toHaveText("950");
-  await page.getByLabel("Example budget").fill("0.001");
-  await page.getByRole("button", { name: "Run sample" }).click();
-  await expect(page.locator("#status")).toContainText("exceeds the budget");
-  await expect(page.locator("#status")).toContainText(
-    "previous completed result",
-  );
-  await expect(page.locator("#closing")).toHaveText("950");
-  await expect(page.getByRole("button", { name: "Run sample" })).toBeEnabled();
-});
-
-test("quiet ranges produce an empty report and can be verified", async ({
-  page,
-}) => {
-  await page.goto("/");
-  await expect(page.locator("#closing")).toHaveText("950");
-  await page.getByLabel("From block").fill("103");
-  await page.getByRole("button", { name: "Run sample" }).click();
-  await expect(page.locator("#result-heading")).toHaveText(
-    "The treasury’s balance did not change.",
-  );
-  await expect(page.locator("#flow")).toContainText("No transfers");
-  await page.getByRole("button", { name: "Verify sample" }).click();
-  await expect(page.locator("#verification")).toContainText(
-    "Sample checks passed",
-  );
-});
-
-test("a total opens evidence with keyboard focus", async ({ page }) => {
-  await page.goto("/");
-  await expect(page.locator("#incoming")).toHaveText("50");
-  await page.locator("#incoming").focus();
-  await page.keyboard.press("Enter");
-  await expect(page.locator("#edge-rows")).toContainText("100000000");
-  await expect(page.locator("#evidence summary")).toBeFocused();
-  await page.keyboard.press("Enter");
-  await expect(page.locator("#edge-rows")).toBeHidden();
 });

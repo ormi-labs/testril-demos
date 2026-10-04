@@ -1,54 +1,46 @@
 import { readFile, writeFile } from "node:fs/promises";
-import { buildSample, defaultInputs } from "./sample.mjs";
-import { verifySample, verifyRpc } from "./verify.mjs";
-import { discover } from "./mcp.mjs";
-import { decimalAmount, usdAmount } from "../public/amounts.js";
+import {
+  createDemo,
+  transferDemo,
+  showTransfers,
+  exportDemo,
+} from "./demo.mjs";
+import { decimalAmount } from "../public/amounts.js";
+import { replayBalances } from "../public/replay.js";
 
 try {
   const [command, filename] = process.argv.slice(2);
+  let run;
   if (command === "sample") {
-    const run = buildSample(defaultInputs);
-    console.log(
-      `Fictional USDC sample · [${run.inputs.fromBlock}, ${run.inputs.toBlock})`,
-    );
-    for (const key of ["opening", "incoming", "outgoing", "net", "closing"])
-      console.log(
-        `${key.padEnd(9)} ${decimalAmount(run.report[`${key}Raw`], 6, key === "net")} USDC`,
-      );
-    console.log(
-      `Illustrative reads: ${usdAmount(run.receipts.readsRaw)}; paid: $0.000000`,
-    );
-    if (filename) {
+    let demo = createDemo();
+    demo = transferDemo(demo, { from: "treasury", to: "a", amount: "0.25" });
+    demo = transferDemo(demo, { from: "treasury", to: "b", amount: "0.1" });
+    demo = transferDemo(demo, { from: "a", to: "b", amount: "0.05" });
+    demo = showTransfers(demo).demo;
+    run = exportDemo(demo);
+    if (filename)
       await writeFile(filename, `${JSON.stringify(run, null, 2)}\n`);
-      console.log(`Exported ${filename}`);
-    }
-  } else if (command === "verify" && filename) {
-    const run = JSON.parse(await readFile(filename, "utf8"));
-    if (run.mode === "live" && !process.env.ETHEREUM_RPC_URL)
-      throw new Error(
-        "Set ETHEREUM_RPC_URL to a reference archive RPC with EIP-1898 support.",
-      );
-    const verification =
-      run.mode === "sample"
-        ? verifySample(run)
-        : await verifyRpc(run, process.env.ETHEREUM_RPC_URL);
-    console.log(JSON.stringify(verification, null, 2));
-    if (verification.status !== "passed") process.exitCode = 1;
-  } else if (command === "discover") {
-    console.log(
-      JSON.stringify(
-        await discover(
-          process.env.TESTRIL_MCP_URL ?? "https://dev.testril.ai/mcp",
-        ),
-        null,
-        2,
-      ),
-    );
-  } else {
+  } else if (command === "replay" && filename) {
+    run = JSON.parse(await readFile(filename, "utf8"));
+    if (run.formatVersion !== 2 || run.mode !== "mock")
+      throw new Error("This CLI replays version 2 mock exports only.");
+  } else
     throw new Error(
-      "Usage: node src/cli.mjs sample [run.json] | verify <run.json> | discover",
+      "Usage: node src/cli.mjs sample [run.json] | replay <run.json>",
     );
-  }
+  const balances = replayBalances(
+    run.initialBalances,
+    run.transfers,
+    run.transfers.length,
+  );
+  if (Object.keys(balances).some((id) => balances[id] !== run.balances[id]))
+    throw new Error("Export balances disagree with the transfer replay.");
+  console.log("Arbitrum / USDC / MOCK — no funds moved or payments occurred.");
+  for (const wallet of run.wallets)
+    console.log(`${wallet.name}: ${decimalAmount(balances[wallet.id])} USDC`);
+  console.log(
+    `${run.transfers.length} mock transfers. Read charges: ${decimalAmount(run.payment.spentRaw)} USDC (simulated).`,
+  );
 } catch (error) {
   console.error(error.message);
   process.exitCode = 1;

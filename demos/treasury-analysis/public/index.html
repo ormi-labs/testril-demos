@@ -3,329 +3,217 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Treasury analysis · A Testril demo</title>
+    <title>Wallet transfers · A Testril demo</title>
     <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml" />
     <link rel="stylesheet" href="/assets/tokens.css" />
     <link rel="stylesheet" href="/style.css" />
     <script src="/app.js" type="module"></script>
   </head>
   <body>
-    <header class="masthead measure">
-      <a class="identity" href="/" aria-label="Treasury analysis home"
-        >Treasury analysis <span>A Testril demo</span></a
+    <header class="measure masthead">
+      <a href="/" class="identity"
+        >Wallet transfers<span>A Testril demo</span></a
       >
-      <img src="/assets/wordmark.svg" alt="Testril" width="152" height="32" />
+      <img src="/assets/wordmark.svg" width="152" height="32" alt="Testril" />
     </header>
     <main class="measure">
-      <section class="introduction" aria-labelledby="question">
-        <p class="eyebrow">01 / Treasury analysis</p>
-        <h1 id="question">
-          Where did the treasury’s<br class="desktop-break" />
-          USDC go?
-        </h1>
-        <p class="intro-copy">
-          Follow the transfers, check the balances, and take the evidence with
-          you.
+      <section class="intro" aria-labelledby="question">
+        <p class="eyebrow">Arbitrum / USDC / <span>Mock</span></p>
+        <h1 id="question">Where is the USDC now?</h1>
+        <p>
+          Move one USDC between three wallets. Read the balances with Testril,
+          then replay the transfers and inspect their sources.
         </p>
       </section>
-
-      <section class="panel scope" aria-labelledby="scope-heading">
+      <p class="mock-disclosure">
+        All transfers, Testril reads, payments, times, and source hashes are
+        mocked. No real funds move and no wallet connection is needed.
+      </p>
+      <section aria-labelledby="balances-heading" class="balances-section">
         <div class="section-top">
-          <h2 id="scope-heading">Choose the scope</h2>
-          <span class="badge">Fictional sample</span>
+          <h2 id="balances-heading">Balances from Testril</h2>
+          <span class="badge" id="balance-block">Loading…</span>
         </div>
-        <p class="disclosure">
-          These addresses, transfers, block hashes, and prices are synthetic. No
-          wallet is needed and no payments are made.
+        <div class="wallet-grid" id="wallets"></div>
+        <p class="small muted">
+          Total in these wallets: <strong>1 USDC</strong>. The read-payment
+          wallet is separate.
         </p>
-        <form id="scope-form">
+      </section>
+      <section class="panel transfer-panel" aria-labelledby="transfer-heading">
+        <div class="section-top">
+          <h2 id="transfer-heading">Make a transfer</h2>
+          <span class="small muted" id="run-label"></span>
+        </div>
+        <form id="transfer-form">
           <div class="form-grid">
-            <label
-              >Treasury<select id="treasury" name="treasury" required></select
-            ></label>
-            <label
-              >Chain &amp; token<input
-                value="Ethereum · fictional USDC"
-                readonly
-                aria-readonly="true"
-            /></label>
-            <label
-              >From block (included)<input
-                id="from-block"
-                name="fromBlock"
-                type="number"
-                min="100"
-                max="1099"
-                value="100"
-                required
-            /></label>
-            <label
-              >To block (excluded)<input
-                id="to-block"
-                name="toBlock"
-                type="number"
-                min="101"
-                max="1100"
-                value="1100"
-                required
-            /></label>
-            <label
-              >Example budget · USD<input
-                id="budget"
-                name="budget"
-                inputmode="decimal"
-                value="0.15"
-                required
-            /></label>
-          </div>
-          <div class="form-bottom">
-            <label class="checkbox"
-              ><input type="checkbox" id="team" /> Include Team B in the team
-              view</label
-            >
-            <button type="submit" id="run" disabled>Run sample</button>
+            <div>
+              <label for="from">From</label
+              ><select id="from" name="from" required disabled></select>
+            </div>
+            <div>
+              <label for="to">To</label
+              ><select id="to" name="to" required disabled></select>
+            </div>
+            <div>
+              <label for="amount">Amount · USDC</label>
+              <div class="amount-field">
+                <input
+                  id="amount"
+                  name="amount"
+                  inputmode="decimal"
+                  value="0.25"
+                  required
+                  disabled
+                /><button id="all" type="button" class="secondary" disabled>
+                  All
+                </button>
+              </div>
+            </div>
+            <button id="transfer" type="submit" disabled>Transfer USDC</button>
           </div>
         </form>
-        <p id="status" class="status" role="status" aria-live="polite">
-          Loading the sample…
+        <div class="transfer-actions">
+          <button id="show" type="button" class="secondary" disabled>
+            Show transfers</button
+          ><button id="reset" type="button" class="text-button" disabled>
+            Reset demo</button
+          ><span id="available" class="small muted"></span>
+        </div>
+        <p id="status" role="status" aria-live="polite">
+          Starting the mock demo…
         </p>
+        <details id="reset-evidence" hidden>
+          <summary>Last reset: return transfers</summary>
+          <ul id="reset-sweeps"></ul>
+          <p class="small muted">
+            These mock return transfers closed the previous run. The current
+            replay starts after the reset.
+          </p>
+        </details>
       </section>
 
       <section
-        id="result"
-        class="result"
+        id="history"
+        class="history-section"
         hidden
-        aria-labelledby="result-heading"
+        aria-labelledby="history-heading"
       >
         <div class="section-top">
           <div>
-            <p class="eyebrow" id="completed-scope"></p>
-            <h2 id="result-heading">
-              The treasury’s balance fell by
-              <span id="headline-change"></span> USDC.
-            </h2>
+            <p class="eyebrow" id="history-scope"></p>
+            <h2 id="history-heading" tabindex="-1">Transfers to date</h2>
           </div>
-          <span id="reconciliation" class="badge"></span>
-        </div>
-        <div class="metrics panel">
-          <div>
-            <span>Opening balance</span><strong id="opening"></strong
-            ><small id="opening-block"></small>
-          </div>
-          <div>
-            <span>Incoming</span
-            ><button
-              class="metric-link"
-              id="incoming"
-              type="button"
-              aria-controls="evidence"
-            ></button
-            ><small>From other addresses</small>
-          </div>
-          <div>
-            <span>Outgoing</span
-            ><button
-              class="metric-link"
-              id="outgoing"
-              type="button"
-              aria-controls="evidence"
-            ></button
-            ><small>To other addresses</small>
-          </div>
-          <div>
-            <span>Net change</span><strong id="net"></strong
-            ><small>Incoming − outgoing</small>
-          </div>
-          <div>
-            <span>Closing balance</span><strong id="closing"></strong
-            ><small id="closing-block"></small>
-          </div>
-        </div>
-        <p class="report-note" id="self-note"></p>
-        <div class="analysis-grid">
-          <section class="panel flow-panel" aria-labelledby="flow-heading">
-            <h3 id="flow-heading">Transfers touching the treasury</h3>
-            <p class="muted">Arrows show direction. Values are USDC.</p>
-            <div id="flow"></div>
-          </section>
-          <section
-            class="panel counterparties"
-            aria-labelledby="counterparty-heading"
-          >
-            <h3 id="counterparty-heading">Counterparties</h3>
-            <p class="muted">Ranked by total incoming + outgoing.</p>
-            <div class="table-scroll">
-              <table>
-                <thead>
-                  <tr>
-                    <th scope="col">Address / supplied label</th>
-                    <th scope="col">Incoming</th>
-                    <th scope="col">Outgoing</th>
-                    <th scope="col">Net</th>
-                  </tr>
-                </thead>
-                <tbody id="counterparty-rows"></tbody>
-              </table>
-            </div>
-            <p class="small muted">
-              Labels come from the fixture. They are not identity claims.
-            </p>
-          </section>
-        </div>
-        <aside
-          id="team-report"
-          class="panel team-report"
-          hidden
-          aria-labelledby="team-heading"
-        >
-          <h3 id="team-heading">Separate team view</h3>
-          <p id="team-summary"></p>
-          <p class="small muted">
-            Transfers between team members are internal. This movement is not
-            reconciled with the treasury’s individual balance; consolidated
-            balances would require every member’s snapshots.
-          </p>
-        </aside>
-      </section>
-
-      <section id="evidence-section" hidden aria-labelledby="evidence-heading">
-        <div class="section-top">
-          <h2 id="evidence-heading">Check the result</h2>
-          <button class="secondary" id="verify" type="button">
-            Verify sample
+          <button id="close-history" class="text-button" type="button">
+            Close
           </button>
         </div>
-        <p class="muted">
-          The verifier compares the returned aggregates with a separate fixture
-          of five transfer events and balance state. It checks synthetic data,
-          not Ethereum.
+        <p id="history-note" class="small muted"></p>
+        <p id="history-stale" class="notice" hidden>
+          There are new transfers. Select “Show transfers” to read the updated
+          history.
         </p>
-        <div
-          id="verification"
-          class="verification panel"
-          role="status"
-          aria-live="polite"
-        >
-          Not checked. Run the verifier to compare rows, snapshots, source
-          references, and arithmetic.
+        <div class="replay-controls" id="replay-controls">
+          <button id="play" class="secondary" type="button">Pause</button>
+          <button id="restart-replay" class="text-button" type="button">
+            Replay from start
+          </button>
+          <label for="replay-step">Replay step</label
+          ><input id="replay-step" type="range" min="0" max="0" value="0" />
+          <output id="step-label" for="replay-step">0 / 0</output>
         </div>
-        <details class="panel" id="evidence">
-          <summary>Transfer rows and raw amounts</summary>
+        <div id="history-layout" class="history-layout">
+          <div class="panel illustration">
+            <p id="replay-caption" class="small muted"></p>
+            <div id="replay-wallets" class="replay-wallets"></div>
+            <p id="empty-history" class="empty" hidden>
+              No transfers yet. Send some USDC, then show transfers again.
+            </p>
+            <p id="replay-start" class="empty">
+              Press Play to reveal each transfer.
+            </p>
+            <div id="transfer-rows" class="transfer-rows"></div>
+            <p class="small muted illustration-help">
+              Select a transfer arrow to inspect its provenance.
+            </p>
+          </div>
+          <aside
+            id="provenance"
+            class="panel provenance"
+            hidden
+            aria-labelledby="provenance-heading"
+          >
+            <div class="section-top">
+              <h3 id="provenance-heading" tabindex="-1">Transfer provenance</h3>
+              <button
+                id="close-provenance"
+                class="text-button"
+                type="button"
+                aria-label="Close provenance"
+              >
+                Close
+              </button>
+            </div>
+            <p class="mock-source">
+              Mock source evidence · not verified on Arbitrum
+            </p>
+            <div id="provenance-content"></div>
+          </aside>
+        </div>
+      </section>
+
+      <section class="panel payments" aria-labelledby="payment-heading">
+        <div class="section-top">
+          <h2 id="payment-heading">Read payments</h2>
+          <span class="badge">Mock payment wallet</span>
+        </div>
+        <div class="payment-grid">
+          <div>
+            <span>Read charges so far · USDC</span
+            ><strong id="spent">0.000000</strong>
+          </div>
+          <div>
+            <span>Read requests</span><strong id="read-count">0</strong>
+          </div>
+          <div>
+            <span>Payment wallet left · USDC</span
+            ><strong id="payment-left">0.010000</strong>
+          </div>
+        </div>
+        <p id="read-note" class="small muted">
+          Prepared data is assumed. This demo does not materialize data or show
+          supplier earnings.
+        </p>
+        <details>
+          <summary>Illustrative rates and read receipts</summary>
           <p class="small muted">
-            Rows are grouped by block, sender, and recipient. A row can contain
-            multiple events. Self-transfers remain in the evidence.
+            Each balance refresh makes three mock reads at 0.000010 USDC each. A
+            transfer-history read costs 0.000010 + 0.000001 per transfer. Empty
+            history, replay, and provenance inspection are free. These are
+            fictional rates, not quotes.
           </p>
           <div class="table-scroll">
             <table>
               <thead>
                 <tr>
-                  <th scope="col">Block</th>
-                  <th scope="col">From</th>
-                  <th scope="col">To</th>
-                  <th scope="col">Amount · USDC</th>
-                  <th scope="col">Raw integer</th>
-                  <th scope="col">Events</th>
+                  <th scope="col">Mock receipt</th>
+                  <th scope="col">Read</th>
+                  <th scope="col">Requests</th>
+                  <th scope="col">USDC</th>
                 </tr>
               </thead>
-              <tbody id="edge-rows"></tbody>
+              <tbody id="receipt-rows"></tbody>
             </table>
           </div>
         </details>
-        <details class="panel">
-          <summary>Source references and calculation</summary>
-          <p id="calculation" class="small"></p>
-          <p class="small muted">
-            Function requirement: erc20_transfer_edges. These sample references
-            are fictional and are not transaction hashes or proof of source
-            integrity.
-          </p>
-          <ul id="source-blocks" class="source-list"></ul>
-        </details>
       </section>
-
-      <section id="cost-section" hidden aria-labelledby="cost-heading">
-        <div class="section-top">
-          <h2 id="cost-heading">What the example would cost</h2>
-          <span class="badge">Paid: $0.000000</span>
-        </div>
-        <p class="muted">
-          Illustrative rates from the planning baseline, not current quotes.
-          Preparation and reads are separate; the budget includes both.
-        </p>
-        <div class="cost-grid">
-          <div class="panel cost">
-            <span>Prepare the data</span><strong id="preparation"></strong>
-            <p class="small muted" id="preparation-detail"></p>
-          </div>
-          <div class="panel cost">
-            <span>Read the report’s data</span><strong id="reads"></strong>
-            <p class="small muted">
-              One edge read and two balance snapshot reads.
-            </p>
-          </div>
-          <div class="panel cost">
-            <span>Example budget remaining</span
-            ><strong id="remaining"></strong>
-            <p class="small muted">
-              Allowance after the estimated preparation and reads.
-            </p>
-          </div>
-        </div>
-        <details class="panel">
-          <summary>Prepared data and supplier earnings</summary>
-          <p class="small">
-            No data has been materialized and no earnings are recorded. The live
-            version needs a covered transfer-edge dataset and a second payer’s
-            purchase before it can show actual reuse and supplier earnings.
-          </p>
-        </details>
-      </section>
-
-      <section class="downloads" aria-labelledby="download-heading">
-        <div>
-          <h2 id="download-heading">Use this as your starting point</h2>
-          <p class="muted">
-            A small Node.js server, plain browser JavaScript, exact accounting,
-            and an independent verifier. No frontend framework.
-          </p>
-        </div>
-        <div class="download-grid">
-          <a id="export" class="download panel" hidden
-            ><strong>Export this run <span aria-hidden="true">↓</span></strong
-            ><span
-              >Inputs, raw rows, report, estimates, source references, and
-              verification status.</span
-            ><small>Run evidence · .tar.gz</small></a
-          >
-          <a href="/api/source" class="download panel"
-            ><strong>Download source <span aria-hidden="true">↓</span></strong
-            ><span
-              >The standalone application, CLI, verifier, fixtures, tests, and
-              locked tooling.</span
-            ><small>Version 0.1.0 · .tar.gz · private evaluation</small></a
-          >
-        </div>
-      </section>
-
-      <details class="panel live-details">
-        <summary>What is needed for live Testril data?</summary>
-        <p>
-          This version runs the sample only. Live treasury reports need the
-          transfer-edge function described in the build specification and a
-          budgeted x402 client. This app does not ask for a private key.
-        </p>
-        <button class="secondary" id="discover" type="button">
-          Check deployed functions
-        </button>
-        <p id="discovery-status" role="status" aria-live="polite">
-          Catalog inspection is free. It makes no paid requests.
-        </p>
-        <pre id="catalog" hidden></pre>
-      </details>
     </main>
     <footer class="measure">
-      <span>Built with Testril</span
-      ><span>Sample data · no payments · no earnings</span>
+      <span>Built with Testril · mock only</span>
+      <div>
+        <a id="export" hidden>Export this run</a
+        ><a href="/api/source">Download source</a>
+      </div>
     </footer>
   </body>
 </html>

@@ -1,13 +1,17 @@
-import { decimalAmount, parseUsd, usdAmount } from "./amounts.js";
+import { decimalAmount, feeAmount } from "./amounts.js";
+import { replayBalances } from "./replay.js";
 
 const $ = (id) => document.getElementById(id);
-let configuration;
-let completed;
+const storageKey = "testril-wallet-demo-v2";
+let state;
 let busy = false;
-const shortAddress = (address) => `${address.slice(0, 6)}…${address.slice(-4)}`;
-const label = (address) =>
-  configuration.accounts.find((account) => account.address === address)
-    ?.label ?? shortAddress(address);
+let history;
+let step = 0;
+let timer;
+let selected;
+const name = (id) => state.wallets.find((wallet) => wallet.id === id).name;
+const time = (timestamp) =>
+  `${new Date(timestamp).toISOString().slice(11, 19)} UTC`;
 
 function element(tag, text, className) {
   const node = document.createElement(tag);
@@ -19,335 +23,407 @@ function element(tag, text, className) {
 async function api(path, input) {
   const response = await fetch(
     path,
-    input
-      ? {
+    input === undefined
+      ? {}
+      : {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(input),
-        }
-      : {},
+        },
   );
   const result = await response.json();
-  if (!response.ok) throw new Error(result.error ?? "Request failed.");
+  if (!response.ok) {
+    if (result.state) {
+      state = result.state;
+      renderState();
+    }
+    throw new Error(result.error ?? "Request failed.");
+  }
   return result;
 }
-
-function setBusy(value) {
-  busy = value;
-  $("run").disabled = value;
-  $("verify").disabled = value;
-  for (const control of $("scope-form").elements) control.disabled = value;
-  $("run").textContent = value ? "Running…" : "Run sample";
-}
-
-function status(text, error = false) {
-  $("status").textContent = text;
+const endpoint = (action = "") =>
+  `/api/sessions/${state.id}${action ? `/${action}` : ""}`;
+function status(message, error = false) {
+  $("status").textContent = message;
   $("status").classList.toggle("error", error);
 }
-
-function svgElement(tag, attributes, text) {
+function lock(value) {
+  busy = value;
+  for (const control of $("transfer-form").elements) control.disabled = value;
+  for (const id of ["show", "reset", "play", "restart-replay", "replay-step"])
+    $(id).disabled = value;
+  if (!value && state) updateAvailable();
+}
+function updateAvailable() {
+  if ($("from").value === $("to").value)
+    $("to").value = state.wallets.find(
+      (wallet) => wallet.id !== $("from").value,
+    ).id;
+  for (const option of $("to").options)
+    option.disabled = option.value === $("from").value;
+  $("available").textContent =
+    `${name($("from").value)} has ${decimalAmount(state.balances[$("from").value])} USDC.`;
+}
+function renderState() {
+  $("wallets").replaceChildren(
+    ...state.wallets.map((wallet) => {
+      const card = element("article", undefined, "panel wallet");
+      const balance = element(
+        "strong",
+        decimalAmount(state.balances[wallet.id]),
+      );
+      balance.id = `balance-${wallet.id}`;
+      const value = element("div", undefined, "wallet-value");
+      value.append(balance, element("small", "USDC"));
+      card.append(
+        element("h3", wallet.name, "wallet-name"),
+        value,
+        element(
+          "p",
+          `${wallet.address.slice(0, 6)}…${wallet.address.slice(-4)}`,
+          "wallet-address",
+        ),
+      );
+      return card;
+    }),
+  );
+  $("balance-block").textContent =
+    `Mock read · block ${state.balanceRead.block}`;
+  $("run-label").textContent = `Run ${state.cycle}`;
+  $("show").textContent = `Show transfers (${state.transferCount})`;
+  $("spent").textContent = feeAmount(state.payment.spentRaw);
+  $("payment-left").textContent = feeAmount(state.payment.remainingRaw);
+  $("read-count").textContent = state.payment.requestCount;
+  $("receipt-rows").replaceChildren(
+    ...state.receipts.map((receipt) => {
+      const row = element("tr");
+      row.append(
+        ...[
+          receipt.id,
+          receipt.kind,
+          receipt.requestCount,
+          feeAmount(receipt.chargeRaw),
+        ].map((value) => element("td", value)),
+      );
+      return row;
+    }),
+  );
+  $("export").hidden = false;
+  $("export").href = endpoint("export");
+  $("reset-evidence").hidden = !state.lastReset;
+  if (state.lastReset)
+    $("reset-sweeps").replaceChildren(
+      ...(state.lastReset.sweeps.length
+        ? state.lastReset.sweeps.map((transfer) =>
+            element(
+              "li",
+              `${name(transfer.from)} → Treasury: ${decimalAmount(transfer.amountRaw)} USDC · ${time(transfer.timestamp)} · block ${transfer.block}`,
+            ),
+          )
+        : [
+            element(
+              "li",
+              "All funds were already in the treasury. No return transfers were needed.",
+            ),
+          ]),
+    );
+  if (history)
+    $("history-stale").hidden =
+      history.transfers.length === state.transferCount;
+  updateAvailable();
+}
+function stop() {
+  clearInterval(timer);
+  timer = undefined;
+  $("play").textContent = "Play";
+}
+function closeProvenance() {
+  $("provenance").hidden = true;
+  $("history-layout").classList.remove("with-provenance");
+  const previous = selected;
+  selected = undefined;
+  if (history) renderReplay();
+  if (previous)
+    document.querySelector(`[data-transfer="${previous}"]`)?.focus();
+}
+function closeHistory() {
+  stop();
+  closeProvenance();
+  history = undefined;
+  $("history").hidden = true;
+}
+function svgNode(tag, attributes, text) {
   const node = document.createElementNS("http://www.w3.org/2000/svg", tag);
   for (const [key, value] of Object.entries(attributes))
     node.setAttribute(key, value);
   if (text) node.textContent = text;
   return node;
 }
-
-function flowDiagram(run) {
-  const rows = run.report.counterparties;
-  if (!rows.length)
-    return element(
-      "p",
-      "No transfers to other addresses in this range.",
-      "muted",
-    );
-  const height = rows.length * 116 + 12;
-  const svg = svgElement("svg", {
-    viewBox: `0 0 440 ${height}`,
-    role: "img",
-    "aria-label":
-      "Directed transfers between the selected treasury and its counterparties",
-  });
-  const defs = svgElement("defs", {});
-  const marker = svgElement("marker", {
-    id: "arrow",
-    viewBox: "0 0 10 10",
-    refX: "9",
-    refY: "5",
-    markerWidth: "6",
-    markerHeight: "6",
-    orient: "auto-start-reverse",
-  });
-  marker.append(
-    svgElement("path", { d: "M 0 0 L 10 5 L 0 10 Z", class: "flow-arrow" }),
+function transferRow(transfer, index) {
+  const button = element(
+    "button",
+    undefined,
+    `transfer-row${selected === transfer.id ? " selected" : ""}`,
   );
-  defs.append(marker);
-  svg.append(defs);
-  rows.forEach((row, index) => {
-    const y = index * 116 + 22;
-    for (const [x, address] of [
-      [4, run.inputs.treasury],
-      [306, row.address],
-    ]) {
-      svg.append(
-        svgElement("rect", {
-          x,
-          y,
-          width: 130,
-          height: 70,
-          rx: 4,
-          class: "flow-node",
-        }),
-      );
-      svg.append(
-        svgElement(
-          "text",
-          { x: x + 12, y: y + 26, class: "flow-label" },
-          label(address),
-        ),
-      );
-      svg.append(
-        svgElement(
-          "text",
-          { x: x + 12, y: y + 48, class: "flow-address" },
-          shortAddress(address),
-        ),
-      );
-    }
-    const outY = y + 18;
-    const inY = y + 54;
-    if (row.outgoingRaw !== "0") {
-      svg.append(
-        svgElement("path", {
-          d: `M 134 ${outY} H 300`,
-          class: "flow-path",
-          "marker-end": "url(#arrow)",
-        }),
-      );
-      svg.append(
-        svgElement(
-          "text",
-          { x: 217, y: outY - 6, "text-anchor": "middle", class: "flow-value" },
-          decimalAmount(row.outgoingRaw),
-        ),
-      );
-    }
-    if (row.incomingRaw !== "0") {
-      svg.append(
-        svgElement("path", {
-          d: `M 306 ${inY} H 140`,
-          class: "flow-path",
-          "marker-end": "url(#arrow)",
-        }),
-      );
-      svg.append(
-        svgElement(
-          "text",
-          { x: 217, y: inY - 6, "text-anchor": "middle", class: "flow-value" },
-          decimalAmount(row.incomingRaw),
-        ),
-      );
-    }
-  });
-  return svg;
-}
-
-function render({ run, id }) {
-  const { report, inputs, data, receipts } = run;
-  const net = BigInt(report.netRaw);
-  $("result-heading").textContent =
-    net === 0n
-      ? "The treasury’s balance did not change."
-      : `The treasury’s balance ${net < 0n ? "fell" : "rose"} by ${decimalAmount(net < 0n ? -net : net)} USDC.`;
-  $("completed-scope").textContent =
-    `Completed sample · ${label(inputs.treasury)} · [${inputs.fromBlock}, ${inputs.toBlock})`;
-  $("reconciliation").textContent = report.reconciles
-    ? "Balances reconcile"
-    : "Balance mismatch";
-  for (const key of ["opening", "incoming", "outgoing", "net", "closing"])
-    $(key).textContent = decimalAmount(
-      report[`${key}Raw`],
-      inputs.decimals,
-      key === "net",
-    );
-  $("opening-block").textContent = `At block ${inputs.fromBlock - 1}`;
-  for (const key of ["incoming", "outgoing"])
-    $(key).setAttribute(
-      "aria-label",
-      `Inspect ${key} transfers: ${decimalAmount(report[`${key}Raw`], inputs.decimals)} USDC`,
-    );
-  $("closing-block").textContent = `At block ${inputs.toBlock - 1}`;
-  $("self-note").textContent =
-    `${report.selfTransfers} self-transfer event(s) excluded from incoming and outgoing; retained in the evidence.`;
-  $("flow").replaceChildren(flowDiagram(run));
-  $("counterparty-rows").replaceChildren(
-    ...report.counterparties.map((row) => {
-      const tr = element("tr");
-      const name = element("td", label(row.address));
-      name.append(
-        element(
-          "small",
-          `${shortAddress(row.address)} · ${row.classification}`,
-        ),
-      );
-      tr.append(
-        name,
-        ...["incoming", "outgoing", "net"].map((key) =>
-          element(
-            "td",
-            decimalAmount(row[`${key}Raw`], inputs.decimals, key === "net"),
-          ),
-        ),
-      );
-      return tr;
-    }),
+  button.type = "button";
+  button.dataset.transfer = transfer.id;
+  button.setAttribute(
+    "aria-label",
+    `Transfer ${index + 1}: ${name(transfer.from)} to ${name(transfer.to)}, ${decimalAmount(transfer.amountRaw)} USDC. Show provenance.`,
   );
-  if (!report.counterparties.length) {
-    const row = element("tr");
-    const cell = element("td", "No counterparties in this range.");
-    cell.colSpan = 4;
-    row.append(cell);
-    $("counterparty-rows").append(row);
-  }
-  $("team-report").hidden = inputs.team.length === 0;
-  $("team-summary").textContent =
-    `External incoming: ${decimalAmount(report.team.incomingRaw)} USDC. External outgoing: ${decimalAmount(report.team.outgoingRaw)} USDC. Net team movement: ${decimalAmount(report.team.netRaw, 6, true)} USDC.`;
-  $("edge-rows").replaceChildren(
-    ...data.edges.map((row) => {
-      const tr = element("tr");
-      tr.append(
-        ...[
-          row.block,
-          label(row.from),
-          label(row.to),
-          decimalAmount(row.amountRaw),
-          row.amountRaw,
-          row.transferCount,
-        ].map((value) => element("td", value)),
-      );
-      return tr;
-    }),
-  );
-  $("calculation").textContent =
-    `${run.calculation.version}: ${run.calculation.description} Opening raw: ${data.openingRaw}; closing raw: ${data.closingRaw}.`;
-  $("source-blocks").replaceChildren(
-    ...run.provenance.blocks.map(({ block, hash }) =>
-      element("li", `Block ${block}: ${hash}`),
+  button.append(
+    element(
+      "span",
+      `${index + 1}. ${name(transfer.from)} → ${name(transfer.to)}`,
+      "route",
     ),
   );
-  $("verification").textContent =
-    "Not checked. Run the verifier to compare rows, snapshots, source references, and arithmetic.";
-  $("preparation").textContent = usdAmount(receipts.preparationRaw);
-  $("preparation-detail").textContent =
-    `${inputs.toBlock - inputs.fromBlock} edge blocks + two balance blocks. No preparation occurred.`;
-  $("reads").textContent = usdAmount(receipts.readsRaw);
-  $("remaining").textContent = usdAmount(receipts.remainingRaw);
-  $("export").href = `/api/export?id=${encodeURIComponent(id)}`;
-  for (const section of [
-    "result",
-    "evidence-section",
-    "cost-section",
-    "export",
-  ])
-    $(section).hidden = false;
-}
-
-async function runSample() {
-  if (busy) return;
-  setBusy(true);
-  status("Calculating the sample…");
-  try {
-    const inputs = {
-      ...configuration.inputs,
-      treasury: $("treasury").value,
-      fromBlock: Number($("from-block").value),
-      toBlock: Number($("to-block").value),
-      budgetRaw: parseUsd($("budget").value),
-      team: $("team").checked ? [configuration.accounts[1].address] : [],
-    };
-    completed = await api("/api/run", inputs);
-    render(completed);
-    status("Sample complete. No payments were made.");
-  } catch (error) {
-    status(
-      `${error.message}${completed ? " The previous completed result is still shown." : ""}`,
-      true,
-    );
-  } finally {
-    setBusy(false);
-  }
-}
-
-$("scope-form").addEventListener("submit", (event) => {
-  event.preventDefault();
-  runSample();
-});
-$("scope-form").addEventListener("input", () => {
-  if (completed)
-    status(
-      "Settings changed. Run the sample to update the result; the completed result below uses the previous settings.",
-    );
-});
-$("verify").addEventListener("click", async () => {
-  if (busy || !completed) return;
-  setBusy(true);
-  $("verify").textContent = "Checking…";
-  try {
-    const verification = await api("/api/verify", { id: completed.id });
-    completed.run.verification = verification;
-    const list = element("ul", undefined, "check-list");
-    for (const check of verification.checks)
-      list.append(element("li", `${check.passed ? "✓" : "✕"} ${check.name}`));
-    $("verification").replaceChildren(
-      element(
-        "p",
-        verification.status === "passed"
-          ? "Sample checks passed."
-          : "Sample checks failed.",
-      ),
-      list,
-      element("p", verification.reference, "muted"),
-    );
-  } catch (error) {
-    $("verification").textContent = error.message;
-  } finally {
-    setBusy(false);
-    $("verify").textContent = "Verify sample";
-  }
-});
-
-for (const key of ["incoming", "outgoing"])
-  $(key).addEventListener("click", () => {
-    $("evidence").open = true;
-    $("evidence").scrollIntoView({ block: "start" });
-    $("evidence").querySelector("summary").focus();
+  button.append(
+    element(
+      "span",
+      `${decimalAmount(transfer.amountRaw)} USDC`,
+      "transfer-amount",
+    ),
+  );
+  const svg = svgNode("svg", {
+    viewBox: "0 0 480 32",
+    preserveAspectRatio: "none",
+    "aria-hidden": "true",
   });
-
-$("discover").addEventListener("click", async () => {
-  $("discover").disabled = true;
-  $("discovery-status").textContent =
-    "Inspecting the deployed function catalog…";
-  try {
-    const result = await api("/api/discover");
-    $("catalog").textContent = JSON.stringify(result.catalog, null, 2);
-    $("catalog").hidden = false;
-    $("discovery-status").textContent = `Catalog checked. ${result.note}`;
-  } catch (error) {
-    $("discovery-status").textContent = error.message;
-  } finally {
-    $("discover").disabled = false;
+  const positions = { treasury: 80, a: 240, b: 400 };
+  const start = positions[transfer.from];
+  const end = positions[transfer.to];
+  const direction = end > start ? 1 : -1;
+  svg.append(
+    svgNode("path", {
+      d: `M ${start} 16 H ${end - direction * 8}`,
+      class: "arrow-line",
+    }),
+    svgNode("path", {
+      d: `M ${end - direction * 10} 10 L ${end} 16 L ${end - direction * 10} 22 Z`,
+      class: "arrow-head",
+    }),
+  );
+  const meta = element("span", undefined, "transfer-meta");
+  meta.append(
+    element("span", time(transfer.timestamp)),
+    element("span", `Block ${transfer.block}`),
+  );
+  button.append(svg, meta);
+  button.addEventListener("click", () => inspect(transfer));
+  return button;
+}
+function renderReplay() {
+  const balances = replayBalances(
+    state.initialBalances,
+    history.transfers,
+    step,
+  );
+  $("replay-wallets").replaceChildren(
+    ...state.wallets.map((wallet) => {
+      const card = element("div", undefined, "replay-wallet");
+      card.append(
+        element("span", wallet.name),
+        element("strong", `${decimalAmount(balances[wallet.id])} USDC`),
+      );
+      return card;
+    }),
+  );
+  $("replay-caption").textContent =
+    `Replay balances · after step ${step} of ${history.transfers.length}. Latest balances remain above.`;
+  $("step-label").textContent = `${step} / ${history.transfers.length}`;
+  $("replay-step").value = step;
+  $("transfer-rows").replaceChildren(
+    ...history.transfers.slice(0, step).map(transferRow),
+  );
+  $("replay-start").hidden = step > 0 || history.transfers.length === 0;
+  $("empty-history").hidden = history.transfers.length !== 0;
+  $("replay-controls").hidden = history.transfers.length === 0;
+}
+function play() {
+  if (!history?.transfers.length || busy) return;
+  if (timer) {
+    stop();
+    return;
   }
+  if (step === history.transfers.length) step = 0;
+  closeProvenance();
+  renderReplay();
+  $("play").textContent = "Pause";
+  timer = setInterval(() => {
+    step += 1;
+    renderReplay();
+    if (step === history.transfers.length) stop();
+  }, 800);
+}
+async function inspect(transfer) {
+  if (busy) return;
+  stop();
+  selected = transfer.id;
+  renderReplay();
+  lock(true);
+  try {
+    const result = await api(
+      `${endpoint("provenance")}?transfer=${encodeURIComponent(transfer.id)}`,
+    );
+    const list = element("dl");
+    for (const [label, value] of [
+      ["Function", `${result.function.name} · ${result.function.version}`],
+      [
+        "Network / token",
+        `${result.chain.name} (${result.chain.id}) / ${result.token.symbol}`,
+      ],
+      ["Block range", `[${result.range.fromBlock}, ${result.range.toBlock})`],
+      ["Time", result.source.timestamp],
+      ["From", result.source.from],
+      ["To", result.source.to],
+      [
+        "Amount",
+        `${decimalAmount(result.source.amountRaw)} USDC · ${result.source.amountRaw} raw units`,
+      ],
+      ["Block hash", result.source.blockHash],
+      ["Transaction hash", result.source.transactionHash],
+      ["Log index", result.source.logIndex],
+      ["Calculation", result.calculation.description],
+    ])
+      list.append(element("dt", label), element("dd", value, "hash"));
+    $("provenance-content").replaceChildren(
+      list,
+      element("p", result.note, "small muted"),
+    );
+    $("provenance").hidden = false;
+    $("history-layout").classList.add("with-provenance");
+    $("provenance-heading").focus({ preventScroll: true });
+  } catch (error) {
+    status(error.message, true);
+  } finally {
+    lock(false);
+  }
+}
+async function action(kind) {
+  if (busy) return;
+  stop();
+  lock(true);
+  status(
+    kind === "transfer"
+      ? "Moving mock USDC and reading the balances…"
+      : kind === "reset"
+        ? "Returning mock funds to the treasury…"
+        : "Reading the mock transfer history…",
+  );
+  let loadedHistory = false;
+  try {
+    const input = { revision: state.revision };
+    if (kind === "transfer")
+      Object.assign(input, {
+        from: $("from").value,
+        to: $("to").value,
+        amount: $("amount").value,
+      });
+    const result = await api(endpoint(kind), input);
+    state = kind === "history" ? result.state : result;
+    if (kind === "reset") closeHistory();
+    renderState();
+    if (kind === "history") {
+      closeProvenance();
+      history = result.history;
+      loadedHistory = true;
+      step = 0;
+      $("history").hidden = false;
+      $("history-stale").hidden = true;
+      $("history-scope").textContent = `Run ${state.cycle} / Arbitrum / USDC`;
+      $("history-note").textContent =
+        `${history.transfers.length} transfers · mock read ${feeAmount(history.chargeRaw)} USDC. Replay and provenance inspection add no charge.`;
+      $("replay-step").max = history.transfers.length;
+      renderReplay();
+      $("history-heading").focus({ preventScroll: true });
+    }
+    status(
+      kind === "reset"
+        ? `Run ${state.cycle} ready. All 1 USDC is in the treasury. Read charges are retained.`
+        : kind === "history"
+          ? "Transfer history loaded. No real payment occurred."
+          : `Mock transfer complete. Testril balances updated at block ${state.balanceRead.block}.`,
+    );
+  } catch (error) {
+    status(error.message, true);
+  } finally {
+    lock(false);
+  }
+  if (
+    loadedHistory &&
+    history &&
+    !matchMedia("(prefers-reduced-motion: reduce)").matches
+  )
+    play();
+}
+$("transfer-form").addEventListener("submit", (event) => {
+  event.preventDefault();
+  action("transfer");
+});
+$("from").addEventListener("change", updateAvailable);
+$("all").addEventListener("click", () => {
+  $("amount").value = decimalAmount(state.balances[$("from").value]);
+});
+$("show").addEventListener("click", () => action("history"));
+$("reset").addEventListener("click", () => action("reset"));
+$("play").addEventListener("click", play);
+$("restart-replay").addEventListener("click", () => {
+  stop();
+  closeProvenance();
+  step = 0;
+  renderReplay();
+  play();
+});
+$("replay-step").addEventListener("input", () => {
+  const next = Number($("replay-step").value);
+  stop();
+  closeProvenance();
+  step = next;
+  renderReplay();
+});
+$("close-history").addEventListener("click", () => {
+  closeHistory();
+  $("show").focus();
+});
+$("close-provenance").addEventListener("click", closeProvenance);
+document.addEventListener("keydown", (event) => {
+  if (event.key === "Escape" && !$("provenance").hidden) closeProvenance();
 });
 
 try {
-  configuration = await api("/api/config");
-  for (const account of configuration.accounts) {
-    const option = element("option", account.label);
-    option.value = account.address;
-    $("treasury").append(option);
+  let saved;
+  try {
+    saved = sessionStorage.getItem(storageKey);
+  } catch {
+    /* Storage is optional. */
   }
-  await runSample();
+  if (saved) {
+    try {
+      state = await api(`/api/sessions/${encodeURIComponent(saved)}`);
+    } catch {
+      /* An expired mock session starts fresh. */
+    }
+  }
+  state ??= await api("/api/sessions", {});
+  try {
+    sessionStorage.setItem(storageKey, state.id);
+  } catch {
+    /* Storage is optional. */
+  }
+  for (const id of ["from", "to"])
+    $(id).replaceChildren(
+      ...state.wallets.map((wallet) => {
+        const option = element("option", wallet.name);
+        option.value = wallet.id;
+        return option;
+      }),
+    );
+  $("to").value = "a";
+  renderState();
+  lock(false);
+  status("Ready. Mock balances loaded. Everything is simulated.");
 } catch (error) {
   status(error.message, true);
-  $("run").disabled = true;
+  lock(true);
 }

@@ -4,21 +4,21 @@ Small, runnable demos showcasing [Testril](https://testril.ai).
 
 MCP server: `https://dev.testril.ai/mcp`
 
-## Demo plan
-
-Start with the [two-page brief](docs/demo-summary.pdf) ([Markdown](docs/demo-summary.md)). The [detailed plan](docs/demo-strategy.md) describes what to build, in what order, and how to verify it. [Download specifications](docs/demo-deliverables.md) describe the proposed applications and exports, with a [treasury screen sketch](docs/treasury-preview.svg). [Function requirements](docs/function-briefs.md) specify the backend work. The [first-release build specification](docs/specs/first-release-data-functions.md) is ready to hand to an implementing agent.
-
-To refresh the PDF, install `reportlab` in a Python environment and run `python docs/render_summary.py`.
-
 ## Demos
 
 | Demo | Run | Status |
 | --- | --- | --- |
-| [Treasury analysis](demos/treasury-analysis/README.md) | `cd demos/treasury-analysis && npm ci && npm start` | Runnable fictional sample, CLI, verifier, and source/run downloads. Live integration awaits transfer edges and a paid client. |
+| [Wallet transfers](demos/treasury-analysis/README.md) | `cd demos/treasury-analysis && npm ci && npm start` | Interactive mock: move 1 USDC between three wallets, read balances, replay transfers, inspect provenance, reset, and download the source. |
 
-The treasury interface follows the approved derivative style guide from `testril-website`. It runs locally with Node.js 22.13+ on macOS or Linux. See its README for exact prerequisites, expected results, and checks. Preview the [desktop](docs/screenshots/treasury-desktop.png) and [mobile](docs/screenshots/treasury-mobile.png) screens as PNGs.
+The interface follows Testril’s approved derivative style guide. It runs locally with Node.js 22.13+ on macOS or Linux. Preview the [desktop](docs/screenshots/treasury-desktop.png) and [mobile](docs/screenshots/treasury-mobile.png) screens as PNGs.
 
-`sub-cent-reads` and `paid-reader` remain planned independent CLI downloads. No hosted demo or public release has been published.
+Everything in the current demo is simulated, including Arbitrum transactions, Testril reads, payment charges, and source evidence. No wallet or credentials are required. `sub-cent-reads` and `paid-reader` remain planned independent downloads.
+
+## Plans
+
+The [two-page brief](docs/demo-summary.pdf) ([Markdown](docs/demo-summary.md)) and [detailed plan](docs/demo-strategy.md) describe the broader demo series. [Download specifications](docs/demo-deliverables.md) describe proposed applications and exports; the [treasury sketch](docs/treasury-preview.svg) is an earlier design. [Function requirements](docs/function-briefs.md) and the [first-release build specification](docs/specs/first-release-data-functions.md) describe backend work for live integration.
+
+The runnable demo’s README describes its current behavior; these planning documents cover future capabilities. To refresh the brief PDF, install `reportlab` and run `python docs/render_summary.py`.
 
 ## Contributing
 
@@ -26,4 +26,4 @@ Read [AGENTS.md](AGENTS.md). Keep each demo self-contained, readable, and simple
 
 ## Status
 
-This repository starts private and is intended to become public. No license has been selected yet.
+This repository is private and intended to become public. No license has been selected yet. No hosted demo or public release has been published.

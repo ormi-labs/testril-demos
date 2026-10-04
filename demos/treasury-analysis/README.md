@@ -1,16 +1,16 @@
-# Treasury analysis
+# Wallet transfers
 
-Ask where a treasury’s USDC went. Inspect directed transfers, reconcile balances,
-verify the evidence, and download the application as a starting point.
+Move **1 USDC** between Treasury, Counterparty A, and Counterparty B. Read their
+balances with Testril, replay the transfers, and select an arrow to inspect provenance.
 
-**Version 0.1.0 runs fictional data only.** No wallet, payments, materialization,
-or earnings. Live integration awaits `erc20_transfer_edges` and a budgeted x402
-client. Free MCP discovery shows the deployed functions.
+**Everything is mocked:** Arbitrum, USDC, wallets, transfers, Testril reads,
+prices, timestamps, and hashes. No funds move or payments occur. This version
+checks the interaction before live integration.
 
 ## Run
 
-Requires Node.js **22.13 or later**, npm, and `tar` on macOS or Linux. No build step
-or runtime dependencies.
+Requires Node.js **22.13+**, npm, and `tar` on macOS or Linux. No build step or
+runtime dependencies.
 
 ```sh
 cd demos/treasury-analysis  # or the extracted treasury-analysis folder
@@ -18,55 +18,57 @@ npm ci
 npm start
 ```
 
-Open **http://127.0.0.1:4173**. Optional configuration: copy `.env.example` to
-`.env` to change `PORT` or `TESTRIL_MCP_URL`. The server accepts local connections
-only; it is not a hosted deployment configuration.
+Open **http://127.0.0.1:4173**. Optional: copy `.env.example` to `.env` to change
+`PORT`. No keys or credentials are needed. The server accepts local connections only.
 
-Expected sample: opening **1,000**, incoming **50**, outgoing **100**, closing
-**950 USDC**. The **50 USDC self-transfer cancels**. Including Team B gives
-**+20 USDC external team movement**, separately from the treasury’s −50 change.
-Try changing the starting block to `103`: no transfers remain.
+## Try it
 
-## CLI and downloads
+1. Transfer **0.25** from Treasury to A, then **0.10** from A to B.
+2. Expect balances **0.75 / 0.15 / 0.10 USDC**.
+3. Select **Show transfers**. Replay reveals arrows with UTC times and block numbers.
+   Pause, scrub, or replay again; select an arrow for mock source evidence.
+4. Select **Reset demo**. Return transfers restore **1 / 0 / 0** and start a fresh history.
+
+Each balance refresh makes three simulated paid reads. History is read on demand;
+replay and provenance inspection are free. A separate mock payment wallet covers
+reads; its accumulated charges survive reset. Rates are illustrative. Refreshing
+resumes the tab’s session; restarting the server clears sessions. Data preparation
+is assumed, so this version has no materialization or supplier earnings.
+
+## Downloads and CLI
+
+**Download source** exports this standalone project, locked tools, and a digest
+manifest, excluding local configuration and installed dependencies. **Export this run**
+contains transfers, balances, receipts, and fictional provenance.
 
 ```sh
 node src/cli.mjs sample run.json
-node src/cli.mjs verify run.json
-node src/cli.mjs discover                 # free, network required
+node src/cli.mjs replay run.json
 ```
 
-**Export this run** contains inputs, exact raw rows, report, illustrative cost
-records, provenance, calculation version, and verification status. Extract it
-and verify `run/run.json` with the matching source version. The sample verifier
-compares separate event/state fixtures; it does not verify Ethereum.
-
-**Download source** contains this standalone project and locked development
-tools and a file-digest manifest, excluding local configuration and installed dependencies. Downloads are
-for private evaluation; public distribution still needs a repository license.
-
-The verifier also supports externally supplied `mode: "live"` runs in this
-format with `ETHEREUM_RPC_URL` set. It retrieves token-wide Transfer logs and
-balances at pinned canonical hashes using
-[EIP-1898](https://eips.ethereum.org/EIPS/eip-1898). Requires historical state;
-trusts the reference provider for complete logs and correct state. It rejects
-synthetic runs as on-chain evidence. No live export producer exists yet.
+Replay checks balance arithmetic; it does not verify Arbitrum evidence. Downloads
+are for private evaluation until a repository license is selected.
 
 ## Development
 
 ```sh
-npm test                     # accounting, verifier, HTTP peers, extracted source
+npm test
 npm run lint
 npm run format:check
 npx playwright install chromium
-npm run test:browser          # desktop + mobile, local server on port 4175
+npm run test:browser  # desktop + mobile; local port 4175
 ```
 
-`src/` holds accounting, server, CLI, verification, and free MCP discovery.
-`public/` holds the plain JavaScript interface; `fixtures/` holds fictional data.
-Amounts use integer strings and BigInt. Start by changing a fixture and its
-independent reference events, then check the resulting report.
+`src/mock-chain.mjs` simulates transfers; `src/mock-testril.mjs` simulates reads.
+`src/demo.mjs` connects them. `public/` holds the plain JavaScript interface;
+`fixtures/demo.json` sets wallets and rates. Amounts use integer strings and BigInt.
+For visual review, try the sequence above on desktop and phone, including keyboard
+provenance selection. Asset origins are in `public/assets/README.md`.
 
-For visual review, inspect desktop and phone layouts, tab through controls,
-open evidence, run verification, and extract both downloads. Styling follows
-Testril’s approved derivative guide v1.0; asset origins are recorded in
-`public/assets/README.md`.
+## Live integration later
+
+Real payment and transfer keys must stay in server secret storage, never browser
+code or source downloads. The server will need restricted destinations and spending
+limits. Confirm Arbitrum USDC payment support and deployed function contracts first.
+Transaction timestamps and individual source events need additional witnesses
+beyond aggregated transfer edges. This mock implements none of those live services.
