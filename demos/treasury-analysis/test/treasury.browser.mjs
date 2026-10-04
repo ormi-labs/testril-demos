@@ -1,19 +1,18 @@
 import { test, expect } from "@playwright/test";
 async function send(page, from, to, amount) {
-  await page.locator("#from").selectOption(from);
-  await page.locator("#to").selectOption(to);
+  await page
+    .locator(`#from label`)
+    .filter({ has: page.locator(`input[value="${from}"]`) })
+    .click();
+  await page
+    .locator(`#to label`)
+    .filter({ has: page.locator(`input[value="${to}"]`) })
+    .click();
   await page.locator("#amount").fill(amount);
   const count = Number(await page.locator("#transfer-count").textContent());
   await page.locator("#transfer").click();
   await expect(page.locator("#transfer-count")).toHaveText(String(count + 1));
   await expect(page.locator("#status")).toBeEmpty();
-}
-async function scrub(page, step) {
-  await expect(page.locator("#replay-step")).toBeEnabled();
-  await page.locator("#replay-step").evaluate((input, value) => {
-    input.value = value;
-    input.dispatchEvent(new Event("input", { bubbles: true }));
-  }, String(step));
 }
 test.beforeEach(async ({ page }) => {
   await page.goto("/");
@@ -37,7 +36,7 @@ test("requested layout, empty history and keyboard balance provenance", async ({
   await expect(page.locator("#payments")).toBeHidden();
   await expect(
     page.locator(
-      "#all, #show, #available, .step-number, #balance-block, .reader-label",
+      "#all, #show, #available, #restart-replay, #replay-step, #export, .step-number, #balance-block, .reader-label",
     ),
   ).toHaveCount(0);
   const logo = await page.getByAltText("Testril").boundingBox();
@@ -50,6 +49,13 @@ test("requested layout, empty history and keyboard balance provenance", async ({
   await expect(
     page.getByRole("radio", { name: "Live", exact: true }),
   ).toBeDisabled();
+  await expect(page.locator("#from input[value=treasury]")).toBeChecked();
+  await expect(page.locator("#to input[value=treasury]")).toBeDisabled();
+  await page.locator("#from input[value=treasury]").focus();
+  await page.keyboard.press("ArrowRight");
+  await expect(page.locator("#from input[value=a]")).toBeChecked();
+  await expect(page.locator("#to input[value=a]")).toBeDisabled();
+  await expect(page.locator("#to input[value=treasury]")).toBeChecked();
   const amount = await page.locator("#amount").boundingBox();
   const sendButton = await page.locator("#transfer").boundingBox();
   expect(Math.abs(amount.y - sendButton.y)).toBeLessThan(1);
@@ -92,6 +98,22 @@ test("both histories refresh automatically; provenance and tabs add no charges",
   await expect(page.locator("#spent")).toBeVisible();
   await expect(page.locator("#spent")).toHaveText("0.000071");
   await expect(page.locator("#receipt-rows tr")).toHaveCount(3);
+  await expect(
+    page.getByRole("columnheader", { name: "Block number" }),
+  ).toBeVisible();
+  await expect(page.locator("#receipt-rows tr").last()).toContainText(
+    "100000001",
+  );
+  const cost = page.locator("#receipt-rows tr").last().getByRole("button");
+  await cost.focus();
+  await expect(page.locator("#cost-breakdown")).toContainText(
+    "History read: 0.000010 USDC",
+  );
+  await expect(page.locator("#cost-breakdown")).toContainText(
+    "Transfer rows: 0.000001 USDC",
+  );
+  await page.keyboard.press("Escape");
+  await expect(page.locator("#cost-breakdown")).toBeHidden();
   await send(page, "a", "b", ".1");
   await expect(page.locator("#receipt-rows tr")).toHaveCount(5);
   await expect(page.locator("#spent")).toHaveText("0.000113");
@@ -143,7 +165,9 @@ test("replay uses separate chronological rows; reset clears transfers and retain
   await page.locator("#play").click();
   await expect(page.locator(".transfer-edge button")).toHaveCount(1);
   await page.locator("#play").click();
-  await scrub(page, 2);
+  await page.locator("#play").click();
+  await expect(page.locator(".transfer-edge button")).toHaveCount(2);
+  await page.locator("#play").click();
   await expect(page.locator('[data-wallet="treasury"]')).toContainText(
     "0.7 USDC",
   );
@@ -174,8 +198,8 @@ test("invalid transfer preserves histories; refresh resumes cached reads and dow
   await expect(page.locator(".transfer-edge button")).toHaveCount(1);
   await expect(page.locator("#spent")).toHaveText("0.000071");
   const download = page.waitForEvent("download");
-  await page.locator("#export").click();
+  await page.getByRole("link", { name: "Download source" }).click();
   expect((await download).suggestedFilename()).toBe(
-    "wallet-transfers-run.tar.gz",
+    "treasury-analysis-0.3.0.tar.gz",
   );
 });

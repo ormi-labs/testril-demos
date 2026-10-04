@@ -28,7 +28,8 @@ Open **http://127.0.0.1:4173**. Optional: copy `.env.example` to `.env` to chang
 3. **Transfer History** updates after each transfer, with one row per event, UTC
    times, and block numbers. Use Replay to watch it build. Click an arrow or a
    balance for mock source evidence; close the modal with Escape or Close.
-4. **Payment History** shows read costs and receipts. It stays current even when
+4. **Payment History** shows read costs, block numbers, and receipts. Hover over
+   a cost (or focus or tap it) for its breakdown. It stays current even when
    its tab is hidden. Switching tabs, replay, and provenance inspection are free.
 5. **Reset demo**, below the header, returns funds to Treasury and clears Transfer
    History. Payment History and accumulated charges are retained.
@@ -42,8 +43,9 @@ transfer diagram horizontally.
 ## Downloads and CLI
 
 **Download source** exports this standalone project, locked tools, and a digest
-manifest, excluding local configuration and installed dependencies. **Export this run**
-contains transfers, balances, receipts, and fictional transfer and balance provenance.
+manifest, excluding local configuration and installed dependencies. The run export
+is available at `/api/sessions/<session-id>/export`; it contains transfers, balances,
+receipts, and fictional transfer and balance provenance.
 
 ```sh
 node src/cli.mjs sample run.json

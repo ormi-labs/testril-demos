@@ -79,7 +79,8 @@ body {
   outline-offset: 4px;
 }
 .sr-only,
-.mode-switch input[type="radio"] {
+.mode-switch input[type="radio"],
+.wallet-choice input[type="radio"] {
   position: absolute;
   width: 1px;
   height: 1px;
@@ -177,6 +178,51 @@ p {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 16px 12px;
+}
+.wallet-choice {
+  grid-column: 1 / -1;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  min-width: 0;
+}
+.wallet-choice legend {
+  padding: 0;
+  margin-bottom: 8px;
+  font-size: 12px;
+}
+.wallet-options {
+  display: grid;
+  grid-template-columns: 1.4fr 1fr 1fr;
+  border: 1px solid var(--line);
+  border-radius: 5px;
+  overflow: hidden;
+}
+.wallet-options label {
+  margin: 0;
+  cursor: pointer;
+}
+.wallet-options label + label {
+  border-left: 1px solid var(--line);
+}
+.wallet-options span {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+}
+.wallet-options input:checked + span {
+  background: var(--accent);
+  color: var(--button-ink);
+  font-weight: 600;
+}
+.wallet-options input:disabled + span {
+  opacity: 0.4;
+  cursor: default;
+}
+.wallet-options input:focus-visible + span {
+  outline: 2px solid var(--accent);
+  outline-offset: -4px;
 }
 .amount-control {
   grid-column: 1 / -1;
@@ -373,21 +419,6 @@ meter::-moz-meter-bar {
   align-items: center;
   flex-wrap: wrap;
   margin: 16px 0;
-}
-.replay-controls label {
-  margin: 0;
-  color: var(--muted);
-  font-size: 12px;
-}
-input[type="range"] {
-  flex: 1;
-  min-width: 100px;
-  accent-color: var(--accent);
-}
-#step-label {
-  font: 12px monospace;
-  min-width: 52px;
-  text-align: right;
 }
 .history-layout {
   min-width: 0;
@@ -589,6 +620,30 @@ th:first-child,
 td:first-child {
   text-align: left;
 }
+.cost {
+  padding: 0 4px;
+  min-height: 44px;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  text-decoration: underline dotted;
+  text-underline-offset: 4px;
+}
+.cost-breakdown {
+  position: fixed;
+  z-index: 10;
+  max-width: min(320px, calc(100vw - 24px));
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--visual);
+  color: var(--ink);
+  font-size: 12px;
+  line-height: 1.6;
+  white-space: pre-line;
+}
 footer {
   display: flex;
   justify-content: space-between;
@@ -707,9 +762,6 @@ a {
   }
   .replay-controls {
     gap: 8px;
-  }
-  .replay-controls label {
-    width: 100%;
   }
   .panel {
     padding: 20px;

@@ -20,6 +20,36 @@ function element(tag, text, className) {
   if (className) node.className = className;
   return node;
 }
+function hideCostBreakdown() {
+  $("cost-breakdown").hidden = true;
+}
+function costButton(raw, breakdown) {
+  const button = element("button", feeAmount(raw), "cost");
+  button.type = "button";
+  button.setAttribute("aria-label", `${feeAmount(raw)} USDC. ${breakdown}`);
+  const show = () => {
+    const tooltip = $("cost-breakdown");
+    tooltip.textContent = breakdown;
+    tooltip.hidden = false;
+    const rect = button.getBoundingClientRect();
+    tooltip.style.left = `${Math.max(12, Math.min(rect.right - tooltip.offsetWidth, innerWidth - tooltip.offsetWidth - 12))}px`;
+    tooltip.style.top = `${rect.top >= tooltip.offsetHeight + 12 ? rect.top - tooltip.offsetHeight - 8 : rect.bottom + 8}px`;
+  };
+  button.addEventListener("mouseenter", show);
+  button.addEventListener("focus", show);
+  button.addEventListener("click", show);
+  button.addEventListener("mouseleave", hideCostBreakdown);
+  button.addEventListener("blur", hideCostBreakdown);
+  return button;
+}
+document.addEventListener("keydown", (event) => {
+  if (event.key === "Escape") hideCostBreakdown();
+});
+document.addEventListener("pointerdown", (event) => {
+  if (!event.target.closest(".cost")) hideCostBreakdown();
+});
+window.addEventListener("scroll", hideCostBreakdown, true);
+window.addEventListener("resize", hideCostBreakdown);
 async function api(path, input) {
   const response = await fetch(
     path,
@@ -52,21 +82,21 @@ function lock(value) {
   busy = value;
   $("transfer-form").setAttribute("aria-busy", String(value));
   for (const control of $("transfer-form").elements) control.disabled = value;
-  for (const id of ["reset", "play", "restart-replay", "replay-step"])
-    $(id).disabled = value;
+  for (const id of ["reset", "play"]) $(id).disabled = value;
   for (const balance of document.querySelectorAll("[data-balance]"))
     balance.disabled = value;
   if (!value && state) updateRecipients();
 }
+const selectedWallet = (id) => $(id).querySelector("input:checked").value;
 function updateRecipients() {
-  if ($("from").value === $("to").value)
-    $("to").value = state.wallets.find(
-      (wallet) => wallet.id !== $("from").value,
-    ).id;
-  for (const option of $("to").options)
-    option.disabled = option.value === $("from").value;
+  const sender = selectedWallet("from");
+  if (sender === selectedWallet("to"))
+    $("to").querySelector(`input:not([value="${sender}"])`).checked = true;
+  for (const input of $("to").querySelectorAll("input"))
+    input.disabled = input.value === sender;
 }
 function renderState() {
+  hideCostBreakdown();
   $("wallets").replaceChildren(
     ...state.wallets.map((wallet) => {
       const card = element("button", undefined, "panel wallet");
@@ -101,7 +131,16 @@ function renderState() {
   );
   $("transfer-count").textContent = state.transferCount;
   $("payment-count").textContent = state.receipts.length;
-  $("spent").textContent = feeAmount(state.payment.spentRaw);
+  const balanceCost = state.receipts
+    .filter((receipt) => receipt.kind === "balances")
+    .reduce((total, receipt) => total + BigInt(receipt.chargeRaw), 0n);
+  const historyCost = BigInt(state.payment.spentRaw) - balanceCost;
+  $("spent").replaceChildren(
+    costButton(
+      state.payment.spentRaw,
+      `Balance reads: ${feeAmount(balanceCost.toString())} USDC\nTransfer history reads: ${feeAmount(historyCost.toString())} USDC\nMock rates`,
+    ),
+  );
   $("payment-left").textContent = feeAmount(state.payment.remainingRaw);
   $("read-count").textContent = state.payment.requestCount;
   $("receipt-rows").replaceChildren(
@@ -110,16 +149,26 @@ function renderState() {
       row.append(
         ...[
           time(receipt.timestamp),
+          receipt.block,
           receipt.kind === "balances" ? "Balances" : "Transfer history",
           receipt.requestCount,
-          feeAmount(receipt.chargeRaw),
         ].map((value) => element("td", value)),
       );
+      const cost = element("td");
+      const breakdown =
+        receipt.kind === "balances"
+          ? `${receipt.requestCount} balance reads × ${feeAmount(state.rates.balanceReadRaw)} USDC`
+          : `History read: ${feeAmount(state.rates.transferReadBaseRaw)} USDC\nTransfer rows: ${feeAmount((BigInt(receipt.chargeRaw) - BigInt(state.rates.transferReadBaseRaw)).toString())} USDC (${feeAmount(state.rates.transferReadPerRowRaw)} per transfer)`;
+      cost.append(
+        costButton(
+          receipt.chargeRaw,
+          `${breakdown}\nTotal: ${feeAmount(receipt.chargeRaw)} USDC\nMock rates`,
+        ),
+      );
+      row.append(cost);
       return row;
     }),
   );
-  $("export").hidden = false;
-  $("export").href = endpoint("export");
   $("reset-evidence").hidden = !state.lastReset;
   if (state.lastReset)
     $("reset-sweeps").replaceChildren(
@@ -179,9 +228,6 @@ function renderReplay() {
     step === history.transfers.length
       ? "Latest balances and transfers"
       : `Replay balances · step ${step} of ${history.transfers.length}`;
-  $("step-label").textContent = `${step} / ${history.transfers.length}`;
-  $("replay-step").max = history.transfers.length;
-  $("replay-step").value = step;
 }
 function play() {
   if (!state.transferCount || busy) return;
@@ -277,8 +323,8 @@ async function action(kind) {
     const input = { revision: state.revision };
     if (kind === "transfer")
       Object.assign(input, {
-        from: $("from").value,
-        to: $("to").value,
+        from: selectedWallet("from"),
+        to: selectedWallet("to"),
         amount: $("amount").value,
       });
     state = await api(endpoint(kind), input);
@@ -293,6 +339,7 @@ async function action(kind) {
   }
 }
 function activateTab(id) {
+  hideCostBreakdown();
   stop();
   if (state) {
     step = state.transferCount;
@@ -329,20 +376,6 @@ $("transfer-form").addEventListener("submit", (event) => {
 $("from").addEventListener("change", updateRecipients);
 $("reset").addEventListener("click", () => action("reset"));
 $("play").addEventListener("click", play);
-$("restart-replay").addEventListener("click", () => {
-  stop();
-  step = 0;
-  renderReplay();
-  play();
-});
-$("replay-step").addEventListener("input", () => {
-  const next = Number($("replay-step").value);
-  stop();
-  closeProvenance();
-  step = next;
-  renderReplay();
-  stop();
-});
 $("close-provenance").addEventListener("click", closeProvenance);
 $("provenance").addEventListener("cancel", (event) => {
   event.preventDefault();
@@ -370,14 +403,28 @@ try {
     /* Storage is optional. */
   }
   for (const id of ["from", "to"])
-    $(id).replaceChildren(
-      ...state.wallets.map((wallet) => {
-        const option = element("option", wallet.name);
-        option.value = wallet.id;
-        return option;
-      }),
-    );
-  $("to").value = "a";
+    $(id)
+      .querySelector(".wallet-options")
+      .replaceChildren(
+        ...state.wallets.map((wallet) => {
+          const label = element("label");
+          const input = element("input");
+          input.type = "radio";
+          input.name = id;
+          input.value = wallet.id;
+          input.required = true;
+          input.checked = wallet.id === (id === "from" ? "treasury" : "a");
+          input.setAttribute("aria-label", wallet.name);
+          label.append(
+            input,
+            element(
+              "span",
+              wallet.id === "treasury" ? "Treasury" : wallet.id.toUpperCase(),
+            ),
+          );
+          return label;
+        }),
+      );
   step = state.transferCount;
   renderState();
   stop();

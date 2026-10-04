@@ -57,14 +57,14 @@
           <p id="status" role="status" aria-live="polite"></p>
           <form id="transfer-form">
             <div class="form-grid">
-              <div>
-                <label for="from">From</label
-                ><select id="from" name="from" required disabled></select>
-              </div>
-              <div>
-                <label for="to">To</label
-                ><select id="to" name="to" required disabled></select>
-              </div>
+              <fieldset id="from" class="wallet-choice" disabled>
+                <legend>From</legend>
+                <div class="wallet-options"></div>
+              </fieldset>
+              <fieldset id="to" class="wallet-choice" disabled>
+                <legend>To</legend>
+                <div class="wallet-options"></div>
+              </fieldset>
               <div class="amount-control">
                 <label for="amount">Amount · USDC</label>
                 <div class="amount-send">
@@ -122,17 +122,6 @@
         >
           <div class="replay-controls" id="replay-controls" hidden>
             <button id="play" class="secondary" type="button">Replay</button>
-            <button id="restart-replay" class="text-button" type="button">
-              Replay from start
-            </button>
-            <label for="replay-step">Replay step</label
-            ><input
-              id="replay-step"
-              type="range"
-              min="0"
-              max="0"
-              value="0"
-            /><output id="step-label" for="replay-step">0 / 0</output>
           </div>
           <div class="panel illustration">
             <p id="replay-caption" class="small muted" hidden></p>
@@ -178,6 +167,7 @@
               <thead>
                 <tr>
                   <th scope="col">Time · UTC</th>
+                  <th scope="col">Block number</th>
                   <th scope="col">Read</th>
                   <th scope="col">Requests</th>
                   <th scope="col">Cost · USDC</th>
@@ -186,15 +176,6 @@
               <tbody id="receipt-rows"></tbody>
             </table>
           </div>
-          <details>
-            <summary>About these mock payments</summary>
-            <p class="small muted">
-              Three balance reads cost 0.000030 USDC. Nonempty history costs
-              0.000010 + 0.000001 per transfer. Both refresh after each
-              transfer. Replay, tab changes, and source inspection are free.
-              These are mock rates.
-            </p>
-          </details>
           <details id="reset-evidence" hidden>
             <summary>Last reset: return transfers</summary>
             <ul id="reset-sweeps"></ul>
@@ -225,11 +206,11 @@
       <p class="mock-source">Mock source evidence · not verified on Arbitrum</p>
       <div id="provenance-content"></div>
     </dialog>
+    <div id="cost-breakdown" class="cost-breakdown" role="tooltip" hidden></div>
     <footer class="measure">
-      <span>Build your own with this example.</span>
+      <span>Build from this example</span>
       <div>
-        <a id="export" hidden>Export run</a
-        ><a href="/api/source">Download source ↗</a>
+        <a href="/api/source">Download source ↗</a>
       </div>
     </footer>
   </body>
