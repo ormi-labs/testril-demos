@@ -153,7 +153,7 @@ test("both histories refresh automatically; provenance and tabs add no charges",
   await expect(page.locator("#history")).toBeVisible();
 });
 
-test("replay uses separate chronological rows; reset clears transfers and retains payments", async ({
+test("replay uses separate chronological rows; reset clears both histories and restores the payer", async ({
   page,
 }) => {
   await send(page, "treasury", "a", ".4");
@@ -191,10 +191,19 @@ test("replay uses separate chronological rows; reset clears transfers and retain
   await expect(page.locator("#empty-history")).toBeVisible();
   await expect(page.locator(".transfer-edge button")).toHaveCount(0);
   await page.locator("#payment-tab").click();
-  await expect(page.locator("#spent")).toHaveText("0.000275");
-  await expect(page.locator("#receipt-rows tr")).toHaveCount(12);
+  await expect(page.locator("#spent")).toHaveText("0.000000");
+  await expect(page.locator("#receipt-rows tr")).toHaveCount(0);
+  await expect(page.locator("#payment-count")).toHaveText("0");
+  await expect(page.locator("#read-count")).toHaveText("0");
+  await expect(page.locator("#payment-left")).toHaveText("0.010000");
   await page.locator("#reset-evidence summary").click();
   await expect(page.locator("#reset-sweeps li")).toHaveCount(2);
+  await page.reload();
+  await expect(page.locator("#payment-count")).toHaveText("0");
+  await send(page, "treasury", "a", ".25");
+  await page.locator("#payment-tab").click();
+  await expect(page.locator("#receipt-rows tr")).toHaveCount(2);
+  await expect(page.locator("#spent")).toHaveText("0.000041");
 });
 
 test("invalid transfer preserves histories; refresh resumes cached reads and downloads work", async ({

@@ -13,7 +13,7 @@ function chargeRead(demo, result, kind) {
   const charge = rawAmount(result.chargeRaw);
   if (charge > BigInt(demo.payment.remainingRaw))
     throw new Error(
-      "The mock payment wallet is empty. Reload in a new tab to start a new mock session.",
+      "The mock payment wallet is empty. Use Reset demo to refill it.",
     );
   if (result.requestCount === 0) return demo;
   const receipt = {
@@ -92,9 +92,18 @@ export function resetDemo(demo) {
     chain = move(chain, wallet.id, "treasury", amountRaw, "reset");
     sweeps.push(chain.transfers.at(-1));
   }
-  return refreshReads({
+  return {
     ...demo,
     chain,
+    balanceRead: readBalances(chain),
+    historyRead: readTransfers(chain, chain.transfers.length),
+    receipts: [],
+    payment: {
+      ...demo.payment,
+      remainingRaw: demo.payment.initialRaw,
+      spentRaw: "0",
+      requestCount: 0,
+    },
     cycle: demo.cycle + 1,
     startIndex: chain.transfers.length,
     revision: demo.revision + 1,
@@ -105,7 +114,7 @@ export function resetDemo(demo) {
         .reduce((sum, transfer) => sum + BigInt(transfer.amountRaw), 0n)
         .toString(),
     },
-  });
+  };
 }
 
 export function publicState(demo) {

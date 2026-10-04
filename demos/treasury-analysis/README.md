@@ -32,7 +32,8 @@ Open **http://127.0.0.1:4173**. Optional: copy `.env.example` to `.env` to chang
    a cost (or focus or tap it) for its breakdown. It stays current even when
    its tab is hidden. Switching tabs, replay, and provenance inspection are free.
 5. **Reset demo**, below the header, returns funds to Treasury and clears Transfer
-   History. Payment History and accumulated charges are retained.
+   History and Payment History. It restores the mock payment wallet and resets
+   read costs to zero. Reset itself adds no mock read charge.
 
 Each transfer refreshes three balance reads and one history read. A separate mock
 payment wallet covers their illustrative charges. Refreshing resumes the tab’s

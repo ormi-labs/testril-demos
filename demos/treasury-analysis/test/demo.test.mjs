@@ -65,19 +65,29 @@ test("history charges only for a read; provenance and replay are free", () => {
   replayBalances(initial, history.transfers, 1);
   assert.equal(demo.payment.spentRaw, "71");
 });
-test("reset returns both counterparties, clears history and retains charges", () => {
+test("reset returns both counterparties and clears payments, including an exhausted payer", () => {
   let demo = send(createDemo(), "treasury", "a", ".25");
   demo = send(demo, "treasury", "b", ".15");
   const reset = resetDemo(demo);
   assert.deepEqual(reset.balanceRead.balances, initial);
   assert.equal(reset.lastReset.sweeps.length, 2);
   assert.equal(reset.lastReset.returnedRaw, "400000");
-  assert.equal(reset.payment.spentRaw, "143");
+  assert.equal(reset.payment.spentRaw, "0");
+  assert.equal(reset.payment.requestCount, 0);
+  assert.equal(reset.payment.remainingRaw, reset.payment.initialRaw);
+  assert.deepEqual(reset.receipts, []);
+  assert.deepEqual(exportDemo(reset).receipts, []);
+  const exhausted = resetDemo(createDemo({ paymentRaw: "30" }));
+  assert.equal(exhausted.payment.remainingRaw, "30");
+  assert.equal(exhausted.payment.spentRaw, "0");
   assert.equal(reset.cycle, 2);
   assert.deepEqual(exportDemo(reset).transfers, []);
   assert.throws(() => provenanceFor(reset, demo.chain.transfers[0].id));
   assert.equal(resetDemo(reset).lastReset.sweeps.length, 0);
   const next = send(reset, "treasury", "b", "1");
+  assert.equal(next.receipts.length, 2);
+  assert.equal(next.payment.spentRaw, "41");
+  assert.equal(demo.payment.spentRaw, "113");
   assert.deepEqual(
     replayBalances(initial, exportDemo(next).transfers, 1),
     next.balanceRead.balances,

@@ -74,6 +74,10 @@ test("sessions isolate state and reject stale mutations, secret inputs and forei
   ).json();
   assert.equal(reset.balances.treasury, "1000000");
   assert.equal(reset.transferCount, 0);
+  assert.deepEqual(reset.receipts, []);
+  assert.equal(reset.payment.spentRaw, "0");
+  assert.equal(reset.payment.remainingRaw, reset.payment.initialRaw);
+  assert.deepEqual((await (await fetch(route)).json()).receipts, []);
 });
 test("downloads extract and replay without repository dependencies", async (t) => {
   const url = await serve(t);

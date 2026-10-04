@@ -110,7 +110,7 @@ export async function exportRun(run) {
     await mkdir(destination);
     await writeFile(
       join(destination, "README.md"),
-      "# Wallet transfers run\n\nAll transfers, reads, payments, addresses, times and hashes are mocked. No real funds moved.\n\nExtract the matching treasury-analysis 0.3.0 source and run:\n\n`node src/cli.mjs replay /path/to/run/run.json`\n\nReplay checks arithmetic; it does not verify Arbitrum or Testril. Amounts are raw six-decimal USDC integer strings. Reset starts a new transfer history; read charges cover the entire mock session and are not refunded.\n",
+      "# Wallet transfers run\n\nAll transfers, reads, payments, addresses, times and hashes are mocked. No real funds moved.\n\nExtract the matching treasury-analysis 0.3.0 source and run:\n\n`node src/cli.mjs replay /path/to/run/run.json`\n\nReplay checks arithmetic; it does not verify Arbitrum or Testril. Amounts are raw six-decimal USDC integer strings. Reset clears both histories, restores the mock payment wallet, and resets read charges to zero.\n",
     );
     await writeFile(
       join(destination, "run.json"),
