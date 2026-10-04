@@ -4,7 +4,7 @@ async function send(page, from, to, amount) {
   await page.locator("#to").selectOption(to);
   await page.locator("#amount").fill(amount);
   await page.locator("#transfer").click();
-  await expect(page.locator("#status")).toContainText("Mock transfer complete");
+  await expect(page.locator("#status")).toContainText("Balances updated");
 }
 async function scrub(page, step) {
   await expect(page.locator("#history")).toBeVisible();
@@ -60,8 +60,10 @@ test("transfers, incremental replay, keyboard provenance and reset", async ({
   await expect(page.locator("#balance-b")).toHaveText("0");
   await expect(page.locator("#spent")).toHaveText("0.000132");
   await expect(page.locator("#history")).toBeHidden();
+  await page.locator("#payment-details").click();
   await page.locator("#reset-evidence summary").click();
   await expect(page.locator("#reset-sweeps li")).toHaveCount(2);
+  await page.locator("#close-payments").click();
   await page.locator("#show").click();
   await expect(page.locator("#empty-history")).toBeVisible();
   await expect(page.locator("#spent")).toHaveText("0.000132");
@@ -161,4 +163,33 @@ test("each transfer has a separate chronological row, including reverse transfer
   await page.keyboard.press("Escape");
   await expect(reverse).toBeFocused();
   await expect(page.locator("#spent")).toHaveText("0.000195");
+});
+
+test("landing makes the first action visible and keeps accounting out of the way", async ({
+  page,
+}) => {
+  await expect(
+    page.getByRole("heading", { name: "Move USDC. Track every transfer." }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("button", { name: "Send 0.25 USDC", exact: true }),
+  ).toBeInViewport();
+  await expect(page.locator("#payments")).toBeHidden();
+  await expect(page.locator("#history")).toBeHidden();
+  await page.locator("#amount").fill(".000001");
+  await expect(page.locator("#transfer")).toHaveText("Send 0.000001 USDC");
+  await page.locator("#all").click();
+  await expect(page.locator("#transfer")).toHaveText("Send 1 USDC");
+  await page.locator("#payment-details").click();
+  await expect(
+    page.getByRole("dialog", { name: "Read payments" }),
+  ).toBeVisible();
+  await expect(page.locator("#payment-spent")).toHaveText("0.000030");
+  await page.keyboard.press("Escape");
+  await expect(page.locator("#payment-details")).toBeFocused();
+  expect(
+    await page.evaluate(
+      () => document.documentElement.scrollWidth <= innerWidth,
+    ),
+  ).toBe(true);
 });

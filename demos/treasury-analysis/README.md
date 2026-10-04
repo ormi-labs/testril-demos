@@ -33,6 +33,9 @@ Open **http://127.0.0.1:4173**. Optional: copy `.env.example` to `.env` to chang
    On phones, scroll the diagram horizontally.
 4. Select **Reset demo**. Return transfers restore **1 / 0 / 0** and start a fresh history.
 
+The first screen puts transfers and balances in one workspace. **Show transfers**
+opens the replay; **Read details** opens payment receipts and the last reset evidence.
+
 Each balance refresh makes three simulated paid reads. History is read on demand;
 replay and provenance inspection are free. A separate mock payment wallet covers
 reads; its accumulated charges survive reset. Rates are illustrative. Refreshing

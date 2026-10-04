@@ -1,4 +1,4 @@
-import { decimalAmount, feeAmount } from "./amounts.js";
+import { decimalAmount, feeAmount, parseUsdc } from "./amounts.js";
 import { replayBalances } from "./replay.js";
 import { transferDiagram } from "./transfer-diagram.js";
 
@@ -50,6 +50,7 @@ function status(message, error = false) {
 }
 function lock(value) {
   busy = value;
+  $("transfer-form").setAttribute("aria-busy", String(value));
   for (const control of $("transfer-form").elements) control.disabled = value;
   for (const id of ["show", "reset", "play", "restart-replay", "replay-step"])
     $(id).disabled = value;
@@ -63,7 +64,14 @@ function updateAvailable() {
   for (const option of $("to").options)
     option.disabled = option.value === $("from").value;
   $("available").textContent =
-    `${name($("from").value)} has ${decimalAmount(state.balances[$("from").value])} USDC.`;
+    `${decimalAmount(state.balances[$("from").value])} USDC available`;
+  let amount;
+  try {
+    amount = decimalAmount(parseUsdc($("amount").value));
+  } catch {
+    /* Keep the action usable while editing. */
+  }
+  $("transfer").textContent = amount ? `Send ${amount} USDC` : "Send USDC";
 }
 function renderState() {
   $("wallets").replaceChildren(
@@ -76,23 +84,25 @@ function renderState() {
       balance.id = `balance-${wallet.id}`;
       const value = element("div", undefined, "wallet-value");
       value.append(balance, element("small", "USDC"));
-      card.append(
-        element("h3", wallet.name, "wallet-name"),
-        value,
-        element(
-          "p",
-          `${wallet.address.slice(0, 6)}…${wallet.address.slice(-4)}`,
-          "wallet-address",
-        ),
+      value.classList.toggle(
+        "precise-value",
+        decimalAmount(state.balances[wallet.id]).length > 6,
       );
+      const meter = element("meter");
+      meter.min = 0;
+      meter.max = 1;
+      meter.value = Number(state.balances[wallet.id]) / 1000000;
+      meter.setAttribute("aria-label", `${wallet.name}: share of the 1 USDC`);
+      card.append(element("h3", wallet.name, "wallet-name"), value, meter);
       return card;
     }),
   );
-  $("balance-block").textContent =
-    `Mock read · block ${state.balanceRead.block}`;
+  $("balance-block").textContent = `Block ${state.balanceRead.block}`;
   $("run-label").textContent = `Run ${state.cycle}`;
   $("show").textContent = `Show transfers (${state.transferCount})`;
+  $("show").classList.toggle("has-transfers", state.transferCount > 0);
   $("spent").textContent = feeAmount(state.payment.spentRaw);
+  $("payment-spent").textContent = feeAmount(state.payment.spentRaw);
   $("payment-left").textContent = feeAmount(state.payment.remainingRaw);
   $("read-count").textContent = state.payment.requestCount;
   $("receipt-rows").replaceChildren(
@@ -170,7 +180,7 @@ function renderReplay() {
     }),
   );
   $("replay-caption").textContent =
-    `Replay balances · after step ${step} of ${history.transfers.length}. Latest balances remain above.`;
+    `Replay balances · step ${step} of ${history.transfers.length}`;
   $("step-label").textContent = `${step} / ${history.transfers.length}`;
   $("replay-step").value = step;
   $("replay-start").hidden = step > 0 || history.transfers.length === 0;
@@ -243,11 +253,12 @@ async function action(kind) {
   lock(true);
   status(
     kind === "transfer"
-      ? "Moving mock USDC and reading the balances…"
+      ? "Sending and reading balances…"
       : kind === "reset"
-        ? "Returning mock funds to the treasury…"
-        : "Reading the mock transfer history…",
+        ? "Returning funds…"
+        : "Reading transfers…",
   );
+  if (kind === "transfer") $("transfer").textContent = "Sending…";
   let loadedHistory = false;
   try {
     const input = { revision: state.revision };
@@ -268,19 +279,25 @@ async function action(kind) {
       step = 0;
       $("history").hidden = false;
       $("history-stale").hidden = true;
-      $("history-scope").textContent = `Run ${state.cycle} / Arbitrum / USDC`;
+      $("history-scope").textContent = `Run ${state.cycle} · Arbitrum`;
       $("history-note").textContent =
-        `${history.transfers.length} transfers · mock read ${feeAmount(history.chargeRaw)} USDC. Replay and provenance inspection add no charge.`;
+        `${history.transfers.length} transfers · ${feeAmount(history.chargeRaw)} USDC read`;
       $("replay-step").max = history.transfers.length;
       renderReplay();
       $("history-heading").focus({ preventScroll: true });
+      $("history").scrollIntoView({
+        block: "start",
+        behavior: matchMedia("(prefers-reduced-motion: reduce)").matches
+          ? "instant"
+          : "smooth",
+      });
     }
     status(
       kind === "reset"
-        ? `Run ${state.cycle} ready. All 1 USDC is in the treasury. Read charges are retained.`
+        ? "Reset. Treasury has 1 USDC."
         : kind === "history"
-          ? "Transfer history loaded. No real payment occurred."
-          : `Mock transfer complete. Testril balances updated at block ${state.balanceRead.block}.`,
+          ? "History ready."
+          : "Sent. Balances updated.",
     );
   } catch (error) {
     status(error.message, true);
@@ -301,7 +318,9 @@ $("transfer-form").addEventListener("submit", (event) => {
 $("from").addEventListener("change", updateAvailable);
 $("all").addEventListener("click", () => {
   $("amount").value = decimalAmount(state.balances[$("from").value]);
+  updateAvailable();
 });
+$("amount").addEventListener("input", updateAvailable);
 $("show").addEventListener("click", () => action("history"));
 $("reset").addEventListener("click", () => action("reset"));
 $("play").addEventListener("click", play);
@@ -324,6 +343,11 @@ $("close-history").addEventListener("click", () => {
   $("show").focus();
 });
 $("close-provenance").addEventListener("click", closeProvenance);
+$("payment-details").addEventListener("click", () => {
+  $("payments").showModal();
+  $("payment-heading").focus({ preventScroll: true });
+});
+$("close-payments").addEventListener("click", () => $("payments").close());
 $("provenance").addEventListener("cancel", (event) => {
   event.preventDefault();
   closeProvenance();
@@ -360,7 +384,7 @@ try {
   $("to").value = "a";
   renderState();
   lock(false);
-  status("Ready. Mock balances loaded. Everything is simulated.");
+  status("");
 } catch (error) {
   status(error.message, true);
   lock(true);
