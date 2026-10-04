@@ -26,7 +26,8 @@ Open **http://127.0.0.1:4173**. Optional: copy `.env.example` to `.env` to chang
 1. Transfer **0.25** from Treasury to A, then **0.10** from A to B.
 2. Expect balances **0.75 / 0.15 / 0.10 USDC**.
 3. Select **Show transfers**. Replay reveals arrows with UTC times and block numbers.
-   The diagram keeps Treasury in the middle and counterparties on either side.
+   The diagram keeps Treasury in the middle and counterparties on either side,
+   with one row per transfer in chronological order.
    Pause, scrub, or replay again; select an arrow to open mock source evidence in a modal.
    Close it with Escape or the Close button.
    On phones, scroll the diagram horizontally.

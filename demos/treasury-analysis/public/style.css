@@ -311,6 +311,24 @@ input[type="range"] {
 .treasury-node text {
   fill: var(--button-ink);
 }
+.diagram-lifeline {
+  fill: none;
+  stroke: var(--visual-line);
+  stroke-dasharray: 4 6;
+}
+.diagram-row-rule {
+  fill: none;
+  stroke: var(--visual-line);
+}
+.diagram-row-background {
+  fill: transparent;
+  cursor: pointer;
+}
+.transfer-edge.selected .diagram-row-background,
+.transfer-edge:hover .diagram-row-background,
+.transfer-edge:focus-within .diagram-row-background {
+  fill: var(--map-fill);
+}
 .diagram-line {
   fill: none;
   stroke: var(--map-stroke);

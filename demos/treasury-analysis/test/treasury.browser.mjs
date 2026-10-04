@@ -114,7 +114,7 @@ test("reduced motion pauses; stale replay stays separate from current balances",
   );
 });
 
-test("shared wallets retain separate arrows for repeated and reverse transfers", async ({
+test("each transfer has a separate chronological row, including reverse transfers", async ({
   page,
 }) => {
   await page.emulateMedia({ reducedMotion: "reduce" });
@@ -133,6 +133,19 @@ test("shared wallets retain separate arrows for repeated and reverse transfers",
   await scrub(page, 5);
   await expect(page.locator(".diagram-wallet")).toHaveCount(3);
   await expect(page.locator(".transfer-edge button")).toHaveCount(5);
+  const rows = await page
+    .locator(".diagram-row button")
+    .evaluateAll((buttons) =>
+      buttons.map((button) => ({
+        name: button.getAttribute("aria-label"),
+        top: button.getBoundingClientRect().top,
+        bottom: button.getBoundingClientRect().bottom,
+      })),
+    );
+  rows.forEach((row, index) => {
+    expect(row.name).toMatch(new RegExp(`^Transfer ${index + 1}:`));
+    if (index > 0) expect(row.top).toBeGreaterThan(rows[index - 1].bottom);
+  });
   const reverse = page.getByRole("button", {
     name: "Transfer 2: Counterparty A to Treasury, 0.1 USDC. Show provenance.",
     exact: true,
