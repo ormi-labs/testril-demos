@@ -9,8 +9,8 @@ function svgNode(tag, attributes, text) {
 }
 const slots = {
   a: { x: 20, center: 105 },
-  treasury: { x: 415, center: 500 },
-  b: { x: 810, center: 895 },
+  treasury: { x: 295, center: 380 },
+  b: { x: 570, center: 655 },
 };
 
 // Wallets stay in fixed columns. Each transfer gets one chronological row,
@@ -26,7 +26,7 @@ export function transferDiagram({
   const middle = 54;
   const height = 120 + visibleCount * 110;
   const svg = svgNode("svg", {
-    viewBox: `0 0 1000 ${height}`,
+    viewBox: `0 0 760 ${height}`,
     class: "transfer-diagram",
     role: "group",
     "aria-label":
@@ -56,12 +56,12 @@ export function transferDiagram({
       svgNode("rect", {
         x: 8,
         y: y - 66,
-        width: 984,
+        width: 744,
         height: 104,
         rx: 5,
         class: "diagram-row-background",
       }),
-      svgNode("path", { d: `M 20 ${y + 42} H 980`, class: "diagram-row-rule" }),
+      svgNode("path", { d: `M 20 ${y + 42} H 740`, class: "diagram-row-rule" }),
       svgNode("path", {
         d: `M ${start} ${y} H ${end - direction * 8}`,
         class: "diagram-line",

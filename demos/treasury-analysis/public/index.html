@@ -49,143 +49,153 @@
         <h1 id="question">Move Money</h1>
         <p class="subtitle">Track balances and transfers</p>
       </section>
-      <section class="workspace panel" aria-label="Interactive wallet demo">
-        <section class="transfer-panel" aria-labelledby="transfer-heading">
-          <div class="section-top">
-            <h2 id="transfer-heading">Send USDC</h2>
-          </div>
-          <p id="status" role="status" aria-live="polite"></p>
-          <form id="transfer-form">
-            <div class="form-grid">
-              <fieldset id="from" class="wallet-choice" disabled>
-                <legend>From</legend>
-                <div class="wallet-options"></div>
-              </fieldset>
-              <fieldset id="to" class="wallet-choice" disabled>
-                <legend>To</legend>
-                <div class="wallet-options"></div>
-              </fieldset>
-              <div class="amount-control">
-                <label for="amount">Amount · USDC</label>
-                <div class="amount-send">
-                  <input
-                    id="amount"
-                    name="amount"
-                    inputmode="decimal"
-                    aria-describedby="status"
-                    value="0.25"
-                    required
-                    disabled
-                  />
-                  <button id="transfer" type="submit" disabled>Send</button>
+      <div class="demo-layout">
+        <section class="workspace panel" aria-label="Interactive wallet demo">
+          <section class="transfer-panel" aria-labelledby="transfer-heading">
+            <div class="section-top">
+              <h2 id="transfer-heading">Send USDC</h2>
+            </div>
+            <p id="status" role="status" aria-live="polite"></p>
+            <form id="transfer-form">
+              <div class="form-grid">
+                <fieldset id="from" class="wallet-choice" disabled>
+                  <legend>From</legend>
+                  <div class="wallet-options"></div>
+                </fieldset>
+                <fieldset id="to" class="wallet-choice" disabled>
+                  <legend>To</legend>
+                  <div class="wallet-options"></div>
+                </fieldset>
+                <div class="amount-control">
+                  <label for="amount">Amount · USDC</label>
+                  <div class="amount-send">
+                    <input
+                      id="amount"
+                      name="amount"
+                      inputmode="decimal"
+                      aria-describedby="status"
+                      value="0.25"
+                      required
+                      disabled
+                    />
+                    <button id="transfer" type="submit" disabled>Send</button>
+                  </div>
                 </div>
               </div>
+            </form>
+          </section>
+          <section class="balances-section" aria-labelledby="balances-heading">
+            <div class="section-top">
+              <h2 id="balances-heading">Balances</h2>
             </div>
-          </form>
+            <div class="wallet-grid" id="wallets"></div>
+            <p class="small muted balance-help">
+              Click on a balance to see the source of the data.
+            </p>
+          </section>
         </section>
-        <section class="balances-section" aria-labelledby="balances-heading">
-          <div class="section-top"><h2 id="balances-heading">Balances</h2></div>
-          <div class="wallet-grid" id="wallets"></div>
-          <p class="small muted balance-help">
-            Click on a balance to see the source of the data.
-          </p>
-        </section>
-      </section>
 
-      <section class="histories" aria-label="Demo histories">
-        <div class="history-tabs" role="tablist" aria-label="Histories">
-          <button
-            id="transfer-tab"
-            role="tab"
-            aria-selected="true"
-            aria-controls="history"
+        <section class="histories" aria-label="Demo histories">
+          <div class="history-tabs" role="tablist" aria-label="Histories">
+            <button
+              id="transfer-tab"
+              role="tab"
+              aria-selected="true"
+              aria-controls="history"
+              tabindex="0"
+            >
+              Transfer History<span id="transfer-count" class="tab-count"
+                >0</span
+              >
+            </button>
+            <button
+              id="payment-tab"
+              role="tab"
+              aria-selected="false"
+              aria-controls="payments"
+              tabindex="-1"
+            >
+              Payment History<span id="payment-count" class="tab-count">0</span>
+            </button>
+          </div>
+          <section
+            id="history"
+            class="history-section"
+            role="tabpanel"
+            aria-labelledby="transfer-tab"
             tabindex="0"
           >
-            Transfer History<span id="transfer-count" class="tab-count">0</span>
-          </button>
-          <button
-            id="payment-tab"
-            role="tab"
-            aria-selected="false"
-            aria-controls="payments"
-            tabindex="-1"
+            <div class="replay-controls" id="replay-controls" hidden>
+              <button id="play" class="secondary" type="button">Replay</button>
+            </div>
+            <div class="panel illustration">
+              <p id="replay-caption" class="small muted" hidden></p>
+              <div
+                id="transfer-diagram"
+                class="diagram-scroll"
+                role="region"
+                aria-label="Wallet transfer illustration"
+                tabindex="0"
+                hidden
+              ></div>
+              <p id="empty-history" class="empty">
+                No transfers yet. Make your first transfer.
+              </p>
+              <p
+                class="small muted illustration-help"
+                id="transfer-help"
+                hidden
+              >
+                Click on an arrow to see the source of the transfer data.
+              </p>
+            </div>
+          </section>
+          <section
+            id="payments"
+            class="panel payment-history"
+            role="tabpanel"
+            aria-labelledby="payment-tab"
+            tabindex="0"
+            hidden
           >
-            Payment History<span id="payment-count" class="tab-count">0</span>
-          </button>
-        </div>
-        <section
-          id="history"
-          class="history-section"
-          role="tabpanel"
-          aria-labelledby="transfer-tab"
-          tabindex="0"
-        >
-          <div class="replay-controls" id="replay-controls" hidden>
-            <button id="play" class="secondary" type="button">Replay</button>
-          </div>
-          <div class="panel illustration">
-            <p id="replay-caption" class="small muted" hidden></p>
-            <div
-              id="transfer-diagram"
-              class="diagram-scroll"
-              role="region"
-              aria-label="Wallet transfer illustration"
-              tabindex="0"
-              hidden
-            ></div>
-            <p id="empty-history" class="empty">
-              No transfers yet. Make your first transfer.
-            </p>
-            <p class="small muted illustration-help" id="transfer-help" hidden>
-              Click on an arrow to see the source of the transfer data.
-            </p>
-          </div>
+            <div class="payment-grid">
+              <div>
+                <span>Total read cost · USDC</span
+                ><strong id="spent">0.000000</strong>
+              </div>
+              <div>
+                <span>Read requests</span><strong id="read-count">0</strong>
+              </div>
+              <div>
+                <span>Payment wallet left · USDC</span
+                ><strong id="payment-left">0.010000</strong>
+              </div>
+            </div>
+            <div class="table-scroll">
+              <table>
+                <thead>
+                  <tr>
+                    <th scope="col">Time · UTC</th>
+                    <th scope="col">Block number</th>
+                    <th scope="col">Read</th>
+                    <th scope="col">Requests</th>
+                    <th scope="col">Cost · USDC</th>
+                  </tr>
+                </thead>
+                <tbody id="receipt-rows"></tbody>
+              </table>
+            </div>
+            <details id="reset-evidence" hidden>
+              <summary>Last reset: return transfers</summary>
+              <ul id="reset-sweeps"></ul>
+              <p class="small muted">
+                Reset starts a fresh transfer history. Payment history is
+                retained.
+              </p>
+            </details>
+          </section>
         </section>
-        <section
-          id="payments"
-          class="panel payment-history"
-          role="tabpanel"
-          aria-labelledby="payment-tab"
-          tabindex="0"
-          hidden
-        >
-          <div class="payment-grid">
-            <div>
-              <span>Total read cost · USDC</span
-              ><strong id="spent">0.000000</strong>
-            </div>
-            <div>
-              <span>Read requests</span><strong id="read-count">0</strong>
-            </div>
-            <div>
-              <span>Payment wallet left · USDC</span
-              ><strong id="payment-left">0.010000</strong>
-            </div>
-          </div>
-          <div class="table-scroll">
-            <table>
-              <thead>
-                <tr>
-                  <th scope="col">Time · UTC</th>
-                  <th scope="col">Block number</th>
-                  <th scope="col">Read</th>
-                  <th scope="col">Requests</th>
-                  <th scope="col">Cost · USDC</th>
-                </tr>
-              </thead>
-              <tbody id="receipt-rows"></tbody>
-            </table>
-          </div>
-          <details id="reset-evidence" hidden>
-            <summary>Last reset: return transfers</summary>
-            <ul id="reset-sweeps"></ul>
-            <p class="small muted">
-              Reset starts a fresh transfer history. Payment history is
-              retained.
-            </p>
-          </details>
-        </section>
-      </section>
+      </div>
     </main>
     <dialog
       id="provenance"

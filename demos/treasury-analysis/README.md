@@ -69,7 +69,8 @@ npm run test:browser  # desktop + mobile; local port 4175
 `src/demo.mjs` connects them. `public/` holds the plain JavaScript interface;
 `fixtures/demo.json` sets wallets and rates. Amounts use integer strings and BigInt.
 For visual review, try the sequence above on desktop and phone, including keyboard
-provenance selection. Asset origins are in `public/assets/README.md`.
+provenance selection. On desktop, Send and Balances share the left panel while
+histories update on the right. Narrow screens stack the panels. Asset origins are in `public/assets/README.md`.
 
 ## Live integration later
 

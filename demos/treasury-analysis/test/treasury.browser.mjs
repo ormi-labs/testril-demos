@@ -39,6 +39,19 @@ test("requested layout, empty history and keyboard balance provenance", async ({
       "#all, #show, #available, #restart-replay, #replay-step, #export, .step-number, #balance-block, .reader-label",
     ),
   ).toHaveCount(0);
+  const workspace = await page.locator(".workspace").boundingBox();
+  const balances = await page.locator(".balances-section").boundingBox();
+  const histories = await page.locator(".histories").boundingBox();
+  expect(balances.x).toBeGreaterThanOrEqual(workspace.x);
+  expect(balances.x + balances.width).toBeLessThanOrEqual(
+    workspace.x + workspace.width,
+  );
+  if (page.viewportSize().width > 1120) {
+    expect(histories.x).toBeGreaterThan(workspace.x + workspace.width);
+    expect(Math.abs(histories.y - workspace.y)).toBeLessThan(1);
+  } else {
+    expect(histories.y).toBeGreaterThan(workspace.y + workspace.height);
+  }
   const logo = await page.getByAltText("Testril").boundingBox();
   const identity = await page.locator(".identity").boundingBox();
   expect(logo.x).toBeLessThan(identity.x);
