@@ -3,3 +3,5 @@ test-results
 playwright-report
 public/assets
 package-lock.json
+.live-state.json*
+.live-lock

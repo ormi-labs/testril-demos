@@ -110,7 +110,7 @@ export async function exportRun(run) {
     await mkdir(destination);
     await writeFile(
       join(destination, "README.md"),
-      "# Wallet transfers run\n\nAll transfers, reads, payments, addresses, times and hashes are mocked. No real funds moved.\n\nExtract the matching treasury-analysis 0.3.0 source and run:\n\n`node src/cli.mjs replay /path/to/run/run.json`\n\nReplay checks arithmetic; it does not verify Arbitrum or Testril. Amounts are raw six-decimal USDC integer strings. Reset clears both histories, restores the mock payment wallet, and resets read charges to zero.\n",
+      `# Wallet transfers run\n\n${run.mode === "live" ? "Live Base Sepolia run; transfers and Testril payments use test funds. Demo balances track a 1 USDC allowance; other wallet funds are reserved. Reset preserves payment usage and caps." : "All transfers, reads, payments, addresses, times and hashes are mocked. No real funds moved. Reset clears both histories and refills the mock payer."}\n\nExtract the matching source and run:\n\n\`node src/cli.mjs replay /path/to/run/run.json\`\n\nReplay checks arithmetic; it does not independently verify chain or Testril evidence. Amounts are raw six-decimal USDC integer strings.\n`,
     );
     await writeFile(
       join(destination, "run.json"),

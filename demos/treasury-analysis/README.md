@@ -3,14 +3,14 @@
 Move **1 USDC** between Treasury, Counterparty A, and Counterparty B. Read their
 balances with Testril, replay the transfers, and select an arrow to inspect provenance.
 
-**Everything is mocked:** Arbitrum, USDC, wallets, transfers, Testril reads,
-prices, timestamps, and hashes. No funds move or payments occur. This version
-checks the interaction before live integration.
+With no signing configuration, start in **Mock** mode: Arbitrum, wallets, transfers, reads, prices, and evidence
+are simulated. No funds move or payments occur. **Live** mode uses Base Sepolia
+test USDC, real testnet transfers, and paid reads at `https://dev.testril.ai/mcp`.
 
 ## Run
 
 Requires Node.js **22.13+**, npm, and `tar` on macOS or Linux. No build step or
-runtime dependencies.
+build step. Runtime dependencies are the MCP SDK and viem, locked by `npm ci`.
 
 ```sh
 cd demos/treasury-analysis  # or the extracted treasury-analysis folder
@@ -19,7 +19,7 @@ npm start
 ```
 
 Open **http://127.0.0.1:4173**. Optional: copy `.env.example` to `.env` to change
-`PORT`. No keys or credentials are needed. The server accepts local connections only.
+`PORT`. Mock mode needs no credentials. The server accepts local connections only.
 
 ## Try it
 
@@ -35,11 +35,83 @@ Open **http://127.0.0.1:4173**. Optional: copy `.env.example` to `.env` to chang
    History and Payment History. It restores the mock payment wallet and resets
    read costs to zero. Reset itself adds no mock read charge.
 
-Each transfer refreshes three balance reads and one history read. A separate mock
+In mock mode, each transfer refreshes three balance reads and one history read. A separate mock
 payment wallet covers their illustrative charges. Refreshing resumes the tab’s
 cached session; restarting the server clears sessions. Data preparation is assumed,
 so this version has no materialization or supplier earnings. On phones, scroll the
 transfer diagram horizontally.
+
+## Live Base Sepolia
+
+Use four dedicated test wallets: Treasury, Counterparty A, Counterparty B, and a
+separate Testril payer. Treasury needs at least 1 test USDC; each wallet that sends
+transfers needs Base Sepolia ETH for gas. The payer needs test USDC for escrow.
+Use Circle USDC at `0x036CbD53842c5426634e7929541eC2318f3dCF7e`, chain ID **84532**.
+
+Copy `.env.example` to `.env` and set the four private keys locally. Public
+addresses default to `fixtures/live.json`; override them with the address variables
+shown in `.env.example` when using your own wallets. A signer must match its address.
+Keep keys out of chat, browser code, and source control.
+
+```sh
+# Working directory: treasury-analysis
+cp .env.example .env  # only if you do not already have one
+chmod 600 .env
+# Edit .env with your local keys and explicitly approved payment limits.
+npm run live:check   # address validation and RPC balances; no transfers or payments
+npm start
+```
+
+The payment limits default to zero. After approving spending, set both
+`TESTRIL_CHARGE_CAP_USDC=0.1` and `TESTRIL_ESCROW_CAP_USDC=0.1`, then restart.
+This version permits at most 0.1 test USDC for each. The first paid request deposits
+the escrow allowance; subsequent requests reuse the channel with cumulative
+vouchers. A deposit is not a read charge. Quotes must use Base Sepolia USDC and the
+supported batch settlement terms; other networks are refused.
+
+With valid local keys and nonzero caps, the app opens **Live** automatically.
+Select **Refresh live reads** for a new snapshot. That action prepares and reads one
+block for each balance and compares the exact results with the reference RPC.
+Sending a transfer waits for its receipt, then refreshes balances and reads transfer
+edges at the transaction's block. Each transfer's transaction/log evidence comes
+from RPC; Testril's edge is the aggregate for a sender/recipient pair in that block.
+The provenance dialog labels these separately. No transaction-level MCP lineage
+is implied. Replay and provenance inspection use cached results and add no charge.
+
+**Demo balances show the allocation of 1 USDC**, even if Treasury holds more.
+Other wallet funds are recorded as reserves and cannot be sent by the demo. The
+provenance dialog shows the full onchain balance as well as the allocation. An
+external change to any wallet pauses transfers rather than changing the allowance.
+
+All live browser tabs share one session. `.live-state.json` persists the allowance,
+payment usage, cached paid results, and a pending signed transaction. It contains
+no private keys, but stays local and is excluded from downloads. **Do not delete
+it to reset a run.** Reset returns only the demo allocation to Treasury; it spends
+gas and preserves payment receipts, escrow, and caps. It cannot undo payments.
+
+If a transfer or a later read fails, use **Refresh live reads**. The recorded
+transaction hash is recovered without signing another transfer; paid results are
+reused. If a settlement response is lost, the charge and deposit remain reserved
+and new payments are refused until the quote is reconciled. The interface shows
+its quote ID and status. A stalled materialization remains attached to its job.
+
+Only one live server may use this directory. Clean shutdown releases `.live-lock`.
+After a crash, verify that the old server has stopped before removing that lock
+directory and restarting. Keep the state file. The caps apply to this saved session,
+not to payments made by unrelated clients using the same payer.
+
+For a deliberate testnet smoke run (requires the approved caps and no active run):
+
+```sh
+npm run live:smoke
+```
+
+This sends 0.25 Treasury → A, then 0.10 A → B, and returns the demo funds to
+Treasury. It makes real testnet transfers and pays MCP quotes within the caps.
+Maximum gas fee per transfer is limited to 0.0001 ETH.
+If that sequence is interrupted, use `node --env-file=.env src/live-cli.mjs
+resume-smoke` to recover its pending transaction and continue only the remaining
+steps. Use the interface to recover an unrelated run.
 
 ## Downloads and CLI
 
@@ -53,7 +125,7 @@ node src/cli.mjs sample run.json
 node src/cli.mjs replay run.json
 ```
 
-Replay checks balance arithmetic; it does not verify Arbitrum evidence. Downloads
+Replay checks allowance arithmetic; it does not independently verify chain or MCP evidence. Downloads
 are for private evaluation until a repository license is selected.
 
 ## Development
@@ -69,14 +141,17 @@ npm run test:browser  # desktop + mobile; local port 4175
 `src/mock-chain.mjs` simulates transfers; `src/mock-testril.mjs` simulates reads.
 `src/demo.mjs` connects them. `public/` holds the plain JavaScript interface;
 `fixtures/demo.json` sets wallets and rates. Amounts use integer strings and BigInt.
+`src/live-demo.mjs` connects the live chain and Testril clients; `batch-payment.mjs`
+signs deposits and vouchers. Live tests use a local HTTP MCP peer, with throwaway
+keys, to check caps, reserved funds, concurrent tabs, and recovery after restart.
 For visual review, try the sequence above on desktop and phone, including keyboard
 provenance selection. On desktop, Send and Balances share the left panel while
 histories update on the right. Narrow screens stack the panels. Asset origins are in `public/assets/README.md`.
 
-## Live integration later
+## Scope
 
-Real payment and transfer keys must stay in server secret storage, never browser
-code or source downloads. The server will need restricted destinations and spending
-limits. Confirm Arbitrum USDC payment support and deployed function contracts first.
-Transaction timestamps and individual source events need additional witnesses
-beyond aggregated transfer edges. This mock implements none of those live services.
+The live adapter supports Base Sepolia only. It reads exact balance snapshots and
+per-block transfer edges; it does not implement mainnet access, supplier earnings,
+wallet-wide historical analysis, or independent verification of every source log.
+Testril citations identify contributing blocks and computations. The separate RPC
+comparison and receipt check are the reference checks performed by this demo.

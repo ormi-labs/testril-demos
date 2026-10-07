@@ -8,11 +8,11 @@ MCP server: `https://dev.testril.ai/mcp`
 
 | Demo | Run | Status |
 | --- | --- | --- |
-| [Move Money](demos/treasury-analysis/README.md) | `cd demos/treasury-analysis && npm ci && npm start` | Interactive mock: move 1 USDC between three wallets, inspect balance and transfer provenance, follow automatically updated transfer/payment histories, replay, reset, and download the source. |
+| [Move Money](demos/treasury-analysis/README.md) | `cd demos/treasury-analysis && npm ci && npm start` | Mock or live Base Sepolia: circulate a 1 USDC allowance between three wallets, inspect balance and transfer evidence, track Testril costs, replay, reset, and download the source. |
 
 The interface follows Testril’s approved derivative style guide. It runs locally with Node.js 22.13+ on macOS or Linux. Preview the landing screen on [desktop](docs/screenshots/treasury-landing-desktop.png) and [mobile](docs/screenshots/treasury-landing-mobile.png), the [transfer replay](docs/screenshots/treasury-desktop.png), and the [provenance modal](docs/screenshots/treasury-provenance-desktop.png).
 
-Everything in the current demo is simulated, including Arbitrum transactions, Testril reads, payment charges, and source evidence. No wallet or credentials are required. `sub-cent-reads` and `paid-reader` remain planned independent downloads.
+Mock mode simulates Arbitrum transactions, Testril reads, payment charges, and source evidence; it needs no credentials. Live mode uses Base Sepolia, local signing, real test USDC transfers, and paid MCP reads. It reserves other wallet funds, shares one persistent session across tabs, and enforces separate charge and escrow caps. See the demo README for setup. `sub-cent-reads` and `paid-reader` remain planned independent downloads.
 
 ## Plans
 

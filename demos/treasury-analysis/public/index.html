@@ -18,7 +18,7 @@
     </header>
     <div class="measure demo-toolbar">
       <div class="demo-context">
-        <span>Arbitrum</span>
+        <span id="network-name">Arbitrum</span>
         <fieldset class="mode-switch">
           <legend class="sr-only">Data mode</legend>
           <label
@@ -30,7 +30,9 @@
             />Mock</label
           >
           <span aria-hidden="true">|</span>
-          <label title="Live integration is not available yet"
+          <label
+            id="live-option"
+            title="Configure local signing to enable live mode"
             ><input
               type="radio"
               name="data-mode"
@@ -48,6 +50,13 @@
       <section class="intro" aria-labelledby="question">
         <h1 id="question">Move Money</h1>
         <p class="subtitle">Track balances and transfers</p>
+        <p id="live-note" class="small muted" hidden>
+          Base Sepolia testnet · 1 USDC demo allowance. Other wallet funds are
+          reserved. Transfers spend gas; Testril reads spend test USDC.
+        </p>
+        <button id="refresh-live" class="secondary" type="button" hidden>
+          Refresh live reads
+        </button>
       </section>
       <div class="demo-layout">
         <section class="workspace panel" aria-label="Interactive wallet demo">
@@ -160,14 +169,14 @@
           >
             <div class="payment-grid">
               <div>
-                <span>Total read cost · USDC</span
+                <span id="cost-label">Total read cost · USDC</span
                 ><strong id="spent">0.000000</strong>
               </div>
               <div>
                 <span>Read requests</span><strong id="read-count">0</strong>
               </div>
               <div>
-                <span>Payment wallet left · USDC</span
+                <span id="budget-label">Payment wallet left · USDC</span
                 ><strong id="payment-left">0.010000</strong>
               </div>
             </div>
@@ -177,7 +186,7 @@
                   <tr>
                     <th scope="col">Time · UTC</th>
                     <th scope="col">Block number</th>
-                    <th scope="col">Read</th>
+                    <th id="operation-label" scope="col">Read</th>
                     <th scope="col">Requests</th>
                     <th scope="col">Cost · USDC</th>
                   </tr>
@@ -188,7 +197,7 @@
             <details id="reset-evidence" hidden>
               <summary>Last reset: return transfers</summary>
               <ul id="reset-sweeps"></ul>
-              <p class="small muted">
+              <p id="reset-note" class="small muted">
                 Reset clears both histories and restores the mock payment
                 wallet.
               </p>
@@ -213,7 +222,9 @@
           Close
         </button>
       </div>
-      <p class="mock-source">Mock source evidence · not verified on Arbitrum</p>
+      <p id="source-note" class="mock-source">
+        Mock source evidence · not verified on Arbitrum
+      </p>
       <div id="provenance-content"></div>
     </dialog>
     <div id="cost-breakdown" class="cost-breakdown" role="tooltip" hidden></div>

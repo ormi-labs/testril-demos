@@ -10,6 +10,7 @@ let step = 0;
 let timer;
 let selected;
 let provenanceTrigger;
+let mode = "mock";
 const name = (id) => state.wallets.find((wallet) => wallet.id === id).name;
 const time = (timestamp) =>
   `${new Date(timestamp).toISOString().slice(11, 19)} UTC`;
@@ -82,10 +83,14 @@ function lock(value) {
   busy = value;
   $("transfer-form").setAttribute("aria-busy", String(value));
   for (const control of $("transfer-form").elements) control.disabled = value;
-  for (const id of ["reset", "play"]) $(id).disabled = value;
+  for (const id of ["reset", "play", "refresh-live"]) $(id).disabled = value;
+  for (const input of document.querySelectorAll('[name="data-mode"]'))
+    input.disabled = value || (input.value === "live" && !liveAvailable);
   for (const balance of document.querySelectorAll("[data-balance]"))
     balance.disabled = value;
   if (!value && state) updateRecipients();
+  if (!value && state?.mode === "live" && state.refreshNeeded)
+    $("transfer").disabled = true;
 }
 const selectedWallet = (id) => $(id).querySelector("input:checked").value;
 function updateRecipients() {
@@ -97,6 +102,21 @@ function updateRecipients() {
 }
 function renderState() {
   hideCostBreakdown();
+  const live = state.mode === "live";
+  $("network-name").textContent = state.chain.name;
+  $("live-note").hidden = !live;
+  $("refresh-live").hidden = !live;
+  $("balances-heading").textContent = live ? "Demo balances" : "Balances";
+  $("cost-label").textContent = live
+    ? "Total Testril cost · USDC"
+    : "Total read cost · USDC";
+  $("budget-label").textContent = live
+    ? "Testril budget left · USDC"
+    : "Payment wallet left · USDC";
+  $("operation-label").textContent = live ? "Operation" : "Read";
+  $("reset-note").textContent = live
+    ? "Reset returns the demo funds to Treasury. Payments, escrow, and spending caps remain."
+    : "Reset clears both histories and restores the mock payment wallet.";
   $("wallets").replaceChildren(
     ...state.wallets.map((wallet) => {
       const card = element("button", undefined, "panel wallet");
@@ -138,7 +158,9 @@ function renderState() {
   $("spent").replaceChildren(
     costButton(
       state.payment.spentRaw,
-      `Balance reads: ${feeAmount(balanceCost.toString())} USDC\nTransfer history reads: ${feeAmount(historyCost.toString())} USDC\nMock rates`,
+      live
+        ? `Testril charges: ${feeAmount(state.payment.spentRaw)} USDC\nEscrow deposited separately: ${feeAmount(state.payment.depositedRaw)} USDC\nGas is paid separately in ETH`
+        : `Balance reads: ${feeAmount(balanceCost.toString())} USDC\nTransfer history reads: ${feeAmount(historyCost.toString())} USDC\nMock rates`,
     ),
   );
   $("payment-left").textContent = feeAmount(state.payment.remainingRaw);
@@ -150,19 +172,31 @@ function renderState() {
         ...[
           time(receipt.timestamp),
           receipt.block,
-          receipt.kind === "balances" ? "Balances" : "Transfer history",
+          live
+            ? receipt.kind === "materialization"
+              ? "Materialization"
+              : "Read"
+            : receipt.kind === "balances"
+              ? "Balances"
+              : "Transfer history",
           receipt.requestCount,
         ].map((value) => element("td", value)),
       );
       const cost = element("td");
-      const breakdown =
-        receipt.kind === "balances"
+      const breakdown = live
+        ? receipt.lines
+            .map(
+              (line) =>
+                `${line.label}: ${line.units} × ${line.unit_price} USDC`,
+            )
+            .join("\n") + `\nPayment: ${receipt.status}\nQuote: ${receipt.id}`
+        : receipt.kind === "balances"
           ? `${receipt.requestCount} balance reads × ${feeAmount(state.rates.balanceReadRaw)} USDC`
           : `History read: ${feeAmount(state.rates.transferReadBaseRaw)} USDC\nTransfer rows: ${feeAmount((BigInt(receipt.chargeRaw) - BigInt(state.rates.transferReadBaseRaw)).toString())} USDC (${feeAmount(state.rates.transferReadPerRowRaw)} per transfer)`;
       cost.append(
         costButton(
           receipt.chargeRaw,
-          `${breakdown}\nTotal: ${feeAmount(receipt.chargeRaw)} USDC\nMock rates`,
+          `${breakdown}\nTotal: ${feeAmount(receipt.chargeRaw)} USDC${live ? "" : "\nMock rates"}`,
         ),
       );
       row.append(cost);
@@ -261,6 +295,10 @@ async function inspect(kind, item) {
         ? `${endpoint("balance-provenance")}?wallet=${item.id}`
         : `${endpoint("provenance")}?transfer=${item.id}`;
     const result = await api(path);
+    $("source-note").textContent =
+      result.mode === "live"
+        ? "Base Sepolia · RPC evidence and Testril block citation"
+        : "Mock source evidence · not verified on Arbitrum";
     const rows =
       kind === "balance"
         ? [
@@ -297,6 +335,24 @@ async function inspect(kind, item) {
       ["Block hash", result.source.blockHash],
       ["Calculation", result.calculation.description],
     );
+    if (result.mode === "live") {
+      if (kind === "balance")
+        rows.push([
+          "Demo allowance",
+          `${decimalAmount(result.source.demoBalanceRaw)} USDC`,
+        ]);
+      rows.push([
+        "Testril computation",
+        JSON.stringify(result.citation.computation),
+      ]);
+      if (result.citation.digest)
+        rows.push(["Testril source digest", result.citation.digest]);
+      if (result.edge)
+        rows.push([
+          "Pair total in this block",
+          `${decimalAmount(result.edge.amount)} USDC in ${result.edge.count} events`,
+        ]);
+    }
     const list = element("dl");
     for (const [label, value] of rows)
       list.append(element("dt", label), element("dd", value, "hash"));
@@ -318,7 +374,7 @@ async function action(kind) {
   if (busy) return;
   stop();
   lock(true);
-  status("");
+  status(state.mode === "live" ? "Waiting for Base Sepolia and Testril…" : "");
   try {
     const input = { revision: state.revision };
     if (kind === "transfer")
@@ -332,6 +388,7 @@ async function action(kind) {
     step = state.transferCount;
     renderState();
     stop();
+    status("");
   } catch (error) {
     status(error.message, true);
   } finally {
@@ -375,6 +432,7 @@ $("transfer-form").addEventListener("submit", (event) => {
 });
 $("from").addEventListener("change", updateRecipients);
 $("reset").addEventListener("click", () => action("reset"));
+$("refresh-live").addEventListener("click", () => action("refresh"));
 $("play").addEventListener("click", play);
 $("close-provenance").addEventListener("click", closeProvenance);
 $("provenance").addEventListener("cancel", (event) => {
@@ -382,55 +440,82 @@ $("provenance").addEventListener("cancel", (event) => {
   closeProvenance();
 });
 
-try {
-  let saved;
-  try {
-    saved = sessionStorage.getItem(storageKey);
-  } catch {
-    /* Storage is optional. */
-  }
-  if (saved) {
-    try {
-      state = await api(`/api/sessions/${encodeURIComponent(saved)}`);
-    } catch {
-      /* Expired sessions start fresh. */
-    }
-  }
-  state ??= await api("/api/sessions", {});
-  try {
-    sessionStorage.setItem(storageKey, state.id);
-  } catch {
-    /* Storage is optional. */
-  }
-  for (const id of ["from", "to"])
-    $(id)
-      .querySelector(".wallet-options")
-      .replaceChildren(
-        ...state.wallets.map((wallet) => {
-          const label = element("label");
-          const input = element("input");
-          input.type = "radio";
-          input.name = id;
-          input.value = wallet.id;
-          input.required = true;
-          input.checked = wallet.id === (id === "from" ? "treasury" : "a");
-          input.setAttribute("aria-label", wallet.name);
-          label.append(
-            input,
-            element(
-              "span",
-              wallet.id === "treasury" ? "Treasury" : wallet.id.toUpperCase(),
-            ),
-          );
-          return label;
-        }),
-      );
-  step = state.transferCount;
-  renderState();
+let liveAvailable = false;
+async function start(nextMode) {
   stop();
-  lock(false);
-  status("");
-} catch (error) {
-  status(error.message, true);
   lock(true);
+  mode = nextMode;
+  for (const input of document.querySelectorAll('[name="data-mode"]'))
+    input.checked = input.value === mode;
+  state = undefined;
+  status(mode === "live" ? "Opening the shared Base Sepolia session…" : "");
+  try {
+    let saved;
+    try {
+      saved = sessionStorage.getItem(`${storageKey}-${mode}`);
+    } catch {
+      /* Storage is optional. */
+    }
+    if (saved) {
+      try {
+        state = await api(`/api/sessions/${encodeURIComponent(saved)}`);
+      } catch {
+        /* Expired sessions start fresh. */
+      }
+    }
+    state ??= await api("/api/sessions", mode === "live" ? { mode } : {});
+    try {
+      sessionStorage.setItem(`${storageKey}-${mode}`, state.id);
+    } catch {
+      /* Storage is optional. */
+    }
+    for (const id of ["from", "to"])
+      $(id)
+        .querySelector(".wallet-options")
+        .replaceChildren(
+          ...state.wallets.map((wallet) => {
+            const label = element("label");
+            const input = element("input");
+            input.type = "radio";
+            input.name = id;
+            input.value = wallet.id;
+            input.required = true;
+            input.checked = wallet.id === (id === "from" ? "treasury" : "a");
+            input.setAttribute("aria-label", wallet.name);
+            label.append(
+              input,
+              element(
+                "span",
+                wallet.id === "treasury" ? "Treasury" : wallet.id.toUpperCase(),
+              ),
+            );
+            return label;
+          }),
+        );
+    step = state.transferCount;
+    renderState();
+    stop();
+    lock(false);
+    status(
+      state.mode === "live" && state.refreshNeeded
+        ? "Select Refresh live reads to prepare and read the snapshot with Testril."
+        : "",
+    );
+  } catch (error) {
+    status(error.message, true);
+    lock(true);
+    for (const input of document.querySelectorAll('[name="data-mode"]'))
+      input.disabled = input.value === "live" && !liveAvailable;
+  }
 }
+for (const input of document.querySelectorAll('[name="data-mode"]'))
+  input.addEventListener("change", () => start(input.value));
+try {
+  const config = await api("/api/config");
+  liveAvailable = config.liveAvailable;
+  $("live-option").title =
+    config.liveReason ?? "Live Base Sepolia with local signing";
+} catch {
+  /* Mock mode can still start. */
+}
+await start(liveAvailable ? "live" : "mock");

@@ -131,4 +131,6 @@ test("downloads extract and replay without repository dependencies", async (t) =
     /Treasury: 0.65 USDC/,
   );
   await assert.rejects(readFile(join(source, ".env")), /ENOENT/);
+  await assert.rejects(readFile(join(source, ".live-state.json")), /ENOENT/);
+  await assert.rejects(readFile(join(source, ".live-lock")), /ENOENT/);
 });

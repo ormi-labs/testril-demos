@@ -12,6 +12,10 @@ import {
   exportDemo,
 } from "./demo.mjs";
 import { exportRun, exportSource } from "./archive.mjs";
+import { liveConfig } from "./live-config.mjs";
+import { createLiveChain } from "./live-chain.mjs";
+import { connectMcp } from "./mcp.mjs";
+import { createLiveDemo } from "./live-demo.mjs";
 
 const root = fileURLToPath(new URL("..", import.meta.url));
 const { version } = JSON.parse(
@@ -48,9 +52,39 @@ async function body(request) {
   }
 }
 
-export function createApp() {
+export function createApp({ env = process.env, liveFactory } = {}) {
   const sessions = new Map();
-  return createServer(async (request, response) => {
+  let live;
+  let livePromise;
+  let config;
+  let liveReason;
+  try {
+    config = liveConfig(env);
+  } catch (error) {
+    liveReason = error.message;
+  }
+  if (config && (config.chargeCapRaw === "0" || config.depositCapRaw === "0"))
+    liveReason =
+      "Set the approved Testril charge and escrow caps in .env to enable live mode.";
+  const getLive = async () => {
+    if (liveReason) throw new Error(liveReason);
+    livePromise ??= (async () => {
+      live = await (liveFactory
+        ? liveFactory(config)
+        : createLiveDemo({
+            config,
+            chain: createLiveChain(config),
+            mcp: await connectMcp(config.mcpUrl),
+            directory: root,
+          }));
+      return live;
+    })().catch((error) => {
+      livePromise = undefined;
+      throw error;
+    });
+    return livePromise;
+  };
+  const server = createServer(async (request, response) => {
     response.setHeader("X-Content-Type-Options", "nosniff");
     response.setHeader("Referrer-Policy", "no-referrer");
     response.setHeader(
@@ -73,15 +107,22 @@ export function createApp() {
       )
         return send(403, { error: "Use the local 127.0.0.1 address." });
       const url = new URL(request.url, `http://${host}`);
+      if (request.method === "GET" && url.pathname === "/api/config")
+        return send(200, { liveAvailable: !liveReason, liveReason });
       if (request.method === "POST" && url.pathname === "/api/sessions") {
         const input = await body(request);
         if (
           !input ||
           typeof input !== "object" ||
           Array.isArray(input) ||
-          Object.keys(input).length
+          Object.keys(input).some((key) => key !== "mode") ||
+          (input.mode !== undefined && !["mock", "live"].includes(input.mode))
         )
-          throw new Error("Session creation requires an empty object.");
+          throw new Error("Choose mock or live mode.");
+        if (input.mode === "live") {
+          const current = await getLive();
+          return send(201, current.state());
+        }
         const demo = createDemo();
         if (sessions.size >= 64) sessions.delete(sessions.keys().next().value);
         sessions.set(demo.id, demo);
@@ -96,10 +137,69 @@ export function createApp() {
         return response.end(archive);
       }
       const match = url.pathname.match(
-        /^\/api\/sessions\/([a-f0-9-]+)(?:\/(transfer|reset|export|provenance|balance-provenance))?$/,
+        /^\/api\/sessions\/([a-f0-9-]+)(?:\/(transfer|reset|refresh|export|provenance|balance-provenance))?$/,
       );
       if (match) {
         const [, id, action] = match;
+        // A live session is shared by all tabs and persisted across server restarts.
+        if (
+          !live &&
+          !sessions.has(id) &&
+          request.method === "GET" &&
+          !action &&
+          !liveReason
+        ) {
+          try {
+            await getLive();
+          } catch {
+            /* A mock session can still resume. */
+          }
+        }
+        if (live?.id === id) {
+          if (request.method === "GET" && !action)
+            return send(200, live.state());
+          if (request.method === "GET" && action === "provenance")
+            return send(200, live.provenance(url.searchParams.get("transfer")));
+          if (request.method === "GET" && action === "balance-provenance")
+            return send(
+              200,
+              live.balanceProvenance(url.searchParams.get("wallet")),
+            );
+          if (request.method === "GET" && action === "export") {
+            const archive = await exportRun(live.export());
+            response.writeHead(200, {
+              "Content-Type": "application/gzip",
+              "Content-Disposition":
+                'attachment; filename="wallet-transfers-run.tar.gz"',
+            });
+            return response.end(archive);
+          }
+          if (
+            request.method === "POST" &&
+            ["transfer", "reset", "refresh"].includes(action)
+          ) {
+            const input = await body(request);
+            const allowed =
+              action === "transfer"
+                ? ["revision", "from", "to", "amount"]
+                : ["revision"];
+            if (
+              !input ||
+              typeof input !== "object" ||
+              Array.isArray(input) ||
+              Object.keys(input).some((key) => !allowed.includes(key))
+            )
+              throw new Error("Unexpected input fields.");
+            try {
+              return send(200, await live[action](input));
+            } catch (error) {
+              return send(error.status ?? 400, {
+                error: error.message,
+                state: live.state(),
+              });
+            }
+          }
+        }
         let demo = sessions.get(id);
         if (!demo)
           return send(404, {
@@ -168,6 +268,11 @@ export function createApp() {
       send(400, { error: error.message });
     }
   });
+  server.closeLive = async () => {
+    if (livePromise) await livePromise.catch(() => {});
+    if (live) await live.close();
+  };
+  return server;
 }
 
 if (
@@ -177,7 +282,14 @@ if (
   const port = Number(process.env.PORT ?? 4173);
   if (!Number.isInteger(port) || port < 1 || port > 65535)
     throw new Error("PORT must be between 1 and 65535.");
-  createApp().listen(port, "127.0.0.1", () =>
-    console.log(`Wallet transfers mock: http://127.0.0.1:${port}`),
+  const server = createApp();
+  server.listen(port, "127.0.0.1", () =>
+    console.log(`Wallet transfers: http://127.0.0.1:${port}`),
   );
+  for (const signal of ["SIGINT", "SIGTERM"])
+    process.once(signal, async () => {
+      server.close();
+      await server.closeLive();
+      process.exit(0);
+    });
 }

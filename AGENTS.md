@@ -14,6 +14,9 @@ Keep programs small and independent: a parent connects children; children do not
 
 ## Build, Test, and Development Commands
 
+Paul starts and stops interactive demos/programs himself. Provide startup commands
+at handover. Test-owned temporary servers must stop when their checks finish.
+
 No runtime or build tooling is selected yet. Document each demo's runtime versions and exact installation, startup, test, and build commands, including the working directory. Add formatter and linter configuration with its tooling and run applicable checks before handover.
 
 ## Coding Style & Naming Conventions

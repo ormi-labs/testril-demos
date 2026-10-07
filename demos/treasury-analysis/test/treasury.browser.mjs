@@ -1,4 +1,6 @@
 import { test, expect } from "@playwright/test";
+import { createDemo, publicState } from "../src/demo.mjs";
+import { fileURLToPath } from "node:url";
 async function send(page, from, to, amount) {
   await page
     .locator(`#from label`)
@@ -224,4 +226,111 @@ test("invalid transfer preserves histories; refresh resumes cached reads and dow
   expect((await download).suggestedFilename()).toBe(
     "treasury-analysis-0.3.0.tar.gz",
   );
+});
+
+test("live mode labels the allowance, requires refreshed reads, and preserves payment costs on reset", async ({
+  page,
+}, testInfo) => {
+  const state = {
+    ...publicState(createDemo()),
+    id: "live-browser-session",
+    mode: "live",
+    chain: { name: "Base Sepolia", id: 84532 },
+    refreshNeeded: true,
+    receipts: [],
+    payment: {
+      spentRaw: "0",
+      depositedRaw: "0",
+      remainingRaw: "100000",
+      requestCount: 0,
+    },
+  };
+  await page.route("**/api/config", (route) =>
+    route.fulfill({ json: { liveAvailable: true } }),
+  );
+  await page.route("**/api/sessions", async (route) => {
+    if (route.request().postDataJSON()?.mode === "live")
+      return route.fulfill({ status: 201, json: state });
+    return route.continue();
+  });
+  await page.route("**/api/sessions/live-browser-session/**", async (route) => {
+    if (route.request().url().endsWith("/refresh")) {
+      state.refreshNeeded = false;
+      state.payment = {
+        spentRaw: "141",
+        depositedRaw: "100000",
+        remainingRaw: "99859",
+        requestCount: 1,
+      };
+      state.receipts = [
+        {
+          id: "paid-browser",
+          kind: "materialization",
+          status: "done",
+          chargeRaw: "120",
+          requestCount: 0,
+          timestamp: "2026-10-07T00:00:00Z",
+          block: 123,
+          lines: [
+            { label: "materialize_blocks", units: 1, unit_price: 0.00012 },
+          ],
+        },
+        {
+          id: "read-browser",
+          kind: "reads",
+          status: "done",
+          chargeRaw: "21",
+          requestCount: 1,
+          timestamp: "2026-10-07T00:00:00Z",
+          block: 123,
+          lines: [
+            { label: "query_read", units: 1, unit_price: 0.00002 },
+            { label: "query_blocks", units: 1, unit_price: 0.000001 },
+          ],
+        },
+      ];
+    }
+    return route.fulfill({ json: state });
+  });
+  await page.reload();
+  await expect(
+    page.getByRole("radio", { name: "Live", exact: true }),
+  ).toBeChecked();
+  await expect(page.locator("#network-name")).toHaveText("Base Sepolia");
+  await expect(page.locator("#live-note")).toContainText(
+    "1 USDC demo allowance",
+  );
+  await expect(page.locator("#balances-heading")).toHaveText("Demo balances");
+  await expect(page.locator("#transfer")).toBeDisabled();
+  await page.locator("#refresh-live").click();
+  await expect(page.locator("#transfer")).toBeEnabled();
+  await page.screenshot({
+    path: fileURLToPath(
+      new URL(
+        `../../../docs/screenshots/treasury-live-${testInfo.project.name}.png`,
+        import.meta.url,
+      ),
+    ),
+    fullPage: true,
+  });
+  await page.locator("#payment-tab").click();
+  await expect(page.locator("#budget-label")).toHaveText(
+    "Testril budget left · USDC",
+  );
+  await expect(page.locator("#spent")).toHaveText("0.000141");
+  await page.screenshot({
+    path: fileURLToPath(
+      new URL(
+        `../../../docs/screenshots/treasury-live-payments-${testInfo.project.name}.png`,
+        import.meta.url,
+      ),
+    ),
+    fullPage: true,
+  });
+  await page.locator("#spent .cost").focus();
+  await expect(page.locator("#cost-breakdown")).toContainText(
+    "Escrow deposited separately: 0.100000 USDC",
+  );
+  await page.locator("#reset").click();
+  await expect(page.locator("#spent")).toHaveText("0.000141");
 });
