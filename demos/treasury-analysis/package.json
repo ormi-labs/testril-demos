@@ -1,0 +1,29 @@
+{
+  "name": "testril-treasury-analysis",
+  "version": "0.3.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=22.13"
+  },
+  "scripts": {
+    "start": "node --env-file-if-exists=.env src/server.mjs",
+    "sample": "node src/cli.mjs sample",
+    "live:check": "node --env-file-if-exists=.env src/live-cli.mjs check",
+    "live:smoke": "node --env-file-if-exists=.env src/live-cli.mjs smoke",
+    "test": "node --test test/*.test.mjs",
+    "test:browser": "playwright test",
+    "lint": "eslint .",
+    "format": "prettier --write .",
+    "format:check": "prettier --check ."
+  },
+  "devDependencies": {
+    "@playwright/test": "1.63.0",
+    "eslint": "10.12.0",
+    "prettier": "3.9.9"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "1.32.1",
+    "viem": "2.57.3"
+  }
+}

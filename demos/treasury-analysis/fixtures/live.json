@@ -1,0 +1,29 @@
+{
+  "chain": { "name": "Base Sepolia", "id": 84532 },
+  "token": {
+    "symbol": "USDC",
+    "decimals": 6,
+    "address": "0x036CbD53842c5426634e7929541eC2318f3dCF7e"
+  },
+  "wallets": [
+    {
+      "id": "treasury",
+      "name": "Treasury",
+      "address": "0x38e01a8EE73B7F88f90378dBfc9aaE4b06B3C751",
+      "keyEnv": "TREASURY_PRIVATE_KEY"
+    },
+    {
+      "id": "a",
+      "name": "Counterparty A",
+      "address": "0xEBf86490d9B63e9cA10eF910ACC2E72Edd6a9ec7",
+      "keyEnv": "COUNTERPARTY_A_PRIVATE_KEY"
+    },
+    {
+      "id": "b",
+      "name": "Counterparty B",
+      "address": "0x9B3085E71a9fb3C62a67a8a3Db2912ad6ebE794b",
+      "keyEnv": "COUNTERPARTY_B_PRIVATE_KEY"
+    }
+  ],
+  "payer": "0x6eA4AB444CD21bd9210D998894585f6148048517"
+}

@@ -1,0 +1,21 @@
+/* Testril derivative identity: generated from public/design-lab/demo.css. */
+:root {
+  --canvas: #f7f8f5;
+  --ink: #252b25;
+  --muted: #626b61;
+  --accent: #485c43;
+  --button-ink: #ffffff;
+  --panel: #ffffff;
+  --line: #d9dfd5;
+  --positive: #3e603a;
+  --visual: #eef1e9;
+  --visual-ink: #596451;
+  --visual-line: #d4dbce;
+  --map-fill: #f8f9f6;
+  --map-stroke: #7a886d;
+  --map-node: #485c43;
+  --method-canvas: #eef1e9;
+  --method-ink: #252b25;
+  --method-muted: #626b61;
+  --color-scheme: light;
+}

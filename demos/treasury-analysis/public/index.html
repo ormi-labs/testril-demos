@@ -1,0 +1,240 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Move Money · A Testril demo</title>
+    <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="/assets/tokens.css" />
+    <link rel="stylesheet" href="/style.css" />
+    <script src="/app.js" type="module"></script>
+  </head>
+  <body>
+    <header class="measure masthead">
+      <img src="/assets/wordmark.svg" width="132" height="28" alt="Testril" />
+      <a href="/" class="identity"
+        >Wallet transfers<span>A Testril demo</span
+        ><span id="testril-server" hidden></span
+      ></a>
+    </header>
+    <div class="measure demo-toolbar">
+      <div class="demo-context">
+        <span id="network-name">Arbitrum</span>
+        <fieldset class="mode-switch">
+          <legend class="sr-only">Data mode</legend>
+          <label
+            ><input
+              type="radio"
+              name="data-mode"
+              value="mock"
+              checked
+            />Mock</label
+          >
+          <span aria-hidden="true">|</span>
+          <label
+            id="live-option"
+            title="Configure local signing to enable live mode"
+            ><input
+              type="radio"
+              name="data-mode"
+              value="live"
+              disabled
+            />Live</label
+          >
+        </fieldset>
+      </div>
+      <button id="reset" type="button" class="secondary" disabled>
+        Reset demo
+      </button>
+    </div>
+    <main class="measure">
+      <section class="intro" aria-labelledby="question">
+        <h1 id="question">Move Money</h1>
+        <p class="subtitle">Track balances and transfers</p>
+        <p id="live-note" class="small muted" hidden>
+          Base Sepolia testnet · 1 USDC demo allowance. Other wallet funds are
+          reserved. Transfers spend gas; Testril reads spend test USDC.
+        </p>
+        <button id="refresh-live" class="secondary" type="button" hidden>
+          Refresh live reads
+        </button>
+      </section>
+      <div class="demo-layout">
+        <section class="workspace panel" aria-label="Interactive wallet demo">
+          <section class="transfer-panel" aria-labelledby="transfer-heading">
+            <div class="section-top">
+              <h2 id="transfer-heading">Send USDC</h2>
+            </div>
+            <p id="status" role="status" aria-live="polite"></p>
+            <form id="transfer-form">
+              <div class="form-grid">
+                <fieldset id="from" class="wallet-choice" disabled>
+                  <legend>From</legend>
+                  <div class="wallet-options"></div>
+                </fieldset>
+                <fieldset id="to" class="wallet-choice" disabled>
+                  <legend>To</legend>
+                  <div class="wallet-options"></div>
+                </fieldset>
+                <div class="amount-control">
+                  <label for="amount">Amount · USDC</label>
+                  <div class="amount-send">
+                    <input
+                      id="amount"
+                      name="amount"
+                      inputmode="decimal"
+                      aria-describedby="status"
+                      value="0.25"
+                      required
+                      disabled
+                    />
+                    <button id="transfer" type="submit" disabled>Send</button>
+                  </div>
+                </div>
+              </div>
+            </form>
+            <p id="transfer-allowance" class="small muted" hidden></p>
+          </section>
+          <section class="balances-section" aria-labelledby="balances-heading">
+            <div class="section-top">
+              <h2 id="balances-heading">Balances</h2>
+            </div>
+            <div class="wallet-grid" id="wallets"></div>
+            <p class="small muted balance-help">
+              Click on a balance to see the source of the data.
+            </p>
+          </section>
+        </section>
+
+        <section class="histories" aria-label="Demo histories">
+          <div class="history-tabs" role="tablist" aria-label="Histories">
+            <button
+              id="transfer-tab"
+              role="tab"
+              aria-selected="true"
+              aria-controls="history"
+              tabindex="0"
+            >
+              Transfer History<span id="transfer-count" class="tab-count"
+                >0</span
+              >
+            </button>
+            <button
+              id="payment-tab"
+              role="tab"
+              aria-selected="false"
+              aria-controls="payments"
+              tabindex="-1"
+            >
+              Payment History<span id="payment-count" class="tab-count">0</span>
+            </button>
+          </div>
+          <section
+            id="history"
+            class="history-section"
+            role="tabpanel"
+            aria-labelledby="transfer-tab"
+            tabindex="0"
+          >
+            <div class="replay-controls" id="replay-controls" hidden>
+              <button id="play" class="secondary" type="button">Replay</button>
+            </div>
+            <div class="panel illustration">
+              <p id="replay-caption" class="small muted" hidden></p>
+              <div
+                id="transfer-diagram"
+                class="diagram-scroll"
+                role="region"
+                aria-label="Wallet transfer illustration"
+                tabindex="0"
+                hidden
+              ></div>
+              <p id="empty-history" class="empty">
+                No transfers yet. Make your first transfer.
+              </p>
+              <p
+                class="small muted illustration-help"
+                id="transfer-help"
+                hidden
+              >
+                Click on an arrow to see the source of the transfer data.
+              </p>
+            </div>
+          </section>
+          <section
+            id="payments"
+            class="panel payment-history"
+            role="tabpanel"
+            aria-labelledby="payment-tab"
+            tabindex="0"
+            hidden
+          >
+            <div class="payment-grid">
+              <div>
+                <span id="cost-label">Total read cost · USDC</span
+                ><strong id="spent">0.000000</strong>
+              </div>
+              <div>
+                <span>Read requests</span><strong id="read-count">0</strong>
+              </div>
+              <div>
+                <span id="budget-label">Payment wallet left · USDC</span
+                ><strong id="payment-left">0.010000</strong>
+              </div>
+            </div>
+            <div class="table-scroll">
+              <table>
+                <thead>
+                  <tr>
+                    <th scope="col">Time · UTC</th>
+                    <th scope="col">Block number</th>
+                    <th id="operation-label" scope="col">Read</th>
+                    <th scope="col">Requests</th>
+                    <th scope="col">Cost · USDC</th>
+                  </tr>
+                </thead>
+                <tbody id="receipt-rows"></tbody>
+              </table>
+            </div>
+            <details id="reset-evidence" hidden>
+              <summary>Last reset: return transfers</summary>
+              <ul id="reset-sweeps"></ul>
+              <p id="reset-note" class="small muted">
+                Reset clears both histories and restores the mock payment
+                wallet.
+              </p>
+            </details>
+          </section>
+        </section>
+      </div>
+    </main>
+    <dialog
+      id="provenance"
+      class="panel provenance"
+      aria-labelledby="provenance-heading"
+    >
+      <div class="section-top">
+        <h3 id="provenance-heading" tabindex="-1">Provenance</h3>
+        <button
+          id="close-provenance"
+          class="text-button"
+          type="button"
+          aria-label="Close provenance"
+        >
+          Close
+        </button>
+      </div>
+      <p id="source-note" class="mock-source">
+        Mock source evidence · not verified on Arbitrum
+      </p>
+      <div id="provenance-content"></div>
+    </dialog>
+    <div id="cost-breakdown" class="cost-breakdown" role="tooltip" hidden></div>
+    <footer class="measure">
+      <span>Build from this example</span>
+      <div>
+        <a href="/api/source">Download source ↗</a>
+      </div>
+    </footer>
+  </body>
+</html>

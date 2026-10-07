@@ -2,7 +2,7 @@
 
 **Proposed implementation · 3 October 2026**
 
-This document describes what users will see and what developers will download. It supplements the [summary](demo-summary.md) and [implementation plan](demo-strategy.md). No runnable demos have been implemented yet.
+This document describes the planned release. It supplements the [summary](demo-summary.md) and [implementation plan](demo-strategy.md). The [current wallet demo](../demos/treasury-analysis/README.md) is an interactive mock: transfer 1 USDC between three wallets, read balances, replay transfers, inspect fictional provenance, and reset. Source/run downloads and an arithmetic replay CLI are available. This replaces the initial static sample; the broader report below remains a future proposal. Live paid data, materialization, and supplier earnings remain unimplemented. The other examples remain planned.
 
 ## First-release structure
 
@@ -127,4 +127,4 @@ run/
 
 Do not describe a run as verified until its independent checks have executed. Reference-RPC access can be required for re-verification; explain this before the command. Export raw integers as strings where JSON number precision would lose information. Remove credentials, session tokens, private keys, and unused account details. Public chain addresses needed to reproduce the result remain explicit.
 
-Before releasing an example, observe a developer extract it into an empty directory, run the local sample, configure live access, and make the suggested modification. Observe them verify a run export using the matching source release. These are acceptance requirements for future implementations; no runnable examples are being tested in this planning change.
+Before releasing an example, observe a developer extract it into an empty directory, run the local sample, configure live access, and make the suggested modification. Observe them verify a run export using the matching source release. The treasury sample now has automated extraction and verification checks. Independent developer observation and funded live acceptance remain to be completed before its release.
