@@ -1,4 +1,6 @@
 import {
+  BlockNotFoundError,
+  TransactionReceiptNotFoundError,
   createPublicClient,
   createWalletClient,
   decodeEventLog,
@@ -88,17 +90,25 @@ export function createLiveChain(config) {
       // Recheck that the receipt belongs to the current block before recording it.
       let block;
       for (let attempt = 0; attempt < 5; attempt++) {
-        receipt = await rpc.getTransactionReceipt({ hash: pending.hash });
-        block = await rpc.getBlock({ blockNumber: receipt.blockNumber });
-        const head = await rpc.getBlockNumber({ cacheTime: 0 });
-        if (block.hash === receipt.blockHash && head >= receipt.blockNumber)
-          break;
+        try {
+          receipt = await rpc.getTransactionReceipt({ hash: pending.hash });
+          block = await rpc.getBlock({ blockNumber: receipt.blockNumber });
+          const head = await rpc.getBlockNumber({ cacheTime: 0 });
+          if (block.hash === receipt.blockHash && head >= receipt.blockNumber)
+            break;
+        } catch (error) {
+          if (
+            !(error instanceof BlockNotFoundError) &&
+            !(error instanceof TransactionReceiptNotFoundError)
+          )
+            throw error;
+        }
         block = undefined;
         await delay(1000);
       }
       if (!block)
         throw new Error(
-          "The transfer block changed. Refresh after the chain settles.",
+          "The RPC has not confirmed a stable transfer block yet. Use Refresh to retry; do not send the transfer again.",
         );
       if (receipt.status !== "success") return { reverted: true };
       const events = receipt.logs
