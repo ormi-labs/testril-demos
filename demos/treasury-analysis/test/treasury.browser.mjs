@@ -265,11 +265,12 @@ test("invalid transfer preserves histories; refresh resumes cached reads and dow
   await expect(page.locator("#balance-b")).toHaveText("0.3");
   await expect(page.locator(".transfer-edge button")).toHaveCount(1);
   await expect(page.locator("#spent")).toHaveText("0.000071");
-  const download = page.waitForEvent("download");
-  await page.getByRole("link", { name: "Download source" }).click();
-  expect((await download).suggestedFilename()).toBe(
-    "treasury-analysis-0.3.0.tar.gz",
+  const source = page.getByRole("link", { name: "Download source" });
+  await expect(source).toHaveAttribute(
+    "href",
+    "https://github.com/ormi-labs/testril-demos/tree/main/demos/treasury-analysis",
   );
+  await expect(source).toHaveAttribute("target", "_blank");
 });
 
 test("live reset starts payment history with only the new wallet reads", async ({

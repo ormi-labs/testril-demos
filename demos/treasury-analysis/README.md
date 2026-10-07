@@ -136,8 +136,8 @@ steps. Use the interface to recover an unrelated run.
 
 ## Downloads and CLI
 
-**Download source** exports this standalone project, locked tools, and a digest
-manifest, excluding local configuration and installed dependencies. The run export
+**Download source** opens [this demo’s GitHub directory](https://github.com/ormi-labs/testril-demos/tree/main/demos/treasury-analysis).
+Clone the repository to get the source and locked tools. The run export
 is available at `/api/sessions/<session-id>/export`; it contains transfers, balances,
 receipts, and fictional transfer and balance provenance.
 
@@ -147,8 +147,7 @@ node src/cli.mjs replay run.json
 ```
 
 Mock replay checks transfer arithmetic; live replay shows cached Testril wallet balances.
-Neither independently verifies chain or MCP evidence. Downloads
-are for private evaluation until a repository license is selected.
+Neither independently verifies chain or MCP evidence.
 
 ## Development
 

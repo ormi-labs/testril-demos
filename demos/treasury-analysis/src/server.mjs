@@ -11,16 +11,13 @@ import {
   provenanceFor,
   exportDemo,
 } from "./demo.mjs";
-import { exportRun, exportSource } from "./archive.mjs";
+import { exportRun } from "./archive.mjs";
 import { liveConfig } from "./live-config.mjs";
 import { createLiveChain } from "./live-chain.mjs";
 import { connectMcp } from "./mcp.mjs";
 import { createLiveDemo } from "./live-demo.mjs";
 
 const root = fileURLToPath(new URL("..", import.meta.url));
-const { version } = JSON.parse(
-  await readFile(join(root, "package.json"), "utf8"),
-);
 const types = {
   ".html": "text/html",
   ".js": "text/javascript",
@@ -131,14 +128,6 @@ export function createApp({ env = process.env, liveFactory } = {}) {
         if (sessions.size >= 64) sessions.delete(sessions.keys().next().value);
         sessions.set(demo.id, demo);
         return send(201, publicState(demo));
-      }
-      if (request.method === "GET" && url.pathname === "/api/source") {
-        const archive = await exportSource(root);
-        response.writeHead(200, {
-          "Content-Type": "application/gzip",
-          "Content-Disposition": `attachment; filename="treasury-analysis-${version}.tar.gz"`,
-        });
-        return response.end(archive);
       }
       const match = url.pathname.match(
         /^\/api\/sessions\/([a-f0-9-]+)(?:\/(transfer|reset|refresh|export|provenance|balance-provenance))?$/,

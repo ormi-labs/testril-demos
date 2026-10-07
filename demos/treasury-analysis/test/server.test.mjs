@@ -1,12 +1,11 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { once } from "node:events";
-import { mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
+import { cp, mkdtemp, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { promisify } from "node:util";
 import { execFile } from "node:child_process";
-import { createHash } from "node:crypto";
 import { createApp } from "../src/server.mjs";
 const execute = promisify(execFile);
 async function serve(t) {
@@ -79,7 +78,7 @@ test("sessions isolate state and reject stale mutations, secret inputs and forei
   assert.equal(reset.payment.remainingRaw, reset.payment.initialRaw);
   assert.deepEqual((await (await fetch(route)).json()).receipts, []);
 });
-test("downloads extract and replay without repository dependencies", async (t) => {
+test("run downloads extract and replay using the standalone demo source", async (t) => {
   const url = await serve(t);
   let state = await (await post(`${url}/api/sessions`, {})).json();
   state = await (
@@ -92,28 +91,26 @@ test("downloads extract and replay without repository dependencies", async (t) =
   ).json();
   const directory = await mkdtemp(join(tmpdir(), "wallet-download-"));
   t.after(() => rm(directory, { recursive: true, force: true }));
-  for (const [route, filename] of [
-    [`/api/sessions/${state.id}/export`, "run.tar.gz"],
-    ["/api/source", "source.tar.gz"],
-  ]) {
-    const response = await fetch(`${url}${route}`);
-    assert.equal(response.status, 200);
-    await writeFile(
-      join(directory, filename),
-      Buffer.from(await response.arrayBuffer()),
-    );
-    await execute("tar", ["-xzf", filename], { cwd: directory });
-  }
-  const source = join(directory, "treasury-analysis");
-  const manifest = JSON.parse(
-    await readFile(join(source, "SOURCE.json"), "utf8"),
+  const response = await fetch(`${url}/api/sessions/${state.id}/export`);
+  assert.equal(response.status, 200);
+  await writeFile(
+    join(directory, "run.tar.gz"),
+    Buffer.from(await response.arrayBuffer()),
   );
-  assert.equal(manifest.version, "0.3.0");
-  assert.equal(
-    manifest.files["README.md"],
-    createHash("sha256")
-      .update(await readFile(join(source, "README.md")))
-      .digest("hex"),
+  await execute("tar", ["-xzf", "run.tar.gz"], { cwd: directory });
+  const source = join(directory, "treasury-analysis");
+  await cp(new URL("../src", import.meta.url), join(source, "src"), {
+    recursive: true,
+  });
+  await cp(new URL("../public", import.meta.url), join(source, "public"), {
+    recursive: true,
+  });
+  await cp(new URL("../fixtures", import.meta.url), join(source, "fixtures"), {
+    recursive: true,
+  });
+  await cp(
+    new URL("../package.json", import.meta.url),
+    join(source, "package.json"),
   );
   const { stdout } = await execute(
     process.execPath,
@@ -130,7 +127,4 @@ test("downloads extract and replay without repository dependencies", async (t) =
     ).stdout,
     /Treasury: 0.65 USDC/,
   );
-  await assert.rejects(readFile(join(source, ".env")), /ENOENT/);
-  await assert.rejects(readFile(join(source, ".live-state.json")), /ENOENT/);
-  await assert.rejects(readFile(join(source, ".live-lock")), /ENOENT/);
 });

@@ -12,7 +12,7 @@ MCP server: `https://dev.testril.ai/mcp`
 
 The interface follows Testril’s approved derivative style guide. It runs locally with Node.js 22.13+ on macOS or Linux. Preview the landing screen on [desktop](docs/screenshots/treasury-landing-desktop.png) and [mobile](docs/screenshots/treasury-landing-mobile.png), the [transfer replay](docs/screenshots/treasury-desktop.png), and the [provenance modal](docs/screenshots/treasury-provenance-desktop.png).
 
-Mock mode simulates Arbitrum transactions, Testril reads, payment charges, and source evidence; it needs no credentials. Live mode uses Base Sepolia, local signing, real test USDC transfers, and paid MCP reads. It reserves other wallet funds, shares one persistent session across tabs, and enforces separate charge and escrow caps. See the demo README for setup. `sub-cent-reads` and `paid-reader` remain planned independent downloads.
+Mock mode simulates Arbitrum transactions, Testril reads, payment charges, and source evidence; it needs no credentials. Live mode uses Base Sepolia, local signing, real test USDC transfers, and paid MCP reads. It uses the full balances in the three demo wallets, shares one persistent session across tabs, and enforces separate charge and escrow caps. See the demo README for setup. `sub-cent-reads` and `paid-reader` remain planned independent downloads.
 
 ## Plans
 
