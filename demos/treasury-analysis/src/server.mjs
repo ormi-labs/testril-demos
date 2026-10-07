@@ -108,7 +108,11 @@ export function createApp({ env = process.env, liveFactory } = {}) {
         return send(403, { error: "Use the local 127.0.0.1 address." });
       const url = new URL(request.url, `http://${host}`);
       if (request.method === "GET" && url.pathname === "/api/config")
-        return send(200, { liveAvailable: !liveReason, liveReason });
+        return send(200, {
+          liveAvailable: !liveReason,
+          liveReason,
+          mcpUrl: config?.mcpUrl,
+        });
       if (request.method === "POST" && url.pathname === "/api/sessions") {
         const input = await body(request);
         if (

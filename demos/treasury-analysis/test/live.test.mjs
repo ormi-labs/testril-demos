@@ -51,6 +51,7 @@ test("live mode checks signer addresses and refuses caps beyond approval without
 test("HTTP MCP payments reuse escrow; the 1 USDC allowance reserves other funds and survives reset/restart", async (t) => {
   const peer = await livePeer(t);
   const demo = peer.demo;
+  assert.equal(demo.state().mcpUrl, peer.config.mcpUrl);
   assert.deepEqual(demo.state().actualBalances, {
     treasury: null,
     a: null,

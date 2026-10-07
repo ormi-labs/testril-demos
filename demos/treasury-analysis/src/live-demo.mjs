@@ -125,6 +125,7 @@ export async function createLiveDemo({ config, chain, mcp, directory }) {
       );
       return {
         mode: "live",
+        mcpUrl: config.mcpUrl,
         id: state.id,
         revision: state.revision,
         cycle: state.cycle,

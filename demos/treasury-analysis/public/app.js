@@ -110,6 +110,8 @@ function updateRecipients() {
 function renderState() {
   hideCostBreakdown();
   const live = state.mode === "live";
+  $("testril-server").textContent = live ? state.mcpUrl : "";
+  $("testril-server").hidden = !live;
   $("network-name").textContent = state.chain.name;
   $("live-note").hidden = !live;
   $("refresh-live").hidden = !live;
@@ -119,6 +121,7 @@ function renderState() {
     (sum, value) => sum + BigInt(value ?? "0"),
     0n,
   );
+  const complete = Object.values(balances).every((value) => value !== null);
   $("cost-label").textContent = live
     ? "Total Testril cost · USDC"
     : "Total read cost · USDC";
@@ -150,16 +153,32 @@ function renderState() {
       value.classList.toggle("precise-value", display.length > 6);
       const meter = element("meter");
       meter.min = 0;
-      meter.max = Number(total || 1n) / 1000000;
-      meter.value = Number(raw ?? "0") / 1000000;
-      meter.hidden = raw === null;
-      meter.setAttribute("aria-hidden", "true");
-      card.append(element("span", wallet.name, "wallet-name"), value, meter);
+      meter.max = 100;
+      const percent =
+        total > 0n && raw !== null
+          ? Number((BigInt(raw) * 10000n + total / 2n) / total) / 100
+          : 0;
+      meter.value = percent;
+      meter.setAttribute(
+        "aria-label",
+        `${wallet.name} share of displayed wallet total`,
+      );
+      const share = element("span", undefined, "wallet-share");
+      share.hidden = !complete;
+      share.title = `${percent.toFixed(2)}% of the displayed USDC across these three wallets`;
+      share.append(meter, element("small", `${percent.toFixed(2)}%`));
+      card.append(
+        element("span", wallet.name, "wallet-name"),
+        value,
+        share,
+        element("small", wallet.address, "wallet-address"),
+      );
       if (live && raw !== null)
         card.append(
           element(
             "small",
             `Testril · block ${state.balanceRead.sources[wallet.id].block}${state.refreshNeeded ? " · refresh needed" : ""}`,
+            "wallet-source",
           ),
         );
       card.addEventListener("click", () => inspect("balance", wallet));
@@ -458,6 +477,7 @@ $("provenance").addEventListener("cancel", (event) => {
 });
 
 let liveAvailable = false;
+let liveServerUrl;
 async function start(nextMode) {
   stop();
   lock(true);
@@ -465,6 +485,8 @@ async function start(nextMode) {
   for (const input of document.querySelectorAll('[name="data-mode"]'))
     input.checked = input.value === mode;
   state = undefined;
+  $("testril-server").textContent = nextMode === "live" ? liveServerUrl : "";
+  $("testril-server").hidden = nextMode !== "live" || !liveServerUrl;
   $("network-name").textContent = mode === "live" ? "Base Sepolia" : "Arbitrum";
   $("balances-heading").textContent =
     mode === "live" ? "Wallet balances" : "Balances";
@@ -545,6 +567,7 @@ for (const input of document.querySelectorAll('[name="data-mode"]'))
 try {
   const config = await api("/api/config");
   liveAvailable = config.liveAvailable;
+  liveServerUrl = config.mcpUrl;
   $("live-option").title =
     config.liveReason ?? "Live Base Sepolia with local signing";
 } catch {

@@ -34,6 +34,10 @@ body {
   font-weight: 400;
   color: var(--muted);
 }
+.identity #testril-server {
+  font-size: 10px;
+  overflow-wrap: anywhere;
+}
 .demo-toolbar {
   display: flex;
   justify-content: space-between;
@@ -350,11 +354,31 @@ button:disabled {
 .wallet-value.precise-value {
   font-size: 17px;
 }
-.wallet meter {
+.wallet-share {
   grid-column: 1 / -1;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 6px;
+}
+.wallet-share small {
+  font-size: 9px;
+  color: var(--muted);
+}
+.wallet-address,
+.wallet-source {
+  grid-column: 1 / -1;
+  font-size: 9px;
+  color: var(--muted);
+}
+.wallet-address {
+  font-family: monospace;
+  overflow-wrap: anywhere;
+  margin-top: 4px;
+}
+.wallet meter {
   width: 100%;
   height: 4px;
-  margin-top: 8px;
 }
 meter::-webkit-meter-bar {
   background: var(--visual);

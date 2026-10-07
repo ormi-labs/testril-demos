@@ -1,6 +1,7 @@
 import { test, expect } from "@playwright/test";
 import { createDemo, publicState } from "../src/demo.mjs";
 import { fileURLToPath } from "node:url";
+import { liveFixture } from "../src/live-config.mjs";
 async function send(page, from, to, amount) {
   await page
     .locator(`#from label`)
@@ -54,6 +55,13 @@ test("failed live startup clears previous mock balances and history", async ({
 test("requested layout, empty history and keyboard balance provenance", async ({
   page,
 }) => {
+  await expect(page.locator("#testril-server")).toBeHidden();
+  await expect(page.locator("#wallet-treasury .wallet-address")).toHaveText(
+    "0x1111111111111111111111111111111111111111",
+  );
+  await expect(page.locator("#wallet-treasury .wallet-share")).toHaveText(
+    "100.00%",
+  );
   await expect(
     page.getByRole("heading", { name: "Move Money", exact: true }),
   ).toBeVisible();
@@ -265,6 +273,12 @@ test("live mode shows full Testril balances separately from the allowance and pr
     ...publicState(createDemo()),
     id: "live-browser-session",
     mode: "live",
+    mcpUrl: "https://dev.testril.ai/mcp",
+    wallets: liveFixture.wallets.map(({ id, name, address }) => ({
+      id,
+      name,
+      address,
+    })),
     chain: { name: "Base Sepolia", id: 84532 },
     refreshNeeded: true,
     balanceRead: {
@@ -347,18 +361,37 @@ test("live mode shows full Testril balances separately from the allowance and pr
     page.getByRole("radio", { name: "Live", exact: true }),
   ).toBeChecked();
   await expect(page.locator("#network-name")).toHaveText("Base Sepolia");
+  await expect(page.locator("#testril-server")).toHaveText(state.mcpUrl);
+  await expect(page.locator("#testril-server")).toBeVisible();
   await expect(page.locator("#live-note")).toContainText(
     "1 USDC demo allowance",
   );
   await expect(page.locator("#balances-heading")).toHaveText("Wallet balances");
   await expect(page.locator("#balance-treasury")).toHaveText("Not yet read");
   await expect(page.locator("#wallet-treasury")).toBeDisabled();
+  await expect(page.locator("#wallet-treasury .wallet-share")).toBeHidden();
+  await expect(page.locator("#wallet-treasury .wallet-address")).toHaveText(
+    state.wallets[0].address,
+  );
   await expect(page.locator("#transfer")).toBeDisabled();
   await page.locator("#refresh-live").click();
   await expect(page.locator("#transfer")).toBeEnabled();
   await expect(page.locator("#balance-treasury")).toHaveText("20");
   await expect(page.locator("#balance-a")).toHaveText("0.5");
   await expect(page.locator("#balance-b")).toHaveText("0");
+  await expect(page.locator("#wallet-treasury .wallet-share")).toHaveText(
+    "97.56%",
+  );
+  await expect(page.locator("#wallet-a .wallet-share")).toHaveText("2.44%");
+  await expect(page.locator("#wallet-b .wallet-share")).toHaveText("0.00%");
+  await expect(page.locator("#wallet-treasury meter")).toHaveAttribute(
+    "max",
+    "100",
+  );
+  await expect(page.locator("#wallet-treasury meter")).toHaveAttribute(
+    "value",
+    "97.56",
+  );
   await expect(page.locator("#wallet-treasury")).toContainText(
     "Testril · block 123",
   );
@@ -412,4 +445,9 @@ test("live mode shows full Testril balances separately from the allowance and pr
     "block 123 · refresh needed",
   );
   await expect(page.locator("#transfer")).toBeDisabled();
+  await page
+    .locator(".mode-switch label")
+    .filter({ has: page.locator('input[value="mock"]') })
+    .click();
+  await expect(page.locator("#testril-server")).toBeHidden();
 });
