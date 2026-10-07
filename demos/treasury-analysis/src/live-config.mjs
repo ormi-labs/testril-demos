@@ -5,7 +5,6 @@ import { parseUsdc } from "../public/amounts.js";
 export const liveFixture = JSON.parse(
   await readFile(new URL("../fixtures/live.json", import.meta.url), "utf8"),
 );
-export const demoLimitRaw = "1000000";
 
 export function liveConfig(env = process.env) {
   for (const name of ["TESTRIL_CHARGE_CAP_USDC", "TESTRIL_ESCROW_CAP_USDC"])

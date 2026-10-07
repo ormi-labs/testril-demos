@@ -38,7 +38,12 @@ export async function livePeer(t, options = {}) {
   let prepares = 0;
   let uncertain = false;
   let missReceipt = false;
-  const balances = { treasury: "20000000", a: "500000", b: "0" };
+  const balances = {
+    treasury: "20000000",
+    a: "500000",
+    b: "0",
+    ...options.balances,
+  };
   const snapshots = new Map();
   const address = (id) => config.wallets.find((w) => w.id === id).address;
   const chain = {
@@ -274,6 +279,9 @@ export async function livePeer(t, options = {}) {
     },
     get prepares() {
       return prepares;
+    },
+    advanceBlock() {
+      block++;
     },
     failNextPayment() {
       uncertain = true;

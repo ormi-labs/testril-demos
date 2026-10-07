@@ -76,7 +76,8 @@ export function createLiveChain(config) {
       try {
         receipt = await rpc.waitForTransactionReceipt({
           hash: pending.hash,
-          confirmations: 2,
+          confirmations: 1,
+          pollingInterval: 200,
           timeout: 60000,
         });
       } catch {
@@ -84,17 +85,13 @@ export function createLiveChain(config) {
           "The transfer is pending. Use Refresh live reads; do not send it again.",
         );
       }
-      // The wait helper can retain a receipt fetched before confirmations. Fetch
-      // it again so an early L2 inclusion cannot become our recorded evidence.
+      // Recheck that the receipt belongs to the current block before recording it.
       let block;
       for (let attempt = 0; attempt < 5; attempt++) {
         receipt = await rpc.getTransactionReceipt({ hash: pending.hash });
         block = await rpc.getBlock({ blockNumber: receipt.blockNumber });
         const head = await rpc.getBlockNumber({ cacheTime: 0 });
-        if (
-          block.hash === receipt.blockHash &&
-          head >= receipt.blockNumber + 1n
-        )
+        if (block.hash === receipt.blockHash && head >= receipt.blockNumber)
           break;
         block = undefined;
         await delay(1000);

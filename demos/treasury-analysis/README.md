@@ -1,6 +1,6 @@
 # Move Money
 
-Move **1 USDC** between Treasury, Counterparty A, and Counterparty B. Read their
+Move USDC between Treasury, Counterparty A, and Counterparty B. Read their
 balances with Testril, replay the transfers, and select an arrow to inspect provenance.
 
 With no signing configuration, start in **Mock** mode: Arbitrum, wallets, transfers, reads, prices, and evidence
@@ -73,7 +73,8 @@ supported batch settlement terms; other networks are refused.
 With valid local keys and nonzero caps, the app opens **Live** automatically.
 Select **Refresh**, beside Reset demo, for a new snapshot. That action prepares and reads one
 block for each balance and compares the exact results with the reference RPC.
-Sending a transfer waits for its receipt, then refreshes balances and reads transfer
+Sending a transfer waits for one block confirmation (receipt polling every 200 ms),
+then refreshes balances and reads transfer
 edges at the transaction's block. Each transfer's transaction/log evidence comes
 from RPC; Testril's edge is the aggregate for a sender/recipient pair in that block.
 The provenance dialog labels these separately. No transaction-level MCP lineage
@@ -87,16 +88,16 @@ have been read. Source blocks are available in balance provenance. Until a
 successful read, a wallet shows “Not yet read.” Failed refreshes report an error
 and retain the last successful reads. Live transfer
 replay keeps those wallet balances visible; it does not calculate historical wallet
-balances. The separate **1 USDC transfer allowance** remains enforced. Other funds
-are reserved and cannot be sent by the demo. An
-external change to any wallet pauses transfers rather than changing the allowance.
-Run exports keep the allowance ledger in `balances` / `initialBalances` and the
-cached Testril results in `actualBalances` / `balanceRead`.
+balances. All USDC held by Treasury, A, and B is available to the demo. Transfers
+must fit within the sending wallet's balance. Refresh accepts deposits or withdrawals
+made outside the demo. Run exports include the latest verified balances in
+`balances`, `actualBalances`, and `balanceRead`, with the starting snapshot in
+`initialBalances`.
 
-All live browser tabs share one session. `.live-state.json` persists the allowance,
+All live browser tabs share one session. `.live-state.json` persists wallet balances,
 payment usage, cached paid results, and a pending signed transaction. It contains
 no private keys, but stays local and is excluded from downloads. **Do not delete
-it to reset a run.** Reset returns only the demo allocation to Treasury, starts new
+it to reset a run.** Reset returns all USDC from A and B to Treasury, starts new
 transfer and payment histories, and refreshes the three wallet balances. The
 displayed cost and read count cover the current run. Materialization has separate
 payment entries; cached results incur no new payment or paid-read count. Earlier
@@ -145,7 +146,8 @@ node src/cli.mjs sample run.json
 node src/cli.mjs replay run.json
 ```
 
-Replay checks allowance arithmetic; it does not independently verify chain or MCP evidence. Downloads
+Mock replay checks transfer arithmetic; live replay shows cached Testril wallet balances.
+Neither independently verifies chain or MCP evidence. Downloads
 are for private evaluation until a repository license is selected.
 
 ## Development
@@ -163,7 +165,7 @@ npm run test:browser  # desktop + mobile; local port 4175
 `fixtures/demo.json` sets wallets and rates. Amounts use integer strings and BigInt.
 `src/live-demo.mjs` connects the live chain and Testril clients; `batch-payment.mjs`
 signs deposits and vouchers. Live tests use a local HTTP MCP peer, with throwaway
-keys, to check caps, reserved funds, concurrent tabs, and recovery after restart.
+keys, to check caps, wallet balances, concurrent tabs, and recovery after restart.
 For visual review, try the sequence above on desktop and phone, including keyboard
 provenance selection. On desktop, Send and Balances share the left panel while
 histories update on the right. Narrow screens stack the panels. Asset origins are in `public/assets/README.md`.
