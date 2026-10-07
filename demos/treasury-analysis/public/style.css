@@ -356,22 +356,12 @@ button:disabled {
 }
 .wallet-share {
   grid-column: 1 / -1;
-  display: flex;
-  align-items: center;
-  gap: 8px;
   margin-top: 6px;
 }
-.wallet-share small {
-  font-size: 9px;
-  color: var(--muted);
-}
-.wallet-address,
-.wallet-source {
+.wallet-address {
   grid-column: 1 / -1;
   font-size: 9px;
   color: var(--muted);
-}
-.wallet-address {
   font-family: monospace;
   overflow-wrap: anywhere;
   margin-top: 4px;

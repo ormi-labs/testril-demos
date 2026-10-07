@@ -59,9 +59,7 @@ test("requested layout, empty history and keyboard balance provenance", async ({
   await expect(page.locator("#wallet-treasury .wallet-address")).toHaveText(
     "0x1111111111111111111111111111111111111111",
   );
-  await expect(page.locator("#wallet-treasury .wallet-share")).toHaveText(
-    "100.00%",
-  );
+  await expect(page.locator("#wallet-treasury .wallet-share")).toBeEmpty();
   await expect(
     page.getByRole("heading", { name: "Move Money", exact: true }),
   ).toBeVisible();
@@ -266,7 +264,7 @@ test("invalid transfer preserves histories; refresh resumes cached reads and dow
   );
 });
 
-test("live mode shows full Testril balances separately from the allowance and preserves costs on reset", async ({
+test("live mode shows full Testril balances and preserves costs on reset", async ({
   page,
 }, testInfo) => {
   const state = {
@@ -363,9 +361,9 @@ test("live mode shows full Testril balances separately from the allowance and pr
   await expect(page.locator("#network-name")).toHaveText("Base Sepolia");
   await expect(page.locator("#testril-server")).toHaveText(state.mcpUrl);
   await expect(page.locator("#testril-server")).toBeVisible();
-  await expect(page.locator("#live-note")).toContainText(
-    "1 USDC demo allowance",
-  );
+  await expect(
+    page.locator("#live-note, #transfer-allowance, .wallet-source"),
+  ).toHaveCount(0);
   await expect(page.locator("#balances-heading")).toHaveText("Wallet balances");
   await expect(page.locator("#balance-treasury")).toHaveText("Not yet read");
   await expect(page.locator("#wallet-treasury")).toBeDisabled();
@@ -379,11 +377,7 @@ test("live mode shows full Testril balances separately from the allowance and pr
   await expect(page.locator("#balance-treasury")).toHaveText("20");
   await expect(page.locator("#balance-a")).toHaveText("0.5");
   await expect(page.locator("#balance-b")).toHaveText("0");
-  await expect(page.locator("#wallet-treasury .wallet-share")).toHaveText(
-    "97.56%",
-  );
-  await expect(page.locator("#wallet-a .wallet-share")).toHaveText("2.44%");
-  await expect(page.locator("#wallet-b .wallet-share")).toHaveText("0.00%");
+  await expect(page.locator("#wallet-treasury .wallet-share")).toBeEmpty();
   await expect(page.locator("#wallet-treasury meter")).toHaveAttribute(
     "max",
     "100",
@@ -392,23 +386,6 @@ test("live mode shows full Testril balances separately from the allowance and pr
     "value",
     "97.56",
   );
-  await expect(page.locator("#wallet-treasury")).toContainText(
-    "Testril · block 123",
-  );
-  await expect(page.locator("#transfer-allowance")).toContainText(
-    "Treasury can send 1 USDC",
-  );
-  await page
-    .locator("#from label")
-    .filter({ has: page.locator('input[value="a"]') })
-    .click();
-  await expect(page.locator("#transfer-allowance")).toContainText(
-    "Counterparty A can send 0 USDC",
-  );
-  await page
-    .locator("#from label")
-    .filter({ has: page.locator('input[value="treasury"]') })
-    .click();
   await page.screenshot({
     path: fileURLToPath(
       new URL(
@@ -441,9 +418,6 @@ test("live mode shows full Testril balances separately from the allowance and pr
   await page.locator("#refresh-live").click();
   await expect(page.locator("#status")).toHaveText("Testril read failed.");
   await expect(page.locator("#balance-treasury")).toHaveText("20");
-  await expect(page.locator("#wallet-treasury")).toContainText(
-    "block 123 · refresh needed",
-  );
   await expect(page.locator("#transfer")).toBeDisabled();
   await page
     .locator(".mode-switch label")

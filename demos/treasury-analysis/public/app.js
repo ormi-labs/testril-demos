@@ -98,10 +98,6 @@ function lock(value) {
 const selectedWallet = (id) => $(id).querySelector("input:checked").value;
 function updateRecipients() {
   const sender = selectedWallet("from");
-  $("transfer-allowance").hidden = state.mode !== "live";
-  if (state.mode === "live")
-    $("transfer-allowance").textContent =
-      `${name(sender)} can send ${decimalAmount(state.balances[sender])} USDC of the shared 1 USDC allowance.`;
   if (sender === selectedWallet("to"))
     $("to").querySelector(`input:not([value="${sender}"])`).checked = true;
   for (const input of $("to").querySelectorAll("input"))
@@ -113,7 +109,6 @@ function renderState() {
   $("testril-server").textContent = live ? state.mcpUrl : "";
   $("testril-server").hidden = !live;
   $("network-name").textContent = state.chain.name;
-  $("live-note").hidden = !live;
   $("refresh-live").hidden = !live;
   $("balances-heading").textContent = live ? "Wallet balances" : "Balances";
   const balances = live ? state.balanceRead.balances : state.balances;
@@ -165,22 +160,13 @@ function renderState() {
       );
       const share = element("span", undefined, "wallet-share");
       share.hidden = !complete;
-      share.title = `${percent.toFixed(2)}% of the displayed USDC across these three wallets`;
-      share.append(meter, element("small", `${percent.toFixed(2)}%`));
+      share.append(meter);
       card.append(
         element("span", wallet.name, "wallet-name"),
         value,
         share,
         element("small", wallet.address, "wallet-address"),
       );
-      if (live && raw !== null)
-        card.append(
-          element(
-            "small",
-            `Testril · block ${state.balanceRead.sources[wallet.id].block}${state.refreshNeeded ? " · refresh needed" : ""}`,
-            "wallet-source",
-          ),
-        );
       card.addEventListener("click", () => inspect("balance", wallet));
       return card;
     }),
@@ -497,9 +483,7 @@ async function start(nextMode) {
       "small muted",
     ),
   );
-  $("live-note").hidden = mode !== "live";
   $("refresh-live").hidden = mode !== "live";
-  $("transfer-allowance").hidden = true;
   document.querySelector(".histories").hidden = true;
   status(mode === "live" ? "Opening the shared Base Sepolia session…" : "");
   try {
