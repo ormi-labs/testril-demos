@@ -71,7 +71,7 @@ vouchers. A deposit is not a read charge. Quotes must use Base Sepolia USDC and 
 supported batch settlement terms; other networks are refused.
 
 With valid local keys and nonzero caps, the app opens **Live** automatically.
-Select **Refresh live reads** for a new snapshot. That action prepares and reads one
+Select **Refresh**, beside Reset demo, for a new snapshot. That action prepares and reads one
 block for each balance and compares the exact results with the reference RPC.
 Sending a transfer waits for its receipt, then refreshes balances and reads transfer
 edges at the transaction's block. Each transfer's transaction/log evidence comes
@@ -105,7 +105,7 @@ payments or refill a cap. Live run exports include the current run's `receipts`
 and all saved payments in `allReceipts`, with cumulative payment totals in
 `lifetimeSpentRaw` and `lifetimeRequestCount`.
 
-If a transfer or a later read fails, use **Refresh live reads**. The recorded
+If a transfer or a later read fails, use **Refresh**. The recorded
 transaction hash is recovered without signing another transfer; paid results are
 reused. If a settlement response is lost, the charge and deposit remain reserved
 and new payments are refused until the quote is reconciled. The interface shows

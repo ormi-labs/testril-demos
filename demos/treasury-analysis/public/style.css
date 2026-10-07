@@ -40,11 +40,18 @@ body {
 }
 .demo-toolbar {
   display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
   justify-content: space-between;
   align-items: center;
   padding-top: 12px;
 }
-.demo-toolbar #reset {
+.demo-actions {
+  display: flex;
+  gap: 8px;
+  margin-left: auto;
+}
+.demo-actions button {
   font-size: 13px;
 }
 .identity {
@@ -702,7 +709,7 @@ a {
   .identity {
     font-size: 12px;
   }
-  .demo-toolbar #reset {
+  .demo-actions button {
     font-size: 11px;
     padding: 8px;
   }

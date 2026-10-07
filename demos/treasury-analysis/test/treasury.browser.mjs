@@ -406,6 +406,12 @@ test("live reset starts payment history with only the new wallet reads", async (
   await expect(page.locator("#network-name")).toHaveText("Base Sepolia");
   await expect(page.locator("#testril-server")).toHaveText(state.mcpUrl);
   await expect(page.locator("#testril-server")).toBeVisible();
+  const refresh = page.getByRole("button", { name: "Refresh", exact: true });
+  await expect(refresh).toBeInViewport();
+  const refreshBox = await refresh.boundingBox();
+  const resetBox = await page.locator("#reset").boundingBox();
+  expect(refreshBox.x + refreshBox.width).toBeLessThanOrEqual(resetBox.x);
+  expect(Math.abs(refreshBox.y - resetBox.y)).toBeLessThan(1);
   await expect(
     page.locator("#live-note, #transfer-allowance, .wallet-source"),
   ).toHaveCount(0);

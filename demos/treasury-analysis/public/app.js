@@ -532,7 +532,7 @@ async function start(nextMode) {
     lock(false);
     status(
       state.mode === "live" && state.refreshNeeded
-        ? "Select Refresh live reads to prepare and read the snapshot with Testril."
+        ? "Select Refresh to prepare and read the snapshot with Testril."
         : "",
     );
   } catch (error) {
