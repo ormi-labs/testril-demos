@@ -290,10 +290,23 @@ if (
   server.listen(port, "127.0.0.1", () =>
     console.log(`Wallet transfers: http://127.0.0.1:${port}`),
   );
+  let shuttingDown = false;
   for (const signal of ["SIGINT", "SIGTERM"])
-    process.once(signal, async () => {
+    process.on(signal, async () => {
+      if (shuttingDown) return;
+      shuttingDown = true;
+      console.log(
+        "Stopping wallet transfers; waiting for any active operation to finish…",
+      );
       server.close();
-      await server.closeLive();
-      process.exit(0);
+      try {
+        await server.closeLive();
+        process.exit(0);
+      } catch {
+        console.error(
+          "Live shutdown failed. Check the saved state before restarting.",
+        );
+        process.exit(1);
+      }
     });
 }

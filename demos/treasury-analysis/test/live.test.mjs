@@ -1,12 +1,40 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { readFile } from "node:fs/promises";
+import { access, mkdir, readFile, rm } from "node:fs/promises";
 import { join } from "node:path";
 import { livePeer, testConfig } from "./live-peer.mjs";
 import { liveConfig } from "../src/live-config.mjs";
 import { replayBalances } from "../public/replay.js";
 import { createLiveDemo } from "../src/live-demo.mjs";
 import { connectMcp } from "../src/mcp.mjs";
+
+test("MCP shutdown failure still releases the lock and preserves state", async (t) => {
+  const peer = await livePeer(t);
+  const directory = join(peer.directory, "close-failure");
+  await mkdir(directory);
+  t.after(() => rm(directory, { recursive: true, force: true }));
+  const demo = await createLiveDemo({
+    config: peer.config,
+    chain: peer.chain,
+    directory,
+    mcp: {
+      close: async () => {
+        throw new Error("MCP close failed");
+      },
+    },
+  });
+  const saved = await readFile(join(directory, ".live-state.json"), "utf8");
+  await assert.rejects(demo.close(), /MCP close failed/);
+  await assert.rejects(access(join(directory, ".live-lock")), {
+    code: "ENOENT",
+  });
+  assert.equal(
+    await readFile(join(directory, ".live-state.json"), "utf8"),
+    saved,
+  );
+  await assert.rejects(demo.close(), /MCP close failed/);
+  await assert.rejects(demo.refresh(), /shutting down/);
+});
 
 test("a second live session reports its lock owner and cannot disturb the first session", async (t) => {
   const peer = await livePeer(t);

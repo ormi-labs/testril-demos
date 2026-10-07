@@ -112,7 +112,8 @@ and new payments are refused until the quote is reconciled. The interface shows
 its quote ID and status. A stalled materialization remains attached to its job.
 
 Only one live server may use this directory. `.live-lock/pid` records its process
-ID, and clean shutdown releases the lock. Startup errors distinguish a running
+ID. Ctrl-C waits for any active operation, releases the lock, and preserves the
+saved state. Repeated shutdown signals do not interrupt that cleanup. Startup errors distinguish a running
 owner, a stopped owner, and an older lock without an owner record. After a crash,
 verify that the old server has stopped before removing only `.live-lock` and
 restarting. Keep `.live-state.json`. Failed live startup clears previous mock

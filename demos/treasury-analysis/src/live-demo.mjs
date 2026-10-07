@@ -46,6 +46,7 @@ export async function createLiveDemo({ config, chain, mcp, directory }) {
   });
   let state;
   let queue = Promise.resolve();
+  let closing;
   const save = async () => {
     await writeFile(`${path}.tmp`, `${JSON.stringify(state, null, 2)}\n`, {
       mode: 0o600,
@@ -53,6 +54,8 @@ export async function createLiveDemo({ config, chain, mcp, directory }) {
     await rename(`${path}.tmp`, path);
   };
   const serial = (operation) => {
+    if (closing)
+      return Promise.reject(new Error("The live server is shutting down."));
     const result = queue.then(operation);
     queue = result.catch(() => {});
     return result;
@@ -449,10 +452,16 @@ export async function createLiveDemo({ config, chain, mcp, directory }) {
           ),
         };
       },
-      async close() {
-        await queue;
-        await mcp.close();
-        await rm(lock, { recursive: true });
+      close() {
+        closing ??= (async () => {
+          await queue;
+          try {
+            await mcp.close();
+          } finally {
+            await rm(lock, { recursive: true });
+          }
+        })();
+        return closing;
       },
     };
   } catch (error) {
