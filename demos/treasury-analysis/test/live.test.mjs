@@ -656,3 +656,49 @@ test("an embedding payment policy rejects authorization before settlement and le
     100000n,
   );
 });
+
+test("durable journals survive a new engine and failed persistence prevents payment transmission", async (t) => {
+  const peer = await livePeer(t);
+  await peer.demo.close();
+  let saved,
+    rejectPaymentSave = false;
+  const journal = {
+    load: async () => saved,
+    async save(contents) {
+      if (
+        rejectPaymentSave &&
+        JSON.parse(contents).receipts.some((r) => r.status === "paying")
+      )
+        throw new Error("Durable storage unavailable");
+      saved = contents;
+    },
+    close: async () => {},
+  };
+  const open = async () =>
+    createLiveDemo({
+      config: peer.config,
+      chain: peer.chain,
+      mcp: await connectMcp(peer.config.mcpUrl),
+      journal,
+    });
+  const first = await open();
+  await first.refresh();
+  const original = first.state();
+  await first.close();
+  const second = await open();
+  t.after(() => second.close());
+  assert.equal(second.state().id, original.id);
+  assert.equal(
+    second.state().payment.lifetimeSpentRaw,
+    original.payment.lifetimeSpentRaw,
+  );
+  peer.advanceBlock();
+  rejectPaymentSave = true;
+  const payments = peer.calls.filter((c) => c.name === "pay_quote").length;
+  await assert.rejects(second.refresh(), /Durable storage unavailable/);
+  assert.equal(
+    peer.calls.filter((c) => c.name === "pay_quote").length,
+    payments,
+  );
+  await assert.rejects(second.refresh(), /journal could not be persisted/);
+});

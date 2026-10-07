@@ -1,10 +1,8 @@
-import { readFile } from "node:fs/promises";
+import liveFixture from "../fixtures/live.json" with { type: "json" };
 import { privateKeyToAccount } from "viem/accounts";
 import { parseUsdc } from "../public/amounts.js";
 
-export const liveFixture = JSON.parse(
-  await readFile(new URL("../fixtures/live.json", import.meta.url), "utf8"),
-);
+export { liveFixture };
 
 export function liveConfig(env = process.env) {
   for (const name of ["TESTRIL_CHARGE_CAP_USDC", "TESTRIL_ESCROW_CAP_USDC"])
