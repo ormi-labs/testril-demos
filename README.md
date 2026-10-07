@@ -26,4 +26,4 @@ Read [AGENTS.md](AGENTS.md). Keep each demo self-contained, readable, and simple
 
 ## Status
 
-This repository is private and intended to become public. No license has been selected yet. No hosted demo or public release has been published.
+This repository is public under the [MIT license](LICENSE). The demos run locally; no hosted demo or packaged release has been published.

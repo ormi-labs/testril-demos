@@ -2,6 +2,7 @@
   "name": "testril-treasury-analysis",
   "version": "0.3.0",
   "private": true,
+  "license": "MIT",
   "type": "module",
   "engines": {
     "node": ">=22.13"

@@ -176,3 +176,7 @@ per-block transfer edges; it does not implement mainnet access, supplier earning
 wallet-wide historical analysis, or independent verification of every source log.
 Testril citations identify contributing blocks and computations. The separate RPC
 comparison and receipt check are the reference checks performed by this demo.
+
+## License
+
+[MIT](LICENSE).
