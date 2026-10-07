@@ -315,7 +315,9 @@ async function inspect(kind, item) {
     const result = await api(path);
     $("source-note").textContent =
       result.mode === "live"
-        ? "Base Sepolia · RPC evidence and Testril block citation"
+        ? kind === "balance"
+          ? "Base Sepolia · Testril wallet balance and block citation"
+          : "Base Sepolia · RPC receipt and Testril block citation"
         : "Mock source evidence · not verified on Arbitrum";
     const rows =
       kind === "balance"
@@ -349,16 +351,12 @@ async function inspect(kind, item) {
         `${result.chain.name} (${result.chain.id}) / ${result.token.symbol}`,
       ],
       ["Token contract", result.token.address],
-      ["Time", result.source.timestamp],
-      ["Block hash", result.source.blockHash],
       ["Calculation", result.calculation.description],
     );
+    if (result.source.timestamp) rows.push(["Time", result.source.timestamp]);
+    if (result.source.blockHash)
+      rows.push(["Block hash", result.source.blockHash]);
     if (result.mode === "live") {
-      if (kind === "balance")
-        rows.push([
-          "Demo allowance",
-          `${decimalAmount(result.source.demoBalanceRaw)} USDC`,
-        ]);
       rows.push([
         "Testril computation",
         JSON.stringify(result.citation.computation),

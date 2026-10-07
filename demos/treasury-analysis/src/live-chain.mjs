@@ -24,31 +24,9 @@ export function createLiveChain(config) {
   );
   const address = (id) => config.wallets.find((w) => w.id === id)?.address;
   return {
-    async snapshot(blockNumber) {
-      if ((await rpc.getChainId()) !== 84532)
-        throw new Error("The RPC must serve Base Sepolia.");
-      const block = await rpc.getBlock(
-        blockNumber === undefined ? {} : { blockNumber: BigInt(blockNumber) },
-      );
-      const balances = {};
-      for (const wallet of config.wallets)
-        balances[wallet.id] = (
-          await rpc.readContract({
-            address: config.token.address,
-            abi: erc20Abi,
-            functionName: "balanceOf",
-            args: [wallet.address],
-            blockNumber: block.number,
-          })
-        ).toString();
-      return {
-        block: Number(block.number),
-        blockHash: block.hash,
-        timestamp: new Date(Number(block.timestamp) * 1000).toISOString(),
-        balances,
-      };
-    },
     async prepare(from, to, amountRaw) {
+      if ((await rpc.getChainId()) !== config.chain.id)
+        throw new Error("The signer RPC must serve Base Sepolia.");
       const data = encodeFunctionData({
         abi: erc20Abi,
         functionName: "transfer",

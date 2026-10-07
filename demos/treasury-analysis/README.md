@@ -59,7 +59,7 @@ Keep keys out of chat, browser code, and source control.
 cp .env.example .env  # only if you do not already have one
 chmod 600 .env
 # Edit .env with your local keys and explicitly approved payment limits.
-npm run live:check   # address validation and RPC balances; no transfers or payments
+npm run live:check   # address validation and Testril chain head; no transfers or payments
 npm start
 ```
 
@@ -72,7 +72,11 @@ supported batch settlement terms; other networks are refused.
 
 With valid local keys and nonzero caps, the app opens **Live** automatically.
 Select **Refresh**, beside Reset demo, for a new snapshot. That action prepares and reads one
-block for each balance and compares the exact results with the reference RPC.
+block for each balance, using Testril’s reported chain head. Balance reads and
+transfer-edge reads come exclusively from Testril. The local signer uses
+`https://sepolia.base.org` (or `BASE_SEPOLIA_RPC_URL`) to prepare, submit, and confirm
+wallet transactions.
+Send and Reset first refresh balances through Testril before choosing amounts.
 Sending a transfer waits for one block confirmation (receipt polling every 200 ms),
 then refreshes balances and reads transfer
 edges at the transaction's block. Each transfer's transaction/log evidence comes
@@ -90,7 +94,7 @@ and retain the last successful reads. Live transfer
 replay keeps those wallet balances visible; it does not calculate historical wallet
 balances. All USDC held by Treasury, A, and B is available to the demo. Transfers
 must fit within the sending wallet's balance. Refresh accepts deposits or withdrawals
-made outside the demo. Run exports include the latest verified balances in
+made outside the demo. Run exports include the latest Testril balances in
 `balances`, `actualBalances`, and `balanceRead`, with the starting snapshot in
 `initialBalances`.
 
@@ -174,8 +178,9 @@ histories update on the right. Narrow screens stack the panels. Asset origins ar
 The live adapter supports Base Sepolia only. It reads exact balance snapshots and
 per-block transfer edges; it does not implement mainnet access, supplier earnings,
 wallet-wide historical analysis, or independent verification of every source log.
-Testril citations identify contributing blocks and computations. The separate RPC
-comparison and receipt check are the reference checks performed by this demo.
+Testril supplies balances, transfer edges, chain-head metadata, and citations.
+The local signer uses RPC to prepare, broadcast, and confirm transactions; its
+receipt records the transaction hash and log index.
 
 ## License
 

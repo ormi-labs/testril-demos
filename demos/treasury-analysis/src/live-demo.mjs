@@ -71,7 +71,6 @@ export async function createLiveDemo({ config, chain, mcp, directory }) {
         "The saved live session belongs to a different wallet, token, or MCP configuration.",
       );
     if (!state) {
-      const snapshot = await chain.snapshot();
       state = {
         identity,
         id: randomUUID(),
@@ -80,9 +79,8 @@ export async function createLiveDemo({ config, chain, mcp, directory }) {
         chargeCapRaw: config.chargeCapRaw,
         depositCapRaw: config.depositCapRaw,
         depositedRaw: "0",
-        initialBalances: { ...snapshot.balances },
-        balances: { ...snapshot.balances },
-        snapshot,
+        initialBalances: null,
+        balances: Object.fromEntries(config.wallets.map((w) => [w.id, null])),
         transfers: [],
         receipts: [],
         paymentStartIndex: 0,
@@ -213,12 +211,6 @@ export async function createLiveDemo({ config, chain, mcp, directory }) {
       const transfer = await chain.confirm(state.pending);
       if (!transfer.reverted) {
         state.transfers.push(transfer);
-        state.balances[transfer.from] = (
-          BigInt(state.balances[transfer.from]) - BigInt(transfer.amountRaw)
-        ).toString();
-        state.balances[transfer.to] = (
-          BigInt(state.balances[transfer.to]) + BigInt(transfer.amountRaw)
-        ).toString();
       }
       state.pending = null;
       state.refreshNeeded = true;
@@ -245,40 +237,37 @@ export async function createLiveDemo({ config, chain, mcp, directory }) {
         await save();
       }
       // Freeze one snapshot so retries reuse paid reads instead of charging new blocks.
-      state.refreshBlock ??= (await chain.snapshot()).block;
+      state.refreshBlock ??= await testril.head(
+        state.transfers.at(-1)?.block ?? 0,
+      );
       await save();
-      const snapshot = await chain.snapshot(state.refreshBlock);
+      const block = state.refreshBlock;
       const actual = {};
       for (const w of config.wallets) {
-        const rows = await testril.read(state.functions[w.id], snapshot.block);
+        const rows = await testril.read(state.functions[w.id], block);
         if (
           !Array.isArray(rows) ||
           rows.length > 1 ||
           rows.some(
             (r) =>
-              r.block !== snapshot.block ||
-              !sameAddress(r.token, config.token.address),
+              r.block !== block || !sameAddress(r.token, config.token.address),
           )
         )
           throw new Error("Testril returned an unexpected balance snapshot.");
         actual[w.id] = rows[0]?.balance ?? "0";
-        if (actual[w.id] !== snapshot.balances[w.id])
-          throw new Error(
-            "Testril and the reference RPC disagree on a balance.",
-          );
+        if (
+          typeof actual[w.id] !== "string" ||
+          !/^(0|[1-9][0-9]*)$/.test(actual[w.id])
+        )
+          throw new Error("Testril returned an invalid raw USDC balance.");
         state.balanceEvidence[w.id] = {
           source: {
             wallet: w.name,
             address: w.address,
             balanceRaw: actual[w.id],
-            block: snapshot.block,
-            blockHash: snapshot.blockHash,
-            timestamp: snapshot.timestamp,
+            block,
           },
-          citation: await testril.provenance(
-            state.functions[w.id],
-            snapshot.block,
-          ),
+          citation: await testril.provenance(state.functions[w.id], block),
         };
         await save();
       }
@@ -308,14 +297,14 @@ export async function createLiveDemo({ config, chain, mcp, directory }) {
         };
       }
       state.balances = { ...actual };
-      state.snapshot = snapshot;
+      state.initialBalances ??= { ...actual };
       state.refreshNeeded = false;
       delete state.refreshBlock;
       state.revision += 1;
       await save();
       return publicState();
     }
-    async function send(from, to, amountRaw, kind = "transfer") {
+    function validateTransfer(from, to, amountRaw) {
       if (!wallet(from) || !wallet(to) || from === to)
         throw new Error("Choose two different demo wallets.");
       const amount = BigInt(amountRaw);
@@ -323,18 +312,11 @@ export async function createLiveDemo({ config, chain, mcp, directory }) {
         throw new Error(
           "Enter a positive amount within the sending wallet's available USDC balance.",
         );
+    }
+    async function send(from, to, amountRaw, kind = "transfer") {
+      validateTransfer(from, to, amountRaw);
       if (state.pending)
         throw new Error("A transfer is pending. Refresh before sending again.");
-      const latest = await chain.snapshot();
-      if (
-        config.wallets.some(
-          (w) => latest.balances[w.id] !== state.balances[w.id],
-        )
-      ) {
-        state.refreshNeeded = true;
-        await save();
-        throw new Error("Wallet balances changed. Refresh before sending.");
-      }
       const prepared = await chain.prepare(from, to, amountRaw);
       state.pending = { ...prepared, from, to, amountRaw, kind };
       state.refreshNeeded = true;
@@ -353,7 +335,10 @@ export async function createLiveDemo({ config, chain, mcp, directory }) {
             throw new Error(
               "Refresh live reads before sending another transfer.",
             );
-          await send(input.from, input.to, parseUsdc(input.amount));
+          const amount = parseUsdc(input.amount);
+          validateTransfer(input.from, input.to, amount);
+          await refresh();
+          await send(input.from, input.to, amount);
           return refresh();
         }),
       reset: (input) =>
@@ -363,16 +348,14 @@ export async function createLiveDemo({ config, chain, mcp, directory }) {
             throw new Error(
               "A payment has an uncertain result. Reconcile its quote before resetting.",
             );
-          await recoverTransfer();
-          state.balances = { ...(await chain.snapshot()).balances };
-          const sweeps = [];
+          await refresh();
+          const sweeps = current().filter((t) => t.kind === "reset");
           for (const w of config.wallets.filter((w) => w.id !== "treasury")) {
             const amount = state.balances[w.id];
             if (amount === "0") continue;
             await send(w.id, "treasury", amount, "reset");
             sweeps.push(state.transfers.at(-1));
           }
-          state.initialBalances = { ...state.balances };
           state.startIndex = state.transfers.length;
           state.paymentStartIndex = state.receipts.length;
           state.cycle += 1;
@@ -386,7 +369,10 @@ export async function createLiveDemo({ config, chain, mcp, directory }) {
           state.refreshNeeded = true;
           delete state.refreshBlock;
           await save();
-          return refresh();
+          await refresh();
+          state.initialBalances = { ...state.balances };
+          await save();
+          return publicState();
         }),
       provenance(id) {
         const transfer = current().find((t) => t.id === id);
@@ -434,7 +420,7 @@ export async function createLiveDemo({ config, chain, mcp, directory }) {
           ...evidence,
           calculation: {
             description:
-              "The full wallet balance is returned by Testril at this block and checked against the reference RPC.",
+              "The full wallet balance comes from Testril at the cited block.",
           },
           note: "The interface shows the full Testril balance at the cited block. All USDC in Treasury, A, and B is available to the demo.",
         };
@@ -445,7 +431,7 @@ export async function createLiveDemo({ config, chain, mcp, directory }) {
           ...publicState(),
           transfers: current(),
           allReceipts: paymentHistory(),
-          note: "Live Base Sepolia run. receipts and payment.spentRaw cover this run; allReceipts and lifetime payment totals cover the saved session. balances and actualBalances contain the latest verified Testril wallet reads. initialBalances records the starting snapshot; outside wallet changes can alter the total funds. RPC receipts and Testril block citations are separate evidence sources.",
+          note: "Live Base Sepolia run. receipts and payment.spentRaw cover this run; allReceipts and lifetime payment totals cover the saved session. balances and actualBalances contain the latest Testril wallet reads. initialBalances records the starting snapshot; outside wallet changes can alter the total funds. RPC receipts and Testril block citations are separate evidence sources.",
           balanceProvenance: config.wallets.map(
             (w) => state.balanceEvidence[w.id] ?? null,
           ),

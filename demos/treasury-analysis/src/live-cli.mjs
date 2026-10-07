@@ -3,9 +3,11 @@ import { liveConfig } from "./live-config.mjs";
 import { createLiveChain } from "./live-chain.mjs";
 import { connectMcp } from "./mcp.mjs";
 import { createLiveDemo } from "./live-demo.mjs";
+import { succeeded } from "./mcp.mjs";
 import { decimalAmount } from "../public/amounts.js";
 
 let demo;
+let mcp;
 try {
   const command = process.argv[2];
   if (!["check", "smoke", "resume-smoke"].includes(command))
@@ -14,23 +16,26 @@ try {
     );
   const config = liveConfig();
   const chain = createLiveChain(config);
-  const snapshot = await chain.snapshot();
-  console.log(
-    `Base Sepolia block ${snapshot.block}; all four signer addresses match.`,
+  mcp = await connectMcp(config.mcpUrl);
+  const { head } = succeeded(
+    await mcp.call("inspect", { subject: "chain", chain_id: config.chain.id }),
+    "inspect",
   );
-  for (const wallet of config.wallets)
-    console.log(
-      `${wallet.name}: ${decimalAmount(snapshot.balances[wallet.id])} test USDC`,
-    );
+  if (!Number.isSafeInteger(head))
+    throw new Error("Testril cannot report the Base Sepolia chain head.");
+  console.log(
+    `Testril reports Base Sepolia block ${head}; all four signer addresses match.`,
+  );
   if (command !== "check") {
     if (config.chargeCapRaw === "0" || config.depositCapRaw === "0")
       throw new Error("Configure the approved Testril caps first.");
     demo = await createLiveDemo({
       config,
       chain,
-      mcp: await connectMcp(config.mcpUrl),
+      mcp,
       directory: fileURLToPath(new URL("..", import.meta.url)),
     });
+    await demo.refresh();
     if (
       command === "smoke" &&
       (demo.state().transferCount ||
@@ -41,7 +46,10 @@ try {
       throw new Error(
         "Finish or reset the existing run before starting a smoke sequence.",
       );
-    await demo.refresh();
+    for (const wallet of config.wallets)
+      console.log(
+        `${wallet.name}: ${decimalAmount(demo.state().actualBalances[wallet.id])} test USDC`,
+      );
     const sequence = [
       ["treasury", "a", "0.25"],
       ["a", "b", "0.10"],
@@ -86,5 +94,6 @@ try {
   );
   process.exitCode = 1;
 } finally {
-  await demo?.close();
+  if (demo) await demo.close();
+  else await mcp?.close();
 }

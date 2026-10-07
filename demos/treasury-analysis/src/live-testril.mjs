@@ -94,6 +94,29 @@ export function createLiveTestril(config, mcp, state, save) {
     return execute(entry);
   }
   return {
+    async head(minimumBlock = 0) {
+      const until = Date.now() + 60000;
+      do {
+        const result = succeeded(
+          await mcp.call("inspect", {
+            subject: "chain",
+            chain_id: config.chain.id,
+          }),
+          "inspect",
+        );
+        if (
+          result.chain_id !== config.chain.id ||
+          !Number.isSafeInteger(result.head) ||
+          result.head < 0
+        )
+          throw new Error("Testril cannot report the Base Sepolia chain head.");
+        if (result.head >= minimumBlock) return result.head;
+        await delay(200);
+      } while (Date.now() < until);
+      throw new Error(
+        "Testril is still catching up with the transfer. Use Refresh to retry.",
+      );
+    },
     async bind(slug, params) {
       return succeeded(
         await mcp.call("bind", {

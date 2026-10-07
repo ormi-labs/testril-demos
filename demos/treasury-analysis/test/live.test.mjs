@@ -7,6 +7,7 @@ import { join } from "node:path";
 import { livePeer, testConfig } from "./live-peer.mjs";
 import { liveConfig } from "../src/live-config.mjs";
 import { replayBalances } from "../public/replay.js";
+import { createLiveChain } from "../src/live-chain.mjs";
 import { createLiveDemo } from "../src/live-demo.mjs";
 import { connectMcp } from "../src/mcp.mjs";
 
@@ -381,7 +382,7 @@ test("small starting balances and outside withdrawals use the actual sending bal
       to: "a",
       amount: ".2",
     }),
-    /balances changed/,
+    /available USDC balance/,
   );
   assert.equal(peer.prepares, 0);
   await peer.demo.refresh();
@@ -405,4 +406,60 @@ test("small starting balances and outside withdrawals use the actual sending bal
     a: "100000",
     b: "0",
   });
+});
+
+test("Testril refresh works while the signer's RPC is unreachable", async (t) => {
+  const peer = await livePeer(t);
+  const directory = join(peer.directory, "testril-only-reads");
+  await mkdir(directory);
+  const config = { ...peer.config, rpcUrl: "http://127.0.0.1:1" };
+  const demo = await createLiveDemo({
+    config,
+    chain: createLiveChain(config),
+    mcp: await connectMcp(config.mcpUrl),
+    directory,
+  });
+  t.after(() => demo.close());
+  assert.deepEqual(demo.state().balances, { treasury: null, a: null, b: null });
+  await demo.refresh();
+  assert.deepEqual(demo.state().actualBalances, peer.balances);
+  assert.deepEqual(demo.state().balances, peer.balances);
+  assert.equal(demo.balanceProvenance("a").source.blockHash, undefined);
+  assert.ok(
+    peer.calls.some((c) => c.name === "inspect" && c.args.subject === "chain"),
+  );
+});
+
+test("an unavailable Testril chain head refuses reads without an RPC fallback", async (t) => {
+  const peer = await livePeer(t, { unavailableHead: true });
+  await assert.rejects(peer.demo.refresh(), /Testril cannot report/);
+  assert.equal(peer.calls.filter((c) => c.name === "pay_quote").length, 0);
+  assert.deepEqual(peer.demo.state().actualBalances, {
+    treasury: null,
+    a: null,
+    b: null,
+  });
+  assert.equal(peer.prepares, 0);
+});
+
+test("a confirmed transfer waits for Testril's head before selecting balance blocks", async (t) => {
+  const peer = await livePeer(t, { headLagAfterTransfer: 1 });
+  await peer.demo.refresh();
+  await peer.demo.transfer({
+    revision: peer.demo.state().revision,
+    from: "treasury",
+    to: "a",
+    amount: ".25",
+  });
+  const transfer = peer.demo.export().transfers.at(-1);
+  assert.equal(
+    peer.demo.state().balanceRead.sources.treasury.block,
+    transfer.block,
+  );
+  assert.equal(peer.demo.state().actualBalances.treasury, "19750000");
+  assert.equal(
+    peer.calls.filter((c) => c.name === "inspect" && c.args.subject === "chain")
+      .length,
+    4,
+  );
 });

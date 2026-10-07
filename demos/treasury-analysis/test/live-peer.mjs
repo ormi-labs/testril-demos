@@ -38,6 +38,7 @@ export async function livePeer(t, options = {}) {
   let prepares = 0;
   let uncertain = false;
   let missReceipt = false;
+  let headLag = options.headLagAfterTransfer ?? 0;
   const balances = {
     treasury: "20000000",
     a: "500000",
@@ -46,16 +47,16 @@ export async function livePeer(t, options = {}) {
   };
   const snapshots = new Map();
   const address = (id) => config.wallets.find((w) => w.id === id).address;
+  async function captureSnapshot(at = block) {
+    if (!snapshots.has(at)) snapshots.set(at, { ...balances });
+    return {
+      block: at,
+      blockHash: `0x${String(at).padStart(64, "0")}`,
+      timestamp: new Date(at * 1000).toISOString(),
+      balances: { ...snapshots.get(at) },
+    };
+  }
   const chain = {
-    async snapshot(at = block) {
-      if (!snapshots.has(at)) snapshots.set(at, { ...balances });
-      return {
-        block: at,
-        blockHash: `0x${String(at).padStart(64, "0")}`,
-        timestamp: new Date(at * 1000).toISOString(),
-        balances: { ...snapshots.get(at) },
-      };
-    },
     async prepare(from, to, amountRaw) {
       prepares++;
       return {
@@ -75,7 +76,7 @@ export async function livePeer(t, options = {}) {
         BigInt(balances[pending.to]) + BigInt(pending.amountRaw)
       ).toString();
       block++;
-      const snapshot = await chain.snapshot();
+      const snapshot = await captureSnapshot();
       records.set(pending.hash, {
         ...pending,
         ...snapshot,
@@ -105,6 +106,20 @@ export async function livePeer(t, options = {}) {
       return { outcome: "success", bound_function_id: id };
     }
     if (name === "inspect") {
+      if (args.subject === "chain") {
+        await captureSnapshot();
+        return {
+          outcome: "success",
+          subject: "chain",
+          chain_id: 84532,
+          head: options.unavailableHead
+            ? null
+            : block > 100 && headLag-- > 0
+              ? block - 1
+              : block,
+        };
+      }
+
       if (args.subject === "channels") return { outcome: "success", channels };
       if (args.subject === "job") return { outcome: "success", state: "done" };
     }

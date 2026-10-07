@@ -310,6 +310,36 @@ test("live reset starts payment history with only the new wallet reads", async (
     return route.continue();
   });
   await page.route("**/api/sessions/live-browser-session/**", async (route) => {
+    if (route.request().url().includes("/balance-provenance")) {
+      const id = new URL(route.request().url()).searchParams.get("wallet");
+      const wallet = state.wallets.find((w) => w.id === id);
+      return route.fulfill({
+        json: {
+          mode: "live",
+          chain: state.chain,
+          token: liveFixture.token,
+          function: { name: "erc20.token_balance", version: 1 },
+          source: {
+            wallet: wallet.name,
+            address: wallet.address,
+            balanceRaw: state.balanceRead.balances[id],
+            block: 123,
+          },
+          citation: {
+            computation: {
+              kind: "function",
+              id: "erc20.token_balance",
+              version: 1,
+            },
+          },
+          calculation: {
+            description:
+              "The full wallet balance comes from Testril at the cited block.",
+          },
+          note: "All USDC in Treasury, A, and B is available to the demo.",
+        },
+      });
+    }
     if (route.request().url().endsWith("/reset")) {
       state.payment = {
         spentRaw: "423",
@@ -447,6 +477,28 @@ test("live reset starts payment history with only the new wallet reads", async (
     ),
     fullPage: true,
   });
+  await page.locator("#wallet-treasury").click();
+  await expect(page.locator("#provenance")).toBeVisible();
+  await expect(page.locator("#source-note")).toHaveText(
+    "Base Sepolia · Testril wallet balance and block citation",
+  );
+  await expect(page.locator("#provenance-content")).toContainText(
+    "20000000 raw units",
+  );
+  await expect(page.locator("#provenance-content")).not.toContainText(
+    "Demo allowance",
+  );
+  await expect(page.locator("#provenance-content")).not.toContainText(
+    "undefined",
+  );
+  await page.screenshot({
+    path: new URL(
+      `../../../docs/screenshots/treasury-live-balance-provenance-${testInfo.project.name}.png`,
+      import.meta.url,
+    ).pathname,
+    fullPage: true,
+  });
+  await page.locator("#close-provenance").click();
   await page.locator("#payment-tab").click();
   await expect(page.locator("#spent")).toHaveText("0.000141");
   await expect(page.locator("#receipt-rows tr").first()).toContainText("Read");
