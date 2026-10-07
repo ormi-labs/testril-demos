@@ -52,17 +52,22 @@ export async function createLiveDemo({ config, chain, mcp, directory }) {
     timing ? timing.measure(name, operation) : operation();
   const stage = (name, operation) =>
     timing ? timing.stage(name, operation) : operation();
-  const save = () =>
-    measure("Save session", async () => {
-      await writeFile(`${path}.tmp`, `${JSON.stringify(state, null, 2)}\n`, {
-        mode: 0o600,
-      });
-      await rename(`${path}.tmp`, path);
-    });
+  let saves = Promise.resolve();
+  const save = () => {
+    const contents = `${JSON.stringify(state, null, 2)}\n`;
+    const result = measure("Save session", () =>
+      saves.then(async () => {
+        await writeFile(`${path}.tmp`, contents, { mode: 0o600 });
+        await rename(`${path}.tmp`, path);
+      }),
+    );
+    saves = result.catch(() => {});
+    return result;
+  };
   const serial = (operation) => {
     if (closing)
       return Promise.reject(new Error("The live server is shutting down."));
-    const result = queue.then(operation);
+    const result = queue.then(() => operation());
     queue = result.catch(() => {});
     return result;
   };
@@ -250,11 +255,13 @@ export async function createLiveDemo({ config, chain, mcp, directory }) {
         throw new Error(
           "The transfer reverted. No USDC moved; gas may have been spent.",
         );
+      return transfer;
     }
-    async function refresh() {
+    async function refresh(confirmedBlock, involved) {
       state.refreshNeeded = true;
       await save();
-      await recoverTransfer();
+      const recovered = await recoverTransfer();
+      testril.beginReadBatch();
       if (!state.functions.edges) {
         state.functions.edges = await testril.bind("erc20.transfer_edges", {
           token_address: config.token.address,
@@ -267,13 +274,17 @@ export async function createLiveDemo({ config, chain, mcp, directory }) {
         await save();
       }
       // Freeze one snapshot so retries reuse paid reads instead of charging new blocks.
-      state.refreshBlock ??= await testril.head(
-        state.transfers.at(-1)?.block ?? 0,
-      );
+      state.refreshBlock ??=
+        confirmedBlock ??
+        recovered?.block ??
+        (await testril.head(state.transfers.at(-1)?.block ?? 0));
       await save();
       const block = state.refreshBlock;
-      const actual = {};
-      for (const w of config.wallets) {
+      const actual = { ...state.balances };
+      const selected = involved
+        ? config.wallets.filter((w) => involved.includes(w.id))
+        : config.wallets;
+      const work = selected.map(async (w) => {
         const rows = await testril.read(state.functions[w.id], block);
         if (
           !Array.isArray(rows) ||
@@ -297,35 +308,44 @@ export async function createLiveDemo({ config, chain, mcp, directory }) {
             balanceRaw: actual[w.id],
             block,
           },
-          citation: await testril.provenance(state.functions[w.id], block),
+          ...(state.balanceEvidence[w.id]?.source.block === block
+            ? { citation: state.balanceEvidence[w.id].citation }
+            : {}),
         };
         await save();
-      }
-      for (const transfer of current()) {
-        if (state.transferEvidence[transfer.id]) continue;
-        const rows = await testril.read(state.functions.edges, transfer.block);
-        const edge = rows.find(
-          (r) =>
-            r.block === transfer.block &&
-            sameAddress(r.from, wallet(transfer.from).address) &&
-            sameAddress(r.to, wallet(transfer.to).address),
-        );
-        if (
-          !edge ||
-          BigInt(edge.amount) < BigInt(transfer.amountRaw) ||
-          BigInt(edge.count) < 1n
-        )
-          throw new Error(
-            "Testril does not include the confirmed transfer in its block's edge result.",
-          );
-        state.transferEvidence[transfer.id] = {
-          edge,
-          citation: await testril.provenance(
-            state.functions.edges,
-            transfer.block,
-          ),
-        };
-      }
+      });
+      work.push(
+        ...current()
+          .filter((transfer) => !state.transferEvidence[transfer.id])
+          .map(async (transfer) => {
+            const rows = await testril.read(
+              state.functions.edges,
+              transfer.block,
+            );
+            const edge = rows.find(
+              (r) =>
+                r.block === transfer.block &&
+                sameAddress(r.from, wallet(transfer.from).address) &&
+                sameAddress(r.to, wallet(transfer.to).address),
+            );
+            if (
+              !edge ||
+              BigInt(edge.amount) < BigInt(transfer.amountRaw) ||
+              BigInt(edge.count) < 1n
+            )
+              throw new Error(
+                "Testril does not include the confirmed transfer in its block's edge result.",
+              );
+            state.transferEvidence[transfer.id] = {
+              edge,
+            };
+            await save();
+          }),
+      );
+      // Drain every paid pipeline before reporting a failure or allowing another action.
+      const results = await Promise.allSettled(work);
+      const failed = results.find((result) => result.status === "rejected");
+      if (failed) throw failed.reason;
       state.balances = { ...actual };
       state.initialBalances ??= { ...actual };
       state.refreshNeeded = false;
@@ -355,7 +375,7 @@ export async function createLiveDemo({ config, chain, mcp, directory }) {
       state.refreshNeeded = true;
       state.revision += 1;
       await save();
-      await recoverTransfer();
+      return recoverTransfer();
     }
     return {
       id: state.id,
@@ -374,11 +394,9 @@ export async function createLiveDemo({ config, chain, mcp, directory }) {
               );
             const amount = parseUsdc(input.amount);
             validateTransfer(input.from, input.to, amount);
-            await stage("Testril balance check before transfer", refresh);
-            await send(input.from, input.to, amount);
-            const result = await stage(
-              "Testril refresh after transfer",
-              refresh,
+            const transfer = await send(input.from, input.to, amount);
+            const result = await stage("Testril refresh after transfer", () =>
+              refresh(transfer.block, [input.from, input.to]),
             );
             return { ...result, timing: report.finish("success") };
           } catch (error) {
@@ -422,57 +440,73 @@ export async function createLiveDemo({ config, chain, mcp, directory }) {
           await save();
           return publicState();
         }),
-      provenance(id) {
-        const transfer = current().find((t) => t.id === id);
-        const evidence = state.transferEvidence[id];
-        if (!transfer || !evidence)
-          throw new Error(
-            "Refresh live reads to obtain this transfer's evidence.",
-          );
-        return {
-          mode: "live",
-          chain: config.chain,
-          token: config.token,
-          function: {
-            name: "erc20.transfer_edges",
-            version: evidence.citation.computation.version,
-          },
-          range: { fromBlock: transfer.block, toBlock: transfer.block + 1 },
-          source: {
-            ...transfer,
-            from: wallet(transfer.from).address,
-            to: wallet(transfer.to).address,
-          },
-          calculation: {
-            description:
-              "Transaction evidence comes from the RPC receipt. Testril returns the block's aggregate for this sender/recipient pair.",
-          },
-          ...evidence,
-          note: "The RPC receipt identifies this transaction. The MCP citation identifies the computation and contributing blocks; it is not transaction-level lineage.",
-        };
-      },
-      balanceProvenance(id) {
-        const evidence = state.balanceEvidence[id];
-        if (!evidence)
-          throw new Error(
-            "Refresh live reads to obtain this balance's evidence.",
-          );
-        return {
-          mode: "live",
-          chain: config.chain,
-          token: config.token,
-          function: {
-            name: "erc20.token_balance",
-            version: evidence.citation.computation.version,
-          },
-          ...evidence,
-          calculation: {
-            description:
-              "The full wallet balance comes from Testril at the cited block.",
-          },
-          note: "The interface shows the full Testril balance at the cited block. All USDC in Treasury, A, and B is available to the demo.",
-        };
-      },
+      provenance: (id) =>
+        serial(async () => {
+          const transfer = current().find((t) => t.id === id);
+          const evidence = state.transferEvidence[id];
+          if (!transfer || !evidence)
+            throw new Error(
+              "Refresh live reads to obtain this transfer's evidence.",
+            );
+          if (!evidence.citation) {
+            evidence.citation = await testril.provenance(
+              state.functions.edges,
+              transfer.block,
+            );
+            await save();
+          }
+          return {
+            mode: "live",
+            chain: config.chain,
+            token: config.token,
+            function: {
+              name: "erc20.transfer_edges",
+              version: evidence.citation.computation.version,
+            },
+            range: { fromBlock: transfer.block, toBlock: transfer.block + 1 },
+            source: {
+              ...transfer,
+              from: wallet(transfer.from).address,
+              to: wallet(transfer.to).address,
+            },
+            calculation: {
+              description:
+                "Transaction evidence comes from the RPC receipt. Testril returns the block's aggregate for this sender/recipient pair.",
+            },
+            ...evidence,
+            note: "The RPC receipt identifies this transaction. The MCP citation identifies the computation and contributing blocks; it is not transaction-level lineage.",
+          };
+        }),
+      balanceProvenance: (id) =>
+        serial(async () => {
+          const evidence = state.balanceEvidence[id];
+          if (!evidence)
+            throw new Error(
+              "Refresh live reads to obtain this balance's evidence.",
+            );
+          if (!evidence.citation) {
+            evidence.citation = await testril.provenance(
+              state.functions[id],
+              evidence.source.block,
+            );
+            await save();
+          }
+          return {
+            mode: "live",
+            chain: config.chain,
+            token: config.token,
+            function: {
+              name: "erc20.token_balance",
+              version: evidence.citation.computation.version,
+            },
+            ...evidence,
+            calculation: {
+              description:
+                "The full wallet balance comes from Testril at the cited block.",
+            },
+            note: "The interface shows the full Testril balance at the cited block. All USDC in Treasury, A, and B is available to the demo.",
+          };
+        }),
       export() {
         return {
           formatVersion: 3,

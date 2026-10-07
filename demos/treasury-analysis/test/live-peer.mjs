@@ -58,6 +58,8 @@ export async function livePeer(t, options = {}) {
   }
   const chain = {
     async prepare(from, to, amountRaw) {
+      if (BigInt(amountRaw) > BigInt(balances[from]))
+        throw new Error("RPC gas estimation: insufficient USDC balance.");
       prepares++;
       return {
         hash: `0x${String(prepares + 1000).padStart(64, "0")}`,
@@ -100,6 +102,7 @@ export async function livePeer(t, options = {}) {
   };
   async function tool(name, args) {
     calls.push({ name, args });
+    await options.beforeTool?.(name, args);
     if (name === "bind") {
       const id = JSON.stringify([args.function_slug, args.params]);
       functions.set(id, args);
@@ -145,7 +148,15 @@ export async function livePeer(t, options = {}) {
           chargedCumulativeAmount: "0",
           closed: false,
         });
-      channels[0].chargedCumulativeAmount = payload.voucher.maxClaimableAmount;
+      const channel = channels.find(
+        (c) => c.channelId === payload.voucher.channelId,
+      );
+      if (
+        BigInt(payload.voucher.maxClaimableAmount) !==
+        BigInt(channel.chargedCumulativeAmount) + BigInt(quote.amount)
+      )
+        throw new Error("Incorrect cumulative voucher.");
+      channel.chargedCumulativeAmount = payload.voucher.maxClaimableAmount;
       quote.paymentId = `paid:${args.quote_id}`;
       return { outcome: "success", payment_id: quote.paymentId };
     }
@@ -197,7 +208,7 @@ export async function livePeer(t, options = {}) {
         return { outcome: "error", kind: "range_unavailable" };
       const id = `quote:${quotes.size + 1}`;
       const amount = String(name === "materialize" ? 120 : 21);
-      quotes.set(id, { args });
+      quotes.set(id, { args, amount });
       return {
         outcome: "payment_required",
         quote_id: id,

@@ -173,5 +173,13 @@ export async function signBatchPayment(accepted, channels, config, depositRaw) {
       payload,
     }),
     depositRaw: deposit.toString(),
+    channel: {
+      channelId,
+      network: accepted.network,
+      channelConfig,
+      balance: ((row ? rawAmount(row.balance) : 0n) + deposit).toString(),
+      chargedCumulativeAmount: maximum.toString(),
+      closed: false,
+    },
   };
 }

@@ -156,6 +156,7 @@ test("INFO logs include the measured transfer stages and browser click-to-refres
   assert.match(messages[0], /RPC receipt wait and block verification/);
   assert.match(messages[0], /Testril materialize Treasury execute/);
   assert.match(messages[0], /Testril read transfer edges execute/);
+  assert.match(messages[0], /detail times overlap; not additive/);
   const report = { id: timing.id, elapsedMs: timing.elapsedMs + 50 };
   assert.equal(
     (await post(`${url}/api/timings`, { ...report, payload: "never log this" }))
@@ -176,4 +177,45 @@ test("INFO logs include the measured transfer stages and browser click-to-refres
     /^0x[0-9a-f]{64}$/.test(v),
   ))
     assert.ok(!messages.join("\n").includes(key));
+});
+
+test("live source dialogs fetch provenance on demand without charging for metadata", async (t) => {
+  const peer = await livePeer(t);
+  const url = await serve(t, {
+    env: peer.env,
+    liveFactory: async () => peer.demo,
+    info: () => {},
+  });
+  const state = await (
+    await post(`${url}/api/sessions`, { mode: "live" })
+  ).json();
+  const route = `${url}/api/sessions/${state.id}`;
+  const ready = await (await post(`${route}/refresh`, {})).json();
+  assert.equal(peer.calls.filter((c) => c.name === "provenance").length, 0);
+  const proof = await (
+    await fetch(`${route}/balance-provenance?wallet=a`)
+  ).json();
+  assert.equal(proof.source.balanceRaw, "500000");
+  assert.equal(proof.function.version, 1);
+  const result = await (
+    await post(`${route}/transfer`, {
+      revision: ready.revision,
+      from: "treasury",
+      to: "a",
+      amount: ".25",
+    })
+  ).json();
+  assert.equal(peer.calls.filter((c) => c.name === "provenance").length, 1);
+  const transfer = result.historyRead.transfers[0];
+  const edge = await (
+    await fetch(`${route}/provenance?transfer=${transfer.id}`)
+  ).json();
+  assert.equal(edge.source.transactionHash, transfer.transactionHash);
+  assert.equal(edge.citation.computation.version, 1);
+  assert.equal(peer.calls.filter((c) => c.name === "provenance").length, 2);
+  assert.equal(peer.demo.state().payment.spentRaw, result.payment.spentRaw);
+  assert.equal(
+    (await fetch(`${route}/balance-provenance?wallet=unknown`)).status,
+    400,
+  );
 });

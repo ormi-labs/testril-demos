@@ -30,9 +30,12 @@ export function createTransferTiming() {
     async measure(name, operation) {
       const stage = current;
       const start = performance.now();
+      stage.activeCalls = (stage.activeCalls ?? 0) + 1;
+      stage.overlapping = stage.overlapping || stage.activeCalls > 1;
       try {
         return await operation();
       } finally {
+        stage.activeCalls--;
         let detail = stage.details.find((d) => d.name === name);
         if (!detail) {
           detail = { name, calls: 0, elapsedMs: 0 };

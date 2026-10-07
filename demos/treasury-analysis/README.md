@@ -76,13 +76,17 @@ block for each balance, using Testril’s reported chain head. Balance reads and
 transfer-edge reads come exclusively from Testril. The local signer uses
 `https://sepolia.base.org` (or `BASE_SEPOLIA_RPC_URL`) to prepare, submit, and confirm
 wallet transactions.
-Send and Reset first refresh balances through Testril before choosing amounts.
-Sending a transfer waits for one block confirmation (receipt polling every 200 ms),
-then refreshes balances and reads transfer
-edges at the transaction's block. Each transfer's transaction/log evidence comes
-from RPC; Testril's edge is the aggregate for a sender/recipient pair in that block.
+Send checks the last successful Testril balance, then waits for one block
+confirmation (receipt polling every 200 ms). It refreshes only the sender and
+recipient, together with transfer edges, at the confirmed transaction's block.
+These materialization and read pipelines run in parallel; the uninvolved wallet
+keeps its last Testril balance. Startup, Refresh, and Reset read all three wallets.
+Reset refreshes balances before choosing sweep amounts. Each transfer's
+transaction/log evidence comes from RPC; Testril's edge is the aggregate for a sender/recipient pair in that block.
 The provenance dialog labels these separately. No transaction-level MCP lineage
-is implied. Replay and provenance inspection use cached results and add no charge.
+is implied. Provenance is fetched only when you open a source dialog, then cached
+for that snapshot; this metadata adds no charge. Run exports contain read evidence
+and any citations already requested. Replay uses cached results.
 
 **Wallet balances show the full amounts returned by Testril**. The header shows
 the configured MCP server URL in Live mode. Each wallet shows its public address
@@ -141,9 +145,12 @@ steps. Use the interface to recover an unrelated run.
 ## Transfer timings
 
 Each Live Send prints an `[INFO]` breakdown in the terminal and browser console:
-Testril balance checks before signing, RPC preparation/broadcast/confirmation,
-and the Testril refresh afterward. Each Testril phase lists per-wallet quote and
-read calls, payments, materialization, provenance, polling sleeps, and session saves.
+RPC preparation/broadcast/confirmation and the Testril refresh afterward. The
+refresh lists per-wallet quotes and reads, payments, materialization, polling
+sleeps, and session saves. Concurrent call durations overlap and are not additive.
+Use a dedicated Testril payer: channel state is inspected once per refresh and
+updated after each successful settlement. Cumulative payment vouchers settle in
+order. Materialization jobs are polled every 200 ms.
 
 The server reports its operation time immediately. After the interface updates,
 the browser reports the measured Send-click-to-refresh duration back to the local

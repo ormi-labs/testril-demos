@@ -16,7 +16,9 @@ export function formatTransferTiming(timing, clickElapsedMs) {
       `  Browser, local HTTP and rendering: ${seconds(Math.max(0, total - timing.elapsedMs))}`,
     );
   for (const stage of timing.stages) {
-    lines.push(`  ${stage.name}: ${seconds(stage.elapsedMs)}`);
+    lines.push(
+      `  ${stage.name}: ${seconds(stage.elapsedMs)}${stage.overlapping ? " (detail times overlap; not additive)" : ""}`,
+    );
     for (const detail of stage.details)
       lines.push(
         `    ${detail.name}: ${seconds(detail.elapsedMs)} (${detail.calls} calls)`,

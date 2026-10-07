@@ -191,11 +191,14 @@ export function createApp({
           if (request.method === "GET" && !action)
             return send(200, live.state());
           if (request.method === "GET" && action === "provenance")
-            return send(200, live.provenance(url.searchParams.get("transfer")));
+            return send(
+              200,
+              await live.provenance(url.searchParams.get("transfer")),
+            );
           if (request.method === "GET" && action === "balance-provenance")
             return send(
               200,
-              live.balanceProvenance(url.searchParams.get("wallet")),
+              await live.balanceProvenance(url.searchParams.get("wallet")),
             );
           if (request.method === "GET" && action === "export") {
             const archive = await exportRun(live.export());
