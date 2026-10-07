@@ -120,9 +120,6 @@ function renderState() {
   $("cost-label").textContent = live
     ? "Total Testril cost · USDC"
     : "Total read cost · USDC";
-  $("budget-label").textContent = live
-    ? "Testril budget left · USDC"
-    : "Payment wallet left · USDC";
   $("operation-label").textContent = live ? "Operation" : "Read";
   $("reset-note").textContent = live
     ? "Reset returns the demo funds to Treasury. Payments, escrow, and spending caps remain."
@@ -185,7 +182,6 @@ function renderState() {
         : `Balance reads: ${feeAmount(balanceCost.toString())} USDC\nTransfer history reads: ${feeAmount(historyCost.toString())} USDC\nMock rates`,
     ),
   );
-  $("payment-left").textContent = feeAmount(state.payment.remainingRaw);
   $("read-count").textContent = state.payment.requestCount;
   $("receipt-rows").replaceChildren(
     ...state.receipts.map((receipt) => {

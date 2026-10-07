@@ -233,7 +233,6 @@ test("replay uses separate chronological rows; reset clears both histories and r
   await expect(page.locator("#receipt-rows tr")).toHaveCount(0);
   await expect(page.locator("#payment-count")).toHaveText("0");
   await expect(page.locator("#read-count")).toHaveText("0");
-  await expect(page.locator("#payment-left")).toHaveText("0.010000");
   await page.locator("#reset-evidence summary").click();
   await expect(page.locator("#reset-sweeps li")).toHaveCount(2);
   await page.reload();
@@ -396,9 +395,6 @@ test("live mode shows full Testril balances and preserves costs on reset", async
     fullPage: true,
   });
   await page.locator("#payment-tab").click();
-  await expect(page.locator("#budget-label")).toHaveText(
-    "Testril budget left · USDC",
-  );
   await expect(page.locator("#spent")).toHaveText("0.000141");
   await page.screenshot({
     path: fileURLToPath(
