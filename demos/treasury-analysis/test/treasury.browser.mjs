@@ -638,3 +638,140 @@ test("Live Send reports browser click-to-refresh time after updating balances", 
     "Testril refresh after transfer: 0.025s",
   );
 });
+
+test("Live Send modal follows overlapping progress, ignores other revisions, and closes on success or error", async ({
+  page,
+}, testInfo) => {
+  const state = {
+    ...publicState(createDemo()),
+    id: "live-progress-session",
+    mode: "live",
+    revision: 0,
+    mcpUrl: "https://dev.testril.ai/mcp",
+    chain: { id: 84532, name: "Base Sepolia" },
+    token: liveFixture.token,
+    wallets: liveFixture.wallets,
+    refreshNeeded: false,
+    balanceRead: {
+      balances: { treasury: "20000000", a: "0", b: "0" },
+      sources: {},
+    },
+    payment: {
+      spentRaw: "0",
+      depositedRaw: "0",
+      remainingRaw: "100000",
+      requestCount: 0,
+    },
+    receipts: [],
+  };
+  let current = {
+    revision: 99,
+    outcome: "running",
+    steps: { pay: { active: 1, started: true } },
+  };
+  let release;
+  let fail = false;
+  let polls = 0;
+  await page.route("**/api/config", (route) =>
+    route.fulfill({ json: { liveAvailable: true } }),
+  );
+  await page.route("**/api/sessions", (route) =>
+    route.fulfill({ status: 201, json: state }),
+  );
+  await page.route(
+    "**/api/sessions/live-progress-session/progress",
+    (route) => {
+      polls++;
+      return route.fulfill({ json: current });
+    },
+  );
+  await page.route(
+    "**/api/sessions/live-progress-session/transfer",
+    async (route) => {
+      await new Promise((resolve) => {
+        release = resolve;
+      });
+      if (fail)
+        return route.fulfill({
+          status: 400,
+          json: {
+            error: "Testril read failed. Use Refresh to retry.",
+            state: { ...state, refreshNeeded: true },
+          },
+        });
+      state.revision++;
+      state.balanceRead.balances = {
+        treasury: "19750000",
+        a: "250000",
+        b: "0",
+      };
+      return route.fulfill({ json: state });
+    },
+  );
+  await page.reload();
+  await expect(page.locator("#balance-treasury")).toHaveText("20");
+  await page.locator("#transfer").click();
+  const modal = page.getByRole("dialog", { name: "Sending USDC" });
+  await expect(modal).toBeVisible();
+  await expect(page.locator("#progress-heading")).toBeFocused();
+  await expect(page.locator("#progress-summary")).toContainText(
+    "0.25 USDC · Treasury → Counterparty A",
+  );
+  await expect.poll(() => polls).toBeGreaterThanOrEqual(2);
+  await expect(
+    page.locator('[data-progress="pay"] .progress-state'),
+  ).toHaveText("Pending");
+  await expect(page.locator("#status")).toBeEmpty();
+  current = {
+    revision: 0,
+    outcome: "running",
+    steps: {
+      transfer: { active: 0, started: true, complete: true },
+      materialize: { active: 2, started: true },
+      pay: { active: 1, started: true },
+      read: { active: 0, started: true },
+    },
+  };
+  await expect(page.locator('[data-progress="materialize"]')).toHaveClass(
+    /active/,
+  );
+  await expect(page.locator('[data-progress="pay"]')).toHaveClass(/active/);
+  await expect(
+    page.locator('[data-progress="transfer"] .progress-state'),
+  ).toHaveText("Complete");
+  await page.keyboard.press("Escape");
+  await expect(modal).toBeVisible();
+  await expect(page.locator("#progress-elapsed")).toContainText("s elapsed");
+  expect(
+    await modal.evaluate((node) => node.scrollWidth <= node.clientWidth),
+  ).toBe(true);
+  await page.screenshot({
+    path: fileURLToPath(
+      new URL(
+        `../../../docs/screenshots/treasury-live-progress-${testInfo.project.name}.png`,
+        import.meta.url,
+      ),
+    ),
+    fullPage: true,
+  });
+  current.steps.materialize = { active: 0, started: true, complete: true };
+  current.steps.pay = { active: 0, started: true, complete: true };
+  current.steps.read = { active: 2, started: true };
+  await expect(page.locator('[data-progress="read"]')).toHaveClass(/active/);
+  release();
+  await expect(modal).toBeHidden();
+  await expect(page.locator("#balance-treasury")).toHaveText("19.75");
+  await expect(page.locator("#transfer")).toBeFocused();
+  fail = true;
+  release = undefined;
+  await page.locator("#transfer").click();
+  await expect(modal).toBeVisible();
+  await expect.poll(() => typeof release).toBe("function");
+  release();
+  await expect(modal).toBeHidden();
+  await expect(page.locator("#status")).toHaveText(
+    "Testril read failed. Use Refresh to retry.",
+  );
+  await expect(page.locator("#status")).toBeFocused();
+  await expect(page.locator("#transfer")).toBeDisabled();
+});

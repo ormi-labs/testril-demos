@@ -9,6 +9,7 @@ export function createLiveTestril(
   state,
   save,
   measure = (_name, operation) => operation(),
+  readProgress = (_id, _block, _phase) => {},
 ) {
   let payments = Promise.resolve();
   let channels;
@@ -24,6 +25,8 @@ export function createLiveTestril(
     return result;
   }
   async function execute(entry) {
+    if (entry.verb === "read")
+      readProgress(entry.args.bound_function_id, entry.args.from_block, "paid");
     const result = succeeded(
       await mcp.call(entry.verb, { payment_id: entry.paymentId }),
       entry.verb,
@@ -156,9 +159,12 @@ export function createLiveTestril(
         throw new Error(
           "Testril is still materializing. Use Refresh to retry.",
         );
+      readProgress(id, block, "materialized");
       result = await paid("read", args);
     }
-    return succeeded(result, "read").values;
+    const values = succeeded(result, "read").values;
+    readProgress(id, block, "done");
+    return values;
   }
   return {
     beginReadBatch() {

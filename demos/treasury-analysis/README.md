@@ -142,6 +142,15 @@ If that sequence is interrupted, use `node --env-file=.env src/live-cli.mjs
 resume-smoke` to recover its pending transaction and continue only the remaining
 steps. Use the interface to recover an unrelated run.
 
+Live Send opens a progress modal showing Requesting Transfer, Materializing Data,
+Paying, and Reading Data, with elapsed time. Its activity comes from the running
+server operation; parallel steps can be active together. Local progress checks add
+no Testril calls or charges. The modal closes when the response updates the balances
+or reports an error. Cached steps are marked “Not needed.” To verify visually,
+send a small Live transfer: the modal should show the amount and wallet pair,
+update its active steps, then close with the new balances visible. Failure should
+close the modal and display the error beside Send.
+
 ## Transfer timings
 
 Each Live Send prints an `[INFO]` breakdown in the terminal and browser console:

@@ -169,7 +169,7 @@ export function createApp({
         return send(201, publicState(demo));
       }
       const match = url.pathname.match(
-        /^\/api\/sessions\/([a-f0-9-]+)(?:\/(transfer|reset|refresh|export|provenance|balance-provenance))?$/,
+        /^\/api\/sessions\/([a-f0-9-]+)(?:\/(transfer|reset|refresh|export|provenance|balance-provenance|progress))?$/,
       );
       if (match) {
         const [, id, action] = match;
@@ -190,6 +190,8 @@ export function createApp({
         if (live?.id === id) {
           if (request.method === "GET" && !action)
             return send(200, live.state());
+          if (request.method === "GET" && action === "progress")
+            return send(200, live.progress());
           if (request.method === "GET" && action === "provenance")
             return send(
               200,

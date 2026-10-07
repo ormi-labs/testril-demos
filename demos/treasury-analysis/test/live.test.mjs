@@ -306,6 +306,9 @@ test("a pending receipt survives restart and is recovered without signing anothe
     },
   );
   assert.ok(peer.demo.state().pending);
+  assert.equal(peer.demo.progress().outcome, "failed");
+  assert.equal(peer.demo.progress().steps.transfer.complete, false);
+  assert.equal(peer.demo.progress().steps.transfer.active, 0);
   assert.equal(peer.demo.state().actualBalances.treasury, "20000000");
   assert.equal(peer.demo.state().balanceRead.sources.treasury.block, 100);
   assert.equal(peer.demo.state().refreshNeeded, true);

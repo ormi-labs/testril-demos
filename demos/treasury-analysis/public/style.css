@@ -561,6 +561,84 @@ meter::-moz-meter-bar {
 dialog::backdrop {
   background: rgb(37 43 37 / 45%);
 }
+.transfer-progress {
+  width: min(480px, calc(100% - 36px));
+  padding: 32px;
+}
+.transfer-progress h2 {
+  font-size: 28px;
+}
+#progress-heading:focus {
+  outline: none;
+}
+#progress-summary {
+  font-size: 14px;
+  margin: 12px 0 24px;
+  overflow-wrap: anywhere;
+}
+.progress-steps {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 12px;
+}
+.progress-steps li {
+  display: grid;
+  grid-template-columns: 20px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 0;
+  color: var(--muted);
+}
+.progress-steps li.active,
+.progress-steps li.complete {
+  color: var(--accent);
+}
+.progress-steps li.active > span:nth-child(2) {
+  font-weight: 600;
+}
+.progress-state {
+  font-size: 11px;
+}
+.progress-icon {
+  width: 18px;
+  height: 18px;
+  border: 2px solid var(--line);
+  border-radius: 50%;
+}
+.active .progress-icon {
+  border-color: var(--line);
+  border-top-color: var(--accent);
+  animation: progress-spin 850ms linear infinite;
+}
+.complete .progress-icon {
+  display: grid;
+  place-items: center;
+  border-color: var(--accent);
+  background: var(--accent);
+  color: var(--button-ink);
+  font-size: 11px;
+}
+.complete .progress-icon::after {
+  content: "✓";
+}
+.progress-footer {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  border-top: 1px solid var(--line);
+  margin-top: 24px;
+  padding-top: 16px;
+}
+#progress-elapsed {
+  font-variant-numeric: tabular-nums;
+}
+@keyframes progress-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
 .provenance .section-top {
   margin-bottom: 8px;
 }
@@ -781,5 +859,6 @@ a {
 @media (prefers-reduced-motion: reduce) {
   * {
     transition: none !important;
+    animation: none !important;
   }
 }

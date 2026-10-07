@@ -63,7 +63,7 @@
             <div class="section-top">
               <h2 id="transfer-heading">Send USDC</h2>
             </div>
-            <p id="status" role="status" aria-live="polite"></p>
+            <p id="status" role="status" aria-live="polite" tabindex="-1"></p>
             <form id="transfer-form">
               <div class="form-grid">
                 <fieldset id="from" class="wallet-choice" disabled>
@@ -201,6 +201,45 @@
         </section>
       </div>
     </main>
+    <dialog
+      id="transfer-progress"
+      class="panel modal transfer-progress"
+      aria-labelledby="progress-heading"
+      aria-describedby="progress-summary"
+    >
+      <p class="eyebrow">Live transfer</p>
+      <h2 id="progress-heading" tabindex="-1">Sending USDC</h2>
+      <p id="progress-summary" class="muted"></p>
+      <ol class="progress-steps">
+        <li data-progress="transfer">
+          <span class="progress-icon" aria-hidden="true"></span>
+          <span>Requesting Transfer</span
+          ><small class="progress-state">Pending</small>
+        </li>
+        <li data-progress="materialize">
+          <span class="progress-icon" aria-hidden="true"></span>
+          <span>Materializing Data</span
+          ><small class="progress-state">Pending</small>
+        </li>
+        <li data-progress="pay">
+          <span class="progress-icon" aria-hidden="true"></span>
+          <span>Paying</span><small class="progress-state">Pending</small>
+        </li>
+        <li data-progress="read">
+          <span class="progress-icon" aria-hidden="true"></span>
+          <span>Reading Data</span><small class="progress-state">Pending</small>
+        </li>
+      </ol>
+      <p
+        id="progress-activity"
+        class="sr-only"
+        role="status"
+        aria-live="polite"
+      ></p>
+      <div class="progress-footer small muted">
+        <span>Steps can run together.</span><span id="progress-elapsed"></span>
+      </div>
+    </dialog>
     <dialog
       id="provenance"
       class="panel provenance"

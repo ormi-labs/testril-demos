@@ -389,14 +389,98 @@ async function inspect(kind, item) {
     lock(false);
   }
 }
+function showTransferProgress(input, started) {
+  const dialog = $("transfer-progress");
+  const controller = new AbortController();
+  const progressUrl = endpoint("progress");
+  const labels = {
+    transfer: "Requesting Transfer",
+    materialize: "Materializing Data",
+    pay: "Paying",
+    read: "Reading Data",
+  };
+  const render = (steps) => {
+    const active = [];
+    for (const row of dialog.querySelectorAll("[data-progress]")) {
+      const key = row.dataset.progress;
+      const step = steps[key] ?? {};
+      row.classList.toggle("active", step.active > 0);
+      row.classList.toggle("complete", !!step.complete);
+      row.querySelector(".progress-state").textContent = step.complete
+        ? step.started
+          ? "Complete"
+          : "Not needed"
+        : step.active > 0
+          ? "In progress"
+          : step.started
+            ? "Waiting"
+            : "Pending";
+      if (step.active > 0) active.push(labels[key]);
+    }
+    const announcement = active.length
+      ? active.join(". ")
+      : "Waiting for the next step.";
+    if ($("progress-activity").textContent !== announcement)
+      $("progress-activity").textContent = announcement;
+  };
+  $("progress-summary").textContent =
+    `${input.amount} USDC · ${name(input.from)} → ${name(input.to)}`;
+  const elapsed = () => {
+    $("progress-elapsed").textContent =
+      `${((performance.now() - started) / 1000).toFixed(1)}s elapsed`;
+  };
+  elapsed();
+  render({ transfer: { active: 1, started: true } });
+  dialog.showModal();
+  $("progress-heading").focus({ preventScroll: true });
+  const clock = setInterval(elapsed, 100);
+  // Poll only this local server; progress never triggers a Testril request.
+  const poll = async () => {
+    while (!controller.signal.aborted) {
+      try {
+        const response = await fetch(progressUrl, {
+          signal: controller.signal,
+        });
+        if (response.ok) {
+          const progress = await response.json();
+          if (
+            !controller.signal.aborted &&
+            progress?.revision === input.revision &&
+            progress.outcome === "running"
+          )
+            render(progress.steps);
+        }
+      } catch {
+        // The transfer response remains authoritative if progress is unavailable.
+      }
+      if (!controller.signal.aborted)
+        await new Promise((resolve) => setTimeout(resolve, 200));
+    }
+  };
+  poll();
+  return () => {
+    controller.abort();
+    clearInterval(clock);
+    dialog.close();
+  };
+}
+$("transfer-progress").addEventListener("cancel", (event) =>
+  event.preventDefault(),
+);
+
 async function action(kind) {
   if (busy) return;
   const started = performance.now();
   const timedSend = kind === "transfer" && state.mode === "live";
   let timing;
+  let closeProgress;
   stop();
   lock(true);
-  status(state.mode === "live" ? "Waiting for Base Sepolia and Testril…" : "");
+  status(
+    state.mode === "live" && !timedSend
+      ? "Waiting for Base Sepolia and Testril…"
+      : "",
+  );
   try {
     const input = { revision: state.revision };
     if (kind === "transfer")
@@ -405,6 +489,7 @@ async function action(kind) {
         to: selectedWallet("to"),
         amount: $("amount").value,
       });
+    if (timedSend) closeProgress = showTransferProgress(input, started);
     state = await api(endpoint(kind), input);
     timing = state.timing;
     selected = undefined;
@@ -416,7 +501,12 @@ async function action(kind) {
     timing = error.timing;
     status(error.message, true);
   } finally {
+    closeProgress?.();
     lock(false);
+    if (timedSend)
+      ($("transfer").disabled ? $("status") : $("transfer")).focus({
+        preventScroll: true,
+      });
     if (timedSend && timing) {
       const elapsedMs = performance.now() - started;
       console.info(formatTransferTiming(timing, elapsedMs));

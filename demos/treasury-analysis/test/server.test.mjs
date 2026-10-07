@@ -219,3 +219,103 @@ test("live source dialogs fetch provenance on demand without charging for metada
     400,
   );
 });
+
+test("live progress reports actual overlapping work without adding Testril calls", async (t) => {
+  let paused = false;
+  const gates = new Map();
+  for (const key of ["transfer", "pay", "materialize", "read"]) {
+    let entered;
+    let release;
+    const started = new Promise((resolve) => {
+      entered = resolve;
+    });
+    const ready = new Promise((resolve) => {
+      release = resolve;
+    });
+    gates.set(key, { entered, release, started, ready, arrivals: 0 });
+  }
+  t.after(() => {
+    for (const gate of gates.values()) gate.release();
+  });
+  const peer = await livePeer(t, {
+    async beforeTool(name, args) {
+      if (!paused) return;
+      const key =
+        name === "pay_quote"
+          ? "pay"
+          : name === "materialize" && args.payment_id
+            ? "materialize"
+            : name === "read" && args.payment_id
+              ? "read"
+              : undefined;
+      const gate = gates.get(key);
+      if (gate) {
+        gate.arrivals++;
+        if (key !== "read" || gate.arrivals === 3) gate.entered();
+        await gate.ready;
+      }
+    },
+  });
+  const prepare = peer.chain.prepare;
+  peer.chain.prepare = async (...args) => {
+    if (paused) {
+      const gate = gates.get("transfer");
+      gate.entered();
+      await gate.ready;
+    }
+    return prepare(...args);
+  };
+  const url = await serve(t, {
+    env: peer.env,
+    liveFactory: async () => peer.demo,
+    info: () => {},
+  });
+  const state = await (
+    await post(`${url}/api/sessions`, { mode: "live" })
+  ).json();
+  const route = `${url}/api/sessions/${state.id}`;
+  const progress = async () => (await fetch(`${route}/progress`)).json();
+  assert.equal(await progress(), null);
+  const ready = await (await post(`${route}/refresh`, {})).json();
+  paused = true;
+  const response = post(`${route}/transfer`, {
+    revision: ready.revision,
+    from: "treasury",
+    to: "a",
+    amount: ".25",
+  });
+  await gates.get("transfer").started;
+  const first = await progress();
+  assert.equal(first.revision, ready.revision);
+  assert.equal(first.outcome, "running");
+  assert.equal(first.steps.transfer.active, 1);
+  assert.equal(first.steps.pay.started, false);
+  gates.get("transfer").release();
+  await gates.get("pay").started;
+  assert.equal((await progress()).steps.transfer.complete, true);
+  assert.equal((await progress()).steps.pay.active, 1);
+  gates.get("pay").release();
+  await gates.get("materialize").started;
+  assert.ok((await progress()).steps.materialize.active >= 1);
+  gates.get("materialize").release();
+  await gates.get("read").started;
+  const reading = await progress();
+  assert.equal(reading.steps.read.active, 3);
+  assert.equal(reading.steps.materialize.complete, true);
+  assert.equal(reading.steps.pay.complete, true);
+  const calls = peer.calls.length;
+  await progress();
+  await progress();
+  await progress();
+  assert.equal(peer.calls.length, calls);
+  gates.get("read").release();
+  const result = await (await response).json();
+  assert.equal(result.timing.outcome, "success");
+  const final = await progress();
+  assert.equal(final.outcome, "success");
+  assert.ok(
+    Object.values(final.steps).every((s) => s.complete && s.active === 0),
+  );
+  assert.equal(peer.demo.export().progress, undefined);
+  assert.equal(peer.demo.state().progress, undefined);
+});

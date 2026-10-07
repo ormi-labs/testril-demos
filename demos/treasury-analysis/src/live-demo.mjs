@@ -4,6 +4,7 @@ import { join } from "node:path";
 import { sameAddress } from "./live-config.mjs";
 import { createLiveTestril } from "./live-testril.mjs";
 import { createTransferTiming } from "./transfer-timing.mjs";
+import { createTransferProgress } from "./transfer-progress.mjs";
 import { parseUsdc } from "../public/amounts.js";
 
 export async function createLiveDemo({ config, chain, mcp, directory }) {
@@ -48,10 +49,13 @@ export async function createLiveDemo({ config, chain, mcp, directory }) {
   let queue = Promise.resolve();
   let closing;
   let timing;
+  let progress;
+  const track = (name, operation) =>
+    progress ? () => progress.track(name, operation) : operation;
   const measure = (name, operation) =>
-    timing ? timing.measure(name, operation) : operation();
+    timing ? timing.measure(name, track(name, operation)) : operation();
   const stage = (name, operation) =>
-    timing ? timing.stage(name, operation) : operation();
+    timing ? timing.stage(name, track(name, operation)) : operation();
   let saves = Promise.resolve();
   const save = () => {
     const contents = `${JSON.stringify(state, null, 2)}\n`;
@@ -145,7 +149,14 @@ export async function createLiveDemo({ config, chain, mcp, directory }) {
         return measure(label, () => mcp.call(name, args));
       },
     };
-    const testril = createLiveTestril(config, timedMcp, state, save, measure);
+    const testril = createLiveTestril(
+      config,
+      timedMcp,
+      state,
+      save,
+      measure,
+      (id, block, phase) => progress?.readPhase(id, block, phase),
+    );
     const current = () => state.transfers.slice(state.startIndex);
     const wallet = (id) => config.wallets.find((w) => w.id === id);
     function paymentHistory(start = 0) {
@@ -284,6 +295,11 @@ export async function createLiveDemo({ config, chain, mcp, directory }) {
       const selected = involved
         ? config.wallets.filter((w) => involved.includes(w.id))
         : config.wallets;
+      const missing = current().filter((t) => !state.transferEvidence[t.id]);
+      progress?.expectReads([
+        ...selected.map((w) => [state.functions[w.id], block]),
+        ...missing.map((t) => [state.functions.edges, t.block]),
+      ]);
       const work = selected.map(async (w) => {
         const rows = await testril.read(state.functions[w.id], block);
         if (
@@ -315,32 +331,30 @@ export async function createLiveDemo({ config, chain, mcp, directory }) {
         await save();
       });
       work.push(
-        ...current()
-          .filter((transfer) => !state.transferEvidence[transfer.id])
-          .map(async (transfer) => {
-            const rows = await testril.read(
-              state.functions.edges,
-              transfer.block,
+        ...missing.map(async (transfer) => {
+          const rows = await testril.read(
+            state.functions.edges,
+            transfer.block,
+          );
+          const edge = rows.find(
+            (r) =>
+              r.block === transfer.block &&
+              sameAddress(r.from, wallet(transfer.from).address) &&
+              sameAddress(r.to, wallet(transfer.to).address),
+          );
+          if (
+            !edge ||
+            BigInt(edge.amount) < BigInt(transfer.amountRaw) ||
+            BigInt(edge.count) < 1n
+          )
+            throw new Error(
+              "Testril does not include the confirmed transfer in its block's edge result.",
             );
-            const edge = rows.find(
-              (r) =>
-                r.block === transfer.block &&
-                sameAddress(r.from, wallet(transfer.from).address) &&
-                sameAddress(r.to, wallet(transfer.to).address),
-            );
-            if (
-              !edge ||
-              BigInt(edge.amount) < BigInt(transfer.amountRaw) ||
-              BigInt(edge.count) < 1n
-            )
-              throw new Error(
-                "Testril does not include the confirmed transfer in its block's edge result.",
-              );
-            state.transferEvidence[transfer.id] = {
-              edge,
-            };
-            await save();
-          }),
+          state.transferEvidence[transfer.id] = {
+            edge,
+          };
+          await save();
+        }),
       );
       // Drain every paid pipeline before reporting a failure or allowing another action.
       const results = await Promise.allSettled(work);
@@ -380,12 +394,14 @@ export async function createLiveDemo({ config, chain, mcp, directory }) {
     return {
       id: state.id,
       state: publicState,
+      progress: () => progress?.snapshot() ?? null,
       refresh: () => serial(refresh),
       transfer(input) {
         const report = createTransferTiming();
         return serial(async () => {
           report.startWork();
           timing = report;
+          progress = createTransferProgress(input.revision);
           try {
             if (input.revision !== state.revision) throw stale(publicState());
             if (state.refreshNeeded)
@@ -395,11 +411,14 @@ export async function createLiveDemo({ config, chain, mcp, directory }) {
             const amount = parseUsdc(input.amount);
             validateTransfer(input.from, input.to, amount);
             const transfer = await send(input.from, input.to, amount);
+            progress.transferred();
             const result = await stage("Testril refresh after transfer", () =>
               refresh(transfer.block, [input.from, input.to]),
             );
+            progress.finish("success");
             return { ...result, timing: report.finish("success") };
           } catch (error) {
+            progress.finish("failed");
             error.timing = report.finish("failed");
             throw error;
           } finally {
