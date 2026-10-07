@@ -1,6 +1,6 @@
 import { readFile, writeFile } from "node:fs/promises";
 import { createDemo, transferDemo, exportDemo } from "./demo.mjs";
-import { decimalAmount } from "../public/amounts.js";
+import { decimalAmount, rawAmount } from "../public/amounts.js";
 import { replayBalances } from "../public/replay.js";
 
 try {
@@ -33,8 +33,18 @@ try {
           run.transfers,
           run.transfers.length,
         );
-  if (Object.keys(balances).some((id) => balances[id] !== run.balances[id]))
+  const walletIds = run.wallets.map((wallet) => wallet.id);
+  if (
+    new Set(walletIds).size !== walletIds.length ||
+    Object.keys(balances).length !== walletIds.length ||
+    Object.keys(run.balances).length !== walletIds.length ||
+    walletIds.some(
+      (id) => !Object.hasOwn(balances, id) || balances[id] !== run.balances[id],
+    )
+  )
     throw new Error("Export balances disagree with the replay results.");
+  // Live replay uses cached snapshots; validate every amount before printing it.
+  for (const amount of Object.values(balances)) rawAmount(amount);
   console.log(
     run.mode === "live"
       ? "Base Sepolia / USDC / LIVE — latest cached Testril wallet balances."

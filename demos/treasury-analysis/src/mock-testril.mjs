@@ -23,7 +23,7 @@ export function readTransfers(chain, startIndex) {
   const transfers = chain.transfers.slice(startIndex);
   return {
     mode: "mock",
-    function: "erc20_transfer_edges",
+    function: "erc20.transfer_edges",
     transfers: transfers.map((transfer) => ({ ...transfer })),
     fromBlock: transfers[0]?.block ?? null,
     toBlock: transfers.length ? chain.block + 1 : null,
@@ -42,7 +42,7 @@ export function transferProvenance(transfer) {
   return {
     mode: "mock",
     note: "Fictional evidence. These hashes cannot be checked on Arbitrum; no source verification was performed.",
-    function: { name: "erc20_transfer_edges", version: "mock-v1" },
+    function: { name: "erc20.transfer_edges", version: "mock-v1" },
     chain: fixture.chain,
     token: fixture.token,
     binding: { chainId: fixture.chain.id, tokenAddress: fixture.token.address },

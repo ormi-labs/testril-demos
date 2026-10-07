@@ -5,6 +5,8 @@ import { createTransferTiming } from "./transfer-timing.mjs";
 import { createTransferProgress } from "./transfer-progress.mjs";
 import { parseUsdc } from "../public/amounts.js";
 
+// Owns the MCP connection and journal; call close() to drain work and release both.
+// See docs/development.md for adapter contracts and persistence requirements.
 export async function createLiveDemo({
   config,
   chain,

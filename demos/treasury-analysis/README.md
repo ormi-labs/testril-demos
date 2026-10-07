@@ -1,282 +1,93 @@
-# Move Money
+# Move Money: treasury analysis
 
-Move USDC between Treasury, Counterparty A, and Counterparty B. Read their
-balances with Testril, replay the transfers, and select an arrow to inspect provenance.
+A local demonstration of USDC transfers, wallet balances, and source evidence
+using [Testril](https://testril.ai). Move funds between Treasury, Counterparty A,
+and Counterparty B, inspect the results, and see the cost of preparing and reading
+data. This is a testnet example, not a mainnet treasury management application.
 
-With no signing configuration, start in **Mock** mode: Arbitrum, wallets, transfers, reads, prices, and evidence
-are simulated. No funds move or payments occur. **Live** mode uses Base Sepolia
-test USDC, real testnet transfers, and paid materialization and reads at
-`https://dev.testril.ai/mcp`.
+**Mock mode** needs no credentials: Arbitrum transfers, reads, payments, and
+source evidence are simulated. **Live mode** uses Base Sepolia test USDC,
+local signing, real testnet transfers, and paid Testril reads. See the
+[live setup and recovery guide](docs/live.md) before configuring Live mode.
 
-## What happens in Live mode
+## Download and run
 
-**The demo requests and pays for indexing on the fly.** When you click Send,
-the application moves USDC, asks Testril for the new balances and transfer data,
-and funds any missing data preparation itself. The client chooses the computation,
-wallets, and block range, pays for the work, and consumes the results through the
-same MCP connection.
-
-Materialization is the indexing step: Testril processes the requested blockchain
-range and prepares the function's results for reading. Reading retrieves those
-prepared results. **Materialization and reads have separate quotes and charges.**
-The Payment History makes both visible: **Materializing** shows the number and
-cost of materialization requests; **Reading** shows the number and cost of reads.
-Moving USDC also spends ETH for transaction gas, separately from either data cost.
-
-For each Live Send:
-
-1. The local signer prepares, submits, and confirms the USDC transfer through
-   Base Sepolia RPC.
-2. The demo asks Testril to read the sender's balance, the recipient's balance,
-   and transfer edges at the confirmed transaction's block. Wallet balances and
-   transfer data come from Testril.
-3. If a result is unavailable, the demo requests materialization for that function
-   and block range. It receives a quote, pays in USDC through `pay_quote`, executes
-   the materialization with the returned payment ID, and waits for its job.
-4. It pays the separate read quote, retrieves the prepared result, and updates
-   the interface. The three data pipelines run in parallel; their cumulative
-   payment vouchers settle in order.
-
-The read/materialize/payment flow is implemented in
-[`src/live-testril.mjs`](src/live-testril.mjs), connected to transfers and the
-interface by [`src/live-demo.mjs`](src/live-demo.mjs). Mock mode simulates reads
-and assumes preparation has already happened; use Live mode to see paid indexing.
-
-### Materialization can be paid for in advance
-
-**On-demand indexing is a choice, not a requirement.** An application or another
-client can request and pay for materialization of the required functions and
-block ranges ahead of time. Materialization can cover future block ranges:
-the work is funded in advance, and results become readable as those blocks exist
-and Testril finishes preparing them.
-
-**With those results already materialized, this demo only needs to pay for reads.**
-Its existing read-first logic uses available results directly, without requesting
-or paying for materialization again. The prepared ranges must cover the functions
-and blocks the demo reads, including new transfer blocks. The RPC transfer still
-happens, and reads still have their own charges.
-
-This separates funding data preparation from consuming data. One client can pay
-to prepare results ahead of demand; a reader can consume them without funding that
-indexing again. The default demo deliberately prepares missing data during the
-interactive run so you can see both stages and their costs.
-
-## Run
-
-Requires Node.js **22.13+**, npm, and `tar` on macOS or Linux. No build step.
-Runtime dependencies are the MCP SDK and viem, locked by `npm ci`.
+Requires **Node.js 22.13+**, npm, and `tar` on macOS or Linux. Git is needed for
+the clone command; you can also download the repository ZIP from GitHub.
+There is no build step. `npm ci` installs the locked dependencies.
 
 ```sh
-cd demos/treasury-analysis  # or the extracted treasury-analysis folder
+git clone https://github.com/ormi-labs/testril-demos.git
+cd testril-demos/demos/treasury-analysis
 npm ci
 npm start
 ```
 
-Open **http://127.0.0.1:4173**. Optional: copy `.env.example` to `.env` to change
-`PORT`. Mock mode needs no credentials. The server accepts local connections only.
+If you already downloaded or extracted this demo, run `npm ci` and `npm start`
+inside its `treasury-analysis` folder. The folder includes all required source,
+fixtures, assets, documentation, and tooling; it works without the parent repository.
 
-## Try it
+Open **http://127.0.0.1:4173**. The server accepts local connections only.
+Stop it with **Ctrl-C**. To change the port, copy `.env.example` to `.env` and
+set `PORT`. Mock mode needs no other configuration. Keys and nonzero payment
+caps enable Live mode automatically.
 
-1. Transfer **0.25** from Treasury to A, then **0.10** from A to B.
-2. Expect balances **0.75 / 0.15 / 0.10 USDC**.
-3. **Transfer History** updates after each transfer, with one row per event, UTC
-   times, and block numbers. Use Replay to watch it build. Click an arrow or a
-   balance for mock source evidence; close the modal with Escape or Close.
-4. **Payment History** separates Reading and Materializing, showing each cost
-   and count alongside the overall total. Reading counts individual read requests;
-   materialization counts materialization entries. Totals cover the current run
-   and reset with its payment history. Receipts appear newest first, with costs
-   and block numbers. Hover over
-   a cost (or focus or tap it) for its breakdown. It stays current even when
-   its tab is hidden. Switching tabs, replay, and provenance inspection are free.
-5. **Reset demo**, below the header, returns funds to Treasury and clears Transfer
-   History and Payment History. It restores the mock payment wallet and resets
-   read costs to zero. Reset itself adds no mock read charge.
+## Try Mock mode
 
-In mock mode, each transfer refreshes three balance reads and one history read. A separate mock
-payment wallet covers their illustrative charges. Refreshing resumes the tab’s
-cached session; restarting the server clears sessions. Data preparation is assumed,
-so mock mode has no materialization charges. On phones, scroll the
-transfer diagram horizontally.
+1. Send **0.25** from Treasury to A, then **0.10** from A to B.
+2. Expect balances of **0.75 / 0.15 / 0.10 USDC**.
+3. Transfer History shows UTC times and block numbers. Use Replay to watch
+   transfers appear; select an arrow or a wallet balance to inspect mock
+   evidence. Close the dialog with Escape or Close.
+4. Payment History shows read costs and counts. Hover over a cost, or focus or
+   tap it, for its breakdown. Each transfer refreshes three wallet reads and
+   one history read. Mock mode assumes data is prepared and has no
+   materialization charges. Startup charges three simulated balance reads.
+5. Reset demo returns funds to Treasury, clears both histories, restores the
+   mock payer, and resets costs to zero. Reset adds no mock charge.
 
-## Live Base Sepolia
+Switching tabs, replay, and inspecting provenance are free. Reloading resumes
+the tab's session; restarting the server clears mock sessions. On phones, scroll
+the transfer diagram horizontally.
 
-Use four dedicated test wallets: Treasury, Counterparty A, Counterparty B, and a
-separate Testril payer. Treasury needs at least 1 test USDC; each wallet that sends
-transfers needs Base Sepolia ETH for gas. The payer needs test USDC for escrow.
-Use Circle USDC at `0x036CbD53842c5426634e7929541eC2318f3dCF7e`, chain ID **84532**.
+## Source and run exports
 
-Copy `.env.example` to `.env` and set the four private keys locally. Public
-addresses default to `fixtures/live.json`; override them with the address variables
-shown in `.env.example` when using your own wallets. A signer must match its address.
-Keep keys out of chat, browser code, and source control.
+**Download source** opens [this demo's GitHub directory](https://github.com/ormi-labs/testril-demos/tree/main/demos/treasury-analysis).
+Clone or download the repository for the application and locked dependencies.
+Source downloads exclude your local `.env`, saved live state, and installed dependencies.
 
-```sh
-# Working directory: treasury-analysis
-cp .env.example .env  # only if you do not already have one
-chmod 600 .env
-# Edit .env with your local keys and explicitly approved payment limits.
-npm run live:check   # address validation and Testril chain head; no transfers or payments
-npm start
-```
+A **run export** is a separate archive available at
+`/api/sessions/<session-id>/export`. It contains `run.json`, a README, and
+separate JSON files for transfers, balances, receipts, and provenance. It contains
+run data, not the application. Mock evidence is fictional. Live evidence contains
+RPC receipts, cached Testril results, and any provenance citations requested.
 
-The payment limits default to zero. After approving spending, set both
-`TESTRIL_CHARGE_CAP_USDC=0.1` and `TESTRIL_ESCROW_CAP_USDC=0.1`, then restart.
-This version permits at most 0.1 test USDC for each. The first paid request deposits
-the escrow allowance; subsequent requests reuse the channel with cumulative
-vouchers. A deposit is not a read charge. Quotes must use Base Sepolia USDC and the
-supported batch settlement terms; other networks are refused.
-
-With valid local keys and nonzero caps, the app opens **Live** automatically.
-Select **Refresh**, beside Reset demo, for a new snapshot. That action prepares and reads one
-block for each balance, using Testril’s reported chain head. Balance reads and
-transfer-edge reads come exclusively from Testril. The local signer uses
-`https://sepolia.base.org` (or `BASE_SEPOLIA_RPC_URL`) to prepare, submit, and confirm
-wallet transactions.
-Send checks the last successful Testril balance, then waits for one block
-confirmation (receipt polling every 200 ms). It refreshes only the sender and
-recipient, together with transfer edges, at the confirmed transaction's block.
-These materialization and read pipelines run in parallel; the uninvolved wallet
-keeps its last Testril balance. Startup, Refresh, and Reset read all three wallets.
-Reset refreshes balances before choosing sweep amounts. Each transfer's
-transaction/log evidence comes from RPC; Testril's edge is the aggregate for a sender/recipient pair in that block.
-The provenance dialog labels these separately. No transaction-level MCP lineage
-is implied. Provenance is fetched only when you open a source dialog, then cached
-for that snapshot; this metadata adds no charge. Run exports contain read evidence
-and any citations already requested. Replay uses cached results.
-
-**Wallet balances show the full amounts returned by Testril**. The header shows
-the configured MCP server URL in Live mode. Each wallet shows its public address
-below a bar proportional to its share of the total USDC displayed across the three
-demo wallets; the separate payer is excluded. Bars wait until all three balances
-have been read. Source blocks are available in balance provenance. Until a
-successful read, a wallet shows “Not yet read.” Failed refreshes report an error
-and retain the last successful reads. Live transfer
-replay keeps those wallet balances visible; it does not calculate historical wallet
-balances. All USDC held by Treasury, A, and B is available to the demo. Transfers
-must fit within the sending wallet's balance. Refresh accepts deposits or withdrawals
-made outside the demo. Run exports include the latest Testril balances in
-`balances`, `actualBalances`, and `balanceRead`, with the starting snapshot in
-`initialBalances`.
-
-All live browser tabs share one session. `.live-state.json` persists wallet balances,
-payment usage, cached paid results, and a pending signed transaction. It contains
-no private keys, but stays local and is excluded from downloads. **Do not delete
-it to reset a run.** Reset returns all USDC from A and B to Treasury, starts new
-transfer and payment histories, and refreshes the three wallet balances. The
-displayed cost and read count cover the current run. Materialization has separate
-payment entries; cached results incur no new payment or paid-read count. Earlier
-receipts, cumulative spending, escrow, and caps remain saved. Reset cannot undo
-payments or refill a cap. Live run exports include the current run's `receipts`
-and all saved payments in `allReceipts`, with cumulative payment totals in
-`lifetimeSpentRaw` and `lifetimeRequestCount`.
-
-If a transfer or a later read fails, use **Refresh**. The recorded
-transaction hash is recovered without signing another transfer; paid results are
-reused. If a settlement response is lost, the charge and deposit remain reserved
-and new payments are refused until the quote is reconciled. The interface shows
-its quote ID and status. A stalled materialization remains attached to its job.
-
-Only one live server may use this directory. `.live-lock/pid` records its process
-ID. Ctrl-C waits for any active operation, releases the lock, and preserves the
-saved state. Repeated shutdown signals do not interrupt that cleanup. Startup errors distinguish a running
-owner, a stopped owner, and an older lock without an owner record. After a crash,
-verify that the old server has stopped before removing only `.live-lock` and
-restarting. Keep `.live-state.json`. Failed live startup clears previous mock
-balances and history. The caps apply to this saved session,
-not to payments made by unrelated clients using the same payer.
-
-For a deliberate testnet smoke run (requires the approved caps and no active run):
-
-```sh
-npm run live:smoke
-```
-
-This sends 0.25 Treasury → A, then 0.10 A → B, and returns the demo funds to
-Treasury. It makes real testnet transfers and pays MCP quotes within the caps.
-Maximum gas fee per transfer is limited to 0.0001 ETH.
-If that sequence is interrupted, use `node --env-file=.env src/live-cli.mjs
-resume-smoke` to recover its pending transaction and continue only the remaining
-steps. Use the interface to recover an unrelated run.
-
-Live Send opens a progress modal with separate **Base Sepolia · RPC** and
-**Testril** sections. RPC shows preparation, submission, and confirmation; Testril
-shows materialization, payment, and reading. Each section shows its wall-clock
-time, alongside the total elapsed time. The RPC timer stops when the transfer is
-confirmed; Testril time includes its parallel work without adding overlapping
-call durations. Activity comes from the running server operation. Local progress
-checks add no Testril calls or charges. The modal closes when the response updates the balances
-or reports an error. Cached steps are marked “Not needed.” To verify visually,
-send a small Live transfer: the modal should show the amount and wallet pair,
-update its active steps, then close with the new balances visible. Failure should
-close the modal and display the error beside Send.
-
-## Transfer timings
-
-Each Live Send prints an `[INFO]` breakdown in the terminal and browser console:
-RPC preparation/broadcast/confirmation and the Testril refresh afterward. The
-refresh lists per-wallet quotes and reads, payments, materialization, polling
-sleeps, and session saves. Concurrent call durations overlap and are not additive.
-Use a dedicated Testril payer: channel state is inspected once per refresh and
-updated after each successful settlement. Cumulative payment vouchers settle in
-order. Materialization jobs are polled every 200 ms.
-
-The server reports its operation time immediately. After the interface updates,
-the browser reports the measured Send-click-to-refresh duration back to the local
-server, including local HTTP and rendering overhead. Timing reports are temporary;
-they add no Testril requests or charges and contain no signed payloads or keys.
-
-## Downloads and CLI
-
-**Download source** opens [this demo’s GitHub directory](https://github.com/ormi-labs/testril-demos/tree/main/demos/treasury-analysis).
-Clone the repository to get the source and locked tools. The run export
-is available at `/api/sessions/<session-id>/export`; it contains transfers, balances,
-receipts, and source evidence. Mock evidence is fictional; Live evidence contains
-RPC receipts, Testril read results, and any provenance citations requested.
+From the demo directory:
 
 ```sh
 node src/cli.mjs sample run.json
 node src/cli.mjs replay run.json
+# After extracting a run archive:
+node src/cli.mjs replay /path/to/run/run.json
 ```
 
-Mock replay checks transfer arithmetic; live replay shows cached Testril wallet balances.
-Neither independently verifies chain or MCP evidence.
+Mock replay checks transfer arithmetic. Live replay displays cached Testril
+balances; it does not calculate historical wallet balances. Neither verifies
+chain or MCP evidence independently. Raw USDC amounts are six-decimal integer
+strings: `"250000"` represents 0.25 USDC.
 
-## Development
+## Further documentation
 
-```sh
-npm test
-npm run lint
-npm run format:check
-npx playwright install chromium
-npm run test:browser  # desktop + mobile; local port 4175
-```
+- [Live setup, payments, indexing, and recovery](docs/live.md)
+- [Code map, development checks, and embedding](docs/development.md)
+- [Design asset origins](public/assets/README.md)
 
-`src/mock-chain.mjs` simulates transfers; `src/mock-testril.mjs` simulates reads.
-`src/demo.mjs` connects them. `public/` holds the plain JavaScript interface;
-`fixtures/demo.json` sets wallets and rates. Amounts use integer strings and BigInt.
-`src/live-demo.mjs` connects the live chain and Testril clients; `batch-payment.mjs`
-signs deposits and vouchers. Live tests use a local HTTP MCP peer, with throwaway
-keys, to check caps, wallet balances, concurrent tabs, and recovery after restart.
-For visual review, try the sequence above on desktop and phone, including keyboard
-provenance selection. On desktop, Send and Balances share the left panel while
-histories update on the right. Narrow screens stack the panels. Asset origins are in `public/assets/README.md`.
-
-## Scope
-
-The live adapter supports Base Sepolia only. It reads exact balance snapshots and
-per-block transfer edges; it does not implement mainnet access, supplier earnings,
-wallet-wide historical analysis, or independent verification of every source log.
-Testril supplies balances, transfer edges, chain-head metadata, and citations.
-The local signer uses RPC to prepare, broadcast, and confirm transactions; its
-receipt records the transaction hash and log index.
+Live mode supports Base Sepolia only. It reads wallet snapshots and per-block
+transfer edges. It does not provide mainnet access, wallet-wide historical
+analysis, or independent verification of every source log. Testril supplies
+balances, transfer edges, chain-head metadata, and citations; the local signer
+uses RPC to prepare, submit, and confirm transactions.
 
 ## License
 
 [MIT](LICENSE).
-
-Embedding applications can pass an optional `authorizePayment` callback to `createLiveDemo`. It receives only the quote ID, charge and escrow deposit amounts before settlement. Rejecting it stops that payment without recording an uncertain settlement. Local runs omit it; hosting/session controls belong in the separate harness.
-
-An embedding host can provide `createLiveDemo({journal})` with `load()`, `save(contents)` and `close()` methods. The default journal uses local files and a process lock. A hosted journal must durably save each payment authorization and signed transfer before its promise resolves; failed saves stop further actions until the engine is recreated. This lets a host use durable storage without adding hosting dependencies to this downloadable demo.
-
-RPC submission failures stop the transfer promptly unless the node can find the exact signed transaction. The saved transaction remains available for recovery; do not send a replacement just because submission or confirmation failed. Confirmation waits for one receipt and checks its canonical block, without transaction-replacement scanning.

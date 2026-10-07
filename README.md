@@ -20,6 +20,10 @@ The [two-page brief](docs/demo-summary.pdf) ([Markdown](docs/demo-summary.md)) a
 
 The runnable demo’s README describes its current behavior; these planning documents cover future capabilities. To refresh the brief PDF, install `reportlab` and run `python docs/render_summary.py`.
 
+Client setup, live recovery, and a code map are included in the
+[treasury demo documentation](demos/treasury-analysis/README.md). Its folder is
+self-contained and can be downloaded and run independently of these plans.
+
 ## Contributing
 
 Read [AGENTS.md](AGENTS.md). Keep each demo self-contained, readable, and simple. Its README should explain what it shows, how to run it, and what to expect.

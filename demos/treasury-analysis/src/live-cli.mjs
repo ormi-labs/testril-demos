@@ -1,10 +1,9 @@
 import { fileURLToPath } from "node:url";
 import { liveConfig } from "./live-config.mjs";
 import { createLiveChain } from "./live-chain.mjs";
-import { connectMcp } from "./mcp.mjs";
+import { connectMcp, succeeded } from "./mcp.mjs";
 import { createLiveDemo } from "./live-demo.mjs";
-import { succeeded } from "./mcp.mjs";
-import { decimalAmount } from "../public/amounts.js";
+import { decimalAmount, parseUsdc } from "../public/amounts.js";
 
 let demo;
 let mcp;
@@ -62,8 +61,7 @@ try {
           t.kind !== "transfer" ||
           t.from !== sequence[i][0] ||
           t.to !== sequence[i][1] ||
-          BigInt(t.amountRaw) !==
-            BigInt(Math.round(Number(sequence[i][2]) * 1000000)),
+          t.amountRaw !== parseUsdc(sequence[i][2]),
       )
     )
       throw new Error(
