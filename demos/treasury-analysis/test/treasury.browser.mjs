@@ -152,10 +152,13 @@ test("both histories refresh automatically; provenance and tabs add no charges",
   await expect(
     page.getByRole("columnheader", { name: "Block number" }),
   ).toBeVisible();
-  await expect(page.locator("#receipt-rows tr").last()).toContainText(
+  await expect(page.locator("#receipt-rows tr").first()).toContainText(
     "100000001",
   );
-  const cost = page.locator("#receipt-rows tr").last().getByRole("button");
+  await expect(page.locator("#receipt-rows tr").last()).toContainText(
+    "100000000",
+  );
+  const cost = page.locator("#receipt-rows tr").first().getByRole("button");
   await cost.focus();
   await expect(page.locator("#cost-breakdown")).toContainText(
     "History read: 0.000010 USDC",
@@ -167,6 +170,12 @@ test("both histories refresh automatically; provenance and tabs add no charges",
   await expect(page.locator("#cost-breakdown")).toBeHidden();
   await send(page, "a", "b", ".1");
   await expect(page.locator("#receipt-rows tr")).toHaveCount(5);
+  await expect(page.locator("#receipt-rows tr").first()).toContainText(
+    "100000002",
+  );
+  await expect(page.locator("#receipt-rows tr").last()).toContainText(
+    "100000000",
+  );
   await expect(page.locator("#spent")).toHaveText("0.000113");
   await expect(page.locator("#transfer-count")).toHaveText("2");
   await page.locator("#transfer-tab").click();
@@ -396,6 +405,10 @@ test("live mode shows full Testril balances and preserves costs on reset", async
   });
   await page.locator("#payment-tab").click();
   await expect(page.locator("#spent")).toHaveText("0.000141");
+  await expect(page.locator("#receipt-rows tr").first()).toContainText("Read");
+  await expect(page.locator("#receipt-rows tr").last()).toContainText(
+    "Materialization",
+  );
   await page.screenshot({
     path: fileURLToPath(
       new URL(

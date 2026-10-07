@@ -28,7 +28,8 @@ Open **http://127.0.0.1:4173**. Optional: copy `.env.example` to `.env` to chang
 3. **Transfer History** updates after each transfer, with one row per event, UTC
    times, and block numbers. Use Replay to watch it build. Click an arrow or a
    balance for mock source evidence; close the modal with Escape or Close.
-4. **Payment History** shows read costs, block numbers, and receipts. Hover over
+4. **Payment History** shows the newest receipts first, with read costs and block
+   numbers. Hover over
    a cost (or focus or tap it) for its breakdown. It stays current even when
    its tab is hidden. Switching tabs, replay, and provenance inspection are free.
 5. **Reset demo**, below the header, returns funds to Treasury and clears Transfer

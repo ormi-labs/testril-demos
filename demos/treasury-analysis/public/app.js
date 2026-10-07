@@ -184,7 +184,7 @@ function renderState() {
   );
   $("read-count").textContent = state.payment.requestCount;
   $("receipt-rows").replaceChildren(
-    ...state.receipts.map((receipt) => {
+    ...state.receipts.toReversed().map((receipt) => {
       const row = element("tr");
       row.append(
         ...[
