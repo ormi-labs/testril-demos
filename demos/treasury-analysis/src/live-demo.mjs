@@ -7,7 +7,13 @@ import { createTransferTiming } from "./transfer-timing.mjs";
 import { createTransferProgress } from "./transfer-progress.mjs";
 import { parseUsdc } from "../public/amounts.js";
 
-export async function createLiveDemo({ config, chain, mcp, directory }) {
+export async function createLiveDemo({
+  config,
+  chain,
+  mcp,
+  directory,
+  authorizePayment,
+}) {
   const lock = join(directory, ".live-lock");
   try {
     await mkdir(lock);
@@ -156,6 +162,7 @@ export async function createLiveDemo({ config, chain, mcp, directory }) {
       save,
       measure,
       (id, block, phase) => progress?.readPhase(id, block, phase),
+      authorizePayment,
     );
     const current = () => state.transfers.slice(state.startIndex);
     const wallet = (id) => config.wallets.find((w) => w.id === id);

@@ -274,3 +274,5 @@ receipt records the transaction hash and log index.
 ## License
 
 [MIT](LICENSE).
+
+Embedding applications can pass an optional `authorizePayment` callback to `createLiveDemo`. It receives only the quote ID, charge and escrow deposit amounts before settlement. Rejecting it stops that payment without recording an uncertain settlement. Local runs omit it; hosting/session controls belong in the separate harness.

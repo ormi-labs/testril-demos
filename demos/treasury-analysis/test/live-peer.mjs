@@ -291,6 +291,7 @@ export async function livePeer(t, options = {}) {
     chain,
     mcp: await connectMcp(config.mcpUrl),
     directory,
+    authorizePayment: options.authorizePayment,
   });
   return {
     env,
@@ -322,6 +323,7 @@ export async function livePeer(t, options = {}) {
         chain,
         mcp: await connectMcp(config.mcpUrl),
         directory,
+        authorizePayment: options.authorizePayment,
       });
     },
   };

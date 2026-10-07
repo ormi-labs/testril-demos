@@ -631,3 +631,28 @@ test("concurrent quotes cannot exceed the shared cap and failure drains the othe
   assert.equal(peer.demo.state().payment.spentRaw, "240");
   assert.equal(peer.demo.state().refreshNeeded, true);
 });
+
+test("an embedding payment policy rejects authorization before settlement and leaves no uncertain payment", async (t) => {
+  let reject = true;
+  const authorized = [];
+  const peer = await livePeer(t, {
+    authorizePayment: async (payment) => {
+      assert.equal(Object.hasOwn(payment, "payload"), false);
+      if (reject) throw new Error("Hosted sponsor budget exhausted");
+      authorized.push(payment);
+    },
+  });
+  await assert.rejects(peer.demo.refresh(), /Hosted sponsor budget/);
+  assert.equal(peer.calls.filter((c) => c.name === "pay_quote").length, 0);
+  assert.equal(peer.demo.export().allReceipts.length, 0);
+  reject = false;
+  await peer.demo.refresh();
+  assert.equal(
+    authorized.length,
+    peer.calls.filter((c) => c.name === "pay_quote").length,
+  );
+  assert.equal(
+    authorized.reduce((sum, p) => sum + BigInt(p.depositRaw), 0n),
+    100000n,
+  );
+});

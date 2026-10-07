@@ -10,6 +10,7 @@ export function createLiveTestril(
   save,
   measure = (_name, operation) => operation(),
   readProgress = (_id, _block, _phase) => {},
+  authorizePayment = async (_payment) => {},
 ) {
   let payments = Promise.resolve();
   let channels;
@@ -83,6 +84,11 @@ export function createLiveTestril(
           (BigInt(state.depositCapRaw) - BigInt(state.depositedRaw)).toString(),
         ),
       );
+      await authorizePayment({
+        quoteId: quote.quote_id,
+        chargeRaw: accepted.amount,
+        depositRaw: signed.depositRaw,
+      });
       const entry = {
         mode: "live",
         id: quote.quote_id,
