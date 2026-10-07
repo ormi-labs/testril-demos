@@ -6,10 +6,11 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { promisify } from "node:util";
 import { execFile } from "node:child_process";
+import { livePeer } from "./live-peer.mjs";
 import { createApp } from "../src/server.mjs";
 const execute = promisify(execFile);
-async function serve(t) {
-  const server = createApp();
+async function serve(t, options) {
+  const server = createApp(options);
   server.listen(0, "127.0.0.1");
   await once(server, "listening");
   t.after(() => new Promise((resolve) => server.close(resolve)));
@@ -127,4 +128,52 @@ test("run downloads extract and replay using the standalone demo source", async 
     ).stdout,
     /Treasury: 0.65 USDC/,
   );
+});
+
+test("INFO logs include the measured transfer stages and browser click-to-refresh duration", async (t) => {
+  const peer = await livePeer(t);
+  const messages = [];
+  const url = await serve(t, {
+    env: peer.env,
+    liveFactory: async () => peer.demo,
+    info: (message) => messages.push(message),
+  });
+  const state = await (
+    await post(`${url}/api/sessions`, { mode: "live" })
+  ).json();
+  const route = `${url}/api/sessions/${state.id}`;
+  const ready = await (await post(`${route}/refresh`, {})).json();
+  const response = await post(`${route}/transfer`, {
+    revision: ready.revision,
+    from: "treasury",
+    to: "a",
+    amount: ".25",
+  });
+  assert.equal(response.status, 200);
+  const { timing } = await response.json();
+  assert.equal(timing.outcome, "success");
+  assert.match(messages[0], /\[INFO\] Send server operation/);
+  assert.match(messages[0], /RPC receipt wait and block verification/);
+  assert.match(messages[0], /Testril materialize Treasury execute/);
+  assert.match(messages[0], /Testril read transfer edges execute/);
+  const report = { id: timing.id, elapsedMs: timing.elapsedMs + 50 };
+  assert.equal(
+    (await post(`${url}/api/timings`, { ...report, payload: "never log this" }))
+      .status,
+    400,
+  );
+  assert.equal(
+    (await post(`${url}/api/timings`, { ...report, elapsedMs: "invalid" }))
+      .status,
+    400,
+  );
+  assert.equal((await post(`${url}/api/timings`, report)).status, 200);
+  assert.match(messages[1], /Send click → refreshed UI/);
+  assert.match(messages[1], /Browser, local HTTP and rendering: 0.050s/);
+  assert.equal((await post(`${url}/api/timings`, report)).status, 404);
+  assert.ok(!messages.join("\n").includes("payload"));
+  for (const key of Object.values(peer.env).filter((v) =>
+    /^0x[0-9a-f]{64}$/.test(v),
+  ))
+    assert.ok(!messages.join("\n").includes(key));
 });

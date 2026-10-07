@@ -3,7 +3,13 @@ import { acceptedQuote, signBatchPayment } from "./batch-payment.mjs";
 import { succeeded } from "./mcp.mjs";
 
 // State is persisted before a signature can authorize a charge or a deposit.
-export function createLiveTestril(config, mcp, state, save) {
+export function createLiveTestril(
+  config,
+  mcp,
+  state,
+  save,
+  measure = (_name, operation) => operation(),
+) {
   async function execute(entry) {
     const result = succeeded(
       await mcp.call(entry.verb, { payment_id: entry.paymentId }),
@@ -52,11 +58,13 @@ export function createLiveTestril(config, mcp, state, save) {
       }),
       "inspect",
     );
-    const signed = await signBatchPayment(
-      accepted,
-      channels.channels,
-      config,
-      (BigInt(state.depositCapRaw) - BigInt(state.depositedRaw)).toString(),
+    const signed = await measure("Sign Testril payment", () =>
+      signBatchPayment(
+        accepted,
+        channels.channels,
+        config,
+        (BigInt(state.depositCapRaw) - BigInt(state.depositedRaw)).toString(),
+      ),
     );
     const entry = {
       mode: "live",
@@ -111,7 +119,7 @@ export function createLiveTestril(config, mcp, state, save) {
         )
           throw new Error("Testril cannot report the Base Sepolia chain head.");
         if (result.head >= minimumBlock) return result.head;
-        await delay(200);
+        await measure("Chain-head polling sleep", () => delay(200));
       } while (Date.now() < until);
       throw new Error(
         "Testril is still catching up with the transfer. Use Refresh to retry.",
@@ -155,7 +163,7 @@ export function createLiveTestril(config, mcp, state, save) {
             throw new Error(
               "Testril materialization failed. Refresh to inspect the same job.",
             );
-          await delay(1000);
+          await measure("Materialization polling sleep", () => delay(1000));
         }
         if (!done)
           throw new Error(

@@ -15,6 +15,7 @@ import { exportRun } from "./archive.mjs";
 import { liveConfig } from "./live-config.mjs";
 import { createLiveChain } from "./live-chain.mjs";
 import { connectMcp } from "./mcp.mjs";
+import { formatTransferTiming } from "../public/timing.js";
 import { createLiveDemo } from "./live-demo.mjs";
 
 const root = fileURLToPath(new URL("..", import.meta.url));
@@ -27,6 +28,7 @@ const types = {
 const staticFiles = new Set([
   "index.html",
   "app.js",
+  "timing.js",
   "amounts.js",
   "replay.js",
   "transfer-diagram.js",
@@ -49,8 +51,19 @@ async function body(request) {
   }
 }
 
-export function createApp({ env = process.env, liveFactory } = {}) {
+export function createApp({
+  env = process.env,
+  liveFactory,
+  info = console.info,
+} = {}) {
   const sessions = new Map();
+  const timings = new Map();
+  const recordTiming = (timing) => {
+    if (!timing) return;
+    if (timings.size >= 64) timings.delete(timings.keys().next().value);
+    timings.set(timing.id, timing);
+    info(formatTransferTiming(timing));
+  };
   let live;
   let livePromise;
   let config;
@@ -104,6 +117,32 @@ export function createApp({ env = process.env, liveFactory } = {}) {
       )
         return send(403, { error: "Use the local 127.0.0.1 address." });
       const url = new URL(request.url, `http://${host}`);
+      if (request.method === "POST" && url.pathname === "/api/timings") {
+        const input = await body(request);
+        if (
+          !input ||
+          typeof input !== "object" ||
+          Array.isArray(input) ||
+          Object.keys(input).some(
+            (key) => !["id", "elapsedMs"].includes(key),
+          ) ||
+          typeof input.id !== "string" ||
+          !Number.isFinite(input.elapsedMs) ||
+          input.elapsedMs < 0 ||
+          input.elapsedMs > 3600000
+        )
+          throw new Error("Invalid timing report.");
+        const timing = timings.get(input.id);
+        if (!timing) return send(404, { error: "Timing report expired." });
+        timings.delete(input.id);
+        info(
+          formatTransferTiming(timing, input.elapsedMs)
+            .split("\n")
+            .slice(0, 2)
+            .join("\n"),
+        );
+        return send(200, { ok: true });
+      }
       if (request.method === "GET" && url.pathname === "/api/config")
         return send(200, {
           liveAvailable: !liveReason,
@@ -184,11 +223,15 @@ export function createApp({ env = process.env, liveFactory } = {}) {
             )
               throw new Error("Unexpected input fields.");
             try {
-              return send(200, await live[action](input));
+              const result = await live[action](input);
+              recordTiming(result.timing);
+              return send(200, result);
             } catch (error) {
+              recordTiming(error.timing);
               return send(error.status ?? 400, {
                 error: error.message,
                 state: live.state(),
+                timing: error.timing,
               });
             }
           }

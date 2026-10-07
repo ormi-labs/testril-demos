@@ -289,7 +289,16 @@ test("a pending receipt survives restart and is recovered without signing anothe
       to: "a",
       amount: ".25",
     }),
-    /pending/,
+    (error) => {
+      assert.match(error.message, /pending/);
+      assert.equal(error.timing.outcome, "failed");
+      assert.ok(
+        error.timing.stages.some(
+          (s) => s.name === "RPC receipt wait and block verification",
+        ),
+      );
+      return true;
+    },
   );
   assert.ok(peer.demo.state().pending);
   assert.equal(peer.demo.state().actualBalances.treasury, "20000000");
@@ -445,12 +454,43 @@ test("an unavailable Testril chain head refuses reads without an RPC fallback", 
 test("a confirmed transfer waits for Testril's head before selecting balance blocks", async (t) => {
   const peer = await livePeer(t, { headLagAfterTransfer: 1 });
   await peer.demo.refresh();
-  await peer.demo.transfer({
+  const result = await peer.demo.transfer({
     revision: peer.demo.state().revision,
     from: "treasury",
     to: "a",
     amount: ".25",
   });
+  const timing = result.timing;
+  assert.equal(timing.outcome, "success");
+  const after = timing.stages.find(
+    (s) => s.name === "Testril refresh after transfer",
+  );
+  assert.equal(
+    after.details.find((d) => d.name === "Testril inspect chain").calls,
+    2,
+  );
+  const sleep = after.details.find(
+    (d) => d.name === "Chain-head polling sleep",
+  );
+  assert.equal(sleep.calls, 1);
+  assert.ok(sleep.elapsedMs >= 150);
+  assert.equal(
+    after.details.find((d) => d.name === "Testril pay_quote").calls,
+    8,
+  );
+  for (const label of [
+    "RPC transaction preparation and signing",
+    "RPC broadcast",
+    "RPC receipt wait and block verification",
+  ])
+    assert.ok(timing.stages.find((s) => s.name === label).elapsedMs >= 0);
+  assert.ok(
+    Math.abs(
+      timing.stages.reduce((sum, s) => sum + s.elapsedMs, 0) - timing.elapsedMs,
+    ) < 0.001,
+  );
+  assert.equal(peer.demo.state().timing, undefined);
+  assert.equal(peer.demo.export().timing, undefined);
   const transfer = peer.demo.export().transfers.at(-1);
   assert.equal(
     peer.demo.state().balanceRead.sources.treasury.block,

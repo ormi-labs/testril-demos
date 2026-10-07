@@ -1,3 +1,4 @@
+import { formatTransferTiming } from "./timing.js";
 import { decimalAmount, feeAmount } from "./amounts.js";
 import { replayBalances } from "./replay.js";
 import { transferDiagram } from "./transfer-diagram.js";
@@ -69,7 +70,9 @@ async function api(path, input) {
       step = state.historyRead.transfers.length;
       renderState();
     }
-    throw new Error(result.error ?? "Request failed.");
+    const error = new Error(result.error ?? "Request failed.");
+    error.timing = result.timing;
+    throw error;
   }
   return result;
 }
@@ -388,6 +391,9 @@ async function inspect(kind, item) {
 }
 async function action(kind) {
   if (busy) return;
+  const started = performance.now();
+  const timedSend = kind === "transfer" && state.mode === "live";
+  let timing;
   stop();
   lock(true);
   status(state.mode === "live" ? "Waiting for Base Sepolia and Testril…" : "");
@@ -400,15 +406,26 @@ async function action(kind) {
         amount: $("amount").value,
       });
     state = await api(endpoint(kind), input);
+    timing = state.timing;
     selected = undefined;
     step = state.transferCount;
     renderState();
     stop();
     status("");
   } catch (error) {
+    timing = error.timing;
     status(error.message, true);
   } finally {
     lock(false);
+    if (timedSend && timing) {
+      const elapsedMs = performance.now() - started;
+      console.info(formatTransferTiming(timing, elapsedMs));
+      fetch("/api/timings", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id: timing.id, elapsedMs }),
+      }).catch(() => {});
+    }
   }
 }
 function activateTab(id) {

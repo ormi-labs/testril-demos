@@ -3,6 +3,7 @@ import { mkdir, readFile, rename, rm, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import { sameAddress } from "./live-config.mjs";
 import { createLiveTestril } from "./live-testril.mjs";
+import { createTransferTiming } from "./transfer-timing.mjs";
 import { parseUsdc } from "../public/amounts.js";
 
 export async function createLiveDemo({ config, chain, mcp, directory }) {
@@ -46,12 +47,18 @@ export async function createLiveDemo({ config, chain, mcp, directory }) {
   let state;
   let queue = Promise.resolve();
   let closing;
-  const save = async () => {
-    await writeFile(`${path}.tmp`, `${JSON.stringify(state, null, 2)}\n`, {
-      mode: 0o600,
+  let timing;
+  const measure = (name, operation) =>
+    timing ? timing.measure(name, operation) : operation();
+  const stage = (name, operation) =>
+    timing ? timing.stage(name, operation) : operation();
+  const save = () =>
+    measure("Save session", async () => {
+      await writeFile(`${path}.tmp`, `${JSON.stringify(state, null, 2)}\n`, {
+        mode: 0o600,
+      });
+      await rename(`${path}.tmp`, path);
     });
-    await rename(`${path}.tmp`, path);
-  };
   const serial = (operation) => {
     if (closing)
       return Promise.reject(new Error("The live server is shutting down."));
@@ -113,7 +120,27 @@ export async function createLiveDemo({ config, chain, mcp, directory }) {
       state.chargeCapRaw = config.chargeCapRaw;
     if (BigInt(config.depositCapRaw) < BigInt(state.depositCapRaw))
       state.depositCapRaw = config.depositCapRaw;
-    const testril = createLiveTestril(config, mcp, state, save);
+    const timedMcp = {
+      ...mcp,
+      call(name, args = {}) {
+        let label = `Testril ${name}`;
+        if (name === "inspect") label += ` ${args.subject}`;
+        if (["read", "materialize", "provenance"].includes(name)) {
+          const bound =
+            args.bound_function_id ??
+            state.receipts.find((r) => r.paymentId === args.payment_id)
+              ?.function;
+          const wallet = config.wallets.find(
+            (w) => state.functions[w.id] === bound,
+          );
+          label += ` ${wallet?.name ?? "transfer edges"}`;
+          if (name !== "provenance")
+            label += args.payment_id ? " execute" : " quote";
+        }
+        return measure(label, () => mcp.call(name, args));
+      },
+    };
+    const testril = createLiveTestril(config, timedMcp, state, save, measure);
     const current = () => state.transfers.slice(state.startIndex);
     const wallet = (id) => config.wallets.find((w) => w.id === id);
     function paymentHistory(start = 0) {
@@ -207,8 +234,11 @@ export async function createLiveDemo({ config, chain, mcp, directory }) {
     }
     async function recoverTransfer() {
       if (!state.pending) return;
-      await chain.broadcast(state.pending);
-      const transfer = await chain.confirm(state.pending);
+      await stage("RPC broadcast", () => chain.broadcast(state.pending));
+      const transfer = await stage(
+        "RPC receipt wait and block verification",
+        () => chain.confirm(state.pending),
+      );
       if (!transfer.reverted) {
         state.transfers.push(transfer);
       }
@@ -317,7 +347,10 @@ export async function createLiveDemo({ config, chain, mcp, directory }) {
       validateTransfer(from, to, amountRaw);
       if (state.pending)
         throw new Error("A transfer is pending. Refresh before sending again.");
-      const prepared = await chain.prepare(from, to, amountRaw);
+      const prepared = await stage(
+        "RPC transaction preparation and signing",
+        () => chain.prepare(from, to, amountRaw),
+      );
       state.pending = { ...prepared, from, to, amountRaw, kind };
       state.refreshNeeded = true;
       state.revision += 1;
@@ -328,19 +361,34 @@ export async function createLiveDemo({ config, chain, mcp, directory }) {
       id: state.id,
       state: publicState,
       refresh: () => serial(refresh),
-      transfer: (input) =>
-        serial(async () => {
-          if (input.revision !== state.revision) throw stale(publicState());
-          if (state.refreshNeeded)
-            throw new Error(
-              "Refresh live reads before sending another transfer.",
+      transfer(input) {
+        const report = createTransferTiming();
+        return serial(async () => {
+          report.startWork();
+          timing = report;
+          try {
+            if (input.revision !== state.revision) throw stale(publicState());
+            if (state.refreshNeeded)
+              throw new Error(
+                "Refresh live reads before sending another transfer.",
+              );
+            const amount = parseUsdc(input.amount);
+            validateTransfer(input.from, input.to, amount);
+            await stage("Testril balance check before transfer", refresh);
+            await send(input.from, input.to, amount);
+            const result = await stage(
+              "Testril refresh after transfer",
+              refresh,
             );
-          const amount = parseUsdc(input.amount);
-          validateTransfer(input.from, input.to, amount);
-          await refresh();
-          await send(input.from, input.to, amount);
-          return refresh();
-        }),
+            return { ...result, timing: report.finish("success") };
+          } catch (error) {
+            error.timing = report.finish("failed");
+            throw error;
+          } finally {
+            timing = undefined;
+          }
+        });
+      },
       reset: (input) =>
         serial(async () => {
           if (input.revision !== state.revision) throw stale(publicState());

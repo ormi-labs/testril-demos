@@ -138,6 +138,18 @@ If that sequence is interrupted, use `node --env-file=.env src/live-cli.mjs
 resume-smoke` to recover its pending transaction and continue only the remaining
 steps. Use the interface to recover an unrelated run.
 
+## Transfer timings
+
+Each Live Send prints an `[INFO]` breakdown in the terminal and browser console:
+Testril balance checks before signing, RPC preparation/broadcast/confirmation,
+and the Testril refresh afterward. Each Testril phase lists per-wallet quote and
+read calls, payments, materialization, provenance, polling sleeps, and session saves.
+
+The server reports its operation time immediately. After the interface updates,
+the browser reports the measured Send-click-to-refresh duration back to the local
+server, including local HTTP and rendering overhead. Timing reports are temporary;
+they add no Testril requests or charges and contain no signed payloads or keys.
+
 ## Downloads and CLI
 
 **Download source** opens [this demo’s GitHub directory](https://github.com/ormi-labs/testril-demos/tree/main/demos/treasury-analysis).

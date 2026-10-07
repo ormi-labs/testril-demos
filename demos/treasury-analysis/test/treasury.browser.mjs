@@ -543,3 +543,98 @@ test("live reset starts payment history with only the new wallet reads", async (
     .click();
   await expect(page.locator("#testril-server")).toBeHidden();
 });
+
+test("Live Send reports browser click-to-refresh time after updating balances", async ({
+  page,
+}) => {
+  const state = {
+    ...publicState(createDemo()),
+    id: "live-timing-session",
+    mode: "live",
+    mcpUrl: "https://dev.testril.ai/mcp",
+    chain: { id: 84532, name: "Base Sepolia" },
+    token: liveFixture.token,
+    wallets: liveFixture.wallets,
+    refreshNeeded: false,
+    balanceRead: {
+      balances: { treasury: "20000000", a: "0", b: "0" },
+      sources: {},
+    },
+    payment: {
+      spentRaw: "0",
+      depositedRaw: "0",
+      remainingRaw: "100000",
+      requestCount: 0,
+    },
+    receipts: [],
+  };
+  const timing = {
+    id: "browser-timing-report",
+    outcome: "success",
+    elapsedMs: 25,
+    stages: [
+      {
+        name: "Testril refresh after transfer",
+        elapsedMs: 25,
+        details: [
+          { name: "Testril read Treasury execute", calls: 1, elapsedMs: 25 },
+        ],
+      },
+    ],
+  };
+  let reported;
+  const messages = [];
+  page.on("console", (message) => {
+    if (message.type() === "info") messages.push(message.text());
+  });
+  await page.route("**/api/config", (route) =>
+    route.fulfill({ json: { liveAvailable: true } }),
+  );
+  await page.route("**/api/sessions", (route) =>
+    route.request().postDataJSON()?.mode === "live"
+      ? route.fulfill({ status: 201, json: state })
+      : route.continue(),
+  );
+  await page.route(
+    "**/api/sessions/live-timing-session/transfer",
+    async (route) => {
+      await new Promise((resolve) => setTimeout(resolve, 100));
+      state.balanceRead.balances = {
+        treasury: "19750000",
+        a: "250000",
+        b: "0",
+      };
+      state.historyRead.transfers = [
+        {
+          id: "timed-transfer",
+          from: "treasury",
+          to: "a",
+          amountRaw: "250000",
+          block: 123,
+          timestamp: "2026-10-07T00:00:00Z",
+        },
+      ];
+      state.transferCount = 1;
+      await route.fulfill({ json: { ...state, timing } });
+    },
+  );
+  await page.route("**/api/timings", (route) => {
+    reported = route.request().postDataJSON();
+    return route.fulfill({ json: { ok: true } });
+  });
+  await page.reload();
+  await page
+    .locator(".mode-switch label")
+    .filter({ has: page.locator('input[value="live"]') })
+    .click();
+  await expect(page.locator("#balance-treasury")).toHaveText("20");
+  await page.locator("#transfer").click();
+  await expect(page.locator("#balance-treasury")).toHaveText("19.75");
+  await expect(page.locator("#transfer")).toBeEnabled();
+  await expect.poll(() => reported?.elapsedMs ?? 0).toBeGreaterThanOrEqual(80);
+  expect(reported.id).toBe(timing.id);
+  expect(messages.join("\n")).toContain("[INFO] Send click → refreshed UI");
+  expect(messages.join("\n")).toContain(
+    "Testril refresh after transfer: 0.025s",
+  );
+});
