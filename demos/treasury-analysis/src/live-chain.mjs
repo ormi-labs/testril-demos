@@ -47,15 +47,31 @@ export function createLiveChain(config) {
         await rpc.sendRawTransaction({
           serializedTransaction: pending.serialized,
         });
-      } catch {
+      } catch (error) {
         // An uncertain response may still mean the exact transaction was accepted.
         const known = await rpc
           .getTransaction({ hash: pending.hash })
           .catch(() => null);
-        if (!known)
-          throw new Error(
-            "The RPC did not acknowledge the transfer. Its signed transaction is saved for recovery; do not send another transfer.",
+        if (!known) {
+          const details = String(
+            error.details ?? error.shortMessage ?? "",
+          ).toLowerCase();
+          const reason = /too many requests|rate limit/.test(details)
+            ? "rate-limited"
+            : /insufficient funds/.test(details)
+              ? "insufficient-gas"
+              : /fee cap|underpriced|base fee/.test(details)
+                ? "fee-too-low"
+                : /nonce/.test(details)
+                  ? "nonce-conflict"
+                  : "provider-or-connection-error";
+          throw Object.assign(
+            new Error(
+              `The RPC did not acknowledge the transfer (${reason}). Its signed transaction is saved for recovery; do not send another transfer.`,
+            ),
+            { code: "RPC_BROADCAST_UNACKNOWLEDGED", reason },
           );
+        }
       }
     },
     async confirm(pending) {

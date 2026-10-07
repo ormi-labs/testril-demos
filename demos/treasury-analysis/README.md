@@ -278,3 +278,5 @@ receipt records the transaction hash and log index.
 Embedding applications can pass an optional `authorizePayment` callback to `createLiveDemo`. It receives only the quote ID, charge and escrow deposit amounts before settlement. Rejecting it stops that payment without recording an uncertain settlement. Local runs omit it; hosting/session controls belong in the separate harness.
 
 An embedding host can provide `createLiveDemo({journal})` with `load()`, `save(contents)` and `close()` methods. The default journal uses local files and a process lock. A hosted journal must durably save each payment authorization and signed transfer before its promise resolves; failed saves stop further actions until the engine is recreated. This lets a host use durable storage without adding hosting dependencies to this downloadable demo.
+
+RPC submission failures stop the transfer promptly unless the node can find the exact signed transaction. The saved transaction remains available for recovery; do not send a replacement just because submission or confirmation failed. Confirmation waits for one receipt and checks its canonical block, without transaction-replacement scanning.
