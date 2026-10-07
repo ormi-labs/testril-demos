@@ -272,7 +272,7 @@ test("invalid transfer preserves histories; refresh resumes cached reads and dow
   );
 });
 
-test("live mode shows full Testril balances and preserves costs on reset", async ({
+test("live reset starts payment history with only the new wallet reads", async ({
   page,
 }, testInfo) => {
   const state = {
@@ -309,6 +309,43 @@ test("live mode shows full Testril balances and preserves costs on reset", async
     return route.continue();
   });
   await page.route("**/api/sessions/live-browser-session/**", async (route) => {
+    if (route.request().url().endsWith("/reset")) {
+      state.payment = {
+        spentRaw: "423",
+        lifetimeSpentRaw: "564",
+        depositedRaw: "100000",
+        remainingRaw: "99436",
+        requestCount: 3,
+        lifetimeRequestCount: 4,
+      };
+      state.receipts = state.wallets.flatMap((wallet) => [
+        {
+          id: `reset-materialize-${wallet.id}`,
+          kind: "materialization",
+          status: "done",
+          chargeRaw: "120",
+          requestCount: 0,
+          timestamp: "2026-10-07T00:00:10Z",
+          block: 124,
+          lines: [
+            { label: "materialize_blocks", units: 1, unit_price: 0.00012 },
+          ],
+        },
+        {
+          id: `reset-read-${wallet.id}`,
+          kind: "reads",
+          status: "done",
+          chargeRaw: "21",
+          requestCount: 1,
+          timestamp: "2026-10-07T00:00:10Z",
+          block: 124,
+          lines: [
+            { label: "query_read", units: 1, unit_price: 0.00002 },
+            { label: "query_blocks", units: 1, unit_price: 0.000001 },
+          ],
+        },
+      ]);
+    }
     if (route.request().url().endsWith("/refresh")) {
       if (refreshCount++) {
         state.refreshNeeded = true;
@@ -423,7 +460,20 @@ test("live mode shows full Testril balances and preserves costs on reset", async
     "Escrow deposited separately: 0.100000 USDC",
   );
   await page.locator("#reset").click();
-  await expect(page.locator("#spent")).toHaveText("0.000141");
+  await expect(page.locator("#spent")).toHaveText("0.000423");
+  await expect(page.locator("#read-count")).toHaveText("3");
+  await expect(page.locator("#payment-count")).toHaveText("6");
+  await expect(page.locator("#receipt-rows tr")).toHaveCount(6);
+  await expect(page.locator("#receipt-rows")).not.toContainText("00:00:00 UTC");
+  await page.screenshot({
+    path: fileURLToPath(
+      new URL(
+        `../../../docs/screenshots/treasury-live-reset-payments-${testInfo.project.name}.png`,
+        import.meta.url,
+      ),
+    ),
+    fullPage: true,
+  });
   await page.locator("#refresh-live").click();
   await expect(page.locator("#status")).toHaveText("Testril read failed.");
   await expect(page.locator("#balance-treasury")).toHaveText("20");

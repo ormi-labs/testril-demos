@@ -75,7 +75,7 @@ try {
     await demo.reset({ revision: demo.state().revision });
     console.log("Reset returned the demo funds to Treasury.");
     console.log(
-      `Testril charges: ${decimalAmount(demo.state().payment.spentRaw)} test USDC; escrow deposited: ${decimalAmount(demo.state().payment.depositedRaw)} test USDC.`,
+      `Testril charges across all runs: ${decimalAmount(demo.state().payment.lifetimeSpentRaw)} test USDC; escrow deposited: ${decimalAmount(demo.state().payment.depositedRaw)} test USDC.`,
     );
   }
 } catch (error) {

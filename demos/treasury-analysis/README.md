@@ -96,8 +96,14 @@ cached Testril results in `actualBalances` / `balanceRead`.
 All live browser tabs share one session. `.live-state.json` persists the allowance,
 payment usage, cached paid results, and a pending signed transaction. It contains
 no private keys, but stays local and is excluded from downloads. **Do not delete
-it to reset a run.** Reset returns only the demo allocation to Treasury; it spends
-gas and preserves payment receipts, escrow, and caps. It cannot undo payments.
+it to reset a run.** Reset returns only the demo allocation to Treasury, starts new
+transfer and payment histories, and refreshes the three wallet balances. The
+displayed cost and read count cover the current run. Materialization has separate
+payment entries; cached results incur no new payment or paid-read count. Earlier
+receipts, cumulative spending, escrow, and caps remain saved. Reset cannot undo
+payments or refill a cap. Live run exports include the current run's `receipts`
+and all saved payments in `allReceipts`, with cumulative payment totals in
+`lifetimeSpentRaw` and `lifetimeRequestCount`.
 
 If a transfer or a later read fails, use **Refresh live reads**. The recorded
 transaction hash is recovered without signing another transfer; paid results are

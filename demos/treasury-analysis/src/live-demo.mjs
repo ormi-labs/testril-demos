@@ -91,6 +91,7 @@ export async function createLiveDemo({ config, chain, mcp, directory }) {
         snapshot,
         transfers: [],
         receipts: [],
+        paymentStartIndex: 0,
         startIndex: 0,
         pending: null,
         lastReset: null,
@@ -109,58 +110,10 @@ export async function createLiveDemo({ config, chain, mcp, directory }) {
     const testril = createLiveTestril(config, mcp, state, save);
     const current = () => state.transfers.slice(state.startIndex);
     const wallet = (id) => config.wallets.find((w) => w.id === id);
-    function publicState() {
-      const sources = Object.fromEntries(
-        config.wallets.map((w) => [
-          w.id,
-          state.balanceEvidence[w.id]?.source ?? null,
-        ]),
-      );
-      const actualBalances = Object.fromEntries(
-        config.wallets.map((w) => [w.id, sources[w.id]?.balanceRaw ?? null]),
-      );
-      const spent = state.receipts.reduce(
-        (sum, r) => sum + BigInt(r.chargeRaw),
-        0n,
-      );
-      return {
-        mode: "live",
-        mcpUrl: config.mcpUrl,
-        id: state.id,
-        revision: state.revision,
-        cycle: state.cycle,
-        chain: config.chain,
-        token: config.token,
-        wallets: config.wallets,
-        initialBalances: state.initialBalances,
-        balances: state.balances,
-        actualBalances,
-        transferCount: current().length,
-        balanceRead: {
-          balances: actualBalances,
-          sources,
-          function: "erc20.token_balance",
-        },
-        historyRead: { transfers: current() },
-        lastReset: state.lastReset,
-        refreshNeeded: state.refreshNeeded,
-        pending: state.pending ? { hash: state.pending.hash } : null,
-        payment: {
-          address: config.payer.address,
-          initialRaw: state.chargeCapRaw,
-          remainingRaw: (spent < BigInt(state.chargeCapRaw)
-            ? BigInt(state.chargeCapRaw) - spent
-            : 0n
-          ).toString(),
-          spentRaw: spent.toString(),
-          requestCount: state.receipts.reduce(
-            (sum, r) => sum + r.requestCount,
-            0,
-          ),
-          depositedRaw: state.depositedRaw,
-          depositCapRaw: state.depositCapRaw,
-        },
-        receipts: state.receipts.map(
+    function paymentHistory(start = 0) {
+      return state.receipts
+        .slice(start)
+        .map(
           ({
             mode,
             id,
@@ -186,7 +139,64 @@ export async function createLiveDemo({ config, chain, mcp, directory }) {
             block,
             timestamp,
           }),
-        ),
+        );
+    }
+    function publicState() {
+      const sources = Object.fromEntries(
+        config.wallets.map((w) => [
+          w.id,
+          state.balanceEvidence[w.id]?.source ?? null,
+        ]),
+      );
+      const actualBalances = Object.fromEntries(
+        config.wallets.map((w) => [w.id, sources[w.id]?.balanceRaw ?? null]),
+      );
+      const lifetimeSpent = state.receipts.reduce(
+        (sum, r) => sum + BigInt(r.chargeRaw),
+        0n,
+      );
+      const receipts = paymentHistory(state.paymentStartIndex ?? 0);
+      const spent = receipts.reduce((sum, r) => sum + BigInt(r.chargeRaw), 0n);
+      return {
+        mode: "live",
+        mcpUrl: config.mcpUrl,
+        id: state.id,
+        revision: state.revision,
+        cycle: state.cycle,
+        chain: config.chain,
+        token: config.token,
+        wallets: config.wallets,
+        initialBalances: state.initialBalances,
+        balances: state.balances,
+        actualBalances,
+        transferCount: current().length,
+        balanceRead: {
+          balances: actualBalances,
+          sources,
+          function: "erc20.token_balance",
+        },
+        historyRead: { transfers: current() },
+        lastReset: state.lastReset,
+        refreshNeeded: state.refreshNeeded,
+        pending: state.pending ? { hash: state.pending.hash } : null,
+        payment: {
+          address: config.payer.address,
+          initialRaw: state.chargeCapRaw,
+          remainingRaw: (lifetimeSpent < BigInt(state.chargeCapRaw)
+            ? BigInt(state.chargeCapRaw) - lifetimeSpent
+            : 0n
+          ).toString(),
+          spentRaw: spent.toString(),
+          requestCount: receipts.reduce((sum, r) => sum + r.requestCount, 0),
+          lifetimeSpentRaw: lifetimeSpent.toString(),
+          lifetimeRequestCount: state.receipts.reduce(
+            (sum, r) => sum + r.requestCount,
+            0,
+          ),
+          depositedRaw: state.depositedRaw,
+          depositCapRaw: state.depositCapRaw,
+        },
+        receipts,
       };
     }
     async function recoverTransfer() {
@@ -346,6 +356,10 @@ export async function createLiveDemo({ config, chain, mcp, directory }) {
       reset: (input) =>
         serial(async () => {
           if (input.revision !== state.revision) throw stale(publicState());
+          if (state.receipts.some((r) => r.status === "paying"))
+            throw new Error(
+              "A payment has an uncertain result. Reconcile its quote before resetting.",
+            );
           await recoverTransfer();
           const sweeps = [];
           for (const w of config.wallets.filter((w) => w.id !== "treasury")) {
@@ -355,6 +369,7 @@ export async function createLiveDemo({ config, chain, mcp, directory }) {
             sweeps.push(state.transfers.at(-1));
           }
           state.startIndex = state.transfers.length;
+          state.paymentStartIndex = state.receipts.length;
           state.cycle += 1;
           state.lastReset = {
             mode: "live",
@@ -421,10 +436,11 @@ export async function createLiveDemo({ config, chain, mcp, directory }) {
       },
       export() {
         return {
-          formatVersion: 2,
+          formatVersion: 3,
           ...publicState(),
           transfers: current(),
-          note: "Live Base Sepolia run. actualBalances contains cached Testril wallet reads; balances and initialBalances track the separate 1 USDC transfer allowance. RPC receipts and Testril block citations are separate evidence sources.",
+          allReceipts: paymentHistory(),
+          note: "Live Base Sepolia run. receipts and payment.spentRaw cover this run; allReceipts and lifetime payment totals cover the saved session. actualBalances contains cached Testril wallet reads; balances and initialBalances track the separate 1 USDC transfer allowance. RPC receipts and Testril block citations are separate evidence sources.",
           balanceProvenance: config.wallets.map(
             (w) => state.balanceEvidence[w.id] ?? null,
           ),

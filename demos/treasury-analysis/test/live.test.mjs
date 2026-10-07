@@ -124,8 +124,21 @@ test("HTTP MCP payments reuse escrow; the 1 USDC allowance reserves other funds 
   assert.deepEqual(demo.state().balances, before.balances);
   assert.equal(peer.balances.treasury, "20000000");
   assert.equal(peer.balances.a, "500000");
-  assert.ok(BigInt(demo.state().payment.spentRaw) > spent);
-  assert.ok(demo.state().receipts.length > receipts);
+  assert.ok(BigInt(demo.state().payment.lifetimeSpentRaw) > spent);
+  assert.ok(demo.export().allReceipts.length > receipts);
+  assert.equal(demo.state().payment.requestCount, 3);
+  assert.equal(
+    demo.state().receipts.filter((r) => r.kind === "reads").length,
+    3,
+  );
+  assert.equal(
+    BigInt(demo.state().payment.spentRaw),
+    BigInt(demo.state().payment.lifetimeSpentRaw) - spent,
+  );
+  assert.equal(
+    BigInt(demo.state().payment.remainingRaw),
+    100000n - BigInt(demo.state().payment.lifetimeSpentRaw),
+  );
   assert.equal(demo.export().transfers.length, 0);
   const saved = demo.state();
   assert.ok(!JSON.stringify(saved).includes("privateKey"));
@@ -136,7 +149,49 @@ test("HTTP MCP payments reuse escrow; the 1 USDC allowance reserves other funds 
     assert.ok(!disk.includes(key));
   await peer.restart();
   assert.deepEqual(peer.demo.state().payment, saved.payment);
+  assert.deepEqual(peer.demo.state().receipts, saved.receipts);
   assert.equal(peer.demo.state().id, saved.id);
+});
+
+test("reset reuses cached reads without inventing payments and never replenishes the lifetime cap", async (t) => {
+  const peer = await livePeer(t);
+  await peer.demo.refresh();
+  const previous = peer.demo.state();
+  await peer.demo.reset({ revision: previous.revision });
+  assert.equal(peer.demo.state().payment.spentRaw, "0");
+  assert.equal(peer.demo.state().payment.requestCount, 0);
+  assert.deepEqual(peer.demo.state().receipts, []);
+  assert.equal(
+    peer.demo.state().payment.lifetimeSpentRaw,
+    previous.payment.spentRaw,
+  );
+  assert.equal(
+    peer.demo.state().payment.remainingRaw,
+    previous.payment.remainingRaw,
+  );
+  assert.equal(peer.demo.export().allReceipts.length, previous.receipts.length);
+  peer.config.chargeCapRaw = previous.payment.spentRaw;
+  await peer.restart();
+  assert.equal(peer.demo.state().payment.remainingRaw, "0");
+  const payments = peer.calls.filter((c) => c.name === "pay_quote").length;
+  await assert.rejects(
+    peer.demo.transfer({
+      revision: peer.demo.state().revision,
+      from: "treasury",
+      to: "a",
+      amount: ".25",
+    }),
+    /charge cap/,
+  );
+  assert.equal(
+    peer.calls.filter((c) => c.name === "pay_quote").length,
+    payments,
+  );
+  assert.equal(peer.demo.state().payment.spentRaw, "0");
+  assert.equal(
+    peer.demo.state().payment.lifetimeSpentRaw,
+    previous.payment.spentRaw,
+  );
 });
 
 test("concurrent tabs cannot authorize two transfers with one revision", async (t) => {
@@ -217,6 +272,11 @@ test("an uncertain settlement reserves the caps and refuses any second payment a
   });
   assert.equal(peer.demo.state().payment.spentRaw, "120");
   assert.equal(peer.demo.state().payment.depositedRaw, "100000");
+  await assert.rejects(
+    peer.demo.reset({ revision: peer.demo.state().revision }),
+    /uncertain/,
+  );
+  assert.equal(peer.demo.state().payment.spentRaw, "120");
   await peer.restart();
   await assert.rejects(peer.demo.refresh(), /uncertain/);
   assert.equal(peer.calls.filter((c) => c.name === "pay_quote").length, 1);

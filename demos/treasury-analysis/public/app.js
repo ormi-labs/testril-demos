@@ -122,7 +122,7 @@ function renderState() {
     : "Total read cost · USDC";
   $("operation-label").textContent = live ? "Operation" : "Read";
   $("reset-note").textContent = live
-    ? "Reset returns the demo funds to Treasury. Payments, escrow, and spending caps remain."
+    ? "Reset returns the demo funds to Treasury and starts new histories. Earlier payments, escrow, and spending caps remain saved."
     : "Reset clears both histories and restores the mock payment wallet.";
   $("wallets").replaceChildren(
     ...state.wallets.map((wallet) => {
@@ -178,7 +178,7 @@ function renderState() {
     costButton(
       state.payment.spentRaw,
       live
-        ? `Testril charges: ${feeAmount(state.payment.spentRaw)} USDC\nEscrow deposited separately: ${feeAmount(state.payment.depositedRaw)} USDC\nGas is paid separately in ETH`
+        ? `Testril charges this run: ${feeAmount(state.payment.spentRaw)} USDC\nEscrow deposited separately: ${feeAmount(state.payment.depositedRaw)} USDC\nGas is paid separately in ETH`
         : `Balance reads: ${feeAmount(balanceCost.toString())} USDC\nTransfer history reads: ${feeAmount(historyCost.toString())} USDC\nMock rates`,
     ),
   );
