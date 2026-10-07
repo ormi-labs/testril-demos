@@ -33,7 +33,7 @@ Test behavior a demo user would notice, including meaningful failure cases. Pref
 
 READMEs must be clear and terse: purpose, prerequisites, copyable setup/run commands, expected result, and required configuration. Update them alongside behavior. The root README indexes runnable demos. Distinguish source downloads from exports of an individual run; document what each contains. Write plans for human engineers: use plain headings, name the work and dependencies, and state how to verify it. Avoid slogans and marketing jargon.
 
-A commit is a complete unit; a PR groups related units. Use imperative subjects and hand over completed work through a PR with its URL. Describe user-visible changes and verification; include screenshots for interface changes.
+A commit is a complete unit. Use imperative subjects. For now, push completed changes and merge into `main` directly; do not open PRs. Describe user-visible changes and verification; include screenshots for interface changes.
 
 ## Public Repository Hygiene
 
