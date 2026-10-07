@@ -28,8 +28,11 @@ Open **http://127.0.0.1:4173**. Optional: copy `.env.example` to `.env` to chang
 3. **Transfer History** updates after each transfer, with one row per event, UTC
    times, and block numbers. Use Replay to watch it build. Click an arrow or a
    balance for mock source evidence; close the modal with Escape or Close.
-4. **Payment History** shows the newest receipts first, with read costs and block
-   numbers. Hover over
+4. **Payment History** separates Reading and Materialization, showing each cost
+   and count alongside the overall total. Reading counts individual read requests;
+   materialization counts materialization entries. Totals cover the current run
+   and reset with its payment history. Receipts appear newest first, with costs
+   and block numbers. Hover over
    a cost (or focus or tap it) for its breakdown. It stays current even when
    its tab is hidden. Switching tabs, replay, and provenance inspection are free.
 5. **Reset demo**, below the header, returns funds to Treasury and clears Transfer
@@ -142,10 +145,13 @@ If that sequence is interrupted, use `node --env-file=.env src/live-cli.mjs
 resume-smoke` to recover its pending transaction and continue only the remaining
 steps. Use the interface to recover an unrelated run.
 
-Live Send opens a progress modal showing Requesting Transfer, Materializing Data,
-Paying, and Reading Data, with elapsed time. Its activity comes from the running
-server operation; parallel steps can be active together. Local progress checks add
-no Testril calls or charges. The modal closes when the response updates the balances
+Live Send opens a progress modal with separate **Base Sepolia · RPC** and
+**Testril** sections. RPC shows preparation, submission, and confirmation; Testril
+shows materialization, payment, and reading. Each section shows its wall-clock
+time, alongside the total elapsed time. The RPC timer stops when the transfer is
+confirmed; Testril time includes its parallel work without adding overlapping
+call durations. Activity comes from the running server operation. Local progress
+checks add no Testril calls or charges. The modal closes when the response updates the balances
 or reports an error. Cached steps are marked “Not needed.” To verify visually,
 send a small Live transfer: the modal should show the amount and wallet pair,
 update its active steps, then close with the new balances visible. Failure should

@@ -1,7 +1,9 @@
-const keys = ["transfer", "materialize", "pay", "read"];
+const keys = ["prepare", "broadcast", "confirm", "materialize", "pay", "read"];
 
 function category(name) {
-  if (name.startsWith("RPC ")) return "transfer";
+  if (name === "RPC transaction preparation and signing") return "prepare";
+  if (name === "RPC broadcast") return "broadcast";
+  if (name === "RPC receipt wait and block verification") return "confirm";
   if (name.startsWith("Testril read ")) return "read";
   if (
     name.startsWith("Testril materialize ") ||
@@ -21,17 +23,23 @@ function category(name) {
 export function createTransferProgress(revision) {
   let outcome = "running";
   let resources = new Map();
+  const phases = { rpc: {}, testril: {} };
   const steps = Object.fromEntries(
     keys.map((key) => [key, { active: 0, started: false, complete: false }]),
   );
   return {
     async track(name, operation) {
-      const step = steps[category(name)];
+      const key = category(name);
+      const step = steps[key];
       if (!step || outcome !== "running") return operation();
+      const rpc = ["prepare", "broadcast", "confirm"].includes(key);
+      if (rpc) phases.rpc.start ??= performance.now();
       step.started = true;
       step.active++;
       try {
-        return await operation();
+        const result = await operation();
+        if (rpc) step.complete = true;
+        return result;
       } finally {
         step.active--;
       }
@@ -52,15 +60,36 @@ export function createTransferProgress(revision) {
         steps[key].complete = [...resources.values()].every((r) => r[key]);
     },
     transferred() {
-      steps.transfer.complete = true;
+      phases.rpc.end = performance.now();
+      phases.rpc.complete = true;
+    },
+    refreshing() {
+      phases.testril.start = performance.now();
     },
     finish(result) {
       outcome = result;
+      for (const phase of Object.values(phases)) {
+        if (phase.start !== undefined) phase.end ??= performance.now();
+      }
+      phases.testril.complete = result === "success";
     },
     snapshot() {
       return {
         revision,
         outcome,
+        phases: Object.fromEntries(
+          Object.entries(phases).map(([key, phase]) => [
+            key,
+            {
+              started: phase.start !== undefined,
+              complete: !!phase.complete,
+              elapsedMs:
+                phase.start === undefined
+                  ? 0
+                  : (phase.end ?? performance.now()) - phase.start,
+            },
+          ]),
+        ),
         steps: Object.fromEntries(keys.map((key) => [key, { ...steps[key] }])),
       };
     },

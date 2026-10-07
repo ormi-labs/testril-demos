@@ -223,7 +223,14 @@ test("live source dialogs fetch provenance on demand without charging for metada
 test("live progress reports actual overlapping work without adding Testril calls", async (t) => {
   let paused = false;
   const gates = new Map();
-  for (const key of ["transfer", "pay", "materialize", "read"]) {
+  for (const key of [
+    "transfer",
+    "broadcast",
+    "confirm",
+    "pay",
+    "materialize",
+    "read",
+  ]) {
     let entered;
     let release;
     const started = new Promise((resolve) => {
@@ -265,6 +272,17 @@ test("live progress reports actual overlapping work without adding Testril calls
     }
     return prepare(...args);
   };
+  for (const key of ["broadcast", "confirm"]) {
+    const operation = peer.chain[key];
+    peer.chain[key] = async (...args) => {
+      if (paused) {
+        const gate = gates.get(key);
+        gate.entered();
+        await gate.ready;
+      }
+      return operation(...args);
+    };
+  }
   const url = await serve(t, {
     env: peer.env,
     liveFactory: async () => peer.demo,
@@ -288,11 +306,31 @@ test("live progress reports actual overlapping work without adding Testril calls
   const first = await progress();
   assert.equal(first.revision, ready.revision);
   assert.equal(first.outcome, "running");
-  assert.equal(first.steps.transfer.active, 1);
+  assert.equal(first.steps.prepare.active, 1);
+  assert.equal(first.phases.rpc.started, true);
+  assert.equal(first.phases.rpc.complete, false);
+  assert.equal(first.phases.testril.started, false);
   assert.equal(first.steps.pay.started, false);
   gates.get("transfer").release();
+  await gates.get("broadcast").started;
+  const submitting = await progress();
+  assert.equal(submitting.steps.prepare.complete, true);
+  assert.equal(submitting.steps.broadcast.active, 1);
+  assert.equal(submitting.steps.confirm.started, false);
+  gates.get("broadcast").release();
+  await gates.get("confirm").started;
+  const confirming = await progress();
+  assert.equal(confirming.steps.broadcast.complete, true);
+  assert.equal(confirming.steps.confirm.active, 1);
+  assert.equal(confirming.phases.testril.started, false);
+  assert.ok(confirming.phases.rpc.elapsedMs >= first.phases.rpc.elapsedMs);
+  gates.get("confirm").release();
   await gates.get("pay").started;
-  assert.equal((await progress()).steps.transfer.complete, true);
+  const transferred = await progress();
+  assert.equal(transferred.steps.confirm.complete, true);
+  assert.equal(transferred.phases.rpc.complete, true);
+  assert.equal(transferred.phases.testril.started, true);
+  const rpcTime = transferred.phases.rpc.elapsedMs;
   assert.equal((await progress()).steps.pay.active, 1);
   gates.get("pay").release();
   await gates.get("materialize").started;
@@ -301,6 +339,10 @@ test("live progress reports actual overlapping work without adding Testril calls
   await gates.get("read").started;
   const reading = await progress();
   assert.equal(reading.steps.read.active, 3);
+  assert.equal(reading.phases.rpc.elapsedMs, rpcTime);
+  assert.ok(
+    reading.phases.testril.elapsedMs > transferred.phases.testril.elapsedMs,
+  );
   assert.equal(reading.steps.materialize.complete, true);
   assert.equal(reading.steps.pay.complete, true);
   const calls = peer.calls.length;
@@ -313,6 +355,13 @@ test("live progress reports actual overlapping work without adding Testril calls
   assert.equal(result.timing.outcome, "success");
   const final = await progress();
   assert.equal(final.outcome, "success");
+  assert.equal(final.phases.rpc.elapsedMs, rpcTime);
+  assert.equal(final.phases.testril.complete, true);
+  assert.ok(final.phases.testril.elapsedMs > reading.phases.testril.elapsedMs);
+  assert.ok(
+    final.phases.rpc.elapsedMs + final.phases.testril.elapsedMs <=
+      result.timing.elapsedMs,
+  );
   assert.ok(
     Object.values(final.steps).every((s) => s.complete && s.active === 0),
   );

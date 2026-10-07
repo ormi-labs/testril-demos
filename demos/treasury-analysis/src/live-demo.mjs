@@ -412,6 +412,7 @@ export async function createLiveDemo({ config, chain, mcp, directory }) {
             validateTransfer(input.from, input.to, amount);
             const transfer = await send(input.from, input.to, amount);
             progress.transferred();
+            progress.refreshing();
             const result = await stage("Testril refresh after transfer", () =>
               refresh(transfer.block, [input.from, input.to]),
             );

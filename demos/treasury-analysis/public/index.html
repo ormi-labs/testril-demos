@@ -166,14 +166,42 @@
             tabindex="0"
             hidden
           >
+            <div class="payment-total">
+              <span id="cost-label">Total read cost · USDC</span>
+              <strong id="spent">0.000000</strong>
+            </div>
             <div class="payment-grid">
-              <div>
-                <span id="cost-label">Total read cost · USDC</span
-                ><strong id="spent">0.000000</strong>
-              </div>
-              <div>
-                <span>Read requests</span><strong id="read-count">0</strong>
-              </div>
+              <section
+                class="payment-operation"
+                aria-labelledby="reading-cost-heading"
+              >
+                <h3 id="reading-cost-heading">Reading</h3>
+                <div class="payment-metrics">
+                  <div>
+                    <span>Cost · USDC</span
+                    ><strong id="read-cost">0.000000</strong>
+                  </div>
+                  <div>
+                    <span>Read requests</span><strong id="read-count">0</strong>
+                  </div>
+                </div>
+              </section>
+              <section
+                class="payment-operation"
+                aria-labelledby="materialization-cost-heading"
+              >
+                <h3 id="materialization-cost-heading">Materialization</h3>
+                <div class="payment-metrics">
+                  <div>
+                    <span>Cost · USDC</span
+                    ><strong id="materialization-cost">0.000000</strong>
+                  </div>
+                  <div>
+                    <span>Occurrences</span
+                    ><strong id="materialization-count">0</strong>
+                  </div>
+                </div>
+              </section>
             </div>
             <div class="table-scroll">
               <table>
@@ -210,26 +238,54 @@
       <p class="eyebrow">Live transfer</p>
       <h2 id="progress-heading" tabindex="-1">Sending USDC</h2>
       <p id="progress-summary" class="muted"></p>
-      <ol class="progress-steps">
-        <li data-progress="transfer">
-          <span class="progress-icon" aria-hidden="true"></span>
-          <span>Requesting Transfer</span
-          ><small class="progress-state">Pending</small>
-        </li>
-        <li data-progress="materialize">
-          <span class="progress-icon" aria-hidden="true"></span>
-          <span>Materializing Data</span
-          ><small class="progress-state">Pending</small>
-        </li>
-        <li data-progress="pay">
-          <span class="progress-icon" aria-hidden="true"></span>
-          <span>Paying</span><small class="progress-state">Pending</small>
-        </li>
-        <li data-progress="read">
-          <span class="progress-icon" aria-hidden="true"></span>
-          <span>Reading Data</span><small class="progress-state">Pending</small>
-        </li>
-      </ol>
+      <section class="progress-phase" aria-labelledby="rpc-progress-heading">
+        <div class="progress-phase-heading">
+          <h3 id="rpc-progress-heading">Base Sepolia · RPC</h3>
+          <span id="rpc-progress-elapsed" class="small muted"></span>
+        </div>
+        <ol class="progress-steps">
+          <li data-progress="prepare">
+            <span class="progress-icon" aria-hidden="true"></span>
+            <span>Preparing Transfer</span
+            ><small class="progress-state">Pending</small>
+          </li>
+          <li data-progress="broadcast">
+            <span class="progress-icon" aria-hidden="true"></span>
+            <span>Submitting Transfer</span
+            ><small class="progress-state">Pending</small>
+          </li>
+          <li data-progress="confirm">
+            <span class="progress-icon" aria-hidden="true"></span>
+            <span>Confirming Transfer</span
+            ><small class="progress-state">Pending</small>
+          </li>
+        </ol>
+      </section>
+      <section
+        class="progress-phase"
+        aria-labelledby="testril-progress-heading"
+      >
+        <div class="progress-phase-heading">
+          <h3 id="testril-progress-heading">Testril</h3>
+          <span id="testril-progress-elapsed" class="small muted"></span>
+        </div>
+        <ol class="progress-steps">
+          <li data-progress="materialize">
+            <span class="progress-icon" aria-hidden="true"></span>
+            <span>Materializing Data</span
+            ><small class="progress-state">Pending</small>
+          </li>
+          <li data-progress="pay">
+            <span class="progress-icon" aria-hidden="true"></span>
+            <span>Paying</span><small class="progress-state">Pending</small>
+          </li>
+          <li data-progress="read">
+            <span class="progress-icon" aria-hidden="true"></span>
+            <span>Reading Data</span
+            ><small class="progress-state">Pending</small>
+          </li>
+        </ol>
+      </section>
       <p
         id="progress-activity"
         class="sr-only"
@@ -237,7 +293,8 @@
         aria-live="polite"
       ></p>
       <div class="progress-footer small muted">
-        <span>Steps can run together.</span><span id="progress-elapsed"></span>
+        <span>Testril steps can run together.</span
+        ><span id="progress-elapsed"></span>
       </div>
     </dialog>
     <dialog

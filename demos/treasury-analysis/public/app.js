@@ -185,7 +185,31 @@ function renderState() {
         : `Balance reads: ${feeAmount(balanceCost.toString())} USDC\nTransfer history reads: ${feeAmount(historyCost.toString())} USDC\nMock rates`,
     ),
   );
-  $("read-count").textContent = state.payment.requestCount;
+  const materializations = state.receipts.filter(
+    (r) => r.kind === "materialization",
+  );
+  const reads = state.receipts.filter((r) => r.kind !== "materialization");
+  const readCount = reads.reduce((sum, r) => sum + r.requestCount, 0);
+  const readCost = reads
+    .reduce((sum, r) => sum + BigInt(r.chargeRaw), 0n)
+    .toString();
+  const materializationCost = materializations
+    .reduce((sum, r) => sum + BigInt(r.chargeRaw), 0n)
+    .toString();
+  $("read-count").textContent = readCount;
+  $("materialization-count").textContent = materializations.length;
+  $("read-cost").replaceChildren(
+    costButton(
+      readCost,
+      `${readCount} read requests: ${feeAmount(readCost)} USDC`,
+    ),
+  );
+  $("materialization-cost").replaceChildren(
+    costButton(
+      materializationCost,
+      `${materializations.length} materializations: ${feeAmount(materializationCost)} USDC`,
+    ),
+  );
   $("receipt-rows").replaceChildren(
     ...state.receipts.toReversed().map((receipt) => {
       const row = element("tr");
@@ -394,12 +418,20 @@ function showTransferProgress(input, started) {
   const controller = new AbortController();
   const progressUrl = endpoint("progress");
   const labels = {
-    transfer: "Requesting Transfer",
+    prepare: "RPC: Preparing Transfer",
+    broadcast: "RPC: Submitting Transfer",
+    confirm: "RPC: Confirming Transfer",
     materialize: "Materializing Data",
     pay: "Paying",
     read: "Reading Data",
   };
-  const render = (steps) => {
+  const render = (steps, phases = {}) => {
+    for (const key of ["rpc", "testril"]) {
+      const phase = phases[key];
+      $(`${key}-progress-elapsed`).textContent = phase?.started
+        ? `${(phase.elapsedMs / 1000).toFixed(1)}s`
+        : "Pending";
+    }
     const active = [];
     for (const row of dialog.querySelectorAll("[data-progress]")) {
       const key = row.dataset.progress;
@@ -430,7 +462,7 @@ function showTransferProgress(input, started) {
       `${((performance.now() - started) / 1000).toFixed(1)}s elapsed`;
   };
   elapsed();
-  render({ transfer: { active: 1, started: true } });
+  render({});
   dialog.showModal();
   $("progress-heading").focus({ preventScroll: true });
   const clock = setInterval(elapsed, 100);
@@ -448,7 +480,7 @@ function showTransferProgress(input, started) {
             progress?.revision === input.revision &&
             progress.outcome === "running"
           )
-            render(progress.steps);
+            render(progress.steps, progress.phases);
         }
       } catch {
         // The transfer response remains authoritative if progress is unavailable.

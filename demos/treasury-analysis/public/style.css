@@ -421,7 +421,39 @@ meter::-moz-meter-bar {
   font-size: 11px;
   border-radius: 3px;
 }
-.payment-history .payment-grid {
+.payment-history .payment-total {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 20px;
+  font-size: 12px;
+  color: var(--muted);
+}
+.payment-total strong {
+  font-size: 23px;
+  font-weight: 400;
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+}
+.payment-operation {
+  padding: 16px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: var(--visual);
+}
+.payment-operation h3 {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--accent);
+  margin-bottom: 12px;
+}
+.payment-metrics {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 16px;
+}
+.payment-grid {
   margin-top: 0;
 }
 .history-section {
@@ -576,19 +608,39 @@ dialog::backdrop {
   margin: 12px 0 24px;
   overflow-wrap: anywhere;
 }
+.progress-phase + .progress-phase {
+  border-top: 1px solid var(--line);
+  margin-top: 16px;
+  padding-top: 16px;
+}
+.progress-phase-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 12px;
+  margin-bottom: 6px;
+}
+.progress-phase-heading h3 {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--accent);
+}
+.progress-phase-heading span {
+  font-variant-numeric: tabular-nums;
+}
 .progress-steps {
   list-style: none;
   margin: 0;
   padding: 0;
   display: grid;
-  gap: 12px;
+  gap: 4px;
 }
 .progress-steps li {
   display: grid;
   grid-template-columns: 20px minmax(0, 1fr) auto;
   align-items: center;
   gap: 12px;
-  padding: 12px 0;
+  padding: 8px 0;
   color: var(--muted);
 }
 .progress-steps li.active,
@@ -837,12 +889,6 @@ a {
   .payment-grid {
     grid-template-columns: 1fr;
     gap: 16px;
-  }
-  .payment-grid > div {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 12px;
   }
   .payment-grid strong {
     margin: 0;

@@ -148,6 +148,10 @@ test("both histories refresh automatically; provenance and tabs add no charges",
   await page.locator("#payment-tab").click();
   await expect(page.locator("#spent")).toBeVisible();
   await expect(page.locator("#spent")).toHaveText("0.000071");
+  await expect(page.locator("#read-cost")).toHaveText("0.000071");
+  await expect(page.locator("#read-count")).toHaveText("7");
+  await expect(page.locator("#materialization-cost")).toHaveText("0.000000");
+  await expect(page.locator("#materialization-count")).toHaveText("0");
   await expect(page.locator("#receipt-rows tr")).toHaveCount(3);
   await expect(
     page.getByRole("columnheader", { name: "Block number" }),
@@ -242,6 +246,9 @@ test("replay uses separate chronological rows; reset clears both histories and r
   await expect(page.locator("#receipt-rows tr")).toHaveCount(0);
   await expect(page.locator("#payment-count")).toHaveText("0");
   await expect(page.locator("#read-count")).toHaveText("0");
+  await expect(page.locator("#read-cost")).toHaveText("0.000000");
+  await expect(page.locator("#materialization-count")).toHaveText("0");
+  await expect(page.locator("#materialization-cost")).toHaveText("0.000000");
   await page.locator("#reset-evidence summary").click();
   await expect(page.locator("#reset-sweeps li")).toHaveCount(2);
   await page.reload();
@@ -501,6 +508,10 @@ test("live reset starts payment history with only the new wallet reads", async (
   await page.locator("#close-provenance").click();
   await page.locator("#payment-tab").click();
   await expect(page.locator("#spent")).toHaveText("0.000141");
+  await expect(page.locator("#read-cost")).toHaveText("0.000021");
+  await expect(page.locator("#read-count")).toHaveText("1");
+  await expect(page.locator("#materialization-cost")).toHaveText("0.000120");
+  await expect(page.locator("#materialization-count")).toHaveText("1");
   await expect(page.locator("#receipt-rows tr").first()).toContainText("Read");
   await expect(page.locator("#receipt-rows tr").last()).toContainText(
     "Materialization",
@@ -520,6 +531,9 @@ test("live reset starts payment history with only the new wallet reads", async (
   );
   await page.locator("#reset").click();
   await expect(page.locator("#spent")).toHaveText("0.000423");
+  await expect(page.locator("#read-cost")).toHaveText("0.000063");
+  await expect(page.locator("#materialization-cost")).toHaveText("0.000360");
+  await expect(page.locator("#materialization-count")).toHaveText("3");
   await expect(page.locator("#read-count")).toHaveText("3");
   await expect(page.locator("#payment-count")).toHaveText("6");
   await expect(page.locator("#receipt-rows tr")).toHaveCount(6);
@@ -725,8 +739,14 @@ test("Live Send modal follows overlapping progress, ignores other revisions, and
   current = {
     revision: 0,
     outcome: "running",
+    phases: {
+      rpc: { started: true, complete: true, elapsedMs: 200 },
+      testril: { started: true, complete: false, elapsedMs: 100 },
+    },
     steps: {
-      transfer: { active: 0, started: true, complete: true },
+      prepare: { active: 0, started: true, complete: true },
+      broadcast: { active: 0, started: true, complete: true },
+      confirm: { active: 0, started: true, complete: true },
       materialize: { active: 2, started: true },
       pay: { active: 1, started: true },
       read: { active: 0, started: true },
@@ -737,8 +757,14 @@ test("Live Send modal follows overlapping progress, ignores other revisions, and
   );
   await expect(page.locator('[data-progress="pay"]')).toHaveClass(/active/);
   await expect(
-    page.locator('[data-progress="transfer"] .progress-state'),
+    page.locator('[data-progress="confirm"] .progress-state'),
   ).toHaveText("Complete");
+  await expect(
+    page.getByRole("heading", { name: "Base Sepolia · RPC", exact: true }),
+  ).toBeVisible();
+  await expect(page.locator("#testril-progress-heading")).toHaveText("Testril");
+  await expect(page.locator("#rpc-progress-elapsed")).toHaveText("0.2s");
+  await expect(page.locator("#testril-progress-elapsed")).toHaveText("0.1s");
   await page.keyboard.press("Escape");
   await expect(modal).toBeVisible();
   await expect(page.locator("#progress-elapsed")).toContainText("s elapsed");
@@ -757,7 +783,10 @@ test("Live Send modal follows overlapping progress, ignores other revisions, and
   current.steps.materialize = { active: 0, started: true, complete: true };
   current.steps.pay = { active: 0, started: true, complete: true };
   current.steps.read = { active: 2, started: true };
+  current.phases.testril.elapsedMs = 300;
   await expect(page.locator('[data-progress="read"]')).toHaveClass(/active/);
+  await expect(page.locator("#rpc-progress-elapsed")).toHaveText("0.2s");
+  await expect(page.locator("#testril-progress-elapsed")).toHaveText("0.3s");
   release();
   await expect(modal).toBeHidden();
   await expect(page.locator("#balance-treasury")).toHaveText("19.75");
