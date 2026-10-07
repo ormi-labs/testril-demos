@@ -48,7 +48,14 @@ export function createLiveChain(config) {
           serializedTransaction: pending.serialized,
         });
       } catch {
-        /* Receipt lookup resolves a duplicate or an uncertain broadcast. */
+        // An uncertain response may still mean the exact transaction was accepted.
+        const known = await rpc
+          .getTransaction({ hash: pending.hash })
+          .catch(() => null);
+        if (!known)
+          throw new Error(
+            "The RPC did not acknowledge the transfer. Its signed transaction is saved for recovery; do not send another transfer.",
+          );
       }
     },
     async confirm(pending) {
@@ -57,6 +64,7 @@ export function createLiveChain(config) {
         receipt = await rpc.waitForTransactionReceipt({
           hash: pending.hash,
           confirmations: 1,
+          checkReplacement: false,
           pollingInterval: 200,
           timeout: 60000,
         });

@@ -99,3 +99,81 @@ for (const missingBlocks of [0, 1])
       assert.equal(blockRequests, 1 + missingBlocks);
     },
   );
+
+for (const outcome of ["accepted", "already-known", "rejected"])
+  test(`broadcast reports ${outcome} without hiding an unacknowledged submission`, async (t) => {
+    const { config } = testConfig();
+    const hash = `0x${"aa".repeat(32)}`;
+    const methods = [];
+    const server = createServer(async (request, response) => {
+      let body = "";
+      for await (const chunk of request) body += chunk;
+      const message = JSON.parse(body);
+      methods.push(message.method);
+      let result;
+      if (message.method === "eth_sendRawTransaction") {
+        if (outcome !== "accepted") {
+          response.setHeader("content-type", "application/json");
+          response.end(
+            JSON.stringify({
+              jsonrpc: "2.0",
+              id: message.id,
+              error: {
+                code: -32000,
+                message: "Provider refused the request; private payload",
+              },
+            }),
+          );
+          return;
+        }
+        result = hash;
+      } else if (message.method === "eth_getTransactionByHash") {
+        result =
+          outcome === "already-known"
+            ? {
+                hash,
+                blockNumber: null,
+                blockHash: null,
+                transactionIndex: null,
+                from: config.wallets[0].address,
+                to: config.token.address,
+                nonce: "0x0",
+                gas: "0x10000",
+                gasPrice: "0x1",
+                value: "0x0",
+                input: "0x",
+                type: "0x0",
+                v: "0x1",
+                r: "0x1",
+                s: "0x1",
+              }
+            : null;
+      } else throw new Error("Unexpected RPC method");
+      response.setHeader("content-type", "application/json");
+      response.end(JSON.stringify({ jsonrpc: "2.0", id: message.id, result }));
+    });
+    server.listen(0, "127.0.0.1");
+    await once(server, "listening");
+    t.after(() => {
+      server.closeAllConnections();
+      server.close();
+    });
+    config.rpcUrl = `http://127.0.0.1:${server.address().port}`;
+    const pending = { hash, serialized: "0x1234" };
+    const broadcast = createLiveChain(config).broadcast(pending);
+    if (outcome === "rejected")
+      await assert.rejects(
+        broadcast,
+        (error) =>
+          /did not acknowledge/.test(error.message) &&
+          !error.message.includes("private payload") &&
+          !error.message.includes(pending.serialized),
+      );
+    else await broadcast;
+    assert.deepEqual(
+      methods,
+      outcome === "accepted"
+        ? ["eth_sendRawTransaction"]
+        : ["eth_sendRawTransaction", "eth_getTransactionByHash"],
+    );
+  });
