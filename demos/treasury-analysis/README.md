@@ -100,9 +100,12 @@ reused. If a settlement response is lost, the charge and deposit remain reserved
 and new payments are refused until the quote is reconciled. The interface shows
 its quote ID and status. A stalled materialization remains attached to its job.
 
-Only one live server may use this directory. Clean shutdown releases `.live-lock`.
-After a crash, verify that the old server has stopped before removing that lock
-directory and restarting. Keep the state file. The caps apply to this saved session,
+Only one live server may use this directory. `.live-lock/pid` records its process
+ID, and clean shutdown releases the lock. Startup errors distinguish a running
+owner, a stopped owner, and an older lock without an owner record. After a crash,
+verify that the old server has stopped before removing only `.live-lock` and
+restarting. Keep `.live-state.json`. Failed live startup clears previous mock
+balances and history. The caps apply to this saved session,
 not to payments made by unrelated clients using the same payer.
 
 For a deliberate testnet smoke run (requires the approved caps and no active run):

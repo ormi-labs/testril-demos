@@ -21,6 +21,36 @@ test.beforeEach(async ({ page }) => {
   await expect(page.locator("#balance-treasury")).toHaveText("1");
 });
 
+test("failed live startup clears previous mock balances and history", async ({
+  page,
+}, testInfo) => {
+  await expect(page.locator("#balance-treasury")).toHaveText("1");
+  await page.route("**/api/config", (route) =>
+    route.fulfill({ json: { liveAvailable: true } }),
+  );
+  await page.route("**/api/sessions", (route) =>
+    route.fulfill({ status: 400, json: { error: "Live session is locked." } }),
+  );
+  await page.reload();
+  await expect(page.locator("#status")).toHaveText("Live session is locked.");
+  await expect(page.locator("#network-name")).toHaveText("Base Sepolia");
+  await expect(page.locator("#balance-treasury")).toHaveCount(0);
+  await expect(page.locator("#wallets")).toHaveText(
+    "Balances unavailable until the session opens.",
+  );
+  await expect(page.locator(".histories")).toBeHidden();
+  await expect(page.locator("#transfer")).toBeDisabled();
+  await page.screenshot({
+    path: fileURLToPath(
+      new URL(
+        `../../../docs/screenshots/treasury-live-unavailable-${testInfo.project.name}.png`,
+        import.meta.url,
+      ),
+    ),
+    fullPage: true,
+  });
+});
+
 test("requested layout, empty history and keyboard balance provenance", async ({
   page,
 }) => {

@@ -465,6 +465,20 @@ async function start(nextMode) {
   for (const input of document.querySelectorAll('[name="data-mode"]'))
     input.checked = input.value === mode;
   state = undefined;
+  $("network-name").textContent = mode === "live" ? "Base Sepolia" : "Arbitrum";
+  $("balances-heading").textContent =
+    mode === "live" ? "Wallet balances" : "Balances";
+  $("wallets").replaceChildren(
+    element(
+      "p",
+      "Balances unavailable until the session opens.",
+      "small muted",
+    ),
+  );
+  $("live-note").hidden = mode !== "live";
+  $("refresh-live").hidden = mode !== "live";
+  $("transfer-allowance").hidden = true;
+  document.querySelector(".histories").hidden = true;
   status(mode === "live" ? "Opening the shared Base Sepolia session…" : "");
   try {
     let saved;
@@ -511,6 +525,7 @@ async function start(nextMode) {
         );
     step = state.transferCount;
     renderState();
+    document.querySelector(".histories").hidden = false;
     stop();
     lock(false);
     status(

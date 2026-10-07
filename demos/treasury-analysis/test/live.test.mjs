@@ -5,6 +5,26 @@ import { join } from "node:path";
 import { livePeer, testConfig } from "./live-peer.mjs";
 import { liveConfig } from "../src/live-config.mjs";
 import { replayBalances } from "../public/replay.js";
+import { createLiveDemo } from "../src/live-demo.mjs";
+import { connectMcp } from "../src/mcp.mjs";
+
+test("a second live session reports its lock owner and cannot disturb the first session", async (t) => {
+  const peer = await livePeer(t);
+  const ownerPath = join(peer.directory, ".live-lock", "pid");
+  assert.equal((await readFile(ownerPath, "utf8")).trim(), String(process.pid));
+  await assert.rejects(
+    createLiveDemo({
+      config: peer.config,
+      chain: peer.chain,
+      mcp: await connectMcp(peer.config.mcpUrl),
+      directory: peer.directory,
+    }),
+    new RegExp(`Live server PID ${process.pid} holds`),
+  );
+  assert.equal((await readFile(ownerPath, "utf8")).trim(), String(process.pid));
+  await peer.restart();
+  assert.equal((await readFile(ownerPath, "utf8")).trim(), String(process.pid));
+});
 
 test("live mode checks signer addresses and refuses caps beyond approval without exposing keys", () => {
   const { env } = testConfig();
