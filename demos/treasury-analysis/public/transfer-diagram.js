@@ -134,7 +134,9 @@ export function transferDiagram({
           "text-anchor": "middle",
           class: "diagram-wallet-balance",
         },
-        `${decimalAmount(balances[wallet.id])} USDC`,
+        balances[wallet.id] === null
+          ? "Not yet read"
+          : `${decimalAmount(balances[wallet.id])} USDC`,
       ),
     );
     svg.append(node);

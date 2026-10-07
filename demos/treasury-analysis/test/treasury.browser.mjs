@@ -228,7 +228,7 @@ test("invalid transfer preserves histories; refresh resumes cached reads and dow
   );
 });
 
-test("live mode labels the allowance, requires refreshed reads, and preserves payment costs on reset", async ({
+test("live mode shows full Testril balances separately from the allowance and preserves costs on reset", async ({
   page,
 }, testInfo) => {
   const state = {
@@ -237,6 +237,10 @@ test("live mode labels the allowance, requires refreshed reads, and preserves pa
     mode: "live",
     chain: { name: "Base Sepolia", id: 84532 },
     refreshNeeded: true,
+    balanceRead: {
+      balances: { treasury: null, a: null, b: null },
+      sources: { treasury: null, a: null, b: null },
+    },
     receipts: [],
     payment: {
       spentRaw: "0",
@@ -245,6 +249,7 @@ test("live mode labels the allowance, requires refreshed reads, and preserves pa
       requestCount: 0,
     },
   };
+  let refreshCount = 0;
   await page.route("**/api/config", (route) =>
     route.fulfill({ json: { liveAvailable: true } }),
   );
@@ -255,7 +260,22 @@ test("live mode labels the allowance, requires refreshed reads, and preserves pa
   });
   await page.route("**/api/sessions/live-browser-session/**", async (route) => {
     if (route.request().url().endsWith("/refresh")) {
+      if (refreshCount++) {
+        state.refreshNeeded = true;
+        return route.fulfill({
+          status: 502,
+          json: { error: "Testril read failed.", state },
+        });
+      }
       state.refreshNeeded = false;
+      state.balanceRead = {
+        balances: { treasury: "20000000", a: "500000", b: "0" },
+        sources: {
+          treasury: { block: 123 },
+          a: { block: 123 },
+          b: { block: 123 },
+        },
+      };
       state.payment = {
         spentRaw: "141",
         depositedRaw: "100000",
@@ -300,10 +320,32 @@ test("live mode labels the allowance, requires refreshed reads, and preserves pa
   await expect(page.locator("#live-note")).toContainText(
     "1 USDC demo allowance",
   );
-  await expect(page.locator("#balances-heading")).toHaveText("Demo balances");
+  await expect(page.locator("#balances-heading")).toHaveText("Wallet balances");
+  await expect(page.locator("#balance-treasury")).toHaveText("Not yet read");
+  await expect(page.locator("#wallet-treasury")).toBeDisabled();
   await expect(page.locator("#transfer")).toBeDisabled();
   await page.locator("#refresh-live").click();
   await expect(page.locator("#transfer")).toBeEnabled();
+  await expect(page.locator("#balance-treasury")).toHaveText("20");
+  await expect(page.locator("#balance-a")).toHaveText("0.5");
+  await expect(page.locator("#balance-b")).toHaveText("0");
+  await expect(page.locator("#wallet-treasury")).toContainText(
+    "Testril · block 123",
+  );
+  await expect(page.locator("#transfer-allowance")).toContainText(
+    "Treasury can send 1 USDC",
+  );
+  await page
+    .locator("#from label")
+    .filter({ has: page.locator('input[value="a"]') })
+    .click();
+  await expect(page.locator("#transfer-allowance")).toContainText(
+    "Counterparty A can send 0 USDC",
+  );
+  await page
+    .locator("#from label")
+    .filter({ has: page.locator('input[value="treasury"]') })
+    .click();
   await page.screenshot({
     path: fileURLToPath(
       new URL(
@@ -333,4 +375,11 @@ test("live mode labels the allowance, requires refreshed reads, and preserves pa
   );
   await page.locator("#reset").click();
   await expect(page.locator("#spent")).toHaveText("0.000141");
+  await page.locator("#refresh-live").click();
+  await expect(page.locator("#status")).toHaveText("Testril read failed.");
+  await expect(page.locator("#balance-treasury")).toHaveText("20");
+  await expect(page.locator("#wallet-treasury")).toContainText(
+    "block 123 · refresh needed",
+  );
+  await expect(page.locator("#transfer")).toBeDisabled();
 });

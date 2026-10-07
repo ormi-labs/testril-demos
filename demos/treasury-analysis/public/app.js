@@ -87,7 +87,10 @@ function lock(value) {
   for (const input of document.querySelectorAll('[name="data-mode"]'))
     input.disabled = value || (input.value === "live" && !liveAvailable);
   for (const balance of document.querySelectorAll("[data-balance]"))
-    balance.disabled = value;
+    balance.disabled =
+      value ||
+      (state?.mode === "live" &&
+        state.balanceRead.balances[balance.dataset.balance] === null);
   if (!value && state) updateRecipients();
   if (!value && state?.mode === "live" && state.refreshNeeded)
     $("transfer").disabled = true;
@@ -95,6 +98,10 @@ function lock(value) {
 const selectedWallet = (id) => $(id).querySelector("input:checked").value;
 function updateRecipients() {
   const sender = selectedWallet("from");
+  $("transfer-allowance").hidden = state.mode !== "live";
+  if (state.mode === "live")
+    $("transfer-allowance").textContent =
+      `${name(sender)} can send ${decimalAmount(state.balances[sender])} USDC of the shared 1 USDC allowance.`;
   if (sender === selectedWallet("to"))
     $("to").querySelector(`input:not([value="${sender}"])`).checked = true;
   for (const input of $("to").querySelectorAll("input"))
@@ -106,7 +113,12 @@ function renderState() {
   $("network-name").textContent = state.chain.name;
   $("live-note").hidden = !live;
   $("refresh-live").hidden = !live;
-  $("balances-heading").textContent = live ? "Demo balances" : "Balances";
+  $("balances-heading").textContent = live ? "Wallet balances" : "Balances";
+  const balances = live ? state.balanceRead.balances : state.balances;
+  const total = Object.values(balances).reduce(
+    (sum, value) => sum + BigInt(value ?? "0"),
+    0n,
+  );
   $("cost-label").textContent = live
     ? "Total Testril cost · USDC"
     : "Total read cost · USDC";
@@ -123,28 +135,33 @@ function renderState() {
       card.type = "button";
       card.dataset.balance = wallet.id;
       card.id = `wallet-${wallet.id}`;
-      card.disabled = busy;
+      const raw = balances[wallet.id];
+      const display = raw === null ? "Not yet read" : decimalAmount(raw);
+      card.disabled = busy || raw === null;
       card.setAttribute(
         "aria-label",
-        `${wallet.name} balance: ${decimalAmount(state.balances[wallet.id])} USDC. Show provenance.`,
+        `${wallet.name} balance: ${display}${raw === null ? "" : " USDC. Show provenance."}`,
       );
-      const balance = element(
-        "strong",
-        decimalAmount(state.balances[wallet.id]),
-      );
+      const balance = element("strong", display);
       balance.id = `balance-${wallet.id}`;
       const value = element("span", undefined, "wallet-value");
-      value.append(balance, element("small", "USDC"));
-      value.classList.toggle(
-        "precise-value",
-        decimalAmount(state.balances[wallet.id]).length > 6,
-      );
+      value.append(balance);
+      if (raw !== null) value.append(element("small", "USDC"));
+      value.classList.toggle("precise-value", display.length > 6);
       const meter = element("meter");
       meter.min = 0;
-      meter.max = 1;
-      meter.value = Number(state.balances[wallet.id]) / 1000000;
+      meter.max = Number(total || 1n) / 1000000;
+      meter.value = Number(raw ?? "0") / 1000000;
+      meter.hidden = raw === null;
       meter.setAttribute("aria-hidden", "true");
       card.append(element("span", wallet.name, "wallet-name"), value, meter);
+      if (live && raw !== null)
+        card.append(
+          element(
+            "small",
+            `Testril · block ${state.balanceRead.sources[wallet.id].block}${state.refreshNeeded ? " · refresh needed" : ""}`,
+          ),
+        );
       card.addEventListener("click", () => inspect("balance", wallet));
       return card;
     }),
@@ -233,11 +250,10 @@ function closeProvenance() {
 }
 function renderReplay() {
   const history = state.historyRead;
-  const balances = replayBalances(
-    state.initialBalances,
-    history.transfers,
-    step,
-  );
+  const live = state.mode === "live";
+  const balances = live
+    ? state.balanceRead.balances
+    : replayBalances(state.initialBalances, history.transfers, step);
   const empty = history.transfers.length === 0;
   $("transfer-diagram").hidden = empty;
   $("transfer-help").hidden = empty;
@@ -258,8 +274,9 @@ function renderReplay() {
           }),
         ]),
   );
-  $("replay-caption").textContent =
-    step === history.transfers.length
+  $("replay-caption").textContent = live
+    ? `Last Testril wallet reads · transfers ${step} of ${history.transfers.length}`
+    : step === history.transfers.length
       ? "Latest balances and transfers"
       : `Replay balances · step ${step} of ${history.transfers.length}`;
 }

@@ -31,6 +31,12 @@ test("live mode checks signer addresses and refuses caps beyond approval without
 test("HTTP MCP payments reuse escrow; the 1 USDC allowance reserves other funds and survives reset/restart", async (t) => {
   const peer = await livePeer(t);
   const demo = peer.demo;
+  assert.deepEqual(demo.state().actualBalances, {
+    treasury: null,
+    a: null,
+    b: null,
+  });
+  assert.equal(demo.state().balanceRead.sources.treasury, null);
   await demo.refresh();
   assert.deepEqual(demo.state().balances, {
     treasury: "1000000",
@@ -38,6 +44,8 @@ test("HTTP MCP payments reuse escrow; the 1 USDC allowance reserves other funds 
     b: "0",
   });
   assert.equal(demo.state().actualBalances.a, "500000");
+  assert.deepEqual(demo.state().balanceRead.balances, peer.balances);
+  assert.equal(demo.state().balanceRead.sources.treasury.block, 100);
   assert.equal(demo.state().payment.depositedRaw, "100000");
   assert.equal(
     peer.calls.filter(
@@ -80,6 +88,11 @@ test("HTTP MCP payments reuse escrow; the 1 USDC allowance reserves other funds 
     demo.state().balances,
   );
   assert.equal(demo.balanceProvenance("a").source.balanceRaw, "650000");
+  assert.deepEqual(demo.state().actualBalances, {
+    treasury: "19750000",
+    a: "650000",
+    b: "100000",
+  });
   assert.equal(
     demo.provenance(demo.export().transfers[0].id).source.logIndex,
     7,
@@ -123,6 +136,31 @@ test("concurrent tabs cannot authorize two transfers with one revision", async (
   assert.equal(peer.demo.state().balances.a, "750000");
 });
 
+test("a Testril read of externally added funds updates the displayed balance while transfers stay paused", async (t) => {
+  const peer = await livePeer(t);
+  await peer.demo.refresh();
+  peer.balances.treasury = "21000000";
+  const snapshot = peer.chain.snapshot;
+  peer.chain.snapshot = (at) => snapshot(at ?? 101);
+  await assert.rejects(peer.demo.refresh(), /changed outside/);
+  assert.equal(peer.demo.state().actualBalances.treasury, "21000000");
+  assert.equal(peer.demo.state().balanceRead.sources.treasury.block, 101);
+  assert.equal(peer.demo.state().balances.treasury, "1000000");
+  assert.equal(peer.demo.state().refreshNeeded, true);
+  await peer.restart();
+  assert.equal(peer.demo.state().actualBalances.treasury, "21000000");
+  await assert.rejects(
+    peer.demo.transfer({
+      revision: peer.demo.state().revision,
+      from: "treasury",
+      to: "a",
+      amount: ".25",
+    }),
+    /Refresh/,
+  );
+  assert.equal(peer.prepares, 0);
+});
+
 test("a pending receipt survives restart and is recovered without signing another transfer", async (t) => {
   const peer = await livePeer(t);
   await peer.demo.refresh();
@@ -137,6 +175,9 @@ test("a pending receipt survives restart and is recovered without signing anothe
     /pending/,
   );
   assert.ok(peer.demo.state().pending);
+  assert.equal(peer.demo.state().actualBalances.treasury, "20000000");
+  assert.equal(peer.demo.state().balanceRead.sources.treasury.block, 100);
+  assert.equal(peer.demo.state().refreshNeeded, true);
   await peer.restart();
   await peer.demo.refresh();
   assert.equal(peer.prepares, 1);
@@ -148,6 +189,11 @@ test("an uncertain settlement reserves the caps and refuses any second payment a
   const peer = await livePeer(t);
   peer.failNextPayment();
   await assert.rejects(peer.demo.refresh(), /request failed/);
+  assert.deepEqual(peer.demo.state().balanceRead.balances, {
+    treasury: null,
+    a: null,
+    b: null,
+  });
   assert.equal(peer.demo.state().payment.spentRaw, "120");
   assert.equal(peer.demo.state().payment.depositedRaw, "100000");
   await peer.restart();

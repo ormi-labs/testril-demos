@@ -66,7 +66,6 @@ export async function createLiveDemo({ config, chain, mcp, directory }) {
           ).toString(),
         },
         balances: { treasury: demoLimitRaw, a: "0", b: "0" },
-        actualBalances: snapshot.balances,
         snapshot,
         transfers: [],
         receipts: [],
@@ -89,6 +88,15 @@ export async function createLiveDemo({ config, chain, mcp, directory }) {
     const current = () => state.transfers.slice(state.startIndex);
     const wallet = (id) => config.wallets.find((w) => w.id === id);
     function publicState() {
+      const sources = Object.fromEntries(
+        config.wallets.map((w) => [
+          w.id,
+          state.balanceEvidence[w.id]?.source ?? null,
+        ]),
+      );
+      const actualBalances = Object.fromEntries(
+        config.wallets.map((w) => [w.id, sources[w.id]?.balanceRaw ?? null]),
+      );
       const spent = state.receipts.reduce(
         (sum, r) => sum + BigInt(r.chargeRaw),
         0n,
@@ -103,11 +111,11 @@ export async function createLiveDemo({ config, chain, mcp, directory }) {
         wallets: config.wallets,
         initialBalances: state.initialBalances,
         balances: state.balances,
-        actualBalances: state.actualBalances,
+        actualBalances,
         transferCount: current().length,
         balanceRead: {
-          ...state.snapshot,
-          balances: state.balances,
+          balances: actualBalances,
+          sources,
           function: "erc20.token_balance",
         },
         historyRead: { transfers: current() },
@@ -216,13 +224,6 @@ export async function createLiveDemo({ config, chain, mcp, directory }) {
           throw new Error(
             "Testril and the reference RPC disagree on a balance.",
           );
-        if (
-          BigInt(actual[w.id]) - BigInt(state.reserves[w.id]) !==
-          BigInt(state.balances[w.id])
-        )
-          throw new Error(
-            "A wallet changed outside this demo. Live transfers are paused to protect the 1 USDC allowance.",
-          );
         state.balanceEvidence[w.id] = {
           source: {
             wallet: w.name,
@@ -238,6 +239,14 @@ export async function createLiveDemo({ config, chain, mcp, directory }) {
             snapshot.block,
           ),
         };
+        await save();
+        if (
+          BigInt(actual[w.id]) - BigInt(state.reserves[w.id]) !==
+          BigInt(state.balances[w.id])
+        )
+          throw new Error(
+            "A wallet changed outside this demo. Live transfers are paused to protect the 1 USDC allowance.",
+          );
       }
       for (const transfer of current()) {
         if (state.transferEvidence[transfer.id]) continue;
@@ -265,7 +274,6 @@ export async function createLiveDemo({ config, chain, mcp, directory }) {
         };
       }
       state.snapshot = snapshot;
-      state.actualBalances = actual;
       state.refreshNeeded = false;
       delete state.refreshBlock;
       state.revision += 1;
@@ -383,9 +391,9 @@ export async function createLiveDemo({ config, chain, mcp, directory }) {
           ...evidence,
           calculation: {
             description:
-              "The full wallet balance is read at this block and compared with the reference RPC. Demo balances subtract the funds reserved outside the 1 USDC allowance.",
+              "The full wallet balance is returned by Testril at this block and checked against the reference RPC. The transfer allowance is tracked separately.",
           },
-          note: "This is the actual onchain wallet balance; the interface shows the wallet's share of the 1 USDC demo allowance.",
+          note: "The interface shows this full Testril balance at the cited block. The demo can transfer only its share of the separate 1 USDC allowance.",
         };
       },
       export() {
@@ -393,7 +401,7 @@ export async function createLiveDemo({ config, chain, mcp, directory }) {
           formatVersion: 2,
           ...publicState(),
           transfers: current(),
-          note: "Live Base Sepolia run. Demo balances track a 1 USDC allowance. RPC receipts and Testril block citations are separate evidence sources.",
+          note: "Live Base Sepolia run. actualBalances contains cached Testril wallet reads; balances and initialBalances track the separate 1 USDC transfer allowance. RPC receipts and Testril block citations are separate evidence sources.",
           balanceProvenance: config.wallets.map(
             (w) => state.balanceEvidence[w.id] ?? null,
           ),

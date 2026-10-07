@@ -78,10 +78,15 @@ from RPC; Testril's edge is the aggregate for a sender/recipient pair in that bl
 The provenance dialog labels these separately. No transaction-level MCP lineage
 is implied. Replay and provenance inspection use cached results and add no charge.
 
-**Demo balances show the allocation of 1 USDC**, even if Treasury holds more.
-Other wallet funds are recorded as reserves and cannot be sent by the demo. The
-provenance dialog shows the full onchain balance as well as the allocation. An
+**Wallet balances show the full amounts returned by Testril**, with their source
+blocks. Until a successful read, a wallet shows “Not yet read.” Failed refreshes
+retain the last successful reads and label them as needing refresh. Live transfer
+replay keeps those wallet balances visible; it does not calculate historical wallet
+balances. The sender's share of the separate **1 USDC transfer allowance** appears
+below the send form. Other funds are reserved and cannot be sent by the demo. An
 external change to any wallet pauses transfers rather than changing the allowance.
+Run exports keep the allowance ledger in `balances` / `initialBalances` and the
+cached Testril results in `actualBalances` / `balanceRead`.
 
 All live browser tabs share one session. `.live-state.json` persists the allowance,
 payment usage, cached paid results, and a pending signed transaction. It contains
