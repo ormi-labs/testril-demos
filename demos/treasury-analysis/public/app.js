@@ -201,13 +201,13 @@ function renderState() {
   $("read-cost").replaceChildren(
     costButton(
       readCost,
-      `${readCount} read requests: ${feeAmount(readCost)} USDC`,
+      `Reading: ${readCount} requests · ${feeAmount(readCost)} USDC`,
     ),
   );
   $("materialization-cost").replaceChildren(
     costButton(
       materializationCost,
-      `${materializations.length} materializations: ${feeAmount(materializationCost)} USDC`,
+      `Materializing: ${materializations.length} requests · ${feeAmount(materializationCost)} USDC`,
     ),
   );
   $("receipt-rows").replaceChildren(
@@ -219,7 +219,7 @@ function renderState() {
           receipt.block,
           live
             ? receipt.kind === "materialization"
-              ? "Materialization"
+              ? "Materializing"
               : "Read"
             : receipt.kind === "balances"
               ? "Balances"

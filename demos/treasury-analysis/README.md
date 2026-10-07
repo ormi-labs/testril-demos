@@ -5,12 +5,66 @@ balances with Testril, replay the transfers, and select an arrow to inspect prov
 
 With no signing configuration, start in **Mock** mode: Arbitrum, wallets, transfers, reads, prices, and evidence
 are simulated. No funds move or payments occur. **Live** mode uses Base Sepolia
-test USDC, real testnet transfers, and paid reads at `https://dev.testril.ai/mcp`.
+test USDC, real testnet transfers, and paid materialization and reads at
+`https://dev.testril.ai/mcp`.
+
+## What happens in Live mode
+
+**The demo requests and pays for indexing on the fly.** When you click Send,
+the application moves USDC, asks Testril for the new balances and transfer data,
+and funds any missing data preparation itself. The client chooses the computation,
+wallets, and block range, pays for the work, and consumes the results through the
+same MCP connection.
+
+Materialization is the indexing step: Testril processes the requested blockchain
+range and prepares the function's results for reading. Reading retrieves those
+prepared results. **Materialization and reads have separate quotes and charges.**
+The Payment History makes both visible: **Materializing** shows the number and
+cost of materialization requests; **Reading** shows the number and cost of reads.
+Moving USDC also spends ETH for transaction gas, separately from either data cost.
+
+For each Live Send:
+
+1. The local signer prepares, submits, and confirms the USDC transfer through
+   Base Sepolia RPC.
+2. The demo asks Testril to read the sender's balance, the recipient's balance,
+   and transfer edges at the confirmed transaction's block. Wallet balances and
+   transfer data come from Testril.
+3. If a result is unavailable, the demo requests materialization for that function
+   and block range. It receives a quote, pays in USDC through `pay_quote`, executes
+   the materialization with the returned payment ID, and waits for its job.
+4. It pays the separate read quote, retrieves the prepared result, and updates
+   the interface. The three data pipelines run in parallel; their cumulative
+   payment vouchers settle in order.
+
+The read/materialize/payment flow is implemented in
+[`src/live-testril.mjs`](src/live-testril.mjs), connected to transfers and the
+interface by [`src/live-demo.mjs`](src/live-demo.mjs). Mock mode simulates reads
+and assumes preparation has already happened; use Live mode to see paid indexing.
+
+### Materialization can be paid for in advance
+
+**On-demand indexing is a choice, not a requirement.** An application or another
+client can request and pay for materialization of the required functions and
+block ranges ahead of time. Materialization can cover future block ranges:
+the work is funded in advance, and results become readable as those blocks exist
+and Testril finishes preparing them.
+
+**With those results already materialized, this demo only needs to pay for reads.**
+Its existing read-first logic uses available results directly, without requesting
+or paying for materialization again. The prepared ranges must cover the functions
+and blocks the demo reads, including new transfer blocks. The RPC transfer still
+happens, and reads still have their own charges.
+
+This separates funding data preparation from consuming data. One client can pay
+to prepare results ahead of demand; a reader can consume them without funding that
+indexing again. The default demo deliberately prepares missing data during the
+interactive run so you can see both stages and their costs.
 
 ## Run
 
-Requires Node.js **22.13+**, npm, and `tar` on macOS or Linux. No build step or
-build step. Runtime dependencies are the MCP SDK and viem, locked by `npm ci`.
+Requires Node.js **22.13+**, npm, and `tar` on macOS or Linux. No build step.
+Runtime dependencies are the MCP SDK and viem, locked by `npm ci`.
 
 ```sh
 cd demos/treasury-analysis  # or the extracted treasury-analysis folder
@@ -28,7 +82,7 @@ Open **http://127.0.0.1:4173**. Optional: copy `.env.example` to `.env` to chang
 3. **Transfer History** updates after each transfer, with one row per event, UTC
    times, and block numbers. Use Replay to watch it build. Click an arrow or a
    balance for mock source evidence; close the modal with Escape or Close.
-4. **Payment History** separates Reading and Materialization, showing each cost
+4. **Payment History** separates Reading and Materializing, showing each cost
    and count alongside the overall total. Reading counts individual read requests;
    materialization counts materialization entries. Totals cover the current run
    and reset with its payment history. Receipts appear newest first, with costs
@@ -42,7 +96,7 @@ Open **http://127.0.0.1:4173**. Optional: copy `.env.example` to `.env` to chang
 In mock mode, each transfer refreshes three balance reads and one history read. A separate mock
 payment wallet covers their illustrative charges. Refreshing resumes the tab’s
 cached session; restarting the server clears sessions. Data preparation is assumed,
-so this version has no materialization or supplier earnings. On phones, scroll the
+so mock mode has no materialization charges. On phones, scroll the
 transfer diagram horizontally.
 
 ## Live Base Sepolia
@@ -177,7 +231,8 @@ they add no Testril requests or charges and contain no signed payloads or keys.
 **Download source** opens [this demo’s GitHub directory](https://github.com/ormi-labs/testril-demos/tree/main/demos/treasury-analysis).
 Clone the repository to get the source and locked tools. The run export
 is available at `/api/sessions/<session-id>/export`; it contains transfers, balances,
-receipts, and fictional transfer and balance provenance.
+receipts, and source evidence. Mock evidence is fictional; Live evidence contains
+RPC receipts, Testril read results, and any provenance citations requested.
 
 ```sh
 node src/cli.mjs sample run.json

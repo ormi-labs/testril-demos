@@ -514,7 +514,7 @@ test("live reset starts payment history with only the new wallet reads", async (
   await expect(page.locator("#materialization-count")).toHaveText("1");
   await expect(page.locator("#receipt-rows tr").first()).toContainText("Read");
   await expect(page.locator("#receipt-rows tr").last()).toContainText(
-    "Materialization",
+    "Materializing",
   );
   await page.screenshot({
     path: fileURLToPath(
