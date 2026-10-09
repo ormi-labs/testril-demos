@@ -11,6 +11,43 @@ import { replayBalances } from "../public/replay.js";
 import { createLiveChain } from "../src/live-chain.mjs";
 import { createLiveDemo } from "../src/live-demo.mjs";
 import { connectMcp } from "../src/mcp.mjs";
+import { createLiveTestril } from "../src/live-testril.mjs";
+
+test("chain inspection reads the block from Testril's head object and rejects invalid snapshots", async () => {
+  const config = { chain: { id: 84532 } };
+  let result = {
+    outcome: "success",
+    subject: "chain",
+    chain_id: 84532,
+    head: { block: 47898718, time: "2026-10-09T17:08:44Z" },
+  };
+  const testril = createLiveTestril(
+    config,
+    {
+      async call(name, args) {
+        assert.equal(name, "inspect");
+        assert.deepEqual(args, { subject: "chain", chain_id: 84532 });
+        return result;
+      },
+    },
+    {},
+    async () => {},
+  );
+  assert.equal(await testril.head(), 47898718);
+  for (const head of [
+    null,
+    {},
+    { block: -1 },
+    { block: 1.5 },
+    { block: "47898718" },
+    { block: Number.MAX_SAFE_INTEGER + 1 },
+  ]) {
+    result = { ...result, head };
+    await assert.rejects(testril.head(), /Testril cannot report/);
+  }
+  result = { ...result, chain_id: 1, head: { block: 47898718 } };
+  await assert.rejects(testril.head(), /Testril cannot report/);
+});
 
 test("MCP shutdown failure still releases the lock and preserves state", async (t) => {
   const peer = await livePeer(t);

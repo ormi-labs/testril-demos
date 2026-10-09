@@ -117,9 +117,10 @@ export async function livePeer(t, options = {}) {
           chain_id: 84532,
           head: options.unavailableHead
             ? null
-            : block > 100 && headLag-- > 0
-              ? block - 1
-              : block,
+            : {
+                block: block > 100 && headLag-- > 0 ? block - 1 : block,
+                time: new Date().toISOString(),
+              },
         };
       }
 

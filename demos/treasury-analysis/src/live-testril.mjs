@@ -186,13 +186,14 @@ export function createLiveTestril(
           }),
           "inspect",
         );
+        const head = result.head?.block;
         if (
           result.chain_id !== config.chain.id ||
-          !Number.isSafeInteger(result.head) ||
-          result.head < 0
+          !Number.isSafeInteger(head) ||
+          head < 0
         )
           throw new Error("Testril cannot report the Base Sepolia chain head.");
-        if (result.head >= minimumBlock) return result.head;
+        if (head >= minimumBlock) return head;
         await measure("Chain-head polling sleep", () => delay(200));
       } while (Date.now() < until);
       throw new Error(
