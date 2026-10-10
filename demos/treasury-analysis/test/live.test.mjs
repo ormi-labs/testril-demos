@@ -2,6 +2,7 @@ import test from "node:test";
 import { setTimeout as delay } from "node:timers/promises";
 import { execFile } from "node:child_process";
 import { promisify } from "node:util";
+import { fileURLToPath } from "node:url";
 import assert from "node:assert/strict";
 import { access, mkdir, readFile, rm, writeFile } from "node:fs/promises";
 import { join } from "node:path";
@@ -12,6 +13,20 @@ import { createLiveChain } from "../src/live-chain.mjs";
 import { createLiveDemo } from "../src/live-demo.mjs";
 import { connectMcp } from "../src/mcp.mjs";
 import { createLiveTestril } from "../src/live-testril.mjs";
+
+test("the live CLI checks Testril's head object without making payments or transfers", async (t) => {
+  const peer = await livePeer(t);
+  const { stdout } = await promisify(execFile)(
+    process.execPath,
+    [fileURLToPath(new URL("../src/live-cli.mjs", import.meta.url)), "check"],
+    {
+      env: { ...process.env, ...peer.env, TESTRIL_MCP_URL: peer.config.mcpUrl },
+    },
+  );
+  assert.match(stdout, /Testril reports Base Sepolia block 100/);
+  assert.equal(peer.calls.filter((c) => c.name === "pay_quote").length, 0);
+  assert.equal(peer.prepares, 0);
+});
 
 test("chain inspection reads the block from Testril's head object and rejects invalid snapshots", async () => {
   const config = { chain: { id: 84532 } };

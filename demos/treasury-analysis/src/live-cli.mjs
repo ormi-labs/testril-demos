@@ -16,11 +16,16 @@ try {
   const config = liveConfig();
   const chain = createLiveChain(config);
   mcp = await connectMcp(config.mcpUrl);
-  const { head } = succeeded(
+  const inspection = succeeded(
     await mcp.call("inspect", { subject: "chain", chain_id: config.chain.id }),
     "inspect",
   );
-  if (!Number.isSafeInteger(head))
+  const head = inspection.head?.block;
+  if (
+    inspection.chain_id !== config.chain.id ||
+    !Number.isSafeInteger(head) ||
+    head < 0
+  )
     throw new Error("Testril cannot report the Base Sepolia chain head.");
   console.log(
     `Testril reports Base Sepolia block ${head}; all four signer addresses match.`,
