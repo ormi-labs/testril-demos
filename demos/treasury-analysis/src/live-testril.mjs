@@ -136,6 +136,21 @@ export function createLiveTestril(
       to_block: block + 1,
     };
     let result = await paid("read", args);
+    const until = Date.now() + 60000;
+    while (
+      result.outcome === "error" &&
+      result.kind === "range_unavailable" &&
+      result.materializing?.some(
+        (range) => range.from_block <= block && range.to_block >= block + 1,
+      )
+    ) {
+      if (Date.now() >= until)
+        throw new Error(
+          "Testril is still materializing. Use Refresh to retry.",
+        );
+      await measure("Materialization polling sleep", () => delay(200));
+      result = await paid("read", args);
+    }
     if (result.outcome === "error" && result.kind === "range_unavailable") {
       const work = succeeded(await paid("materialize", args), "materialize");
       const jobId = work.job?.job_id;

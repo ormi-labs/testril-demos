@@ -32,6 +32,7 @@ export async function livePeer(t, options = {}) {
   const functions = new Map();
   const quotes = new Map();
   const covered = new Set();
+  const pendingRanges = new Set();
   const channels = [];
   const records = new Map();
   let block = 100;
@@ -220,8 +221,21 @@ export async function livePeer(t, options = {}) {
                 }));
         return { outcome: "success", values, paymentResponse };
       }
-      if (name === "read" && !covered.has(JSON.stringify(args)))
-        return { outcome: "error", kind: "range_unavailable" };
+      if (name === "read" && !covered.has(JSON.stringify(args))) {
+        const key = JSON.stringify(args);
+        if (options.existingMaterialization && !pendingRanges.has(key)) {
+          pendingRanges.add(key);
+          return {
+            outcome: "error",
+            kind: "range_unavailable",
+            materializing: [
+              { from_block: args.from_block, to_block: args.to_block },
+            ],
+          };
+        }
+        if (options.existingMaterialization) covered.add(key);
+        else return { outcome: "error", kind: "range_unavailable" };
+      }
       const id = `quote:${quotes.size + 1}`;
       const amount = String(name === "materialize" ? 120 : 21);
       quotes.set(id, { args, amount, verb: name });

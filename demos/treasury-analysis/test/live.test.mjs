@@ -132,6 +132,14 @@ test("live mode checks signer addresses and refuses caps beyond approval without
   );
 });
 
+test("reads wait for existing materialization without paying to index the same range", async (t) => {
+  const peer = await livePeer(t, { existingMaterialization: true });
+  const snapshot = await peer.demo.refresh();
+  assert.equal(snapshot.actualBalances.a, "500000");
+  assert.equal(peer.calls.filter((c) => c.name === "materialize").length, 0);
+  assert.equal(peer.calls.filter((c) => !!c.payment).length, 3);
+});
+
 test("HTTP MCP payments reuse escrow; all wallet funds are available and reset sweeps A and B", async (t) => {
   const peer = await livePeer(t);
   const demo = peer.demo;

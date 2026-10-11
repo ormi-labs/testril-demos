@@ -139,8 +139,9 @@ For each Live Send:
 2. The demo asks Testril to read the sender's balance, the recipient's balance,
    and transfer edges at the confirmed transaction's block. Wallet balances and
    transfer data come from Testril.
-3. If a result is unavailable, the demo requests materialization for that function
-   and block range. It receives a quote, repeats the same
+3. If a result is unavailable, the demo waits for any job already materializing
+   that block range. Otherwise it requests materialization for that function
+   and range. It receives a quote, repeats the same
    materialize call with a signed x402 payment in MCP metadata, and waits for its job.
 4. It pays the separate read quote, retrieves the prepared result, and updates
    the interface. The three data pipelines run in parallel; their cumulative
