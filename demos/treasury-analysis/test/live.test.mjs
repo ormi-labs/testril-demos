@@ -24,7 +24,7 @@ test("the live CLI checks Testril's head object without making payments or trans
     },
   );
   assert.match(stdout, /Testril reports Base Sepolia block 100/);
-  assert.equal(peer.calls.filter((c) => c.name === "pay_quote").length, 0);
+  assert.equal(peer.calls.filter((c) => !!c.payment).length, 0);
   assert.equal(peer.prepares, 0);
 });
 
@@ -154,9 +154,7 @@ test("HTTP MCP payments reuse escrow; all wallet funds are available and reset s
   assert.equal(demo.state().payment.depositedRaw, "100000");
   assert.equal(
     peer.calls.filter(
-      (c) =>
-        c.name === "pay_quote" &&
-        JSON.parse(c.args.payload).payload.type === "deposit",
+      (c) => !!c.payment && c.payment.payload.type === "deposit",
     ).length,
     1,
   );
@@ -265,7 +263,7 @@ test("reset reuses cached reads without inventing payments and never replenishes
   peer.config.chargeCapRaw = previous.payment.spentRaw;
   await peer.restart();
   assert.equal(peer.demo.state().payment.remainingRaw, "0");
-  const payments = peer.calls.filter((c) => c.name === "pay_quote").length;
+  const payments = peer.calls.filter((c) => !!c.payment).length;
   await assert.rejects(
     peer.demo.transfer({
       revision: peer.demo.state().revision,
@@ -275,10 +273,7 @@ test("reset reuses cached reads without inventing payments and never replenishes
     }),
     /charge cap/,
   );
-  assert.equal(
-    peer.calls.filter((c) => c.name === "pay_quote").length,
-    payments,
-  );
+  assert.equal(peer.calls.filter((c) => !!c.payment).length, payments);
   assert.equal(peer.demo.state().payment.spentRaw, "0");
   assert.equal(
     peer.demo.state().payment.lifetimeSpentRaw,
@@ -389,13 +384,79 @@ test("an uncertain settlement reserves the caps and refuses any second payment a
   assert.equal(peer.demo.state().payment.spentRaw, "120");
   await peer.restart();
   await assert.rejects(peer.demo.refresh(), /uncertain/);
-  assert.equal(peer.calls.filter((c) => c.name === "pay_quote").length, 1);
+  assert.equal(peer.calls.filter((c) => !!c.payment).length, 1);
+});
+
+test("MCP payment challenges retain the request arguments and settle through metadata", async (t) => {
+  const peer = await livePeer(t);
+  await peer.demo.refresh();
+  const payments = peer.calls.filter((c) => c.payment);
+  assert.equal(payments.length, 6);
+  assert.ok(
+    peer.calls.every(
+      (c) => c.name !== "pay_quote" && !Object.hasOwn(c.args, "payment_id"),
+    ),
+  );
+  for (const payment of payments) {
+    assert.ok(
+      peer.calls.some(
+        (c) =>
+          !c.payment &&
+          c.name === payment.name &&
+          JSON.stringify(c.args) === JSON.stringify(payment.args),
+      ),
+    );
+    assert.match(
+      payment.payment.extensions["payment-identifier"].info.id,
+      /^[a-zA-Z0-9_-]{16,128}$/,
+    );
+  }
+  assert.ok(peer.demo.export().allReceipts.every((r) => r.status === "done"));
+});
+
+test("a malformed MCP challenge cannot authorize a payment", async (t) => {
+  const peer = await livePeer(t, { malformedChallenge: true });
+  await assert.rejects(peer.demo.refresh(), /invalid payment challenge/);
+  assert.equal(peer.calls.filter((c) => c.payment).length, 0);
+  assert.equal(peer.demo.export().allReceipts.length, 0);
+});
+
+for (const response of ["omitSettlement", "wrongSettlement"]) {
+  test(`${response} keeps the paid call uncertain and forbids another payment after restart`, async (t) => {
+    const peer = await livePeer(t, { [response]: true });
+    await assert.rejects(
+      peer.demo.refresh(),
+      /settlement confirmation|uncertain/,
+    );
+    assert.equal(peer.demo.export().allReceipts[0].status, "paying");
+    assert.equal(peer.calls.filter((c) => c.payment).length, 1);
+    await peer.restart();
+    await assert.rejects(peer.demo.refresh(), /uncertain/);
+    assert.equal(peer.calls.filter((c) => c.payment).length, 1);
+  });
+}
+
+test("saved paid tickets need reconciliation before a new payment under the new transport", async (t) => {
+  const peer = await livePeer(t);
+  await peer.demo.refresh();
+  await peer.demo.close();
+  const path = join(peer.directory, ".live-state.json");
+  const saved = JSON.parse(await readFile(path, "utf8"));
+  const receipt = saved.receipts.find((r) => r.verb === "read");
+  receipt.status = "paid";
+  receipt.paymentId = "legacy-paid-ticket";
+  saved.refreshBlock = receipt.block;
+  await writeFile(path, JSON.stringify(saved));
+  const payments = peer.calls.filter((c) => c.payment).length;
+  await peer.restart();
+  await assert.rejects(peer.demo.refresh(), /Reconcile its quote/);
+  assert.equal(peer.calls.filter((c) => c.payment).length, payments);
 });
 
 test("quotes for a different network are refused before signing or paying", async (t) => {
   const peer = await livePeer(t, { network: "eip155:8453" });
   await assert.rejects(peer.demo.refresh(), /Base Sepolia/);
-  assert.equal(peer.calls.filter((c) => c.name === "pay_quote").length, 0);
+  assert.equal(peer.calls.filter((c) => !!c.payment).length, 0);
 });
 
 test("a charge cap smaller than the next quote stops before payment", async (t) => {
@@ -404,7 +465,7 @@ test("a charge cap smaller than the next quote stops before payment", async (t) 
   peer.config.chargeCapRaw = "119";
   await peer.restart();
   await assert.rejects(peer.demo.refresh(), /charge cap/);
-  assert.equal(peer.calls.filter((c) => c.name === "pay_quote").length, 0);
+  assert.equal(peer.calls.filter((c) => !!c.payment).length, 0);
 });
 
 test("saved allowance sessions upgrade without losing transfers or payment usage", async (t) => {
@@ -502,7 +563,7 @@ test("Testril refresh works while the signer's RPC is unreachable", async (t) =>
 test("an unavailable Testril chain head refuses reads without an RPC fallback", async (t) => {
   const peer = await livePeer(t, { unavailableHead: true });
   await assert.rejects(peer.demo.refresh(), /Testril cannot report/);
-  assert.equal(peer.calls.filter((c) => c.name === "pay_quote").length, 0);
+  assert.equal(peer.calls.filter((c) => !!c.payment).length, 0);
   assert.deepEqual(peer.demo.state().actualBalances, {
     treasury: null,
     a: null,
@@ -534,7 +595,7 @@ test("Send reads only the two involved wallets and their edge at the receipt blo
     1,
   );
   assert.equal(
-    after.details.find((d) => d.name === "Testril pay_quote").calls,
+    after.details.find((d) => d.name === "Settle Testril payment").calls,
     6,
   );
   assert.equal(after.overlapping, true);
@@ -610,37 +671,28 @@ test("provenance is fetched on demand, cached per snapshot, and preserved for un
   assert.equal(peer.calls.filter((c) => c.name === "provenance").length, 4);
 });
 
-test("all three materializations and reads overlap while cumulative payments remain correct", async (t) => {
-  const barriers = new Map();
+test("concurrent resource quotes settle in order with one cumulative escrow balance", async (t) => {
+  let active = 0,
+    maximumActive = 0;
   const peer = await livePeer(t, {
-    async beforeTool(name, args) {
-      if (!["materialize", "read"].includes(name) || !args.payment_id) return;
-      let barrier = barriers.get(name);
-      if (!barrier) {
-        let release;
-        const ready = new Promise((resolve) => {
-          release = resolve;
-        });
-        const timeout = setTimeout(() => release(), 3000);
-        barrier = { arrived: 0, ready, release, timeout };
-        barriers.set(name, barrier);
-      }
-      barrier.arrived++;
-      if (barrier.arrived === 3) {
-        clearTimeout(barrier.timeout);
-        barrier.release();
-      }
-      await barrier.ready;
-      assert.equal(
-        barrier.arrived,
-        3,
-        `${name} execution must overlap for three resources`,
-      );
+    async beforeTool(name, args, payment) {
+      if (!payment) return;
+      active++;
+      maximumActive = Math.max(maximumActive, active);
+      await delay(10);
+      active--;
     },
   });
   await peer.demo.refresh();
-  assert.equal(barriers.get("materialize").arrived, 3);
-  assert.equal(barriers.get("read").arrived, 3);
+  assert.equal(maximumActive, 1);
+  assert.equal(
+    peer.calls.filter((c) => c.name === "materialize" && c.payment).length,
+    3,
+  );
+  assert.equal(
+    peer.calls.filter((c) => c.name === "read" && c.payment).length,
+    3,
+  );
   assert.equal(peer.demo.state().payment.depositedRaw, "100000");
   assert.equal(peer.demo.state().payment.spentRaw, "423");
   assert.equal(peer.channels[0].chargedCumulativeAmount, "423");
@@ -662,8 +714,8 @@ test("all three materializations and reads overlap while cumulative payments rem
 test("concurrent quotes cannot exceed the shared cap and failure drains the other pipelines", async (t) => {
   let completed = 0;
   const peer = await livePeer(t, {
-    async beforeTool(name, args) {
-      if (name === "materialize" && args.payment_id) {
+    async beforeTool(name, args, payment) {
+      if (name === "materialize" && payment) {
         await delay(100);
         completed++;
       }
@@ -675,7 +727,7 @@ test("concurrent quotes cannot exceed the shared cap and failure drains the othe
   assert.equal(completed, 2);
   assert.equal(peer.demo.state().payment.spentRaw, "240");
   assert.equal(peer.demo.state().payment.depositedRaw, "100000");
-  assert.equal(peer.calls.filter((c) => c.name === "pay_quote").length, 2);
+  assert.equal(peer.calls.filter((c) => !!c.payment).length, 2);
   assert.equal(peer.channels[0].chargedCumulativeAmount, "240");
   const calls = peer.calls.length;
   await peer.restart();
@@ -695,14 +747,11 @@ test("an embedding payment policy rejects authorization before settlement and le
     },
   });
   await assert.rejects(peer.demo.refresh(), /Hosted sponsor budget/);
-  assert.equal(peer.calls.filter((c) => c.name === "pay_quote").length, 0);
+  assert.equal(peer.calls.filter((c) => !!c.payment).length, 0);
   assert.equal(peer.demo.export().allReceipts.length, 0);
   reject = false;
   await peer.demo.refresh();
-  assert.equal(
-    authorized.length,
-    peer.calls.filter((c) => c.name === "pay_quote").length,
-  );
+  assert.equal(authorized.length, peer.calls.filter((c) => !!c.payment).length);
   assert.equal(
     authorized.reduce((sum, p) => sum + BigInt(p.depositRaw), 0n),
     100000n,
@@ -746,11 +795,8 @@ test("durable journals survive a new engine and failed persistence prevents paym
   );
   peer.advanceBlock();
   rejectPaymentSave = true;
-  const payments = peer.calls.filter((c) => c.name === "pay_quote").length;
+  const payments = peer.calls.filter((c) => !!c.payment).length;
   await assert.rejects(second.refresh(), /Durable storage unavailable/);
-  assert.equal(
-    peer.calls.filter((c) => c.name === "pay_quote").length,
-    payments,
-  );
+  assert.equal(peer.calls.filter((c) => !!c.payment).length, payments);
   await assert.rejects(second.refresh(), /journal could not be persisted/);
 });

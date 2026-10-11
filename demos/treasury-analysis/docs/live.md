@@ -78,7 +78,9 @@ and all saved payments in `allReceipts`, with cumulative payment totals in
 If a transfer or a later read fails, use **Refresh**. The recorded
 transaction hash is recovered without signing another transfer; paid results are
 reused. If a settlement response is lost, the charge and deposit remain reserved
-and new payments are refused until the quote is reconciled. The interface shows
+and new payments are refused until the quote is reconciled. The signed payment
+travels only in `_meta["x402/payment"]`; settlement is confirmed by
+`_meta["x402/payment-response"]`. Signatures are never saved in the receipt history. The interface shows
 its quote ID and status. A stalled materialization remains attached to its job.
 
 Only one live server may use this directory. `.live-lock/pid` records its process
@@ -138,11 +140,11 @@ For each Live Send:
    and transfer edges at the confirmed transaction's block. Wallet balances and
    transfer data come from Testril.
 3. If a result is unavailable, the demo requests materialization for that function
-   and block range. It receives a quote, pays in USDC through `pay_quote`, executes
-   the materialization with the returned payment ID, and waits for its job.
+   and block range. It receives a quote, repeats the same
+   materialize call with a signed x402 payment in MCP metadata, and waits for its job.
 4. It pays the separate read quote, retrieves the prepared result, and updates
    the interface. The three data pipelines run in parallel; their cumulative
-   payment vouchers settle in order.
+   payment vouchers settle in order on each resource call.
 
 The read/materialize/payment flow is implemented in
 [`live-testril.mjs`](../src/live-testril.mjs), connected to transfers and the

@@ -118,22 +118,18 @@ export async function createLiveDemo({
       state.depositCapRaw = config.depositCapRaw;
     const timedMcp = {
       ...mcp,
-      call(name, args = {}) {
+      call(name, args = {}, payment) {
         let label = `Testril ${name}`;
         if (name === "inspect") label += ` ${args.subject}`;
         if (["read", "materialize", "provenance"].includes(name)) {
-          const bound =
-            args.bound_function_id ??
-            state.receipts.find((r) => r.paymentId === args.payment_id)
-              ?.function;
+          const bound = args.bound_function_id;
           const wallet = config.wallets.find(
             (w) => state.functions[w.id] === bound,
           );
           label += ` ${wallet?.name ?? "transfer edges"}`;
-          if (name !== "provenance")
-            label += args.payment_id ? " execute" : " quote";
+          if (name !== "provenance") label += payment ? " execute" : " quote";
         }
-        return measure(label, () => mcp.call(name, args));
+        return measure(label, () => mcp.call(name, args, payment));
       },
     };
     const testril = createLiveTestril(

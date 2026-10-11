@@ -12,7 +12,7 @@ function category(name) {
   )
     return "materialize";
   if (
-    name === "Testril pay_quote" ||
+    name === "Settle Testril payment" ||
     name === "Testril inspect channels" ||
     name === "Sign Testril payment"
   )

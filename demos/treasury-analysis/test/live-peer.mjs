@@ -100,9 +100,9 @@ export async function livePeer(t, options = {}) {
       return record;
     },
   };
-  async function tool(name, args) {
-    calls.push({ name, args });
-    await options.beforeTool?.(name, args);
+  async function tool(name, args, payment) {
+    calls.push({ name, args, payment });
+    await options.beforeTool?.(name, args, payment);
     if (name === "bind") {
       const id = JSON.stringify([args.function_slug, args.params]);
       functions.set(id, args);
@@ -133,39 +133,53 @@ export async function livePeer(t, options = {}) {
         computation: { kind: "function", id: "test", version: 1 },
         sources: [],
       };
-    if (name === "pay_quote") {
-      if (uncertain) {
-        uncertain = false;
-        throw new Error("uncertain settlement");
-      }
-      const payload = JSON.parse(args.payload).payload;
-      const quote = quotes.get(args.quote_id);
-      if (payload.deposit)
-        channels.push({
-          channelId: payload.voucher.channelId,
-          network: "eip155:84532",
-          channelConfig: payload.channelConfig,
-          balance: payload.deposit.amount,
-          chargedCumulativeAmount: "0",
-          closed: false,
-        });
-      const channel = channels.find(
-        (c) => c.channelId === payload.voucher.channelId,
-      );
-      if (
-        BigInt(payload.voucher.maxClaimableAmount) !==
-        BigInt(channel.chargedCumulativeAmount) + BigInt(quote.amount)
-      )
-        throw new Error("Incorrect cumulative voucher.");
-      channel.chargedCumulativeAmount = payload.voucher.maxClaimableAmount;
-      quote.paymentId = `paid:${args.quote_id}`;
-      return { outcome: "success", payment_id: quote.paymentId };
-    }
     if (name === "materialize" || name === "read") {
-      if (args.payment_id) {
+      if (payment) {
+        if (
+          !/^[a-zA-Z0-9_-]{16,128}$/.test(
+            payment.extensions?.["payment-identifier"]?.info?.id ?? "",
+          )
+        )
+          throw new Error("Invalid payment identifier");
+        if (uncertain) {
+          uncertain = false;
+          throw new Error("uncertain settlement");
+        }
         const quote = [...quotes.values()].find(
-          (q) => q.paymentId === args.payment_id,
+          (q) =>
+            q.verb === name &&
+            JSON.stringify(q.args) === JSON.stringify(args) &&
+            !q.paid,
         );
+        if (!quote || payment.accepted.amount !== quote.amount)
+          throw new Error("No matching payment challenge");
+        const payload = payment.payload;
+        if (payload.deposit)
+          channels.push({
+            channelId: payload.voucher.channelId,
+            network: "eip155:84532",
+            channelConfig: payload.channelConfig,
+            balance: payload.deposit.amount,
+            chargedCumulativeAmount: "0",
+            closed: false,
+          });
+        const channel = channels.find(
+          (c) => c.channelId === payload.voucher.channelId,
+        );
+        if (
+          BigInt(payload.voucher.maxClaimableAmount) !==
+          BigInt(channel.chargedCumulativeAmount) + BigInt(quote.amount)
+        )
+          throw new Error("Incorrect cumulative voucher.");
+        channel.chargedCumulativeAmount = payload.voucher.maxClaimableAmount;
+        quote.paid = true;
+        const paymentResponse = {
+          success: true,
+          network: "eip155:84532",
+          payer: config.payer.address,
+          transaction: "0x" + "1".repeat(64),
+          extra: { chargedAmount: quote.amount },
+        };
         const work = quote.args;
         if (name === "materialize") {
           covered.add(JSON.stringify(work));
@@ -173,6 +187,7 @@ export async function livePeer(t, options = {}) {
             outcome: "success",
             result: "materializing",
             job: { job_id: "job:1" },
+            paymentResponse,
           };
         }
         const definition = functions.get(work.bound_function_id);
@@ -203,13 +218,13 @@ export async function livePeer(t, options = {}) {
                   amount: r.amountRaw,
                   count: "1",
                 }));
-        return { outcome: "success", values };
+        return { outcome: "success", values, paymentResponse };
       }
       if (name === "read" && !covered.has(JSON.stringify(args)))
         return { outcome: "error", kind: "range_unavailable" };
       const id = `quote:${quotes.size + 1}`;
       const amount = String(name === "materialize" ? 120 : 21);
-      quotes.set(id, { args, amount });
+      quotes.set(id, { args, amount, verb: name });
       return {
         outcome: "payment_required",
         quote_id: id,
@@ -261,12 +276,40 @@ export async function livePeer(t, options = {}) {
       };
     else {
       try {
-        const value = await tool(message.params.name, message.params.arguments);
-        result = {
-          content: [{ type: "text", text: JSON.stringify(value) }],
-          structuredContent: value,
-          isError: false,
-        };
+        const value = await tool(
+          message.params.name,
+          message.params.arguments,
+          message.params._meta?.["x402/payment"],
+        );
+        if (value.outcome === "payment_required") {
+          const { quote_id, lines, accepts } = value;
+          const challenge = {
+            x402Version: 2,
+            error: "payment_required",
+            accepts,
+          };
+          result = {
+            content: [
+              { type: "text", text: JSON.stringify(challenge) },
+              { type: "text", text: JSON.stringify({ quote_id, lines }) },
+            ],
+            structuredContent: challenge,
+            isError: true,
+          };
+          if (options.malformedChallenge) result.content.pop();
+        } else {
+          const { paymentResponse, ...body } = value;
+          if (paymentResponse && options.wrongSettlement)
+            paymentResponse.network = "eip155:1";
+          result = {
+            content: [{ type: "text", text: JSON.stringify(body) }],
+            structuredContent: body,
+            isError: false,
+            ...(paymentResponse && !options.omitSettlement
+              ? { _meta: { "x402/payment-response": paymentResponse } }
+              : {}),
+          };
+        }
       } catch {
         response.destroy();
         return;

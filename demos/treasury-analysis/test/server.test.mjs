@@ -245,20 +245,20 @@ test("live progress reports actual overlapping work without adding Testril calls
     for (const gate of gates.values()) gate.release();
   });
   const peer = await livePeer(t, {
-    async beforeTool(name, args) {
+    async beforeTool(name, args, payment) {
       if (!paused) return;
       const key =
-        name === "pay_quote"
+        payment && !gates.get("pay").arrivals
           ? "pay"
-          : name === "materialize" && args.payment_id
+          : name === "materialize" && payment
             ? "materialize"
-            : name === "read" && args.payment_id
+            : name === "read" && payment
               ? "read"
               : undefined;
       const gate = gates.get(key);
       if (gate) {
         gate.arrivals++;
-        if (key !== "read" || gate.arrivals === 3) gate.entered();
+        gate.entered();
         await gate.ready;
       }
     },
@@ -338,13 +338,13 @@ test("live progress reports actual overlapping work without adding Testril calls
   gates.get("materialize").release();
   await gates.get("read").started;
   const reading = await progress();
-  assert.equal(reading.steps.read.active, 3);
+  assert.equal(reading.steps.read.active, 1);
   assert.equal(reading.phases.rpc.elapsedMs, rpcTime);
   assert.ok(
     reading.phases.testril.elapsedMs > transferred.phases.testril.elapsedMs,
   );
   assert.equal(reading.steps.materialize.complete, true);
-  assert.equal(reading.steps.pay.complete, true);
+  assert.equal(reading.steps.pay.complete, false);
   const calls = peer.calls.length;
   await progress();
   await progress();

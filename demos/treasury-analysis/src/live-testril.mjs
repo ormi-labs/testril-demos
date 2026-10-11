@@ -1,4 +1,5 @@
 import { setTimeout as delay } from "node:timers/promises";
+import { randomUUID } from "node:crypto";
 import { acceptedQuote, signBatchPayment } from "./batch-payment.mjs";
 import { succeeded } from "./mcp.mjs";
 
@@ -25,37 +26,20 @@ export function createLiveTestril(
     payments = result.catch(() => {});
     return result;
   }
-  async function execute(entry) {
-    if (entry.verb === "read")
-      readProgress(entry.args.bound_function_id, entry.args.from_block, "paid");
-    const result = succeeded(
-      await mcp.call(entry.verb, { payment_id: entry.paymentId }),
-      entry.verb,
-    );
-    entry.result = result;
-    entry.status = "done";
-    await save();
-    return result;
-  }
   async function paid(verb, args) {
     const key = JSON.stringify([verb, args]);
     const cached = state.receipts.find(
       (r) => r.cacheKey === key && r.status === "done",
     );
     if (cached) return cached.result;
-    const waiting = state.receipts.find(
-      (r) => r.cacheKey === key && r.status === "paid",
-    );
-    if (waiting && Date.now() - Date.parse(waiting.timestamp) < 120000)
-      return execute(waiting);
-    if (waiting) {
-      waiting.status = "expired";
-      await save();
-    }
+    if (state.receipts.some((r) => r.cacheKey === key && r.status === "paid"))
+      throw new Error(
+        "A paid request did not finish. Reconcile its quote before paying again.",
+      );
     const quote = await mcp.call(verb, args);
     if (quote.outcome === "success") return quote;
     if (quote.outcome !== "payment_required") return quote;
-    const entry = await settle(async () => {
+    return settle(async () => {
       if (state.receipts.some((r) => r.status === "paying"))
         throw new Error(
           "A payment has an uncertain result. Reconcile its quote before authorizing another payment.",
@@ -104,32 +88,46 @@ export function createLiveTestril(
         requestCount: verb === "read" ? 1 : 0,
         block: args.from_block,
         timestamp: new Date().toISOString(),
+        paymentIdentifier: randomUUID(),
       };
       state.receipts.push(entry);
       state.depositedRaw = (
         BigInt(state.depositedRaw) + BigInt(signed.depositRaw)
       ).toString();
       await save();
-      const settled = succeeded(
-        await mcp.call("pay_quote", {
-          quote_id: quote.quote_id,
-          payload: signed.payload,
-        }),
-        "pay_quote",
+      const payment = JSON.parse(signed.payload);
+      // Name the request without persisting its signature. A lost settlement
+      // remains quarantined; no second payment is authorized automatically.
+      payment.extensions = {
+        "payment-identifier": { info: { id: entry.paymentIdentifier } },
+      };
+      const result = await measure("Settle Testril payment", () =>
+        mcp.call(verb, args, payment),
       );
-      if (typeof settled.payment_id !== "string")
-        throw new Error("The paid quote returned no payment id.");
+      const response = result.paymentResponse;
+      if (
+        response?.success !== true ||
+        response.network !== accepted.network ||
+        typeof response.payer !== "string" ||
+        response.payer.toLowerCase() !== config.payer.address.toLowerCase() ||
+        (response.chargedAmount !== undefined &&
+          response.chargedAmount !== accepted.amount)
+      )
+        throw new Error(
+          "The paid call returned no matching settlement confirmation. Reconcile its quote before paying again.",
+        );
       const index = channels.findIndex(
         (c) => c.channelId === signed.channel.channelId,
       );
       if (index < 0) channels.push(signed.channel);
       else channels[index] = signed.channel;
-      entry.paymentId = settled.payment_id;
-      entry.status = "paid";
+      entry.result = result;
+      entry.status = result.outcome === "success" ? "done" : "paid";
       await save();
-      return entry;
+      if (verb === "read")
+        readProgress(args.bound_function_id, args.from_block, "paid");
+      return result;
     });
-    return execute(entry);
   }
   async function readWindow(id, block) {
     const args = {
