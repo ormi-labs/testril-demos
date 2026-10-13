@@ -6,8 +6,8 @@ MCP server: `https://dev.testril.ai/mcp`
 
 ## Demos
 
-| Demo | Run | Status |
-| --- | --- | --- |
+| Demo                                            | Run                                                 | Status                                                                                                                                                                                         |
+| ----------------------------------------------- | --------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | [Move Money](demos/treasury-analysis/README.md) | `cd demos/treasury-analysis && npm ci && npm start` | Mock or live Base Sepolia: move USDC between three wallets using their full live balances, inspect balance and transfer evidence, track Testril costs, replay, reset, and download the source. |
 
 The interface follows Testril’s approved derivative style guide. It runs locally with Node.js 22.13+ on macOS or Linux. Preview the landing screen on [desktop](docs/screenshots/treasury-landing-desktop.png) and [mobile](docs/screenshots/treasury-landing-mobile.png), the [transfer replay](docs/screenshots/treasury-desktop.png), and the [provenance modal](docs/screenshots/treasury-provenance-desktop.png).
@@ -28,6 +28,25 @@ self-contained and can be downloaded and run independently of these plans.
 
 Read [AGENTS.md](AGENTS.md). Keep each demo self-contained, readable, and simple. Its README should explain what it shows, how to run it, and what to expect.
 
+## Production deployment
+
+Pushes to `main` request deployment through the private `testril-demo-harness`
+repository. Its workflow tests the latest demo commit on `main`, records that
+revision, deploys the Cloudflare Worker and assets, and verifies live payments
+and sandbox cleanup. Harness pushes to `main` also run this workflow.
+
+The [request workflow](https://github.com/ormi-labs/testril-demos/actions/workflows/deploy.yml)
+reports whether deployment was requested. The
+[private deployment workflow](https://github.com/ormi-labs/testril-demo-harness/actions/workflows/deploy.yml)
+reports the checks and production result. Both workflows can also be started
+manually from GitHub Actions.
+
+Repository administrators must configure `HARNESS_DEPLOY_TOKEN` here: a
+fine-grained GitHub token scoped to `ormi-labs/testril-demo-harness` with
+Actions read/write permission. Cloudflare and operator credentials stay in the
+private harness repository. Downloaded demos need none of these credentials.
+
 ## Status
 
-This repository is public under the [MIT license](LICENSE). The demos run locally; no hosted demo or packaged release has been published.
+This repository is public under the [MIT license](LICENSE). Move Money runs
+locally and at [demos.testril.si/move-money](https://demos.testril.si/move-money).

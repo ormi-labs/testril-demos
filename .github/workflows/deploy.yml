@@ -1,0 +1,27 @@
+name: Request production deployment
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions: {}
+
+jobs:
+  deploy:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - name: Start the private deployment workflow
+        env:
+          GH_TOKEN: ${{ secrets.HARNESS_DEPLOY_TOKEN }}
+        run: |
+          if [ -z "$GH_TOKEN" ]; then
+            echo "Configure the HARNESS_DEPLOY_TOKEN repository secret."
+            exit 1
+          fi
+          gh api --method POST \
+            repos/ormi-labs/testril-demo-harness/actions/workflows/deploy.yml/dispatches \
+            -f ref=main
+          echo "Deployment requested. Follow its checks and rollout at:"
+          echo "https://github.com/ormi-labs/testril-demo-harness/actions/workflows/deploy.yml"
