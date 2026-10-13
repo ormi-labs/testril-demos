@@ -251,6 +251,32 @@ test("HTTP MCP payments reuse escrow; all wallet funds are available and reset s
   assert.equal(peer.demo.state().id, saved.id);
 });
 
+test("zero and over-balance transfers are typed as 400 refusals", async (t) => {
+  const peer = await livePeer(t, {
+    balances: { treasury: "1000000", a: "0", b: "0" },
+  });
+  await peer.demo.refresh();
+  const before = peer.demo.state();
+  const calls = peer.calls.length;
+  for (const amount of ["0", "5"]) {
+    await assert.rejects(
+      peer.demo.transfer({
+        revision: before.revision,
+        from: "treasury",
+        to: "a",
+        amount,
+      }),
+      (error) => {
+        assert.equal(error.status, 400);
+        assert.match(error.message, /available USDC balance/);
+        return true;
+      },
+    );
+  }
+  assert.equal(peer.prepares, 0);
+  assert.equal(peer.calls.length, calls);
+});
+
 test("reset reuses cached reads without inventing payments and never replenishes the lifetime cap", async (t) => {
   const peer = await livePeer(t, { balances: { a: "0" } });
   await peer.demo.refresh();
