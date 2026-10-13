@@ -155,14 +155,20 @@ export function createApp({
           !input ||
           typeof input !== "object" ||
           Array.isArray(input) ||
-          Object.keys(input).some((key) => key !== "mode") ||
-          (input.mode !== undefined && !["mock", "live"].includes(input.mode))
+          Object.keys(input).some((key) => !["mode", "resume"].includes(key)) ||
+          (input.mode !== undefined &&
+            !["mock", "live"].includes(input.mode)) ||
+          (input.resume !== undefined &&
+            (typeof input.resume !== "string" ||
+              !/^[a-f0-9-]+$/.test(input.resume)))
         )
           throw new Error("Choose mock or live mode.");
         if (input.mode === "live") {
           const current = await getLive();
           return send(201, current.state());
         }
+        const resumed = input.resume && sessions.get(input.resume);
+        if (resumed) return send(200, publicState(resumed));
         const demo = createDemo();
         if (sessions.size >= 64) sessions.delete(sessions.keys().next().value);
         sessions.set(demo.id, demo);

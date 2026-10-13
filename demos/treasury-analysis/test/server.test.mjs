@@ -79,6 +79,24 @@ test("sessions isolate state and reject stale mutations, secret inputs and forei
   assert.equal(reset.payment.remainingRaw, reset.payment.initialRaw);
   assert.deepEqual((await (await fetch(route)).json()).receipts, []);
 });
+
+test("session creation resumes known sessions and replaces expired browser ids without a 404", async (t) => {
+  const url = await serve(t);
+  const original = await (await post(`${url}/api/sessions`, {})).json();
+  const resumedResponse = await post(`${url}/api/sessions`, {
+    mode: "mock",
+    resume: original.id,
+  });
+  assert.equal(resumedResponse.status, 200);
+  assert.equal((await resumedResponse.json()).id, original.id);
+
+  const replacementResponse = await post(`${url}/api/sessions`, {
+    mode: "mock",
+    resume: "00000000-0000-0000-0000-000000000000",
+  });
+  assert.equal(replacementResponse.status, 201);
+  assert.notEqual((await replacementResponse.json()).id, original.id);
+});
 test("run downloads extract and replay using the standalone demo source", async (t) => {
   const url = await serve(t);
   let state = await (await post(`${url}/api/sessions`, {})).json();
@@ -177,6 +195,36 @@ test("INFO logs include the measured transfer stages and browser click-to-refres
     /^0x[0-9a-f]{64}$/.test(v),
   ))
     assert.ok(!messages.join("\n").includes(key));
+});
+
+test("invalid live transfer amounts return clean refusals before RPC or Testril work", async (t) => {
+  const peer = await livePeer(t);
+  const url = await serve(t, {
+    env: peer.env,
+    liveFactory: async () => peer.demo,
+    info: () => {},
+  });
+  const state = await (
+    await post(`${url}/api/sessions`, { mode: "live" })
+  ).json();
+  const route = `${url}/api/sessions/${state.id}`;
+  const ready = await (await post(`${route}/refresh`, {})).json();
+  const calls = peer.calls.length;
+  for (const amount of ["0", "20.000001", "-1", "nope", ".0000001"]) {
+    const response = await post(`${route}/transfer`, {
+      revision: ready.revision,
+      from: "treasury",
+      to: "a",
+      amount,
+    });
+    assert.equal(response.status, 400);
+    assert.match(
+      (await response.json()).error,
+      /positive amount|up to six decimal places/,
+    );
+  }
+  assert.equal(peer.prepares, 0);
+  assert.equal(peer.calls.length, calls);
 });
 
 test("live source dialogs fetch provenance on demand without charging for metadata", async (t) => {

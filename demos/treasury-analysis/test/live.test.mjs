@@ -223,10 +223,16 @@ test("HTTP MCP payments reuse escrow; all wallet funds are available and reset s
   assert.equal(peer.balances.a, "0");
   assert.ok(BigInt(demo.state().payment.lifetimeSpentRaw) > spent);
   assert.ok(demo.export().allReceipts.length > receipts);
-  assert.equal(demo.state().payment.requestCount, 3);
+  assert.equal(demo.state().payment.requestCount, 6);
   assert.equal(
     demo.state().receipts.filter((r) => r.kind === "reads").length,
     3,
+  );
+  assert.ok(
+    demo
+      .state()
+      .receipts.filter((r) => r.kind === "materialization")
+      .every((r) => r.requestCount === 1),
   );
   // Reset's pre-sweep refresh also updates Treasury, untouched by the previous A→B transfer.
   assert.equal(

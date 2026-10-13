@@ -262,9 +262,16 @@ test("replay uses separate chronological rows; reset clears both histories and r
 test("invalid transfer preserves histories; refresh resumes cached reads and downloads work", async ({
   page,
 }) => {
-  await page.locator("#amount").fill("2");
-  await page.locator("#transfer").click();
-  await expect(page.locator("#status")).toHaveClass(/error/);
+  let transferRequests = 0;
+  page.on("request", (request) => {
+    if (request.url().endsWith("/transfer")) transferRequests++;
+  });
+  for (const amount of ["0", "2", "-1", "not-a-number", ".0000001"]) {
+    await page.locator("#amount").fill(amount);
+    await page.locator("#transfer").click();
+    await expect(page.locator("#status")).toHaveClass(/error/);
+  }
+  expect(transferRequests).toBe(0);
   await expect(page.locator("#spent")).toHaveText("0.000030");
   await expect(page.locator("#empty-history")).toBeVisible();
   await send(page, "treasury", "b", ".3");
@@ -353,8 +360,8 @@ test("live reset starts payment history with only the new wallet reads", async (
         lifetimeSpentRaw: "564",
         depositedRaw: "100000",
         remainingRaw: "99436",
-        requestCount: 3,
-        lifetimeRequestCount: 4,
+        requestCount: 6,
+        lifetimeRequestCount: 8,
       };
       state.receipts = state.wallets.flatMap((wallet) => [
         {
@@ -362,7 +369,7 @@ test("live reset starts payment history with only the new wallet reads", async (
           kind: "materialization",
           status: "done",
           chargeRaw: "120",
-          requestCount: 0,
+          requestCount: 1,
           timestamp: "2026-10-07T00:00:10Z",
           block: 124,
           lines: [
@@ -405,7 +412,7 @@ test("live reset starts payment history with only the new wallet reads", async (
         spentRaw: "141",
         depositedRaw: "100000",
         remainingRaw: "99859",
-        requestCount: 1,
+        requestCount: 2,
       };
       state.receipts = [
         {
@@ -413,7 +420,7 @@ test("live reset starts payment history with only the new wallet reads", async (
           kind: "materialization",
           status: "done",
           chargeRaw: "120",
-          requestCount: 0,
+          requestCount: 1,
           timestamp: "2026-10-07T00:00:00Z",
           block: 123,
           lines: [
