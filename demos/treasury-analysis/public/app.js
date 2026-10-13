@@ -1,5 +1,5 @@
 import { formatTransferTiming } from "./timing.js";
-import { decimalAmount, feeAmount, parseUsdc } from "./amounts.js";
+import { decimalAmount, feeAmount } from "./amounts.js";
 import { replayBalances } from "./replay.js";
 import { transferDiagram } from "./transfer-diagram.js";
 
@@ -197,11 +197,7 @@ function renderState() {
     .reduce((sum, r) => sum + BigInt(r.chargeRaw), 0n)
     .toString();
   $("read-count").textContent = readCount;
-  const materializationCount = materializations.reduce(
-    (sum, receipt) => sum + receipt.requestCount,
-    0,
-  );
-  $("materialization-count").textContent = materializationCount;
+  $("materialization-count").textContent = materializations.length;
   $("read-cost").replaceChildren(
     costButton(
       readCost,
@@ -211,7 +207,7 @@ function renderState() {
   $("materialization-cost").replaceChildren(
     costButton(
       materializationCost,
-      `Materializing: ${materializationCount} requests · ${feeAmount(materializationCost)} USDC`,
+      `Materializing: ${materializations.length} requests · ${feeAmount(materializationCost)} USDC`,
     ),
   );
   $("receipt-rows").replaceChildren(
@@ -585,29 +581,9 @@ for (const tab of tabs) {
     target.focus();
   });
 }
-function transferRefusal() {
-  try {
-    const from = selectedWallet("from");
-    const amount = parseUsdc($("amount").value);
-    if (BigInt(amount) <= 0n || BigInt(amount) > BigInt(state.balances[from]))
-      return "Enter a positive amount within the sending wallet's available USDC balance.";
-  } catch (error) {
-    return error.message;
-  }
-}
 $("transfer-form").addEventListener("submit", (event) => {
   event.preventDefault();
-  const refusal = transferRefusal();
-  $("amount").setAttribute("aria-invalid", String(!!refusal));
-  if (refusal) {
-    status(refusal, true);
-    return;
-  }
   action("transfer");
-});
-$("amount").addEventListener("input", () => {
-  $("amount").removeAttribute("aria-invalid");
-  if ($("status").classList.contains("error")) status("");
 });
 $("from").addEventListener("change", updateRecipients);
 $("reset").addEventListener("click", () => action("reset"));
@@ -650,10 +626,14 @@ async function start(nextMode) {
     } catch {
       /* Storage is optional. */
     }
-    state = await api("/api/sessions", {
-      mode,
-      ...(saved ? { resume: saved } : {}),
-    });
+    if (saved) {
+      try {
+        state = await api(`/api/sessions/${encodeURIComponent(saved)}`);
+      } catch {
+        /* Expired sessions start fresh. */
+      }
+    }
+    state ??= await api("/api/sessions", mode === "live" ? { mode } : {});
     try {
       sessionStorage.setItem(`${storageKey}-${mode}`, state.id);
     } catch {

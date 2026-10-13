@@ -85,7 +85,7 @@ export function createLiveTestril(
         chargeRaw: accepted.amount,
         depositRaw: signed.depositRaw,
         lines: quote.lines,
-        requestCount: 1,
+        requestCount: verb === "read" ? 1 : 0,
         block: args.from_block,
         timestamp: new Date().toISOString(),
         paymentIdentifier: randomUUID(),
