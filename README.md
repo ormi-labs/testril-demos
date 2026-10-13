@@ -30,21 +30,19 @@ Read [AGENTS.md](AGENTS.md). Keep each demo self-contained, readable, and simple
 
 ## Production deployment
 
-Pushes to `main` request deployment through the private `testril-demo-harness`
-repository. Its workflow tests the latest demo commit on `main`, records that
-revision, deploys the Cloudflare Worker and assets, and verifies live payments
-and sandbox cleanup. Harness pushes to `main` also run this workflow.
+Production uses Cloudflare Workers Builds, connected to the private
+`testril-demo-harness` repository. Harness pushes to `main` start its native
+build. Public demo pushes call a Cloudflare Deploy Hook through the
+[request workflow](https://github.com/ormi-labs/testril-demos/actions/workflows/deploy.yml).
+That workflow reports whether the request succeeded; Cloudflare's build history
+reports the checks and deployment result.
 
-The [request workflow](https://github.com/ormi-labs/testril-demos/actions/workflows/deploy.yml)
-reports whether deployment was requested. The
-[private deployment workflow](https://github.com/ormi-labs/testril-demo-harness/actions/workflows/deploy.yml)
-reports the checks and production result. Both workflows can also be started
-manually from GitHub Actions.
-
-Repository administrators must configure `HARNESS_DEPLOY_TOKEN` here: a
-fine-grained GitHub token scoped to `ormi-labs/testril-demo-harness` with
-Actions read/write permission. Cloudflare and operator credentials stay in the
-private harness repository. Downloaded demos need none of these credentials.
+The native build selects the latest demo commit on `main`, tests both repositories,
+deploys the Worker and assets, and verifies that production reports the tested
+commit hashes at [the health endpoint](https://demos.testril.si/healthz).
+Cloudflare manages deployment credentials. Repository administrators configure
+only `CLOUDFLARE_DEPLOY_HOOK` here, containing the harness's `main` deploy-hook URL.
+Downloaded demos need no deployment credentials.
 
 ## Status
 

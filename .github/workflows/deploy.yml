@@ -1,4 +1,4 @@
-name: Request production deployment
+name: Request Cloudflare build
 
 on:
   push:
@@ -12,16 +12,21 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 5
     steps:
-      - name: Start the private deployment workflow
+      - name: Trigger the native Cloudflare build
         env:
-          GH_TOKEN: ${{ secrets.HARNESS_DEPLOY_TOKEN }}
+          DEPLOY_HOOK: ${{ secrets.CLOUDFLARE_DEPLOY_HOOK }}
         run: |
-          if [ -z "$GH_TOKEN" ]; then
-            echo "Configure the HARNESS_DEPLOY_TOKEN repository secret."
+          if [ -z "$DEPLOY_HOOK" ]; then
+            echo "Configure the CLOUDFLARE_DEPLOY_HOOK repository secret."
             exit 1
           fi
-          gh api --method POST \
-            repos/ormi-labs/testril-demo-harness/actions/workflows/deploy.yml/dispatches \
-            -f ref=main
-          echo "Deployment requested. Follow its checks and rollout at:"
-          echo "https://github.com/ormi-labs/testril-demo-harness/actions/workflows/deploy.yml"
+          node <<'JS'
+          (async () => {
+            const response = await fetch(process.env.DEPLOY_HOOK, {
+              method: 'POST', signal: AbortSignal.timeout(30000),
+            });
+            const result = await response.json();
+            if (!response.ok || !result.success) throw new Error('Cloudflare rejected the build request.');
+            console.log('Cloudflare build requested:', result.result.build_uuid);
+          })().catch(() => { console.error('Cloudflare build request failed.'); process.exitCode = 1; });
+          JS
