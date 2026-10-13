@@ -354,7 +354,7 @@ export async function createLiveDemo({
     }
     function validateTransfer(from, to, amountRaw) {
       if (!wallet(from) || !wallet(to) || from === to)
-        throw refusal("Choose two different demo wallets.");
+        throw new Error("Choose two different demo wallets.");
       const amount = BigInt(amountRaw);
       if (amount <= 0n || amount > BigInt(state.balances[from]))
         throw refusal(
