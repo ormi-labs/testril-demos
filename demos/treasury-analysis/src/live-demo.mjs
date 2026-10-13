@@ -357,7 +357,7 @@ export async function createLiveDemo({
         throw new Error("Choose two different demo wallets.");
       const amount = BigInt(amountRaw);
       if (amount <= 0n || amount > BigInt(state.balances[from]))
-        throw new Error(
+        throw refusal(
           "Enter a positive amount within the sending wallet's available USDC balance.",
         );
     }
@@ -552,4 +552,8 @@ function stale(state) {
   error.status = 409;
   error.state = state;
   return error;
+}
+
+function refusal(message) {
+  return Object.assign(new Error(message), { status: 400 });
 }
