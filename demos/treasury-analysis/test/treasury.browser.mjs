@@ -653,7 +653,7 @@ test("Live Send reports browser click-to-refresh time after updating balances", 
   );
 });
 
-test("Live Send modal follows overlapping progress, ignores other revisions, and closes on success or error", async ({
+test("Live Send modal follows overlapping progress and keeps a finished summary until dismiss", async ({
   page,
 }, testInfo) => {
   const state = {
@@ -765,6 +765,8 @@ test("Live Send modal follows overlapping progress, ignores other revisions, and
   await expect(page.locator("#testril-progress-heading")).toHaveText("Testril");
   await expect(page.locator("#rpc-progress-elapsed")).toHaveText("0.2s");
   await expect(page.locator("#testril-progress-elapsed")).toHaveText("0.1s");
+  await expect(page.locator("#progress-result")).toBeHidden();
+  await expect(page.locator("#close-progress")).toBeHidden();
   await page.keyboard.press("Escape");
   await expect(modal).toBeVisible();
   await expect(page.locator("#progress-elapsed")).toContainText("s elapsed");
@@ -787,16 +789,68 @@ test("Live Send modal follows overlapping progress, ignores other revisions, and
   await expect(page.locator('[data-progress="read"]')).toHaveClass(/active/);
   await expect(page.locator("#rpc-progress-elapsed")).toHaveText("0.2s");
   await expect(page.locator("#testril-progress-elapsed")).toHaveText("0.3s");
+  await expect(page.locator("#progress-result")).toBeHidden();
+  current = finishedProgress(0, "success", 1400, 2600);
   release();
-  await expect(modal).toBeHidden();
+  await expect(modal).toBeVisible();
+  await expect(page.locator("#chain-duration")).toHaveText("1.4s");
+  await expect(page.locator("#testril-duration")).toHaveText("2.6s");
+  await expect(page.locator("#progress-error")).toBeHidden();
+  await expect(
+    page.getByRole("heading", { name: "Base Sepolia · RPC", exact: true }),
+  ).toBeVisible();
+  await expect(page.locator("#testril-progress-heading")).toHaveText("Testril");
+  await expect(modal.getByText("Total RPC", { exact: true })).toHaveCount(0);
+  await expect(modal.getByText("Total Testril", { exact: true })).toHaveCount(
+    0,
+  );
+  expect(
+    await page.evaluate(() => {
+      const summary = document.querySelector("#progress-result");
+      const steps = document.querySelector(".progress-phase");
+      return Boolean(
+        summary.compareDocumentPosition(steps) &
+        Node.DOCUMENT_POSITION_FOLLOWING,
+      );
+    }),
+  ).toBe(true);
+  expect(
+    await modal.evaluate((node) => node.scrollWidth <= node.clientWidth),
+  ).toBe(true);
   await expect(page.locator("#balance-treasury")).toHaveText("19.75");
+  await page.getByRole("button", { name: "Close transfer progress" }).click();
+  await expect(modal).toBeHidden();
   await expect(page.locator("#transfer")).toBeFocused();
   fail = true;
   release = undefined;
+  current = {
+    revision: 1,
+    outcome: "running",
+    phases: {
+      rpc: { started: true, elapsedMs: 50 },
+      testril: { started: false, elapsedMs: 0 },
+    },
+    steps: { prepare: { active: 1, started: true } },
+  };
   await page.locator("#transfer").click();
   await expect(modal).toBeVisible();
+  await expect(page.locator("#progress-result")).toBeHidden();
   await expect.poll(() => typeof release).toBe("function");
+  current = finishedProgress(1, "failed", 800, 400);
   release();
+  await expect(modal).toBeVisible();
+  await expect(page.locator("#chain-duration")).toHaveText("0.8s");
+  await expect(page.locator("#testril-duration")).toHaveText("0.4s");
+  await expect(page.locator("#progress-error")).toHaveText(
+    "Testril read failed. Use Refresh to retry.",
+  );
+  await expect(page.locator("#status")).toHaveText(
+    "Testril read failed. Use Refresh to retry.",
+  );
+  await expect(
+    page.getByRole("heading", { name: "Base Sepolia · RPC", exact: true }),
+  ).toBeVisible();
+  await page.keyboard.press("Escape");
   await expect(modal).toBeHidden();
   await expect(page.locator("#status")).toHaveText(
     "Testril read failed. Use Refresh to retry.",
@@ -804,3 +858,27 @@ test("Live Send modal follows overlapping progress, ignores other revisions, and
   await expect(page.locator("#status")).toBeFocused();
   await expect(page.locator("#transfer")).toBeDisabled();
 });
+
+function finishedProgress(revision, outcome, chainMs, testrilMs) {
+  const step = { active: 0, started: true, complete: true };
+  return {
+    revision,
+    outcome,
+    phases: {
+      rpc: { started: true, complete: true, elapsedMs: chainMs },
+      testril: {
+        started: true,
+        complete: outcome === "success",
+        elapsedMs: testrilMs,
+      },
+    },
+    steps: {
+      prepare: step,
+      broadcast: step,
+      confirm: step,
+      materialize: step,
+      pay: step,
+      read: step,
+    },
+  };
+}

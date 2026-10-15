@@ -111,11 +111,14 @@ shows materialization, payment, and reading. Each section shows its wall-clock
 time, alongside the total elapsed time. The RPC timer stops when the transfer is
 confirmed; Testril time includes its parallel work without adding overlapping
 call durations. Activity comes from the running server operation. Local progress
-checks add no Testril calls or charges. The modal closes when the response updates the balances
-or reports an error. Cached steps are marked “Not needed.” To verify visually,
-send a small Live transfer: the modal should show the amount and wallet pair,
-update its active steps, then close with the new balances visible. Failure should
-close the modal and display the error beside Send.
+checks add no Testril calls or charges. When the send finishes, the modal stays
+open. A summary at the top shows the measured Chain and Testril durations, and
+the step list stays underneath with its Base Sepolia · RPC and Testril headings.
+Close or Escape dismisses it. Cached steps are marked “Not needed.” To verify
+visually, send a small Live transfer: the modal should show the amount and
+wallet pair, update its active steps, then stay open with that summary. Failure
+keeps the modal open with the error until dismiss; the error also remains beside
+Send.
 
 ## How indexing and reads work
 

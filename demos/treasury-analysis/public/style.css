@@ -600,6 +600,32 @@ dialog::backdrop {
 .transfer-progress h2 {
   font-size: 28px;
 }
+.transfer-progress .section-top {
+  margin-bottom: 0;
+}
+.progress-result {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin: 0 0 24px;
+}
+.progress-result span {
+  display: block;
+  font-size: 12px;
+  color: var(--muted);
+}
+.progress-result strong {
+  display: block;
+  margin-top: 4px;
+  font-size: 23px;
+  font-weight: 400;
+  font-variant-numeric: tabular-nums;
+}
+.progress-error {
+  margin: 0 0 16px;
+  color: #803f32;
+  font-size: 12px;
+}
 #progress-heading:focus {
   outline: none;
 }

@@ -236,8 +236,30 @@
       aria-describedby="progress-summary"
     >
       <p class="eyebrow">Live transfer</p>
-      <h2 id="progress-heading" tabindex="-1">Sending USDC</h2>
+      <div class="section-top">
+        <h2 id="progress-heading" tabindex="-1">Sending USDC</h2>
+        <button
+          id="close-progress"
+          class="text-button"
+          type="button"
+          hidden
+          aria-label="Close transfer progress"
+        >
+          Close
+        </button>
+      </div>
       <p id="progress-summary" class="muted"></p>
+      <div id="progress-result" class="progress-result" hidden>
+        <div>
+          <span>Chain</span>
+          <strong id="chain-duration"></strong>
+        </div>
+        <div>
+          <span>Testril</span>
+          <strong id="testril-duration"></strong>
+        </div>
+      </div>
+      <p id="progress-error" class="progress-error" hidden></p>
       <section class="progress-phase" aria-labelledby="rpc-progress-heading">
         <div class="progress-phase-heading">
           <h3 id="rpc-progress-heading">Base Sepolia · RPC</h3>

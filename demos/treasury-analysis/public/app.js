@@ -413,10 +413,34 @@ async function inspect(kind, item) {
     lock(false);
   }
 }
+const rpcStageNames = [
+  "RPC transaction preparation and signing",
+  "RPC broadcast",
+  "RPC receipt wait and block verification",
+];
+
+function stageDuration(timing, names) {
+  const stages = timing?.stages?.filter((stage) => names.includes(stage.name));
+  if (!stages?.length) return;
+  return stages.reduce((total, stage) => total + stage.elapsedMs, 0);
+}
+
+function formatDuration(milliseconds) {
+  return `${(milliseconds / 1000).toFixed(1)}s`;
+}
+
+function measuredDuration(phase, fallbackMs) {
+  if (phase?.started && Number.isFinite(phase.elapsedMs))
+    return formatDuration(phase.elapsedMs);
+  if (Number.isFinite(fallbackMs)) return formatDuration(fallbackMs);
+  return "—";
+}
+
 function showTransferProgress(input, started) {
   const dialog = $("transfer-progress");
   const controller = new AbortController();
   const progressUrl = endpoint("progress");
+  let finished = false;
   const labels = {
     prepare: "RPC: Preparing Transfer",
     broadcast: "RPC: Submitting Transfer",
@@ -429,7 +453,7 @@ function showTransferProgress(input, started) {
     for (const key of ["rpc", "testril"]) {
       const phase = phases[key];
       $(`${key}-progress-elapsed`).textContent = phase?.started
-        ? `${(phase.elapsedMs / 1000).toFixed(1)}s`
+        ? formatDuration(phase.elapsedMs)
         : "Pending";
     }
     const active = [];
@@ -455,8 +479,20 @@ function showTransferProgress(input, started) {
     if ($("progress-activity").textContent !== announcement)
       $("progress-activity").textContent = announcement;
   };
+  const dismiss = () => {
+    if (!finished) return;
+    finished = false;
+    dialog.close();
+    ($("transfer").disabled ? $("status") : $("transfer")).focus({
+      preventScroll: true,
+    });
+  };
   $("progress-summary").textContent =
     `${input.amount} USDC · ${name(input.from)} → ${name(input.to)}`;
+  $("progress-result").hidden = true;
+  $("progress-error").hidden = true;
+  $("progress-error").textContent = "";
+  $("close-progress").hidden = true;
   const elapsed = () => {
     $("progress-elapsed").textContent =
       `${((performance.now() - started) / 1000).toFixed(1)}s elapsed`;
@@ -477,6 +513,7 @@ function showTransferProgress(input, started) {
           const progress = await response.json();
           if (
             !controller.signal.aborted &&
+            !finished &&
             progress?.revision === input.revision &&
             progress.outcome === "running"
           )
@@ -490,22 +527,59 @@ function showTransferProgress(input, started) {
     }
   };
   poll();
-  return () => {
-    controller.abort();
-    clearInterval(clock);
-    dialog.close();
+  return {
+    dismiss,
+    running: () => !finished && dialog.open,
+    async finish(error, timing) {
+      controller.abort();
+      clearInterval(clock);
+      let snapshot;
+      try {
+        const response = await fetch(progressUrl);
+        if (response.ok) snapshot = await response.json();
+      } catch {
+        snapshot = undefined;
+      }
+      const done =
+        snapshot?.revision === input.revision &&
+        (snapshot.outcome === "success" || snapshot.outcome === "failed");
+      const phases = done ? snapshot.phases : undefined;
+      if (done) render(snapshot.steps, phases);
+      $("chain-duration").textContent = measuredDuration(
+        phases?.rpc,
+        stageDuration(timing, rpcStageNames),
+      );
+      $("testril-duration").textContent = measuredDuration(
+        phases?.testril,
+        stageDuration(timing, ["Testril refresh after transfer"]),
+      );
+      $("progress-result").hidden = false;
+      $("progress-error").hidden = !error;
+      $("progress-error").textContent = error ? error.message : "";
+      $("progress-activity").textContent = error
+        ? error.message
+        : "Send finished.";
+      $("close-progress").hidden = false;
+      finished = true;
+      $("close-progress").focus({ preventScroll: true });
+    },
   };
 }
-$("transfer-progress").addEventListener("cancel", (event) =>
-  event.preventDefault(),
-);
+let progressSession;
+$("close-progress").addEventListener("click", () => progressSession?.dismiss());
+$("transfer-progress").addEventListener("cancel", (event) => {
+  event.preventDefault();
+  if (progressSession?.running()) return;
+  progressSession?.dismiss();
+});
 
 async function action(kind) {
   if (busy) return;
   const started = performance.now();
   const timedSend = kind === "transfer" && state.mode === "live";
   let timing;
-  let closeProgress;
+  let failure;
+  let session;
   stop();
   lock(true);
   status(
@@ -521,7 +595,8 @@ async function action(kind) {
         to: selectedWallet("to"),
         amount: $("amount").value,
       });
-    if (timedSend) closeProgress = showTransferProgress(input, started);
+    if (timedSend)
+      session = progressSession = showTransferProgress(input, started);
     state = await api(endpoint(kind), input);
     timing = state.timing;
     selected = undefined;
@@ -530,15 +605,12 @@ async function action(kind) {
     stop();
     status("");
   } catch (error) {
+    failure = error;
     timing = error.timing;
     status(error.message, true);
   } finally {
-    closeProgress?.();
+    if (session) await session.finish(failure, timing);
     lock(false);
-    if (timedSend)
-      ($("transfer").disabled ? $("status") : $("transfer")).focus({
-        preventScroll: true,
-      });
     if (timedSend && timing) {
       const elapsedMs = performance.now() - started;
       console.info(formatTransferTiming(timing, elapsedMs));
