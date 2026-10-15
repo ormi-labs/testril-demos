@@ -29,10 +29,9 @@ fixtures, assets, documentation, and tooling; it works without the parent reposi
 
 Open **http://127.0.0.1:4173**. The server accepts local connections only.
 Stop it with **Ctrl-C**. To change the port, copy `.env.example` to `.env` and
-set `PORT`. Mock mode needs no other configuration. Keys and nonzero payment
-caps enable Live mode automatically. Until then the page stays in mock:
-Send remains available, and it does not ask for a Testril refresh or
-report an escrow quote.
+set `PORT`. The local page always opens in Mock mode, including when `.env`
+contains Live wallets. Mock needs no credentials or Testril refresh. Keys and
+nonzero payment caps enable the Live option; select it explicitly to use Live.
 
 ## Try Mock mode
 

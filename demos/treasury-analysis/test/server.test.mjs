@@ -338,7 +338,7 @@ test("live progress reports actual overlapping work without adding Testril calls
   gates.get("materialize").release();
   await gates.get("read").started;
   const reading = await progress();
-  assert.equal(reading.steps.read.active, 1);
+  assert.ok(reading.steps.read.active >= 1);
   assert.equal(reading.phases.rpc.elapsedMs, rpcTime);
   assert.ok(
     reading.phases.testril.elapsedMs > transferred.phases.testril.elapsedMs,

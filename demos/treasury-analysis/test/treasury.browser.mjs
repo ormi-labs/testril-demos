@@ -2,6 +2,9 @@ import { test, expect } from "@playwright/test";
 import { createDemo, publicState } from "../src/demo.mjs";
 import { fileURLToPath } from "node:url";
 import { liveFixture } from "../src/live-config.mjs";
+import { createApp } from "../src/server.mjs";
+import { testConfig } from "./live-peer.mjs";
+import { once } from "node:events";
 async function send(page, from, to, amount) {
   await page
     .locator(`#from label`)
@@ -22,6 +25,66 @@ test.beforeEach(async ({ page }) => {
   await expect(page.locator("#balance-treasury")).toHaveText("1");
 });
 
+test("Mock sends the default amount immediately after startup", async ({
+  page,
+}) => {
+  await page.getByRole("button", { name: "Send", exact: true }).click();
+  await expect(page.locator("#balance-treasury")).toHaveText("0.75");
+  await expect(page.locator("#balance-a")).toHaveText("0.25");
+  await expect(page.locator("#transfer-count")).toHaveText("1");
+  await expect(page.locator("#status")).toBeEmpty();
+});
+
+test("configured Live wallets do not prevent the Mock walkthrough", async ({
+  page,
+}, testInfo) => {
+  let liveOpens = 0;
+  const server = createApp({
+    env: testConfig().env,
+    liveFactory: async () => {
+      liveOpens++;
+      throw new Error("Live was explicitly selected.");
+    },
+  });
+  server.listen(0, "127.0.0.1");
+  await once(server, "listening");
+  try {
+    await page.goto(`http://127.0.0.1:${server.address().port}`);
+    await expect(
+      page.getByRole("radio", { name: "Mock", exact: true }),
+    ).toBeChecked();
+    await page.getByRole("button", { name: "Send", exact: true }).click();
+    await expect(page.locator("#balance-treasury")).toHaveText("0.75");
+    await expect(page.locator("#balance-a")).toHaveText("0.25");
+    await page.screenshot({
+      path: fileURLToPath(
+        new URL(
+          `../../../docs/screenshots/treasury-mock-configured-${testInfo.project.name}.png`,
+          import.meta.url,
+        ),
+      ),
+      fullPage: true,
+    });
+    await send(page, "a", "b", "0.10");
+    await expect(page.locator("#balance-a")).toHaveText("0.15");
+    await expect(page.locator("#balance-b")).toHaveText("0.1");
+    await page.reload();
+    await expect(page.locator("#transfer-count")).toHaveText("2");
+    await expect(page.locator("#balance-b")).toHaveText("0.1");
+    await page.getByRole("button", { name: "Reset demo", exact: true }).click();
+    await expect(page.locator("#balance-treasury")).toHaveText("1");
+    await expect(page.locator("#transfer-count")).toHaveText("0");
+    expect(liveOpens).toBe(0);
+    await page.locator("#live-option").click();
+    await expect(page.locator("#status")).toHaveText(
+      "Live was explicitly selected.",
+    );
+    expect(liveOpens).toBe(1);
+  } finally {
+    await new Promise((resolve) => server.close(resolve));
+  }
+});
+
 test("failed live startup clears previous mock balances and history", async ({
   page,
 }, testInfo) => {
@@ -30,9 +93,15 @@ test("failed live startup clears previous mock balances and history", async ({
     route.fulfill({ json: { liveAvailable: true } }),
   );
   await page.route("**/api/sessions", (route) =>
-    route.fulfill({ status: 400, json: { error: "Live session is locked." } }),
+    route.request().postDataJSON()?.mode === "live"
+      ? route.fulfill({
+          status: 400,
+          json: { error: "Live session is locked." },
+        })
+      : route.continue(),
   );
   await page.reload();
+  await page.locator("#live-option").click();
   await expect(page.locator("#status")).toHaveText("Live session is locked.");
   await expect(page.locator("#network-name")).toHaveText("Base Sepolia");
   await expect(page.locator("#balance-treasury")).toHaveCount(0);
@@ -528,6 +597,7 @@ test("live reset starts payment history with only the new wallet reads", async (
     return route.fulfill({ json: state });
   });
   await page.reload();
+  await page.locator("#live-option").click();
   await expect(
     page.getByRole("radio", { name: "Live", exact: true }),
   ).toBeChecked();
@@ -550,13 +620,10 @@ test("live reset starts payment history with only the new wallet reads", async (
   await expect(page.locator("#wallet-treasury .wallet-address")).toHaveText(
     state.wallets[0].address,
   );
-  await expect(
-    page.getByText(
-      "Select Refresh to prepare and read the snapshot with Testril.",
-    ),
-  ).toHaveCount(0);
-  await expect(page.locator("#status")).toBeEmpty();
-  await expect(page.locator("#transfer")).toBeEnabled();
+  await expect(page.locator("#status")).toHaveText(
+    "Select Refresh to prepare and read the snapshot with Testril.",
+  );
+  await expect(page.locator("#transfer")).toBeDisabled();
   await page.locator("#refresh-live").click();
   await expect(page.locator("#transfer")).toBeEnabled();
   await expect(page.locator("#balance-treasury")).toHaveText("20");
@@ -651,7 +718,7 @@ test("live reset starts payment history with only the new wallet reads", async (
       "Select Refresh to prepare and read the snapshot with Testril.",
     ),
   ).toHaveCount(0);
-  await expect(page.locator("#transfer")).toBeEnabled();
+  await expect(page.locator("#transfer")).toBeDisabled();
   await page
     .locator(".mode-switch label")
     .filter({ has: page.locator('input[value="mock"]') })
@@ -788,7 +855,7 @@ test("Live Send modal follows overlapping progress and keeps a finished summary 
   let fail = false;
   let polls = 0;
   await page.route("**/api/config", (route) =>
-    route.fulfill({ json: { liveAvailable: true } }),
+    route.fulfill({ json: { defaultMode: "live", liveAvailable: true } }),
   );
   await page.route("**/api/sessions", (route) =>
     route.fulfill({ status: 201, json: state }),

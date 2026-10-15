@@ -110,6 +110,8 @@ function lock(value) {
       (state?.mode === "live" &&
         state.balanceRead.balances[balance.dataset.balance] === null);
   if (!value && state) updateRecipients();
+  if (!value && state?.mode === "live" && state.refreshNeeded)
+    $("transfer").disabled = true;
 }
 const selectedWallet = (id) => $(id).querySelector("input:checked").value;
 function updateRecipients() {
@@ -690,6 +692,7 @@ $("provenance").addEventListener("cancel", (event) => {
 
 let liveAvailable = false;
 let liveServerUrl;
+let defaultMode = "mock";
 function rememberSession(id) {
   try {
     sessionStorage.setItem(`${storageKey}-${mode}`, id);
@@ -726,7 +729,11 @@ function paintSession() {
   document.querySelector(".histories").hidden = false;
   stop();
   lock(false);
-  status("");
+  status(
+    state.mode === "live" && state.refreshNeeded
+      ? "Select Refresh to prepare and read the snapshot with Testril."
+      : "",
+  );
 }
 async function loadSession(nextMode) {
   let saved;
@@ -815,9 +822,10 @@ try {
   const config = await api("/api/config");
   liveAvailable = config.liveAvailable;
   liveServerUrl = config.mcpUrl;
+  defaultMode = config.defaultMode === "live" ? "live" : "mock";
   $("live-option").title =
     config.liveReason ?? "Live Base Sepolia with local signing";
 } catch {
   /* Mock mode can still start. */
 }
-await start(liveAvailable ? "live" : "mock");
+await start(defaultMode);

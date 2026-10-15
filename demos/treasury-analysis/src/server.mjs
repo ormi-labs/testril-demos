@@ -145,6 +145,7 @@ export function createApp({
       }
       if (request.method === "GET" && url.pathname === "/api/config")
         return send(200, {
+          defaultMode: "mock",
           liveAvailable: !liveReason,
           liveReason,
           mcpUrl: config?.mcpUrl,
