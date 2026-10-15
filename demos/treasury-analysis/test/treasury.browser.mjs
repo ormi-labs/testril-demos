@@ -770,6 +770,11 @@ test("Live Send modal follows overlapping progress and keeps a finished summary 
   await page.keyboard.press("Escape");
   await expect(modal).toBeVisible();
   await expect(page.locator("#progress-elapsed")).toContainText("s elapsed");
+  await expect(page.locator("#progress-eyebrow")).toHaveText("Live transfer");
+  await expect(page.locator("#progress-eyebrow")).toBeVisible();
+  await expect(page.getByText("Testril steps can run together.")).toHaveCount(
+    0,
+  );
   expect(
     await modal.evaluate((node) => node.scrollWidth <= node.clientWidth),
   ).toBe(true);
@@ -796,6 +801,24 @@ test("Live Send modal follows overlapping progress and keeps a finished summary 
   await expect(page.locator("#chain-duration")).toHaveText("1.4s");
   await expect(page.locator("#testril-duration")).toHaveText("2.6s");
   await expect(page.locator("#progress-error")).toBeHidden();
+  await expect(page.locator("#progress-eyebrow")).toBeHidden();
+  await expect(page.locator("#rpc-progress-elapsed")).toBeHidden();
+  await expect(page.locator("#testril-progress-elapsed")).toBeHidden();
+  await expect(page.locator("#progress-footer")).toBeHidden();
+  await expect(page.locator("#chain-duration")).toBeVisible();
+  await expect(page.locator("#testril-duration")).toBeVisible();
+  for (const stepName of [
+    "Preparing Transfer",
+    "Submitting Transfer",
+    "Confirming Transfer",
+    "Materializing Data",
+    "Paying",
+    "Reading Data",
+  ])
+    await expect(modal.getByText(stepName, { exact: true })).toBeVisible();
+  await expect(modal.locator(".progress-state")).toHaveText(
+    Array(6).fill("Complete"),
+  );
   await expect(
     page.getByRole("heading", { name: "Base Sepolia · RPC", exact: true }),
   ).toBeVisible();
@@ -841,6 +864,13 @@ test("Live Send modal follows overlapping progress and keeps a finished summary 
   await expect(modal).toBeVisible();
   await expect(page.locator("#chain-duration")).toHaveText("0.8s");
   await expect(page.locator("#testril-duration")).toHaveText("0.4s");
+  await expect(page.locator("#progress-eyebrow")).toBeHidden();
+  await expect(page.locator("#rpc-progress-elapsed")).toBeHidden();
+  await expect(page.locator("#testril-progress-elapsed")).toBeHidden();
+  await expect(page.locator("#progress-elapsed")).toBeHidden();
+  await expect(page.getByText("Testril steps can run together.")).toHaveCount(
+    0,
+  );
   await expect(page.locator("#progress-error")).toHaveText(
     "Testril read failed. Use Refresh to retry.",
   );

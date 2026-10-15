@@ -107,18 +107,20 @@ steps. Use the interface to recover an unrelated run.
 
 Live Send opens a progress modal with separate **Base Sepolia · RPC** and
 **Testril** sections. RPC shows preparation, submission, and confirmation; Testril
-shows materialization, payment, and reading. Each section shows its wall-clock
-time, alongside the total elapsed time. The RPC timer stops when the transfer is
-confirmed; Testril time includes its parallel work without adding overlapping
-call durations. Activity comes from the running server operation. Local progress
-checks add no Testril calls or charges. When the send finishes, the modal stays
-open. A summary at the top shows the measured Chain and Testril durations, and
-the step list stays underneath with its Base Sepolia · RPC and Testril headings.
-Close or Escape dismisses it. Cached steps are marked “Not needed.” To verify
-visually, send a small Live transfer: the modal should show the amount and
-wallet pair, update its active steps, then stay open with that summary. Failure
-keeps the modal open with the error until dismiss; the error also remains beside
-Send.
+shows materialization, payment, and reading. While the send is running, each
+section shows its wall-clock time, alongside the total elapsed time. The RPC
+timer stops when the transfer is confirmed; Testril time includes its parallel
+work without adding overlapping call durations. Activity comes from the running
+server operation. Local progress checks add no Testril calls or charges. When
+the send finishes, the modal stays open. A summary at the top shows the measured
+Chain and Testril durations. The step list stays underneath with its Base
+Sepolia · RPC and Testril headings, step names, and status. That finished
+summary leaves out the Live transfer label and the section and elapsed times,
+which repeat the totals above. Close or Escape dismisses it. Cached steps are
+marked “Not needed.” To verify visually, send a small Live transfer: the modal
+should show the amount and wallet pair, update its active steps, then stay open
+with that summary. Failure keeps the modal open with the error until dismiss;
+the error also remains beside Send.
 
 ## How indexing and reads work
 

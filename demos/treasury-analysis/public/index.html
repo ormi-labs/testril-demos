@@ -235,7 +235,7 @@
       aria-labelledby="progress-heading"
       aria-describedby="progress-summary"
     >
-      <p class="eyebrow">Live transfer</p>
+      <p id="progress-eyebrow" class="eyebrow">Live transfer</p>
       <div class="section-top">
         <h2 id="progress-heading" tabindex="-1">Sending USDC</h2>
         <button
@@ -314,9 +314,8 @@
         role="status"
         aria-live="polite"
       ></p>
-      <div class="progress-footer small muted">
-        <span>Testril steps can run together.</span
-        ><span id="progress-elapsed"></span>
+      <div id="progress-footer" class="progress-footer small muted">
+        <span id="progress-elapsed"></span>
       </div>
     </dialog>
     <dialog

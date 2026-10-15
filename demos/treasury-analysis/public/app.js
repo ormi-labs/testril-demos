@@ -489,10 +489,14 @@ function showTransferProgress(input, started) {
   };
   $("progress-summary").textContent =
     `${input.amount} USDC · ${name(input.from)} → ${name(input.to)}`;
+  $("progress-eyebrow").hidden = false;
   $("progress-result").hidden = true;
   $("progress-error").hidden = true;
   $("progress-error").textContent = "";
   $("close-progress").hidden = true;
+  $("rpc-progress-elapsed").hidden = false;
+  $("testril-progress-elapsed").hidden = false;
+  $("progress-footer").hidden = false;
   const elapsed = () => {
     $("progress-elapsed").textContent =
       `${((performance.now() - started) / 1000).toFixed(1)}s elapsed`;
@@ -559,6 +563,10 @@ function showTransferProgress(input, started) {
       $("progress-activity").textContent = error
         ? error.message
         : "Send finished.";
+      $("progress-eyebrow").hidden = true;
+      $("rpc-progress-elapsed").hidden = true;
+      $("testril-progress-elapsed").hidden = true;
+      $("progress-footer").hidden = true;
       $("close-progress").hidden = false;
       finished = true;
       $("close-progress").focus({ preventScroll: true });

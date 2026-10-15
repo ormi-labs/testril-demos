@@ -703,7 +703,7 @@ dialog::backdrop {
 }
 .progress-footer {
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-end;
   gap: 12px;
   border-top: 1px solid var(--line);
   margin-top: 24px;
