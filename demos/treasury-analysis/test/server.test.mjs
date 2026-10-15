@@ -368,3 +368,33 @@ test("live progress reports actual overlapping work without adding Testril calls
   assert.equal(peer.demo.export().progress, undefined);
   assert.equal(peer.demo.state().progress, undefined);
 });
+
+test("live disabled startup stays on mock and never reports refresh or escrow quotes", async (t) => {
+  const url = await serve(t, { env: {} });
+  const config = await (await fetch(`${url}/api/config`)).json();
+  assert.equal(config.liveAvailable, false);
+  const created = await post(`${url}/api/sessions`, {});
+  assert.equal(created.status, 201);
+  const state = await created.json();
+  assert.equal(state.mode, "mock");
+  assert.equal(state.refreshNeeded, undefined);
+  assert.equal(state.chain.name, "Arbitrum");
+  const transferred = await (
+    await post(`${url}/api/sessions/${state.id}/transfer`, {
+      revision: 0,
+      from: "treasury",
+      to: "a",
+      amount: ".25",
+    })
+  ).json();
+  assert.equal(transferred.mode, "mock");
+  assert.equal(transferred.balances.a, "250000");
+  const refused = await post(`${url}/api/sessions`, { mode: "live" });
+  assert.equal(refused.status, 400);
+  const body = await refused.json();
+  const text = JSON.stringify({ config, state, transferred, body });
+  assert.doesNotMatch(text, /Select Refresh to prepare/);
+  assert.doesNotMatch(text, /escrow deposit allowance/);
+  assert.doesNotMatch(text, /quote/i);
+  assert.equal(body.state, undefined);
+});

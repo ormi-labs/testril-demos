@@ -65,7 +65,7 @@ async function api(path, input) {
   );
   const result = await response.json();
   if (!response.ok) {
-    if (result.state) {
+    if (result.state && (liveAvailable || result.state.mode !== "live")) {
       state = result.state;
       step = state.historyRead.transfers.length;
       renderState();
@@ -78,7 +78,22 @@ async function api(path, input) {
 }
 const endpoint = (action = "") =>
   `/api/sessions/${state.id}${action ? `/${action}` : ""}`;
+function liveBlockedMessage(message) {
+  return (
+    !liveAvailable &&
+    typeof message === "string" &&
+    (/Select Refresh to prepare and read the snapshot with Testril/.test(
+      message,
+    ) ||
+      /escrow deposit allowance/i.test(message) ||
+      /\bquote\b/i.test(message))
+  );
+}
 function status(message, error = false) {
+  if (liveBlockedMessage(message)) {
+    message = "";
+    error = false;
+  }
   $("status").textContent = message;
   $("status").classList.toggle("error", error);
 }
@@ -95,7 +110,7 @@ function lock(value) {
       (state?.mode === "live" &&
         state.balanceRead.balances[balance.dataset.balance] === null);
   if (!value && state) updateRecipients();
-  if (!value && state?.mode === "live" && state.refreshNeeded)
+  if (!value && liveAvailable && state?.mode === "live" && state.refreshNeeded)
     $("transfer").disabled = true;
 }
 const selectedWallet = (id) => $(id).querySelector("input:checked").value;
@@ -677,15 +692,79 @@ $("provenance").addEventListener("cancel", (event) => {
 
 let liveAvailable = false;
 let liveServerUrl;
+function rememberSession(id) {
+  try {
+    sessionStorage.setItem(`${storageKey}-${mode}`, id);
+  } catch {
+    /* Storage is optional. */
+  }
+}
+function paintSession() {
+  for (const id of ["from", "to"])
+    $(id)
+      .querySelector(".wallet-options")
+      .replaceChildren(
+        ...state.wallets.map((wallet) => {
+          const label = element("label");
+          const input = element("input");
+          input.type = "radio";
+          input.name = id;
+          input.value = wallet.id;
+          input.required = true;
+          input.checked = wallet.id === (id === "from" ? "treasury" : "a");
+          input.setAttribute("aria-label", wallet.name);
+          label.append(
+            input,
+            element(
+              "span",
+              wallet.id === "treasury" ? "Treasury" : wallet.id.toUpperCase(),
+            ),
+          );
+          return label;
+        }),
+      );
+  step = state.transferCount;
+  renderState();
+  document.querySelector(".histories").hidden = false;
+  stop();
+  lock(false);
+  status(
+    liveAvailable && state.mode === "live" && state.refreshNeeded
+      ? "Select Refresh to prepare and read the snapshot with Testril."
+      : "",
+  );
+}
+async function loadSession(nextMode) {
+  let saved;
+  try {
+    saved = sessionStorage.getItem(`${storageKey}-${nextMode}`);
+  } catch {
+    /* Storage is optional. */
+  }
+  if (saved) {
+    try {
+      const resumed = await api(`/api/sessions/${encodeURIComponent(saved)}`);
+      if (liveAvailable || resumed.mode !== "live") return resumed;
+    } catch {
+      /* Expired sessions start fresh. */
+    }
+  }
+  const opened = await api(
+    "/api/sessions",
+    nextMode === "live" ? { mode: "live" } : {},
+  );
+  if (!liveAvailable && opened.mode === "live") return api("/api/sessions", {});
+  return opened;
+}
 async function start(nextMode) {
   stop();
   lock(true);
-  mode = nextMode;
+  mode = nextMode === "live" && !liveAvailable ? "mock" : nextMode;
   for (const input of document.querySelectorAll('[name="data-mode"]'))
     input.checked = input.value === mode;
   state = undefined;
-  $("testril-server").textContent = nextMode === "live" ? liveServerUrl : "";
-  $("testril-server").hidden = nextMode !== "live" || !liveServerUrl;
+  $("testril-server").textContent = mode === "live" ? liveServerUrl : "";
+  $("testril-server").hidden = mode !== "live" || !liveServerUrl;
   $("network-name").textContent = mode === "live" ? "Base Sepolia" : "Arbitrum";
   $("balances-heading").textContent =
     mode === "live" ? "Wallet balances" : "Balances";
@@ -700,59 +779,36 @@ async function start(nextMode) {
   document.querySelector(".histories").hidden = true;
   status(mode === "live" ? "Opening the shared Base Sepolia session…" : "");
   try {
-    let saved;
-    try {
-      saved = sessionStorage.getItem(`${storageKey}-${mode}`);
-    } catch {
-      /* Storage is optional. */
+    state = await loadSession(mode);
+    if (!liveAvailable && state.mode === "live") {
+      mode = "mock";
+      for (const input of document.querySelectorAll('[name="data-mode"]'))
+        input.checked = input.value === "mock";
+      $("network-name").textContent = "Arbitrum";
+      $("balances-heading").textContent = "Balances";
+      $("refresh-live").hidden = true;
+      state = await api("/api/sessions", {});
     }
-    if (saved) {
+    rememberSession(state.id);
+    paintSession();
+  } catch (error) {
+    if (!liveAvailable) {
       try {
-        state = await api(`/api/sessions/${encodeURIComponent(saved)}`);
+        mode = "mock";
+        for (const input of document.querySelectorAll('[name="data-mode"]'))
+          input.checked = input.value === "mock";
+        $("network-name").textContent = "Arbitrum";
+        $("balances-heading").textContent = "Balances";
+        $("refresh-live").hidden = true;
+        state = await api("/api/sessions", {});
+        if (state.mode === "live") throw new Error("Live mode is disabled.");
+        rememberSession(state.id);
+        paintSession();
+        return;
       } catch {
-        /* Expired sessions start fresh. */
+        /* Show the startup error below when mock cannot be opened. */
       }
     }
-    state ??= await api("/api/sessions", mode === "live" ? { mode } : {});
-    try {
-      sessionStorage.setItem(`${storageKey}-${mode}`, state.id);
-    } catch {
-      /* Storage is optional. */
-    }
-    for (const id of ["from", "to"])
-      $(id)
-        .querySelector(".wallet-options")
-        .replaceChildren(
-          ...state.wallets.map((wallet) => {
-            const label = element("label");
-            const input = element("input");
-            input.type = "radio";
-            input.name = id;
-            input.value = wallet.id;
-            input.required = true;
-            input.checked = wallet.id === (id === "from" ? "treasury" : "a");
-            input.setAttribute("aria-label", wallet.name);
-            label.append(
-              input,
-              element(
-                "span",
-                wallet.id === "treasury" ? "Treasury" : wallet.id.toUpperCase(),
-              ),
-            );
-            return label;
-          }),
-        );
-    step = state.transferCount;
-    renderState();
-    document.querySelector(".histories").hidden = false;
-    stop();
-    lock(false);
-    status(
-      state.mode === "live" && state.refreshNeeded
-        ? "Select Refresh to prepare and read the snapshot with Testril."
-        : "",
-    );
-  } catch (error) {
     status(error.message, true);
     lock(true);
     for (const input of document.querySelectorAll('[name="data-mode"]'))
