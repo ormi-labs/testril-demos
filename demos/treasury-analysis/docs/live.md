@@ -31,7 +31,8 @@ vouchers. A deposit is not a read charge. Quotes must use Base Sepolia USDC and 
 supported batch settlement terms; other networks are refused.
 
 With valid local keys and nonzero caps, the app opens **Live** automatically.
-Select **Refresh**, beside Reset demo, for a new snapshot. That action prepares and reads one
+The Send form does not ask you to refresh, and Send stays available. Select
+**Refresh**, beside Reset demo, for a new snapshot. That action prepares and reads one
 block for each balance, using Testril’s reported chain head. Balance reads and
 transfer-edge reads come exclusively from Testril. The local signer uses
 `https://sepolia.base.org` (or `BASE_SEPOLIA_RPC_URL`) to prepare, submit, and confirm

@@ -550,7 +550,13 @@ test("live reset starts payment history with only the new wallet reads", async (
   await expect(page.locator("#wallet-treasury .wallet-address")).toHaveText(
     state.wallets[0].address,
   );
-  await expect(page.locator("#transfer")).toBeDisabled();
+  await expect(
+    page.getByText(
+      "Select Refresh to prepare and read the snapshot with Testril.",
+    ),
+  ).toHaveCount(0);
+  await expect(page.locator("#status")).toBeEmpty();
+  await expect(page.locator("#transfer")).toBeEnabled();
   await page.locator("#refresh-live").click();
   await expect(page.locator("#transfer")).toBeEnabled();
   await expect(page.locator("#balance-treasury")).toHaveText("20");
@@ -640,7 +646,12 @@ test("live reset starts payment history with only the new wallet reads", async (
   await page.locator("#refresh-live").click();
   await expect(page.locator("#status")).toHaveText("Testril read failed.");
   await expect(page.locator("#balance-treasury")).toHaveText("20");
-  await expect(page.locator("#transfer")).toBeDisabled();
+  await expect(
+    page.getByText(
+      "Select Refresh to prepare and read the snapshot with Testril.",
+    ),
+  ).toHaveCount(0);
+  await expect(page.locator("#transfer")).toBeEnabled();
   await page
     .locator(".mode-switch label")
     .filter({ has: page.locator('input[value="mock"]') })

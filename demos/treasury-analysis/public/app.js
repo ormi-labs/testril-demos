@@ -110,8 +110,6 @@ function lock(value) {
       (state?.mode === "live" &&
         state.balanceRead.balances[balance.dataset.balance] === null);
   if (!value && state) updateRecipients();
-  if (!value && liveAvailable && state?.mode === "live" && state.refreshNeeded)
-    $("transfer").disabled = true;
 }
 const selectedWallet = (id) => $(id).querySelector("input:checked").value;
 function updateRecipients() {
@@ -728,11 +726,7 @@ function paintSession() {
   document.querySelector(".histories").hidden = false;
   stop();
   lock(false);
-  status(
-    liveAvailable && state.mode === "live" && state.refreshNeeded
-      ? "Select Refresh to prepare and read the snapshot with Testril."
-      : "",
-  );
+  status("");
 }
 async function loadSession(nextMode) {
   let saved;
