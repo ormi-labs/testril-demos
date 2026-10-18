@@ -114,6 +114,10 @@ Display preparation time/spend, request-to-usable-result time/spend, and optiona
 
 The live Testril pricing card reported materialization at $0.00012/block, a $0.00002 read base, and $0.000001 per queried block. These are unit rates, not a benchmark result: inspect actual quotes, dependency work, and receipts. No relative speed or savings claim is justified yet.
 
+## TODO: Testril payment policy
+
+- [ ] Consider requiring real USDC for Testril service usage even when querying testnet data. Testnet payments do not offset real infrastructure costs or provide an economic barrier to abuse; assess the implications for public demos and development access before changing policy.
+
 ## Before a blog makes comparative claims
 
 1. With a bounded, funded wallet and no Allium credentials, complete `SELECT 1` through submission, status, and results; record all charges and failures.
