@@ -118,6 +118,12 @@ The live Testril pricing card reported materialization at $0.00012/block, a $0.0
 
 - [ ] Consider requiring real USDC for Testril service usage even when querying testnet data. Testnet payments do not offset real infrastructure costs or provide an economic barrier to abuse; assess the implications for public demos and development access before changing policy.
 
+## Demo implementation update
+
+Paul selected mainnet recordings with optional visitor-funded fresh runs. The [initial local implementation](../../demos/pool-volume/README.md) targets Ethereum pool volume and Base mainnet USDC payments on both sides, assuming Testril's mainnet rail will be enabled. It ships no measured recordings and leaves fresh runs disabled until vendor verification and suitable coverage are complete.
+
+An unpaid live quote on 18 October for the three-hour Ethereum report requested **1,661.2092 test USDC for 13,843,410 materialization blocks**. The bound function had no cached coverage; factory history and dependencies broaden preparation beyond the displayed pool and window. Nothing was paid. This is nominal test-token pricing, not actual real-USDC spending or a future mainnet quote. The demo rejects preparation beyond its visitor cap; operator preparation, reusable coverage, or narrower scope must be resolved before launch.
+
 ## Before a blog makes comparative claims
 
 1. With a bounded, funded wallet and no Allium credentials, complete `SELECT 1` through submission, status, and results; record all charges and failures.

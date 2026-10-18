@@ -1,0 +1,31 @@
+{
+  "name": "testril-pool-volume",
+  "version": "0.1.0",
+  "private": true,
+  "license": "MIT",
+  "type": "module",
+  "engines": {
+    "node": ">=22.13"
+  },
+  "scripts": {
+    "build": "esbuild public/app.js --bundle --format=esm --outfile=public/build/app.js",
+    "preflight": "node --env-file-if-exists=.env src/preflight.mjs",
+    "start": "npm run build && node --env-file-if-exists=.env src/server.mjs",
+    "test": "node --test test/*.test.mjs",
+    "test:browser": "npm run build && playwright test",
+    "lint": "eslint .",
+    "format:check": "prettier --check .",
+    "format": "prettier --write .",
+    "recording:import": "node src/import-recording.mjs"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "1.32.1",
+    "viem": "2.57.3"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.63.0",
+    "esbuild": "0.28.2",
+    "eslint": "10.12.0",
+    "prettier": "3.9.9"
+  }
+}

@@ -6,9 +6,12 @@ MCP server: `https://dev.testril.ai/mcp`
 
 ## Demos
 
-| Demo                                            | Run                                                 | Status                                                                                                                                                                                         |
-| ----------------------------------------------- | --------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| [Move Money](demos/treasury-analysis/README.md) | `cd demos/treasury-analysis && npm ci && npm start` | Mock or live Base Sepolia: move USDC between three wallets using their full live balances, inspect balance and transfer evidence, track Testril costs, replay, reset, and download the source. |
+| Demo                                            | Run                                                 | Status                                                                                                                                                                                                                                        |
+| ----------------------------------------------- | --------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [Move Money](demos/treasury-analysis/README.md) | `cd demos/treasury-analysis && npm ci && npm start` | Mock or live Base Sepolia: move USDC between three wallets using their full live balances, inspect balance and transfer evidence, track Testril costs, replay, reset, and download the source.                                                |
+| [Pool Volume](demos/pool-volume/README.md)      | `cd demos/pool-volume && npm ci && npm start`       | Initial local Testril/Allium comparison: exact hourly pool volumes, recording playback, and visitor-wallet payment flows. No measured recordings yet; paid vendor verification and prepared coverage are required before enabling fresh runs. |
+
+Preview the Pool Volume layout example on [desktop](docs/screenshots/pool-volume-example-desktop.png) and [mobile](docs/screenshots/pool-volume-example-mobile.png). The example uses invented data and includes no benchmark timings or spending claims.
 
 The interface follows Testril’s approved derivative style guide. It runs locally with Node.js 22.13+ on macOS or Linux. Preview the landing screen on [desktop](docs/screenshots/treasury-landing-desktop.png) and [mobile](docs/screenshots/treasury-landing-mobile.png), the [transfer replay](docs/screenshots/treasury-desktop.png), and the [provenance modal](docs/screenshots/treasury-provenance-desktop.png).
 

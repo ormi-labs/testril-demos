@@ -1,0 +1,204 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Pool Volume · Testril demos</title>
+    <link rel="icon" href="assets/favicon.svg" />
+    <link rel="stylesheet" href="style.css" />
+    <script type="module" src="build/app.js"></script>
+  </head>
+  <body>
+    <header class="measure masthead">
+      <a href="https://testril.si"
+        ><img
+          src="assets/wordmark.svg"
+          alt="Testril"
+          width="115"
+          height="38" /></a
+      ><span>Data demos / 02</span>
+    </header>
+    <main class="measure">
+      <div class="eyebrow">ONE QUESTION · TWO PROVIDERS</div>
+      <h1>The same swaps.<br />Two ways to buy the answer.</h1>
+      <p class="intro">
+        Compare hourly pool volume from Testril and Allium. See the data, the
+        time, and what each request costs.
+      </p>
+      <section class="scope" aria-label="Report scope">
+        <div>
+          <span class="label">DATA</span><strong>Ethereum · Uniswap v3</strong>
+        </div>
+        <div>
+          <span class="label">POOL</span><strong>USDC / WETH · 0.05%</strong>
+        </div>
+        <div>
+          <span class="label">WINDOW · UTC</span
+          ><strong id="window">Loading…</strong>
+        </div>
+        <div>
+          <span class="label">PAYMENTS</span
+          ><strong>USDC on Base mainnet</strong>
+        </div>
+      </section>
+      <div class="toolbar">
+        <div class="tabs" role="group" aria-label="Run mode">
+          <button id="recorded-mode" class="selected" type="button">
+            Recorded runs</button
+          ><button id="wallet-mode" type="button">Run with your wallet</button>
+        </div>
+        <button id="download" class="quiet" type="button" disabled>
+          Download this run
+        </button>
+      </div>
+      <section id="recorded-controls" class="controls">
+        <div>
+          <label for="recording">Choose a recorded run</label
+          ><select id="recording">
+            <option value="">Loading…</option>
+          </select>
+        </div>
+        <p id="recording-note">
+          Recorded runs require no wallet and make no paid requests.
+        </p>
+        <button id="example" class="quiet" type="button">
+          Explore a layout example
+        </button>
+      </section>
+      <section id="wallet-controls" class="controls" hidden>
+        <div>
+          <strong>Use your wallet to buy the same report.</strong>
+          <p>
+            No account or private key required. Each payment needs your
+            approval. Both providers use Base mainnet USDC.
+          </p>
+          <p>
+            Per run: at most <strong>0.25 USDC in service charges</strong> and
+            <strong>0.25 USDC in Testril escrow deposits</strong>. Deposits are
+            separate from charges; provider fees and network costs may differ.
+          </p>
+        </div>
+        <div class="wallet-actions">
+          <button id="connect" type="button">Connect wallet</button
+          ><button id="run" type="button" disabled>Run comparison</button>
+        </div>
+        <p id="live-reason" role="status"></p>
+      </section>
+      <p id="notice" class="notice" role="status" aria-live="polite">
+        Loading the report…
+      </p>
+      <section class="comparison" aria-label="Provider comparison">
+        <article class="provider" id="testril">
+          <div class="provider-heading">
+            <h2>Testril</h2>
+            <span class="status">No run selected</span>
+          </div>
+          <div class="metrics">
+            <div>
+              <span class="label">READ / QUERY</span
+              ><strong class="read-time">—</strong
+              ><span class="read-cost">—</span>
+            </div>
+            <div>
+              <span class="label">PREPARATION · THIS RUN</span
+              ><strong class="prep-time">—</strong
+              ><span class="prep-cost">—</span>
+            </div>
+          </div>
+          <div class="provider-body">
+            <p>Reusable materialized data, followed by a paid read.</p>
+          </div>
+        </article>
+        <article class="provider" id="allium">
+          <div class="provider-heading">
+            <h2>Allium</h2>
+            <span class="status">No run selected</span>
+          </div>
+          <div class="metrics">
+            <div>
+              <span class="label">READ / QUERY</span
+              ><strong class="read-time">—</strong
+              ><span class="read-cost">—</span>
+            </div>
+            <div>
+              <span class="label">PREPARATION</span
+              ><strong class="prep-time">—</strong
+              ><span class="prep-cost">Included in service</span>
+            </div>
+          </div>
+          <div class="provider-body">
+            <p>Accountless SQL submission, polling, and result retrieval.</p>
+          </div>
+        </article>
+      </section>
+      <section class="results">
+        <div class="section-heading">
+          <h2>Do the answers agree?</h2>
+          <span id="agreement">Waiting for both results</span>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <caption>
+              Exact raw token amounts per UTC hour. Empty hours are filled with
+              zero.
+            </caption>
+            <thead>
+              <tr>
+                <th>Hour · UTC</th>
+                <th>Provider</th>
+                <th>Swaps</th>
+                <th>USDC · raw</th>
+                <th>WETH · raw</th>
+              </tr>
+            </thead>
+            <tbody id="rows">
+              <tr>
+                <td colspan="5">Choose a recording or run the comparison.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+      <details class="method">
+        <summary>What is being compared?</summary>
+        <p>
+          One Ethereum pool and three complete UTC hours. Volume is the sum of
+          absolute token amounts across swaps, in raw integer units. It is not
+          USD volume. Testril binds the factory and reads this pool; its
+          preparation may include factory and dependency history. Allium
+          aggregates this pool's trades through its payment API.
+        </p>
+        <p>
+          Read/query time includes payment negotiation, polling, and result
+          retrieval. Wallet approval time is shown separately. Testril
+          preparation is separate and may reuse data paid for by someone else. A
+          matching result does not independently verify the underlying events.
+        </p>
+        <p>
+          Recording playback makes no provider requests. Recordings contain
+          measurements supplied by their operator; they are not independently
+          audited. Missing payment confirmations are labelled, and unknown costs
+          are never shown as verified spending.
+        </p>
+        <details>
+          <summary>Allium SQL for fresh runs</summary>
+          <pre id="sql"></pre>
+        </details>
+      </details>
+    </main>
+    <footer class="measure">Pool Volume comparison · Testril demos</footer>
+    <dialog id="payment-dialog" aria-labelledby="payment-title">
+      <form method="dialog">
+        <span class="eyebrow">PAYMENT APPROVAL</span>
+        <h2 id="payment-title">Approve data purchase</h2>
+        <p id="payment-summary"></p>
+        <p id="payment-recipient" class="address"></p>
+        <p id="escrow-note"></p>
+        <div class="dialog-actions">
+          <button value="cancel" class="quiet">Cancel run</button
+          ><button value="approve">Approve and sign</button>
+        </div>
+      </form>
+    </dialog>
+  </body>
+</html>
