@@ -67,6 +67,11 @@ export function selectOffer(challenge, provider) {
       `${provider === "testril" ? "Testril" : "Allium"} is not offering a supported Base mainnet USDC payment. No signature requested.`,
     );
   if (
+    challenge.amount !== undefined &&
+    atoms(challenge.amount.atoms) !== atoms(accepted.amount)
+  )
+    throw new Error("The payment offer does not match the quoted charge.");
+  if (
     !addressPattern.test(accepted.payTo) ||
     atoms(accepted.amount) <= 0n ||
     !["USDC", "USD Coin"].includes(accepted.extra?.name) ||

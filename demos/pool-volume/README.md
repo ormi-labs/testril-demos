@@ -42,13 +42,15 @@ From `demos/pool-volume`:
 npm run preflight
 ```
 
-This binds report metadata, inspects coverage, requests unpaid quotes, and checks Allium's SQL submission payment challenge. It signs nothing, pays nothing, and starts no materialization job. Output excludes signed payloads and temporary payment identifiers. A successful payment challenge does not establish successful paid SQL execution, result access, or data correctness.
+This binds report metadata, inspects coverage, requests unpaid quotes, and checks Allium's SQL submission payment challenge. It signs nothing, pays nothing, and starts no materialization job. It checks both providers independently, closes its MCP connection, and excludes signed payloads and temporary payment identifiers from output.
 
-An unpaid live check on **18 October 2026** found:
+The command exits with status **1** when report coverage, Base mainnet payment offers, signing-domain fields, or the discovered charges block a wallet trial. Read `blockers` in its JSON output. `readyForWalletTrial: true` means these discovery gates pass; `paidExecutionVerified` remains false because unpaid discovery cannot verify settlement, completed SQL results, or data correctness. Allium status and result charges must still fit within the run cap.
+
+An unpaid live check on **20 October 2026** found:
 
 - The Ethereum hourly pool-volume binding succeeds. An unpaid read with the pool filter reaches the coverage gate; the report has no materialized coverage. A completed filtered read remains unverified.
 - Its three-hour preparation quote was **1,661.2092 test USDC for 13,843,410 blocks**, reflecting factory history and dependencies. This is a quote, not a charge or a prediction of future mainnet pricing.
-- Testril offered Base Sepolia test USDC; Base mainnet settlement was not enabled in that check.
+- The endpoint reported Testril **0.11.0**, with instructions describing multiple payment networks, but its actual offers still contained only Base Sepolia test USDC. Mainnet implementation support does not establish that this endpoint has enabled its mainnet rail.
 - Allium's `SELECT 1` submission offered a Base mainnet USDC payment challenge. Paid submission through completed results remains unverified.
 
 The first report therefore needs operator-prepared coverage, existing shared coverage, or a narrower supported scope before it is suitable for visitor-funded reads. **Do not increase the visitor spending cap to buy the initial factory history.** Show operator preparation costs alongside recordings, even when visitors subsequently pay only for reads.
@@ -120,6 +122,6 @@ For manual review, open the layout example at desktop and mobile widths. Check t
 
 ## Code map
 
-`src/server.mjs` owns the fixed local routes and bounded run sessions. `src/run.mjs` advances each provider's workflow. `src/providers.mjs` holds MCP/HTTP transport and the SQL. `public/payments.js` handles browser signatures and escrow plans; `public/model.js` holds exact comparison and recording validation. `public/app.js` connects the interface to these operations. `src/preflight.mjs` inspects unpaid readiness; `src/import-recording.mjs` prepares reviewed recordings for playback.
+`src/server.mjs` owns the fixed local routes and bounded run sessions. `src/run.mjs` advances each provider's workflow. `src/providers.mjs` holds MCP/HTTP transport and the SQL. `public/payments.js` handles browser signatures and escrow plans; `public/model.js` holds exact comparison and recording validation. `public/app.js` connects the interface to these operations. `src/preflight.mjs` runs the unpaid gates in `src/readiness.mjs`; `src/import-recording.mjs` prepares reviewed recordings for playback.
 
 For the supporting research and unresolved Allium documentation discrepancy, see the repository's `docs/research/2026-10-18-allium-accountless-access.md`. This README contains the setup and limitations needed without that document.
