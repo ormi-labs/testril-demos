@@ -46,6 +46,39 @@ test("the live CLI checks Testril's head and Function bindings without making pa
   assert.equal(peer.prepares, 0);
 });
 
+test("the live CLI reports a refused Function binding and exits without paying", async (t) => {
+  const peer = await livePeer(t, {
+    refuseBinding: "erc20.token_balance",
+  });
+  await assert.rejects(
+    promisify(execFile)(
+      process.execPath,
+      [fileURLToPath(new URL("../src/live-cli.mjs", import.meta.url)), "check"],
+      {
+        env: {
+          ...process.env,
+          ...peer.env,
+          TESTRIL_MCP_URL: peer.config.mcpUrl,
+        },
+      },
+    ),
+    (error) => {
+      assert.equal(error.code, 1);
+      assert.match(
+        error.stderr,
+        /refused binding erc20\.token_balance \(Treasury\): invalid_params/,
+      );
+      assert.match(
+        error.stderr,
+        /test\/fixtures\/erc20-token-balance-params\.json/,
+      );
+      return true;
+    },
+  );
+  assert.equal(peer.calls.filter((call) => !!call.payment).length, 0);
+  assert.equal(peer.prepares, 0);
+});
+
 test("chain inspection reads the block from Testril's head object and rejects invalid snapshots", async () => {
   const config = { chain: { id: 84532 } };
   let result = {

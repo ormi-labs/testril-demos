@@ -53,18 +53,33 @@ the transfer diagram horizontally.
 
 ## Testril release smoke
 
-After every Testril release or deployment, an operator with the dedicated Base
-Sepolia wallets and approved test-USDC caps should run:
+After every Testril release or deployment, test the exact code and endpoint used
+by the hosted harness:
 
 ```sh
+DEMO_REVISION='<demoRevision from the deployed harness operator status>'
+git fetch origin "$DEMO_REVISION"
+git checkout --detach "$DEMO_REVISION"
+test "$(git rev-parse HEAD)" = "$DEMO_REVISION"
+cd demos/treasury-analysis
+npm ci
+# Configure .env with dedicated testnet-only wallets, approved test-USDC caps,
+# and the exact TESTRIL_MCP_URL value from the hosted harness environment.
 npm run live:check
 npm run live:smoke
 ```
 
+Do not test another branch, revision, or the default MCP endpoint: that can pass
+while the hosted demo remains broken. Do not print, share, or commit the harness
+configuration.
+
 `live:check` verifies the chain response and current Function parameter schemas
 without a payment or transfer. `live:smoke` exercises paid reads and two testnet
-transfers, then returns the demo funds to Treasury. Never use mainnet wallets or
-endpoints. See the [live setup and recovery guide](docs/live.md) for configuration
+transfers, then returns the demo funds to Treasury. The code refuses chains and
+payment networks other than Base Sepolia (84532), but an EOA can hold funds on
+several networks. Use dedicated testnet-only wallets that have never held mainnet
+funds, and never point `TESTRIL_MCP_URL` or `BASE_SEPOLIA_RPC_URL` at mainnet
+services. See the [live setup and recovery guide](docs/live.md) for configuration
 and interrupted-smoke recovery.
 
 ## Source and run exports

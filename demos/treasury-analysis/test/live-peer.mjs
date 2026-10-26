@@ -9,9 +9,13 @@ import { connectMcp } from "../src/mcp.mjs";
 import { createLiveDemo } from "../src/live-demo.mjs";
 import { AjvJsonSchemaValidator } from "@modelcontextprotocol/sdk/validation/ajv";
 import balanceParams from "./fixtures/erc20-token-balance-params.json" with { type: "json" };
+import transferEdgesParams from "./fixtures/erc20-transfer-edges-params.json" with { type: "json" };
 
 const validateBalanceParams = new AjvJsonSchemaValidator().getValidator(
   balanceParams,
+);
+const validateTransferEdgesParams = new AjvJsonSchemaValidator().getValidator(
+  transferEdgesParams,
 );
 
 // Public throwaway keys, used only by the local HTTP peer.
@@ -111,9 +115,15 @@ export async function livePeer(t, options = {}) {
     calls.push({ name, args, payment });
     await options.beforeTool?.(name, args, payment);
     if (name === "bind") {
+      const validator =
+        args.function_slug === "erc20.token_balance"
+          ? validateBalanceParams
+          : args.function_slug === "erc20.transfer_edges"
+            ? validateTransferEdgesParams
+            : undefined;
       if (
-        args.function_slug === "erc20.token_balance" &&
-        !validateBalanceParams(args.params).valid
+        options.refuseBinding === args.function_slug ||
+        !validator?.(args.params).valid
       )
         return { outcome: "error", kind: "invalid_params" };
       const id = JSON.stringify([args.function_slug, args.params]);

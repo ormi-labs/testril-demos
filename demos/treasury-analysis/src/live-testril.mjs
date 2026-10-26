@@ -3,19 +3,49 @@ import { randomUUID } from "node:crypto";
 import { acceptedQuote, signBatchPayment } from "./batch-payment.mjs";
 import { succeeded } from "./mcp.mjs";
 
+async function bindFunction(testril, slug, label, params, schemaFixture) {
+  try {
+    return await testril.bind(slug, params);
+  } catch (error) {
+    const context = label ? ` (${label})` : "";
+    const message =
+      error instanceof Error ? error.message : "Testril bind failed.";
+    const refusal = /^Testril bind: (.+)\.$/.exec(message);
+    if (refusal)
+      throw new Error(
+        `Testril refused binding ${slug}${context}: ${refusal[1]}. Its params schema may have changed in a Testril release; compare with ${schemaFixture}.`,
+        { cause: error },
+      );
+    throw new Error(
+      `Testril could not bind ${slug}${context}. ${message} Compare its params with ${schemaFixture}.`,
+      { cause: error },
+    );
+  }
+}
+
 export async function bindLiveFunctions(testril, config) {
   const functions = {
-    edges: await testril.bind("erc20.transfer_edges", {
-      token_address: config.token.address,
-    }),
+    edges: await bindFunction(
+      testril,
+      "erc20.transfer_edges",
+      "",
+      { token_address: config.token.address },
+      "test/fixtures/erc20-transfer-edges-params.json",
+    ),
   };
   for (const wallet of config.wallets)
-    functions[wallet.id] = await testril.bind("erc20.token_balance", {
-      reads: {
-        tokens: [config.token.address],
-        owners: [wallet.address],
+    functions[wallet.id] = await bindFunction(
+      testril,
+      "erc20.token_balance",
+      wallet.name,
+      {
+        reads: {
+          tokens: [config.token.address],
+          owners: [wallet.address],
+        },
       },
-    });
+      "test/fixtures/erc20-token-balance-params.json",
+    );
   return functions;
 }
 

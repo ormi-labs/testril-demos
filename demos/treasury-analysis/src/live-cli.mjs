@@ -28,14 +28,17 @@ try {
     head < 0
   )
     throw new Error("Testril cannot report the Base Sepolia chain head.");
-  await bindLiveFunctions(
-    createLiveTestril(config, mcp, {}, async () => {}),
-    config,
-  );
-  console.log(
-    `Testril reports Base Sepolia block ${head}; live Function bindings and all four signer addresses are valid.`,
-  );
-  if (command !== "check") {
+  if (command === "check") {
+    // Bind-only adapter: the empty state prevents any paid call from proceeding.
+    const bindOnlyTestril = createLiveTestril(config, mcp, {}, async () => {});
+    await bindLiveFunctions(bindOnlyTestril, config);
+    console.log(
+      `Testril reports Base Sepolia block ${head}; live Function bindings and all four signer addresses are valid.`,
+    );
+  } else {
+    console.log(
+      `Testril reports Base Sepolia block ${head}; all four signer addresses match.`,
+    );
     if (config.chargeCapRaw === "0" || config.depositCapRaw === "0")
       throw new Error("Configure the approved Testril caps first.");
     demo = await createLiveDemo({

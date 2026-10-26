@@ -19,13 +19,13 @@ Keep keys out of chat, browser code, and source control.
 cp .env.example .env  # only if you do not already have one
 chmod 600 .env
 # Edit .env with your local keys and explicitly approved payment limits.
-npm run live:check   # addresses, chain head, and Function schemas; no transfers or payments
+npm run live:check   # schemas; no paid Testril reads, payments, or transfers
 npm start
 ```
 
 `live:check` binds the transfer Function and all three balance Functions, so it
-fails if a Testril release changes their accepted parameters. It does not read,
-pay, or move funds.
+fails if a Testril release changes their accepted parameters. It makes no paid
+Testril reads, payments, or transfers.
 
 The payment limits default to zero. After approving spending, set both
 `TESTRIL_CHARGE_CAP_USDC=0.1` and `TESTRIL_ESCROW_CAP_USDC=0.1`, then restart.
@@ -107,15 +107,40 @@ For a deliberate testnet smoke run (requires the approved caps and no active run
 npm run live:smoke
 ```
 
-After every Testril release or deployment, an operator should run
-`npm run live:check` and then this smoke. Both commands are restricted to Base
-Sepolia by the demo configuration; never substitute mainnet wallets or endpoints.
 This sends 0.25 Treasury → A, then 0.10 A → B, and returns the demo funds to
 Treasury. It makes real testnet transfers and pays MCP quotes within the caps.
 Maximum gas fee per transfer is limited to 0.0001 ETH.
 If that sequence is interrupted, use `node --env-file=.env src/live-cli.mjs
 resume-smoke` to recover its pending transaction and continue only the remaining
 steps. Use the interface to recover an unrelated run.
+
+### Hosted release and deployment check
+
+After every Testril release or deployment, test the harness's exact inputs. Read
+`demoRevision` from the deployed harness operator status and copy
+`TESTRIL_MCP_URL` from that harness environment. Do not assume the pin is the
+latest demos `main` commit or use this demo's default MCP endpoint.
+
+From a clean `testril-demos` clone:
+
+```sh
+DEMO_REVISION='<demoRevision from the deployed harness operator status>'
+git fetch origin "$DEMO_REVISION"
+git checkout --detach "$DEMO_REVISION"
+test "$(git rev-parse HEAD)" = "$DEMO_REVISION"
+cd demos/treasury-analysis
+npm ci
+# Configure .env with dedicated testnet-only wallets, approved test-USDC caps,
+# and the exact TESTRIL_MCP_URL value from the hosted harness environment.
+npm run live:check
+npm run live:smoke
+```
+
+Do not print, share, or commit the harness configuration. The code refuses any
+chain other than Base Sepolia (84532) and any payment network other than
+`eip155:84532`, but an EOA can hold funds on several networks. Use dedicated
+testnet-only wallets that have never held mainnet funds, and never point
+`TESTRIL_MCP_URL` or `BASE_SEPOLIA_RPC_URL` at mainnet services.
 
 Live Send opens a progress modal with separate **Base Sepolia · RPC** and
 **Testril** sections. RPC shows preparation, submission, and confirmation; Testril
