@@ -1,6 +1,6 @@
 import { randomUUID } from "node:crypto";
 import { sameAddress } from "./live-config.mjs";
-import { createLiveTestril } from "./live-testril.mjs";
+import { bindLiveFunctions, createLiveTestril } from "./live-testril.mjs";
 import { createTransferTiming } from "./transfer-timing.mjs";
 import { createTransferProgress } from "./transfer-progress.mjs";
 import { parseUsdc } from "../public/amounts.js";
@@ -259,15 +259,7 @@ export async function createLiveDemo({
       const recovered = await recoverTransfer();
       testril.beginReadBatch();
       if (!bindingsReady) {
-        const functions = {};
-        functions.edges = await testril.bind("erc20.transfer_edges", {
-          token_address: config.token.address,
-        });
-        for (const w of config.wallets)
-          functions[w.id] = await testril.bind("erc20.token_balance", {
-            reads: { tokens: [config.token.address], owners: [w.address] },
-          });
-        state.functions = functions;
+        state.functions = await bindLiveFunctions(testril, config);
         await save();
         bindingsReady = true;
       }

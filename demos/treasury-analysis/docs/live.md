@@ -19,9 +19,13 @@ Keep keys out of chat, browser code, and source control.
 cp .env.example .env  # only if you do not already have one
 chmod 600 .env
 # Edit .env with your local keys and explicitly approved payment limits.
-npm run live:check   # address validation and Testril chain head; no transfers or payments
+npm run live:check   # addresses, chain head, and Function schemas; no transfers or payments
 npm start
 ```
+
+`live:check` binds the transfer Function and all three balance Functions, so it
+fails if a Testril release changes their accepted parameters. It does not read,
+pay, or move funds.
 
 The payment limits default to zero. After approving spending, set both
 `TESTRIL_CHARGE_CAP_USDC=0.1` and `TESTRIL_ESCROW_CAP_USDC=0.1`, then restart.
@@ -103,6 +107,9 @@ For a deliberate testnet smoke run (requires the approved caps and no active run
 npm run live:smoke
 ```
 
+After every Testril release or deployment, an operator should run
+`npm run live:check` and then this smoke. Both commands are restricted to Base
+Sepolia by the demo configuration; never substitute mainnet wallets or endpoints.
 This sends 0.25 Treasury → A, then 0.10 A → B, and returns the demo funds to
 Treasury. It makes real testnet transfers and pays MCP quotes within the caps.
 Maximum gas fee per transfer is limited to 0.0001 ETH.

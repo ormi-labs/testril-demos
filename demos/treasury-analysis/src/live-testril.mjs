@@ -3,6 +3,22 @@ import { randomUUID } from "node:crypto";
 import { acceptedQuote, signBatchPayment } from "./batch-payment.mjs";
 import { succeeded } from "./mcp.mjs";
 
+export async function bindLiveFunctions(testril, config) {
+  const functions = {
+    edges: await testril.bind("erc20.transfer_edges", {
+      token_address: config.token.address,
+    }),
+  };
+  for (const wallet of config.wallets)
+    functions[wallet.id] = await testril.bind("erc20.token_balance", {
+      reads: {
+        tokens: [config.token.address],
+        owners: [wallet.address],
+      },
+    });
+  return functions;
+}
+
 // State is persisted before a signature can authorize a charge or a deposit.
 export function createLiveTestril(
   config,

@@ -3,6 +3,7 @@ import { liveConfig } from "./live-config.mjs";
 import { createLiveChain } from "./live-chain.mjs";
 import { connectMcp, succeeded } from "./mcp.mjs";
 import { createLiveDemo } from "./live-demo.mjs";
+import { bindLiveFunctions, createLiveTestril } from "./live-testril.mjs";
 import { decimalAmount, parseUsdc } from "../public/amounts.js";
 
 let demo;
@@ -27,8 +28,12 @@ try {
     head < 0
   )
     throw new Error("Testril cannot report the Base Sepolia chain head.");
+  await bindLiveFunctions(
+    createLiveTestril(config, mcp, {}, async () => {}),
+    config,
+  );
   console.log(
-    `Testril reports Base Sepolia block ${head}; all four signer addresses match.`,
+    `Testril reports Base Sepolia block ${head}; live Function bindings and all four signer addresses are valid.`,
   );
   if (command !== "check") {
     if (config.chargeCapRaw === "0" || config.depositCapRaw === "0")

@@ -51,6 +51,22 @@ Switching tabs, replay, and inspecting provenance are free. Reloading resumes
 the tab's session; restarting the server clears mock sessions. On phones, scroll
 the transfer diagram horizontally.
 
+## Testril release smoke
+
+After every Testril release or deployment, an operator with the dedicated Base
+Sepolia wallets and approved test-USDC caps should run:
+
+```sh
+npm run live:check
+npm run live:smoke
+```
+
+`live:check` verifies the chain response and current Function parameter schemas
+without a payment or transfer. `live:smoke` exercises paid reads and two testnet
+transfers, then returns the demo funds to Treasury. Never use mainnet wallets or
+endpoints. See the [live setup and recovery guide](docs/live.md) for configuration
+and interrupted-smoke recovery.
+
 ## Source and run exports
 
 **Download source** opens [this demo's GitHub directory](https://github.com/ormi-labs/testril-demos/tree/main/demos/treasury-analysis).

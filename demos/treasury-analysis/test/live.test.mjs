@@ -14,7 +14,7 @@ import { createLiveDemo } from "../src/live-demo.mjs";
 import { connectMcp } from "../src/mcp.mjs";
 import { createLiveTestril } from "../src/live-testril.mjs";
 
-test("the live CLI checks Testril's head object without making payments or transfers", async (t) => {
+test("the live CLI checks Testril's head and Function bindings without making payments or transfers", async (t) => {
   const peer = await livePeer(t);
   const { stdout } = await promisify(execFile)(
     process.execPath,
@@ -24,6 +24,24 @@ test("the live CLI checks Testril's head object without making payments or trans
     },
   );
   assert.match(stdout, /Testril reports Base Sepolia block 100/);
+  assert.match(stdout, /live Function bindings/);
+  assert.deepEqual(
+    peer.calls
+      .filter((call) => call.name === "bind")
+      .map((call) => [call.args.function_slug, call.args.params]),
+    [
+      ["erc20.transfer_edges", { token_address: peer.config.token.address }],
+      ...peer.config.wallets.map((wallet) => [
+        "erc20.token_balance",
+        {
+          reads: {
+            tokens: [peer.config.token.address],
+            owners: [wallet.address],
+          },
+        },
+      ]),
+    ],
+  );
   assert.equal(peer.calls.filter((c) => !!c.payment).length, 0);
   assert.equal(peer.prepares, 0);
 });
