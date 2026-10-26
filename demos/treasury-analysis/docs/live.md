@@ -37,6 +37,10 @@ block for each balance, using Testril’s reported chain head. Balance reads and
 transfer-edge reads come exclusively from Testril. The local signer uses
 `https://sepolia.base.org` (or `BASE_SEPOLIA_RPC_URL`) to prepare, submit, and confirm
 wallet transactions.
+Balance scope uses Testril 0.13's `reads: { tokens: [...], owners: [...] }` parameters.
+On the first refresh after opening an engine, the demo rebinds its four Functions
+before reading. Saved binding IDs may no longer exist after a service upgrade;
+rebinding preserves payment history, pending transfers, and the frozen retry block.
 Send checks the last successful Testril balance, then waits for one block
 confirmation (receipt polling every 200 ms). It refreshes only the sender and
 recipient, together with transfer edges, at the confirmed transaction's block.

@@ -35,6 +35,7 @@ export async function createLiveDemo({
   let closing;
   let timing;
   let progress;
+  let bindingsReady = false;
   const track = (name, operation) =>
     progress ? () => progress.track(name, operation) : operation;
   const measure = (name, operation) =>
@@ -257,16 +258,18 @@ export async function createLiveDemo({
       await save();
       const recovered = await recoverTransfer();
       testril.beginReadBatch();
-      if (!state.functions.edges) {
-        state.functions.edges = await testril.bind("erc20.transfer_edges", {
+      if (!bindingsReady) {
+        const functions = {};
+        functions.edges = await testril.bind("erc20.transfer_edges", {
           token_address: config.token.address,
         });
         for (const w of config.wallets)
-          state.functions[w.id] = await testril.bind("erc20.token_balance", {
-            tokens: [config.token.address],
-            owners: [w.address],
+          functions[w.id] = await testril.bind("erc20.token_balance", {
+            reads: { tokens: [config.token.address], owners: [w.address] },
           });
+        state.functions = functions;
         await save();
+        bindingsReady = true;
       }
       // Freeze one snapshot so retries reuse paid reads instead of charging new blocks.
       state.refreshBlock ??=

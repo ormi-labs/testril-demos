@@ -7,6 +7,12 @@ import { privateKeyToAccount } from "viem/accounts";
 import { liveConfig, sameAddress } from "../src/live-config.mjs";
 import { connectMcp } from "../src/mcp.mjs";
 import { createLiveDemo } from "../src/live-demo.mjs";
+import { AjvJsonSchemaValidator } from "@modelcontextprotocol/sdk/validation/ajv";
+import balanceParams from "./fixtures/erc20-token-balance-params.json" with { type: "json" };
+
+const validateBalanceParams = new AjvJsonSchemaValidator().getValidator(
+  balanceParams,
+);
 
 // Public throwaway keys, used only by the local HTTP peer.
 export function testConfig() {
@@ -105,6 +111,11 @@ export async function livePeer(t, options = {}) {
     calls.push({ name, args, payment });
     await options.beforeTool?.(name, args, payment);
     if (name === "bind") {
+      if (
+        args.function_slug === "erc20.token_balance" &&
+        !validateBalanceParams(args.params).valid
+      )
+        return { outcome: "error", kind: "invalid_params" };
       const id = JSON.stringify([args.function_slug, args.params]);
       functions.set(id, args);
       return { outcome: "success", bound_function_id: id };
@@ -197,7 +208,7 @@ export async function livePeer(t, options = {}) {
           definition.function_slug === "erc20.token_balance"
             ? config.wallets
                 .filter((w) =>
-                  sameAddress(w.address, definition.params.owners[0]),
+                  sameAddress(w.address, definition.params.reads.owners[0]),
                 )
                 .flatMap((w) =>
                   snapshot[w.id] === "0"
@@ -367,6 +378,9 @@ export async function livePeer(t, options = {}) {
     },
     advanceBlock() {
       block++;
+    },
+    clearBindings() {
+      functions.clear();
     },
     failNextPayment() {
       uncertain = true;

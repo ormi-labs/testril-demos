@@ -834,3 +834,48 @@ test("durable journals survive a new engine and failed persistence prevents paym
   assert.equal(peer.calls.filter((c) => !!c.payment).length, payments);
   await assert.rejects(second.refresh(), /journal could not be persisted/);
 });
+
+test("balance bindings satisfy the captured Testril 0.13 schema and old top-level scope is refused", async (t) => {
+  const peer = await livePeer(t);
+  const client = await connectMcp(peer.config.mcpUrl);
+  t.after(() => client.close());
+  const refused = await client.call("bind", {
+    function_slug: "erc20.token_balance",
+    chain_id: 84532,
+    params: {
+      tokens: [peer.config.token.address],
+      owners: [peer.config.wallets[0].address],
+    },
+  });
+  assert.equal(refused.kind, "invalid_params");
+  await peer.demo.refresh();
+  assert.equal(peer.demo.state().balances.treasury, peer.balances.treasury);
+});
+
+test("a saved session rebinds after a service restart without erasing payment or transfer history", async (t) => {
+  const peer = await livePeer(t);
+  await peer.demo.refresh();
+  await peer.demo.transfer({
+    revision: peer.demo.state().revision,
+    from: "treasury",
+    to: "a",
+    amount: "0.25",
+  });
+  const before = peer.demo.export();
+  const bindings = peer.calls.filter((c) => c.name === "bind").length;
+  peer.clearBindings();
+  peer.advanceBlock();
+  await peer.restart();
+  await peer.demo.refresh();
+  const after = peer.demo.export();
+  assert.equal(
+    peer.calls.filter((c) => c.name === "bind").length,
+    bindings + 4,
+  );
+  assert.deepEqual(after.transfers, before.transfers);
+  assert.deepEqual(
+    after.allReceipts.slice(0, before.allReceipts.length),
+    before.allReceipts,
+  );
+  assert.equal(after.actualBalances.a, peer.balances.a);
+});
