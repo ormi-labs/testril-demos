@@ -12,6 +12,15 @@ the contract. Record adoption in each demo's own documentation.
 
 ## Ownership
 
+This public file is the single authoritative hosting integration specification.
+Harness maintainers maintain its hosting requirements, adapter boundary,
+acceptance criteria, and coordinated release process with affected demo developers.
+Each demo owns its domain semantics, failure catalog/detail schemas, provider
+normalization, durable state, and reconciliation. Changes to this contract require
+coordination with affected demos. Harness onboarding guides and adoption records
+must link here rather than introduce competing specifications. Demo developers
+and users need no access to private harness documentation.
+
 | Concern      | Demo                                                                                | Demo-specific harness adapter                       | Common harness                                                                   |
 | ------------ | ----------------------------------------------------------------------------------- | --------------------------------------------------- | -------------------------------------------------------------------------------- |
 | Execution    | Provider calls, calculations, transactions, evidence, and durable domain state      | Connects the demo to hosted resources and hooks     | Allocates resources and manages visitor sessions                                 |
@@ -113,7 +122,7 @@ of future demos.
 
 ## Adapter boundary
 
-The adapter obtains `describeFailure` from the same pinned demo checkout as the
+The adapter obtains `describeFailure` from the same pinned demo checkout and module instance as the
 engine. It must translate failures from engine creation and all invoked engine
 operations, including refresh, transfer, export/state access, and cleanup where
 those operations exist. Both synchronous throws and rejected promises need the
@@ -168,6 +177,37 @@ to end a lease or quarantine a sandbox. An HTTP status or a generic "retryable"
 flag is not evidence that repeating a payment or transfer is safe. Recovery must
 use the demo's reconciliation operations and existing journals.
 
+## Operation lifecycle
+
+These are requirements to verify, not a statement that every current integration
+implements them. The managed lifecycle includes engine creation, execution,
+state/export access, response preparation, finalization, cleanup, restart, and
+recovery. Reads or response construction after an action still belong to that
+request's lifecycle.
+
+Create a harness reference and persist the operation/reservation before chargeable
+work. Preserve the primary normalized failure and reference through finalization;
+record secondary inspection, persistence, and cleanup failures only as bounded safe
+diagnostics. Accounting and busy/lease transitions must complete even if snapshots
+fail. A response-construction failure must appear in the operation and correlated
+logs without erasing known settlement or causing an executed action to be repeated.
+
+An unreadable snapshot cannot establish that no payment or transaction is pending.
+Preserve journals and appropriate reservations, distinguish known financial
+outcomes from unknown outcomes, and isolate uncertain resources until safe reuse
+is verified. Cleanup cannot erase primary failures or evidence. Restart must
+restore durable operations, references, reservations, and isolation. Recovery
+reconciles existing work, associates diagnostics with the original operation, and
+accounts once; it must not authorize duplicate payments or replacement transactions
+automatically. Verify reconciliation, readable state, cleanup, and closure before
+making resources available again.
+
+Operator status must remain useful when an individual resource cannot be inspected.
+Retain stored safe failures, report bounded per-resource inspection warnings, mark
+unreadable pending state as unknown, and continue inspecting other resources. Do
+not expose corrupt journal contents or turn one unreadable resource into loss of
+all pool diagnostics.
+
 ## Compatibility checks and release
 
 The demo supplies a free compatibility check that exercises the provider
@@ -214,7 +254,12 @@ Before hosting a new demo or changing this boundary, verify:
 6. Existing busy responses, sponsored limits, uncertain-payment handling,
    quarantine, cleanup, and request-reference correlation still behave as
    documented. Check engine creation and cleanup failures as well as actions.
-7. The exact demo/harness pair passes its applicable release checks. Report live
+7. Persistence failures, malformed nested provider responses, state/export
+   failures, and response-construction failures after successful execution preserve
+   safe classification, known outcomes, accounting, isolation, and reference
+   correlation. Restart and repeated recovery neither double-account nor repeat
+   submissions. Operator status survives individual unreadable journals.
+8. The exact demo/harness pair passes its applicable release checks. Report live
    compatibility and paid smoke results separately, including any checks not run.
 
 When implementing behavioral changes, run their applicable checks. This document
