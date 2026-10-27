@@ -2,24 +2,46 @@ import { setTimeout as delay } from "node:timers/promises";
 import { randomUUID } from "node:crypto";
 import { acceptedQuote, signBatchPayment } from "./batch-payment.mjs";
 import { succeeded } from "./mcp.mjs";
+import { demoFailure, describeFailure, failureMessage } from "./errors.mjs";
 
-async function bindFunction(testril, slug, label, params, schemaFixture) {
+async function bindFunction(testril, slug, wallet, params, schemaFixture) {
   try {
     return await testril.bind(slug, params);
   } catch (error) {
-    const context = label ? ` (${label})` : "";
-    const message =
-      error instanceof Error ? error.message : "Testril bind failed.";
-    const refusal = /^Testril bind: (.+)\.$/.exec(message);
-    if (refusal)
-      throw new Error(
-        `Testril refused binding ${slug}${context}: ${refusal[1]}. Its params schema may have changed in a Testril release; compare with ${schemaFixture}.`,
-        { cause: error },
+    const failure = describeFailure(error);
+    const context = wallet ? ` (${wallet.name})` : "";
+    const details = {
+      functionSlug: slug,
+      ...(wallet && { walletId: wallet.id }),
+    };
+    if (
+      failure?.code === "TESTRIL_OPERATION_REJECTED" &&
+      failure.details.operation === "bind"
+    ) {
+      const { reason } = failure.details;
+      const hint =
+        reason === "invalid_params"
+          ? ` Its params schema may have changed in a Testril release; compare with ${schemaFixture}.`
+          : "";
+      throw demoFailure(
+        "TESTRIL_BINDING_REJECTED",
+        `Testril refused binding ${slug}${context}: ${reason}.${hint}`,
+        { ...details, reason },
       );
-    throw new Error(
-      `Testril could not bind ${slug}${context}. ${message} Compare its params with ${schemaFixture}.`,
-      { cause: error },
-    );
+    }
+    if (
+      [
+        "TESTRIL_REQUEST_FAILED",
+        "TESTRIL_RESPONSE_INVALID",
+        "TESTRIL_PAYMENT_CHALLENGE_INVALID",
+      ].includes(failure?.code)
+    )
+      throw demoFailure(
+        failure.code,
+        `Testril could not bind ${slug}${context}. ${failureMessage(error)}`,
+        { ...failure.details, ...details },
+      );
+    throw error;
   }
 }
 
@@ -28,7 +50,7 @@ export async function bindLiveFunctions(testril, config) {
     edges: await bindFunction(
       testril,
       "erc20.transfer_edges",
-      "",
+      undefined,
       { token_address: config.token.address },
       "test/fixtures/erc20-transfer-edges-params.json",
     ),
@@ -37,7 +59,7 @@ export async function bindLiveFunctions(testril, config) {
     functions[wallet.id] = await bindFunction(
       testril,
       "erc20.token_balance",
-      wallet.name,
+      wallet,
       {
         reads: {
           tokens: [config.token.address],
@@ -79,16 +101,20 @@ export function createLiveTestril(
     );
     if (cached) return cached.result;
     if (state.receipts.some((r) => r.cacheKey === key && r.status === "paid"))
-      throw new Error(
+      throw demoFailure(
+        "PAYMENT_RECONCILIATION_REQUIRED",
         "A paid request did not finish. Reconcile its quote before paying again.",
+        { reason: "unfinished-request" },
       );
     const quote = await mcp.call(verb, args);
     if (quote.outcome === "success") return quote;
     if (quote.outcome !== "payment_required") return quote;
     return settle(async () => {
       if (state.receipts.some((r) => r.status === "paying"))
-        throw new Error(
+        throw demoFailure(
+          "PAYMENT_RECONCILIATION_REQUIRED",
           "A payment has an uncertain result. Reconcile its quote before authorizing another payment.",
+          { reason: "uncertain-settlement" },
         );
       const accepted = acceptedQuote(quote, config);
       const amount = BigInt(accepted.amount);
@@ -97,7 +123,11 @@ export function createLiveTestril(
         0n,
       );
       if (spent + amount > BigInt(state.chargeCapRaw))
-        throw new Error("The Testril charge cap would be exceeded.");
+        throw demoFailure(
+          "PAYMENT_LIMIT_REACHED",
+          "The Testril charge cap would be exceeded.",
+          { limit: "charge" },
+        );
       channels ??= succeeded(
         await mcp.call("inspect", {
           subject: "channels",
@@ -159,8 +189,10 @@ export function createLiveTestril(
         (response.chargedAmount !== undefined &&
           response.chargedAmount !== accepted.amount)
       )
-        throw new Error(
+        throw demoFailure(
+          "PAYMENT_RECONCILIATION_REQUIRED",
           "The paid call returned no matching settlement confirmation. Reconcile its quote before paying again.",
+          { reason: "missing-settlement" },
         );
       const index = channels.findIndex(
         (c) => c.channelId === signed.channel.channelId,
@@ -191,8 +223,10 @@ export function createLiveTestril(
       )
     ) {
       if (Date.now() >= until)
-        throw new Error(
+        throw demoFailure(
+          "TESTRIL_MATERIALIZING",
           "Testril is still materializing. Use Refresh to retry.",
+          {},
         );
       await measure("Materialization polling sleep", () => delay(200));
       result = await paid("read", args);
@@ -201,7 +235,11 @@ export function createLiveTestril(
       const work = succeeded(await paid("materialize", args), "materialize");
       const jobId = work.job?.job_id;
       if (typeof jobId !== "string")
-        throw new Error("Materialization returned no job handle.");
+        throw demoFailure(
+          "TESTRIL_RESPONSE_INVALID",
+          "Materialization returned no job handle.",
+          { operation: "materialize" },
+        );
       const until = Date.now() + 60000;
       let done = false;
       while (Date.now() < until) {
@@ -215,19 +253,29 @@ export function createLiveTestril(
           break;
         }
         if (status === "failed")
-          throw new Error(
+          throw demoFailure(
+            "TESTRIL_MATERIALIZATION_FAILED",
             "Testril materialization failed. Refresh to inspect the same job.",
+            {},
           );
         await measure("Materialization polling sleep", () => delay(200));
       }
       if (!done)
-        throw new Error(
+        throw demoFailure(
+          "TESTRIL_MATERIALIZING",
           "Testril is still materializing. Use Refresh to retry.",
+          {},
         );
       readProgress(id, block, "materialized");
       result = await paid("read", args);
     }
     const values = succeeded(result, "read").values;
+    if (!Array.isArray(values))
+      throw demoFailure(
+        "TESTRIL_RESPONSE_INVALID",
+        "Testril read returned invalid rows.",
+        { operation: "read" },
+      );
     readProgress(id, block, "done");
     return values;
   }
@@ -251,23 +299,40 @@ export function createLiveTestril(
           !Number.isSafeInteger(head) ||
           head < 0
         )
-          throw new Error("Testril cannot report the Base Sepolia chain head.");
+          throw demoFailure(
+            "TESTRIL_HEAD_UNAVAILABLE",
+            "Testril cannot report the Base Sepolia chain head.",
+            {},
+          );
         if (head >= minimumBlock) return head;
         await measure("Chain-head polling sleep", () => delay(200));
       } while (Date.now() < until);
-      throw new Error(
+      throw demoFailure(
+        "TESTRIL_CATCHING_UP",
         "Testril is still catching up with the transfer. Use Refresh to retry.",
+        {},
       );
     },
     async bind(slug, params) {
-      return succeeded(
+      const result = succeeded(
         await mcp.call("bind", {
           function_slug: slug,
           chain_id: 84532,
           params,
         }),
         "bind",
-      ).bound_function_id;
+      );
+      if (
+        typeof result.bound_function_id !== "string" ||
+        !result.bound_function_id ||
+        result.bound_function_id.length > 512
+      )
+        throw demoFailure(
+          "TESTRIL_RESPONSE_INVALID",
+          "Testril bind returned an invalid Function identifier.",
+          { operation: "bind" },
+        );
+      return result.bound_function_id;
     },
     read(id, block) {
       const key = JSON.stringify([id, block]);

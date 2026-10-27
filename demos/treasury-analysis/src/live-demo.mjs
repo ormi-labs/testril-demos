@@ -1,3 +1,4 @@
+import { demoFailure, describeFailure } from "./errors.mjs";
 import { randomUUID } from "node:crypto";
 import { sameAddress } from "./live-config.mjs";
 import { bindLiveFunctions, createLiveTestril } from "./live-testril.mjs";
@@ -20,8 +21,15 @@ export async function createLiveDemo({
       await import("./live-journal.mjs")
     ).createFileJournal(directory);
   } catch (error) {
-    await mcp.close();
-    throw error;
+    await Promise.resolve()
+      .then(() => mcp.close())
+      .catch(() => {});
+    if (describeFailure(error)) throw error;
+    throw demoFailure(
+      "JOURNAL_UNAVAILABLE",
+      "The live journal could not be opened.",
+      { operation: "open" },
+    );
   }
   const identity = JSON.stringify({
     chain: config.chain,
@@ -47,20 +55,24 @@ export async function createLiveDemo({
   const save = () => {
     const contents = `${JSON.stringify(state, null, 2)}\n`;
     const result = measure("Save session", () =>
-      saves.then(() => journal.save(contents)),
+      saves.then(() => journalOperation("save", () => journal.save(contents))),
     );
     saves = result.catch((error) => {
-      journalFailure = error;
+      journalFailure ??= error;
     });
     return result;
   };
   const serial = (operation) => {
     if (closing)
-      return Promise.reject(new Error("The live server is shutting down."));
+      return Promise.reject(
+        demoFailure("LIVE_CLOSING", "The live server is shutting down."),
+      );
     const result = queue.then(() => {
       if (journalFailure)
-        throw new Error(
+        throw demoFailure(
+          "JOURNAL_UNAVAILABLE",
           "The live journal could not be persisted. Stop and restore durable storage before restarting.",
+          { operation: "save" },
         );
       return operation();
     });
@@ -68,11 +80,22 @@ export async function createLiveDemo({
     return result;
   };
   try {
-    const saved = await journal.load();
-    if (saved) state = JSON.parse(saved);
+    const saved = await journalOperation("load", () => journal.load());
+    if (saved) {
+      try {
+        state = JSON.parse(saved);
+      } catch {
+        throw demoFailure(
+          "JOURNAL_INVALID",
+          "The saved live journal is not valid JSON. Preserve it and investigate.",
+        );
+      }
+    }
     if (state && state.identity !== identity)
-      throw new Error(
+      throw demoFailure(
+        "JOURNAL_INCOMPATIBLE",
         "The saved live session belongs to a different wallet, token, or MCP configuration.",
+        {},
       );
     if (!state) {
       state = {
@@ -248,8 +271,10 @@ export async function createLiveDemo({
       state.revision += 1;
       await save();
       if (transfer.reverted)
-        throw new Error(
+        throw demoFailure(
+          "TRANSFER_REVERTED",
           "The transfer reverted. No USDC moved; gas may have been spent.",
+          {},
         );
       return transfer;
     }
@@ -286,16 +311,26 @@ export async function createLiveDemo({
           rows.length > 1 ||
           rows.some(
             (r) =>
-              r.block !== block || !sameAddress(r.token, config.token.address),
+              !r ||
+              r.block !== block ||
+              !sameAddress(r.token, config.token.address),
           )
         )
-          throw new Error("Testril returned an unexpected balance snapshot.");
+          throw demoFailure(
+            "TESTRIL_EVIDENCE_MISMATCH",
+            "Testril returned an unexpected balance snapshot.",
+            { functionSlug: "erc20.token_balance", walletId: w.id },
+          );
         actual[w.id] = rows[0]?.balance ?? "0";
         if (
           typeof actual[w.id] !== "string" ||
           !/^(0|[1-9][0-9]*)$/.test(actual[w.id])
         )
-          throw new Error("Testril returned an invalid raw USDC balance.");
+          throw demoFailure(
+            "TESTRIL_EVIDENCE_MISMATCH",
+            "Testril returned an invalid raw USDC balance.",
+            { functionSlug: "erc20.token_balance", walletId: w.id },
+          );
         state.balanceEvidence[w.id] = {
           source: {
             wallet: w.name,
@@ -317,17 +352,24 @@ export async function createLiveDemo({
           );
           const edge = rows.find(
             (r) =>
+              r &&
               r.block === transfer.block &&
               sameAddress(r.from, wallet(transfer.from).address) &&
               sameAddress(r.to, wallet(transfer.to).address),
           );
           if (
             !edge ||
+            typeof edge.amount !== "string" ||
+            !/^(0|[1-9][0-9]*)$/.test(edge.amount) ||
+            typeof edge.count !== "string" ||
+            !/^(0|[1-9][0-9]*)$/.test(edge.count) ||
             BigInt(edge.amount) < BigInt(transfer.amountRaw) ||
             BigInt(edge.count) < 1n
           )
-            throw new Error(
+            throw demoFailure(
+              "TESTRIL_EVIDENCE_MISMATCH",
               "Testril does not include the confirmed transfer in its block's edge result.",
+              { functionSlug: "erc20.transfer_edges" },
             );
           state.transferEvidence[transfer.id] = {
             edge,
@@ -337,6 +379,7 @@ export async function createLiveDemo({
       );
       // Drain every paid pipeline before reporting a failure or allowing another action.
       const results = await Promise.allSettled(work);
+      if (journalFailure) throw journalFailure;
       const failed = results.find((result) => result.status === "rejected");
       if (failed) throw failed.reason;
       state.balances = { ...actual };
@@ -349,7 +392,11 @@ export async function createLiveDemo({
     }
     function validateTransfer(from, to, amountRaw) {
       if (!wallet(from) || !wallet(to) || from === to)
-        throw new Error("Choose two different demo wallets.");
+        throw demoFailure(
+          "INVALID_WALLETS",
+          "Choose two different demo wallets.",
+          {},
+        );
       const amount = BigInt(amountRaw);
       if (amount <= 0n || amount > BigInt(state.balances[from]))
         throw refusal(
@@ -359,7 +406,11 @@ export async function createLiveDemo({
     async function send(from, to, amountRaw, kind = "transfer") {
       validateTransfer(from, to, amountRaw);
       if (state.pending)
-        throw new Error("A transfer is pending. Refresh before sending again.");
+        throw demoFailure(
+          "TRANSFER_PENDING",
+          "A transfer is pending. Refresh before sending again.",
+          {},
+        );
       const prepared = await stage(
         "RPC transaction preparation and signing",
         () => chain.prepare(from, to, amountRaw),
@@ -382,12 +433,22 @@ export async function createLiveDemo({
           timing = report;
           progress = createTransferProgress(input.revision);
           try {
-            if (input.revision !== state.revision) throw stale(publicState());
+            if (input.revision !== state.revision) throw stale();
             if (state.refreshNeeded)
-              throw new Error(
+              throw demoFailure(
+                "REFRESH_REQUIRED",
                 "Refresh live reads before sending another transfer.",
+                { reason: "transfer" },
               );
-            const amount = parseUsdc(input.amount);
+            let amount;
+            try {
+              amount = parseUsdc(input.amount);
+            } catch {
+              throw demoFailure(
+                "INVALID_AMOUNT",
+                "Use a USDC amount with up to six decimal places.",
+              );
+            }
             validateTransfer(input.from, input.to, amount);
             const transfer = await send(input.from, input.to, amount);
             progress.transferred();
@@ -399,7 +460,15 @@ export async function createLiveDemo({
             return { ...result, timing: report.finish("success") };
           } catch (error) {
             progress.finish("failed");
-            error.timing = report.finish("failed");
+            const measured = report.finish("failed");
+            try {
+              Object.defineProperty(error, "timing", {
+                value: measured,
+                configurable: true,
+              });
+            } catch {
+              // A host policy error may be frozen or have hostile properties.
+            }
             throw error;
           } finally {
             timing = undefined;
@@ -408,10 +477,12 @@ export async function createLiveDemo({
       },
       reset: (input) =>
         serial(async () => {
-          if (input.revision !== state.revision) throw stale(publicState());
+          if (input.revision !== state.revision) throw stale();
           if (state.receipts.some((r) => r.status === "paying"))
-            throw new Error(
+            throw demoFailure(
+              "PAYMENT_RECONCILIATION_REQUIRED",
               "A payment has an uncertain result. Reconcile its quote before resetting.",
+              { reason: "uncertain-settlement" },
             );
           await refresh();
           const sweeps = current().filter((t) => t.kind === "reset");
@@ -444,8 +515,10 @@ export async function createLiveDemo({
           const transfer = current().find((t) => t.id === id);
           const evidence = state.transferEvidence[id];
           if (!transfer || !evidence)
-            throw new Error(
+            throw demoFailure(
+              "REFRESH_REQUIRED",
               "Refresh live reads to obtain this transfer's evidence.",
+              { reason: "transfer-evidence" },
             );
           if (!evidence.citation) {
             evidence.citation = await testril.provenance(
@@ -480,8 +553,10 @@ export async function createLiveDemo({
         serial(async () => {
           const evidence = state.balanceEvidence[id];
           if (!evidence)
-            throw new Error(
+            throw demoFailure(
+              "REFRESH_REQUIRED",
               "Refresh live reads to obtain this balance's evidence.",
+              { reason: "balance-evidence" },
             );
           if (!evidence.citation) {
             evidence.citation = await testril.provenance(
@@ -524,31 +599,44 @@ export async function createLiveDemo({
       close() {
         closing ??= (async () => {
           await queue;
-          try {
-            await mcp.close();
-          } finally {
-            await journal.close();
-          }
+          const results = await Promise.allSettled([
+            Promise.resolve().then(() => mcp.close()),
+            journalOperation("close", () => journal.close()),
+          ]);
+          const failed = results.find((result) => result.status === "rejected");
+          if (failed) throw failed.reason;
         })();
         return closing;
       },
     };
   } catch (error) {
-    await journal.close();
-    await mcp.close();
+    await Promise.allSettled([
+      Promise.resolve().then(() => journal.close()),
+      Promise.resolve().then(() => mcp.close()),
+    ]);
     throw error;
   }
 }
 
-function stale(state) {
-  const error = new Error(
+function stale() {
+  return demoFailure(
+    "STALE_REVISION",
     "This view is out of date. Try again with the latest demo balances.",
   );
-  error.status = 409;
-  error.state = state;
-  return error;
 }
 
 function refusal(message) {
-  return Object.assign(new Error(message), { status: 400 });
+  return demoFailure("INVALID_AMOUNT", message);
+}
+
+async function journalOperation(operation, work) {
+  try {
+    return await work();
+  } catch {
+    throw demoFailure(
+      "JOURNAL_UNAVAILABLE",
+      `The live journal could not complete ${operation}. Stop and restore durable storage before restarting.`,
+      { operation },
+    );
+  }
 }

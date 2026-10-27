@@ -4,10 +4,11 @@ This is the contract for new hosted demos and for changes to existing demo
 integrations. It defines failure reporting and the ownership boundaries that
 make it reliable. Each demo remains independently understandable and runnable.
 
-**Adoption status:** this document specifies the interface to implement. It does
-not establish that an existing demo or deployed harness implements it. The Move
-Money demo and its harness adapter still need coordinated changes and integration
-verification. Record adoption in each demo's own documentation.
+**Adoption status:** the Move Money demo documents its implementation and complete
+catalog in [its standalone failure guide](../../demos/treasury-analysis/docs/errors.md).
+Harness adoption and verification of the actual demo/adapter pair remain separate
+requirements. This document does not establish that a deployed harness implements
+the contract. Record adoption in each demo's own documentation.
 
 ## Ownership
 

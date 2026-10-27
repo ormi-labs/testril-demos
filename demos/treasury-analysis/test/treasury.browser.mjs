@@ -43,7 +43,9 @@ test("configured Live wallets do not prevent the Mock walkthrough", async ({
     env: testConfig().env,
     liveFactory: async () => {
       liveOpens++;
-      throw new Error("Live was explicitly selected.");
+      throw new Error(
+        "Live was explicitly selected. Private provider credentials.",
+      );
     },
   });
   server.listen(0, "127.0.0.1");
@@ -77,8 +79,20 @@ test("configured Live wallets do not prevent the Mock walkthrough", async ({
     expect(liveOpens).toBe(0);
     await page.locator("#live-option").click();
     await expect(page.locator("#status")).toHaveText(
-      "Live was explicitly selected.",
+      "Live operation failed. Inspect the saved state and refresh.",
     );
+    await expect(page.locator("body")).not.toContainText(
+      "Private provider credentials",
+    );
+    await page.screenshot({
+      path: fileURLToPath(
+        new URL(
+          `../../../docs/screenshots/treasury-live-unknown-error-${testInfo.project.name}.png`,
+          import.meta.url,
+        ),
+      ),
+      fullPage: true,
+    });
     expect(liveOpens).toBe(1);
   } finally {
     await new Promise((resolve) => server.close(resolve));

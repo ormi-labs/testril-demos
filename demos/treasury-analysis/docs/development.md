@@ -86,6 +86,11 @@ explicitly configured caps.
 
 ## Embedding the live engine
 
+Read the [structured failure interface and catalog](errors.md) when embedding
+this engine. Import `describeFailure` from `src/errors.mjs`; do not interpret
+exception messages, HTTP properties, or arbitrary `cause` chains as domain
+classifications. Host authorization rejections retain their original identity.
+
 `createLiveDemo({ config, chain, mcp, directory, authorizePayment, journal })`
 returns an engine with `state`, `progress`, `refresh`, `transfer`, `reset`,
 `provenance`, `balanceProvenance`, `export`, and `close` methods.

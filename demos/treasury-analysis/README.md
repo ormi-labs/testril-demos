@@ -51,13 +51,20 @@ Switching tabs, replay, and inspecting provenance are free. Reloading resumes
 the tab's session; restarting the server clears mock sessions. On phones, scroll
 the transfer diagram horizontally.
 
+## Embedding and failures
+
+Embedding applications use the [structured failure interface](docs/errors.md).
+It defines the `describeFailure(error)` export, the complete code/detail catalog,
+and authorization and recovery constraints. Hosted adapters classify these
+descriptors independently of the demo's human-readable error wording.
+
 ## Testril release smoke
 
 After every Testril release or deployment, test the exact code and endpoint used
 by the hosted harness:
 
 ```sh
-DEMO_REVISION='<demoRevision from the deployed harness operator status>'
+DEMO_REVISION='<demoRevision from the deployed harness /healthz>'
 git fetch origin "$DEMO_REVISION"
 git checkout --detach "$DEMO_REVISION"
 test "$(git rev-parse HEAD)" = "$DEMO_REVISION"

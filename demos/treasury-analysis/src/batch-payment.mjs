@@ -1,3 +1,4 @@
+import { demoFailure } from "./errors.mjs";
 import { randomBytes } from "node:crypto";
 import { encodeAbiParameters, hashTypedData, keccak256 } from "viem";
 import { rawAmount } from "../public/amounts.js";
@@ -55,18 +56,38 @@ export function acceptedQuote(quote, config) {
     accepted.extra?.name !== "USDC" ||
     accepted.extra?.version !== "2"
   )
-    throw new Error(
+    throw demoFailure(
+      "PAYMENT_CONFIGURATION_INVALID",
       "The quote must use Base Sepolia USDC and the supported batch settlement terms.",
+      { reason: "unsupported-terms" },
     );
-  rawAmount(accepted.amount);
+  paymentAmount(accepted.amount);
   if (BigInt(accepted.amount) === 0n)
-    throw new Error("The quote has no positive charge.");
+    throw demoFailure(
+      "PAYMENT_CONFIGURATION_INVALID",
+      "The quote has no positive charge.",
+      { reason: "empty-charge" },
+    );
   return { ...accepted, maxTimeoutSeconds: 3600 };
 }
 
 export async function signBatchPayment(accepted, channels, config, depositRaw) {
   const payer = config.payer;
-  const charge = rawAmount(accepted.amount);
+  const charge = paymentAmount(accepted.amount);
+  if (
+    !Array.isArray(channels) ||
+    channels.some(
+      (row) =>
+        !row ||
+        !row.channelConfig ||
+        typeof row.channelConfig !== "object" ||
+        !/^0x[0-9a-fA-F]{64}$/.test(row.channelId),
+    )
+  )
+    throw demoFailure(
+      "PAYMENT_RESPONSE_INVALID",
+      "Testril returned invalid payment channel data.",
+    );
   const candidates = channels.filter(
     (row) =>
       !row.closed &&
@@ -84,7 +105,8 @@ export async function signBatchPayment(accepted, channels, config, depositRaw) {
   const row =
     candidates.find(
       (r) =>
-        rawAmount(r.balance) >= rawAmount(r.chargedCumulativeAmount) + charge,
+        paymentAmount(r.balance) >=
+        paymentAmount(r.chargedCumulativeAmount) + charge,
     ) ?? candidates[0];
   const channelConfig = row?.channelConfig ?? {
     payer: payer.address,
@@ -95,20 +117,36 @@ export async function signBatchPayment(accepted, channels, config, depositRaw) {
     withdrawDelay: accepted.extra.withdrawDelay,
     salt: salt(),
   };
-  const channelId = hashTypedData({
-    domain: batchDomain,
-    types: channelTypes,
-    primaryType: "ChannelConfig",
-    message: channelConfig,
-  });
+  let channelId;
+  try {
+    channelId = hashTypedData({
+      domain: batchDomain,
+      types: channelTypes,
+      primaryType: "ChannelConfig",
+      message: channelConfig,
+    });
+  } catch {
+    throw demoFailure(
+      "PAYMENT_RESPONSE_INVALID",
+      "Testril returned an invalid payment channel configuration.",
+    );
+  }
   if (row && channelId.toLowerCase() !== row.channelId.toLowerCase())
-    throw new Error("The inspected channel does not match its config.");
-  const prior = row ? rawAmount(row.chargedCumulativeAmount) : 0n;
+    throw demoFailure(
+      "PAYMENT_CONFIGURATION_INVALID",
+      "The inspected channel does not match its config.",
+      { reason: "channel-mismatch" },
+    );
+  const prior = row ? paymentAmount(row.chargedCumulativeAmount) : 0n;
   const maximum = prior + charge;
-  const shortfall = maximum - (row ? rawAmount(row.balance) : 0n);
-  const deposit = shortfall > 0n ? rawAmount(depositRaw) : 0n;
+  const shortfall = maximum - (row ? paymentAmount(row.balance) : 0n);
+  const deposit = shortfall > 0n ? paymentAmount(depositRaw) : 0n;
   if (deposit < shortfall)
-    throw new Error("The escrow deposit allowance cannot cover this quote.");
+    throw demoFailure(
+      "PAYMENT_LIMIT_REACHED",
+      "The escrow deposit allowance cannot cover this quote.",
+      { limit: "deposit" },
+    );
   const payload = {
     type: deposit ? "deposit" : "voucher",
     channelConfig,
@@ -177,9 +215,20 @@ export async function signBatchPayment(accepted, channels, config, depositRaw) {
       channelId,
       network: accepted.network,
       channelConfig,
-      balance: ((row ? rawAmount(row.balance) : 0n) + deposit).toString(),
+      balance: ((row ? paymentAmount(row.balance) : 0n) + deposit).toString(),
       chargedCumulativeAmount: maximum.toString(),
       closed: false,
     },
   };
+}
+
+function paymentAmount(value) {
+  try {
+    return rawAmount(value);
+  } catch {
+    throw demoFailure(
+      "PAYMENT_RESPONSE_INVALID",
+      "Testril payment amounts must be unsigned decimal integer strings.",
+    );
+  }
 }

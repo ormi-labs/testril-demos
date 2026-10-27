@@ -1,11 +1,26 @@
 import { Client } from "@modelcontextprotocol/sdk/client/index.js";
 import { StreamableHTTPClientTransport } from "@modelcontextprotocol/sdk/client/streamableHttp.js";
+import {
+  demoFailure,
+  refusalReason,
+  testrilOperation,
+  transportCode,
+} from "./errors.mjs";
 
 export async function connectMcp(url) {
   const client = new Client({ name: "move-money", version: "0.3.0" });
-  await client.connect(new StreamableHTTPClientTransport(new URL(url)));
+  try {
+    await client.connect(new StreamableHTTPClientTransport(new URL(url)));
+  } catch (error) {
+    await client.close().catch(() => {});
+    throw demoFailure("TESTRIL_REQUEST_FAILED", "Cannot connect to Testril.", {
+      operation: "connect",
+      transportCode: transportCode(error),
+    });
+  }
   return {
     async call(name, args = {}, payment) {
+      const operation = testrilOperation(name);
       let result;
       try {
         result = await client.callTool(
@@ -19,10 +34,12 @@ export async function connectMcp(url) {
             timeout: 60000,
           },
         );
-      } catch {
+      } catch (error) {
         // SDK errors can include request bodies. Never forward signed payloads.
-        throw new Error(
-          `Testril ${name} request failed. Check the connection and refresh.`,
+        throw demoFailure(
+          "TESTRIL_REQUEST_FAILED",
+          `Testril ${operation} request failed. Check the connection and refresh.`,
+          { operation, transportCode: transportCode(error) },
         );
       }
       let value;
@@ -33,7 +50,11 @@ export async function connectMcp(url) {
             result.content.find((item) => item.type === "text")?.text ?? "null",
           );
       } catch {
-        throw new Error(`Testril ${name} returned an invalid response.`);
+        throw demoFailure(
+          "TESTRIL_RESPONSE_INVALID",
+          `Testril ${operation} returned an invalid response.`,
+          { operation },
+        );
       }
       if (
         result.isError &&
@@ -52,8 +73,10 @@ export async function connectMcp(url) {
           !quote.quote_id ||
           !Array.isArray(quote.lines)
         )
-          throw new Error(
-            `Testril ${name} returned an invalid payment challenge.`,
+          throw demoFailure(
+            "TESTRIL_PAYMENT_CHALLENGE_INVALID",
+            `Testril ${operation} returned an invalid payment challenge.`,
+            { operation },
           );
         return {
           ...value,
@@ -63,8 +86,17 @@ export async function connectMcp(url) {
           outcome: "payment_required",
         };
       }
-      if (!value || result.isError)
-        throw new Error(`Testril ${name} returned an invalid response.`);
+      if (
+        !value ||
+        typeof value !== "object" ||
+        Array.isArray(value) ||
+        result.isError
+      )
+        throw demoFailure(
+          "TESTRIL_RESPONSE_INVALID",
+          `Testril ${operation} returned an invalid response.`,
+          { operation },
+        );
       const settlement = result._meta?.["x402/payment-response"];
       return settlement
         ? {
@@ -79,14 +111,43 @@ export async function connectMcp(url) {
           }
         : value;
     },
-    close: () => client.close(),
+    async close() {
+      try {
+        await client.close();
+      } catch (error) {
+        throw demoFailure(
+          "TESTRIL_REQUEST_FAILED",
+          "The Testril connection could not close.",
+          {
+            operation: "close",
+            transportCode: transportCode(error),
+          },
+        );
+      }
+    },
   };
 }
 
 export function succeeded(result, name) {
-  if (result.outcome !== "success")
-    throw new Error(
-      `Testril ${name}: ${result.kind ?? result.outcome ?? "invalid response"}.`,
+  const operation = testrilOperation(name);
+  if (
+    !result ||
+    typeof result !== "object" ||
+    Array.isArray(result) ||
+    !["success", "error", "payment_required"].includes(result.outcome)
+  )
+    throw demoFailure(
+      "TESTRIL_RESPONSE_INVALID",
+      `Testril ${operation} returned an invalid response.`,
+      { operation },
     );
+  if (result.outcome !== "success") {
+    const reason = refusalReason(result.kind);
+    throw demoFailure(
+      "TESTRIL_OPERATION_REJECTED",
+      `Testril ${operation}: ${reason}.`,
+      { operation, reason },
+    );
+  }
   return result;
 }

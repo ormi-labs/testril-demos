@@ -23,6 +23,7 @@ export function testConfig() {
   const env = {
     TESTRIL_CHARGE_CAP_USDC: "0.1",
     TESTRIL_ESCROW_CAP_USDC: "0.1",
+    BASE_SEPOLIA_RPC_URL: "http://127.0.0.1:1",
   };
   for (const [i, key, address] of [
     [1, "TREASURY_PRIVATE_KEY", "TREASURY_ADDRESS"],
@@ -115,6 +116,7 @@ export async function livePeer(t, options = {}) {
     calls.push({ name, args, payment });
     await options.beforeTool?.(name, args, payment);
     if (name === "bind") {
+      if (options.bindingResponse) return options.bindingResponse(args);
       const validator =
         args.function_slug === "erc20.token_balance"
           ? validateBalanceParams

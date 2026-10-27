@@ -117,14 +117,14 @@ steps. Use the interface to recover an unrelated run.
 ### Hosted release and deployment check
 
 After every Testril release or deployment, test the harness's exact inputs. Read
-`demoRevision` from the deployed harness operator status and copy
+`demoRevision` from the deployed harness `/healthz` response and copy
 `TESTRIL_MCP_URL` from that harness environment. Do not assume the pin is the
 latest demos `main` commit or use this demo's default MCP endpoint.
 
 From a clean `testril-demos` clone:
 
 ```sh
-DEMO_REVISION='<demoRevision from the deployed harness operator status>'
+DEMO_REVISION='<demoRevision from the deployed harness /healthz>'
 git fetch origin "$DEMO_REVISION"
 git checkout --detach "$DEMO_REVISION"
 test "$(git rev-parse HEAD)" = "$DEMO_REVISION"

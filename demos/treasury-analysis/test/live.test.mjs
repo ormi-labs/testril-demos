@@ -13,6 +13,7 @@ import { createLiveChain } from "../src/live-chain.mjs";
 import { createLiveDemo } from "../src/live-demo.mjs";
 import { connectMcp } from "../src/mcp.mjs";
 import { createLiveTestril } from "../src/live-testril.mjs";
+import { describeFailure } from "../src/errors.mjs";
 
 test("the live CLI checks Testril's head and Function bindings without making payments or transfers", async (t) => {
   const peer = await livePeer(t);
@@ -20,7 +21,13 @@ test("the live CLI checks Testril's head and Function bindings without making pa
     process.execPath,
     [fileURLToPath(new URL("../src/live-cli.mjs", import.meta.url)), "check"],
     {
-      env: { ...process.env, ...peer.env, TESTRIL_MCP_URL: peer.config.mcpUrl },
+      env: {
+        ...process.env,
+        ...peer.env,
+        TESTRIL_MCP_URL: peer.config.mcpUrl,
+        TESTRIL_CHARGE_CAP_USDC: "0",
+        TESTRIL_ESCROW_CAP_USDC: "0",
+      },
     },
   );
   assert.match(stdout, /Testril reports Base Sepolia block 100/);
@@ -302,7 +309,7 @@ test("HTTP MCP payments reuse escrow; all wallet funds are available and reset s
   assert.equal(peer.demo.state().id, saved.id);
 });
 
-test("zero and over-balance transfers are typed as 400 refusals", async (t) => {
+test("zero and over-balance transfers have stable input failures without HTTP policy", async (t) => {
   const peer = await livePeer(t, {
     balances: { treasury: "1000000", a: "0", b: "0" },
   });
@@ -318,7 +325,11 @@ test("zero and over-balance transfers are typed as 400 refusals", async (t) => {
         amount,
       }),
       (error) => {
-        assert.equal(error.status, 400);
+        assert.deepEqual(describeFailure(error), {
+          code: "INVALID_AMOUNT",
+          details: {},
+        });
+        assert.equal(error.status, undefined);
         assert.match(error.message, /available USDC balance/);
         return true;
       },
@@ -501,7 +512,13 @@ test("MCP payment challenges retain the request arguments and settle through met
 
 test("a malformed MCP challenge cannot authorize a payment", async (t) => {
   const peer = await livePeer(t, { malformedChallenge: true });
-  await assert.rejects(peer.demo.refresh(), /invalid payment challenge/);
+  await assert.rejects(peer.demo.refresh(), (error) => {
+    assert.deepEqual(describeFailure(error), {
+      code: "TESTRIL_PAYMENT_CHALLENGE_INVALID",
+      details: { operation: "materialize" },
+    });
+    return true;
+  });
   assert.equal(peer.calls.filter((c) => c.payment).length, 0);
   assert.equal(peer.demo.export().allReceipts.length, 0);
 });
@@ -509,10 +526,13 @@ test("a malformed MCP challenge cannot authorize a payment", async (t) => {
 for (const response of ["omitSettlement", "wrongSettlement"]) {
   test(`${response} keeps the paid call uncertain and forbids another payment after restart`, async (t) => {
     const peer = await livePeer(t, { [response]: true });
-    await assert.rejects(
-      peer.demo.refresh(),
-      /settlement confirmation|uncertain/,
-    );
+    await assert.rejects(peer.demo.refresh(), (error) => {
+      assert.equal(
+        describeFailure(error).code,
+        "PAYMENT_RECONCILIATION_REQUIRED",
+      );
+      return true;
+    });
     assert.equal(peer.demo.export().allReceipts[0].status, "paying");
     assert.equal(peer.calls.filter((c) => c.payment).length, 1);
     await peer.restart();
@@ -540,7 +560,13 @@ test("saved paid tickets need reconciliation before a new payment under the new 
 
 test("quotes for a different network are refused before signing or paying", async (t) => {
   const peer = await livePeer(t, { network: "eip155:8453" });
-  await assert.rejects(peer.demo.refresh(), /Base Sepolia/);
+  await assert.rejects(peer.demo.refresh(), (error) => {
+    assert.deepEqual(describeFailure(error), {
+      code: "PAYMENT_CONFIGURATION_INVALID",
+      details: { reason: "unsupported-terms" },
+    });
+    return true;
+  });
   assert.equal(peer.calls.filter((c) => !!c.payment).length, 0);
 });
 
@@ -549,7 +575,13 @@ test("a charge cap smaller than the next quote stops before payment", async (t) 
   // Saved-session cap can be lowered, never refilled by restart.
   peer.config.chargeCapRaw = "119";
   await peer.restart();
-  await assert.rejects(peer.demo.refresh(), /charge cap/);
+  await assert.rejects(peer.demo.refresh(), (error) => {
+    assert.deepEqual(describeFailure(error), {
+      code: "PAYMENT_LIMIT_REACHED",
+      details: { limit: "charge" },
+    });
+    return true;
+  });
   assert.equal(peer.calls.filter((c) => !!c.payment).length, 0);
 });
 
@@ -881,7 +913,14 @@ test("durable journals survive a new engine and failed persistence prevents paym
   peer.advanceBlock();
   rejectPaymentSave = true;
   const payments = peer.calls.filter((c) => !!c.payment).length;
-  await assert.rejects(second.refresh(), /Durable storage unavailable/);
+  await assert.rejects(second.refresh(), (error) => {
+    assert.deepEqual(describeFailure(error), {
+      code: "JOURNAL_UNAVAILABLE",
+      details: { operation: "save" },
+    });
+    assert.doesNotMatch(error.message, /Durable storage unavailable/);
+    return true;
+  });
   assert.equal(peer.calls.filter((c) => !!c.payment).length, payments);
   await assert.rejects(second.refresh(), /journal could not be persisted/);
 });

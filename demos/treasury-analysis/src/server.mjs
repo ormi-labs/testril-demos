@@ -17,6 +17,7 @@ import { createLiveChain } from "./live-chain.mjs";
 import { connectMcp } from "./mcp.mjs";
 import { formatTransferTiming } from "../public/timing.js";
 import { createLiveDemo } from "./live-demo.mjs";
+import { demoFailure, describeFailure, failureMessage } from "./errors.mjs";
 
 const root = fileURLToPath(new URL("..", import.meta.url));
 const types = {
@@ -77,7 +78,7 @@ export function createApp({
     liveReason =
       "Set the approved Testril charge and escrow caps in .env to enable live mode.";
   const getLive = async () => {
-    if (liveReason) throw new Error(liveReason);
+    if (liveReason) throw demoFailure("LIVE_CONFIGURATION_INVALID", liveReason);
     livePromise ??= (async () => {
       live = await (liveFactory
         ? liveFactory(config)
@@ -106,6 +107,7 @@ export function createApp({
       response.writeHead(status, { "Content-Type": "application/json" });
       response.end(JSON.stringify(result));
     };
+    let liveRequest = false;
     try {
       const host = request.headers.host;
       if (
@@ -161,6 +163,7 @@ export function createApp({
         )
           throw new Error("Choose mock or live mode.");
         if (input.mode === "live") {
+          liveRequest = true;
           const current = await getLive();
           return send(201, current.state());
         }
@@ -189,6 +192,7 @@ export function createApp({
           }
         }
         if (live?.id === id) {
+          liveRequest = true;
           if (request.method === "GET" && !action)
             return send(200, live.state());
           if (request.method === "GET" && action === "progress")
@@ -233,11 +237,17 @@ export function createApp({
               recordTiming(result.timing);
               return send(200, result);
             } catch (error) {
-              recordTiming(error.timing);
-              return send(error.status ?? 400, {
-                error: error.message,
+              const failure = describeFailure(error);
+              const timing = failure ? error.timing : undefined;
+              recordTiming(timing);
+              return send(failure?.code === "STALE_REVISION" ? 409 : 400, {
+                error: failureMessage(error),
+                ...(failure && {
+                  code: failure.code,
+                  details: failure.details,
+                }),
                 state: live.state(),
-                timing: error.timing,
+                timing,
               });
             }
           }
@@ -307,6 +317,13 @@ export function createApp({
       }
       send(404, { error: "Not found." });
     } catch (error) {
+      if (liveRequest) {
+        const failure = describeFailure(error);
+        return send(failure?.code === "STALE_REVISION" ? 409 : 400, {
+          error: failureMessage(error),
+          ...(failure && { code: failure.code, details: failure.details }),
+        });
+      }
       send(400, { error: error.message });
     }
   });
