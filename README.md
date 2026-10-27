@@ -31,6 +31,11 @@ self-contained and can be downloaded and run independently of these plans.
 
 Read [AGENTS.md](AGENTS.md). Keep each demo self-contained, readable, and simple. Its README should explain what it shows, how to run it, and what to expect.
 
+Hosted demos follow the [demo and harness failure contract](docs/specs/demo-harness-contract.md).
+It defines ownership, structured failures, adapter validation, safe diagnostics,
+and the integration checks required for each new demo. Each demo also documents
+its supported failures within its own downloadable source.
+
 ## Production deployment
 
 Production uses Cloudflare Workers Builds, connected to the private

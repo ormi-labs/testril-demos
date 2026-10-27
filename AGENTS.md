@@ -12,6 +12,15 @@ Place each demo in `demos/<descriptive-kebab-case-name>/`, with its own README, 
 
 Keep programs small and independent: a parent connects children; children do not know their parent or siblings. Introduce shared code only when it makes the demos easier to read. Avoid a common framework that readers must learn before understanding an example.
 
+## Hosted Demo Integration
+
+Before adding or changing a hosted demo integration, read and follow the
+[demo and harness failure contract](docs/specs/demo-harness-contract.md). Demos
+own structured domain failures; their harness adapters validate and translate
+them. Error wording is not an integration API. Document each demo's supported
+failure codes and safe context in its own source download, and verify the actual
+demo and adapter together before release.
+
 ## Build, Test, and Development Commands
 
 Paul starts and stops interactive demos/programs himself. Provide startup commands
