@@ -510,18 +510,24 @@ test("MCP payment challenges retain the request arguments and settle through met
   assert.ok(peer.demo.export().allReceipts.every((r) => r.status === "done"));
 });
 
-test("a malformed MCP challenge cannot authorize a payment", async (t) => {
-  const peer = await livePeer(t, { malformedChallenge: true });
-  await assert.rejects(peer.demo.refresh(), (error) => {
-    assert.deepEqual(describeFailure(error), {
-      code: "TESTRIL_PAYMENT_CHALLENGE_INVALID",
-      details: { operation: "materialize" },
+for (const [label, options] of [
+  ["missing quote", { malformedChallenge: true }],
+  ["null offer", { paymentOffers: [null] }],
+  ["non-object offer", { paymentOffers: ["batch-settlement"] }],
+  ["array offer", { paymentOffers: [[]] }],
+])
+  test(`a malformed MCP challenge (${label}) cannot authorize a payment`, async (t) => {
+    const peer = await livePeer(t, options);
+    await assert.rejects(peer.demo.refresh(), (error) => {
+      assert.deepEqual(describeFailure(error), {
+        code: "TESTRIL_PAYMENT_CHALLENGE_INVALID",
+        details: { operation: "materialize" },
+      });
+      return true;
     });
-    return true;
+    assert.equal(peer.calls.filter((c) => c.payment).length, 0);
+    assert.equal(peer.demo.export().allReceipts.length, 0);
   });
-  assert.equal(peer.calls.filter((c) => c.payment).length, 0);
-  assert.equal(peer.demo.export().allReceipts.length, 0);
-});
 
 for (const response of ["omitSettlement", "wrongSettlement"]) {
   test(`${response} keeps the paid call uncertain and forbids another payment after restart`, async (t) => {

@@ -135,49 +135,51 @@ test("failed live startup clears previous mock balances and history", async ({
   });
 });
 
-test("disabled Live stays on mock when a live refresh session is returned", async ({
-  page,
-}) => {
-  const liveState = {
-    ...publicState(createDemo()),
-    id: "live-labeled-session",
-    mode: "live",
-    refreshNeeded: true,
-    mcpUrl: "https://dev.testril.ai/mcp",
-    chain: { id: 84532, name: "Base Sepolia" },
-  };
-  await page.route("**/api/config", (route) =>
-    route.fulfill({
-      json: {
-        liveAvailable: false,
-        liveReason:
-          "Set the approved Testril charge and escrow caps in .env to enable live mode.",
-      },
-    }),
-  );
-  await page.route("**/api/sessions/*", (route) => {
-    if (route.request().method() !== "GET") return route.continue();
-    return route.fulfill({ json: liveState });
+for (const liveAvailable of [false, true])
+  test(`Mock ignores a saved live session (Live enabled: ${liveAvailable})`, async ({
+    page,
+  }) => {
+    const liveState = {
+      ...publicState(createDemo()),
+      id: "live-labeled-session",
+      mode: "live",
+      refreshNeeded: true,
+      mcpUrl: "https://dev.testril.ai/mcp",
+      chain: { id: 84532, name: "Base Sepolia" },
+    };
+    await page.route("**/api/config", (route) =>
+      route.fulfill({
+        json: {
+          liveAvailable,
+          liveReason:
+            "Set the approved Testril charge and escrow caps in .env to enable live mode.",
+        },
+      }),
+    );
+    await page.route("**/api/sessions/*", (route) => {
+      if (route.request().method() !== "GET") return route.continue();
+      return route.fulfill({ json: liveState });
+    });
+    await page.reload();
+    await expect(page.locator("#status")).toBeEmpty();
+    await expect(page.locator("#network-name")).toHaveText("Arbitrum");
+    await expect(page.locator("#balances-heading")).toHaveText("Balances");
+    await expect(
+      page.getByRole("radio", { name: "Mock", exact: true }),
+    ).toBeChecked();
+    if (!liveAvailable)
+      await expect(page.locator('input[value="live"]')).toBeDisabled();
+    await expect(page.getByText("Select Refresh to prepare")).toHaveCount(0);
+    await expect(page.getByText("escrow deposit allowance")).toHaveCount(0);
+    await expect(page.locator("#transfer")).toBeEnabled();
+    await expect(page.locator("#balance-treasury")).toHaveText("1");
+    await send(page, "treasury", "a", ".25");
+    await expect(page.locator("#balance-a")).toHaveText("0.25");
   });
-  await page.reload();
-  await expect(page.locator("#status")).toBeEmpty();
-  await expect(page.locator("#network-name")).toHaveText("Arbitrum");
-  await expect(page.locator("#balances-heading")).toHaveText("Balances");
-  await expect(
-    page.getByRole("radio", { name: "Mock", exact: true }),
-  ).toBeChecked();
-  await expect(page.locator('input[value="live"]')).toBeDisabled();
-  await expect(page.getByText("Select Refresh to prepare")).toHaveCount(0);
-  await expect(page.getByText("escrow deposit allowance")).toHaveCount(0);
-  await expect(page.locator("#transfer")).toBeEnabled();
-  await expect(page.locator("#balance-treasury")).toHaveText("1");
-  await send(page, "treasury", "a", ".25");
-  await expect(page.locator("#balance-a")).toHaveText("0.25");
-});
 
-test("disabled Live does not show an escrow quote error before send", async ({
+test("a failed Mock startup shows its error once without adopting live state", async ({
   page,
-}) => {
+}, testInfo) => {
   const liveState = {
     ...publicState(createDemo()),
     id: "quoted-live-session",
@@ -185,7 +187,7 @@ test("disabled Live does not show an escrow quote error before send", async ({
     refreshNeeded: true,
     chain: { id: 84532, name: "Base Sepolia" },
   };
-  let quotes = 0;
+  let opens = 0;
   await page.route("**/api/config", (route) =>
     route.fulfill({
       json: {
@@ -203,8 +205,9 @@ test("disabled Live does not show an escrow quote error before send", async ({
     });
   });
   await page.route("**/api/sessions", (route) => {
-    if (route.request().method() !== "POST" || quotes++)
-      return route.continue();
+    if (route.request().method() !== "POST") return route.continue();
+    opens++;
+    expect(route.request().postDataJSON()).toEqual({ mode: "mock" });
     return route.fulfill({
       status: 400,
       json: {
@@ -214,16 +217,79 @@ test("disabled Live does not show an escrow quote error before send", async ({
     });
   });
   await page.reload();
-  await expect(page.locator("#status")).toBeEmpty();
-  await expect(page.locator("#status")).not.toHaveClass(/error/);
-  await expect(page.getByText("escrow deposit allowance")).toHaveCount(0);
+  await expect(page.locator("#status")).toHaveText(
+    "The escrow deposit allowance cannot cover this quote.",
+  );
+  await expect(page.locator("#status")).toHaveClass(/error/);
   await expect(page.getByText("Select Refresh to prepare")).toHaveCount(0);
   await expect(page.locator("#network-name")).toHaveText("Arbitrum");
-  await expect(page.locator("#transfer")).toBeEnabled();
-  await expect(page.locator("#balance-treasury")).toHaveText("1");
-  await send(page, "treasury", "a", ".1");
-  await expect(page.locator("#balance-a")).toHaveText("0.1");
+  await expect(page.locator("#transfer")).toBeDisabled();
+  await expect(page.locator("#balance-treasury")).toHaveCount(0);
+  await expect(page.locator(".histories")).toBeHidden();
+  expect(opens).toBe(1);
+  await page.screenshot({
+    path: fileURLToPath(
+      new URL(
+        `../../../docs/screenshots/treasury-mock-startup-error-${testInfo.project.name}.png`,
+        import.meta.url,
+      ),
+    ),
+    fullPage: true,
+  });
 });
+
+test("an unavailable saved session shows its error without opening another session", async ({
+  page,
+}) => {
+  await page.route("**/api/sessions/*", (route) =>
+    route.fulfill({
+      status: 503,
+      json: { error: "The saved session is unavailable. Try again later." },
+    }),
+  );
+  let opens = 0;
+  await page.route("**/api/sessions", (route) => {
+    opens++;
+    return route.continue();
+  });
+  await page.reload();
+  await expect(page.locator("#status")).toHaveText(
+    "The saved session is unavailable. Try again later.",
+  );
+  await expect(page.locator("#transfer")).toBeDisabled();
+  await expect(page.locator("#balance-treasury")).toHaveCount(0);
+  expect(opens).toBe(0);
+});
+
+for (const mode of ["mock", "live"])
+  test(`${mode} startup rejects a response for the other mode`, async ({
+    page,
+  }) => {
+    await page.route("**/api/config", (route) =>
+      route.fulfill({ json: { liveAvailable: true, defaultMode: mode } }),
+    );
+    await page.route("**/api/sessions/*", (route) =>
+      route.fulfill({ status: 404, json: { error: "Session expired." } }),
+    );
+    let opens = 0;
+    await page.route("**/api/sessions", (route) => {
+      opens++;
+      expect(route.request().postDataJSON()).toEqual({ mode });
+      return route.fulfill({
+        json: {
+          ...publicState(createDemo()),
+          mode: mode === "mock" ? "live" : "mock",
+        },
+      });
+    });
+    await page.reload();
+    await expect(page.locator("#status")).toHaveText(
+      "The server returned a different demo mode. Reload to try again.",
+    );
+    await expect(page.locator("#transfer")).toBeDisabled();
+    await expect(page.locator("#balance-treasury")).toHaveCount(0);
+    expect(opens).toBe(1);
+  });
 
 test("requested layout, empty history and keyboard balance provenance", async ({
   page,

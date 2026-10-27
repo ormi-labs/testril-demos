@@ -33,6 +33,14 @@ the session and connects the chain, Testril, and storage adapters. These adapter
 do not import the server or browser controller. Browser modules used by Node.js
 are pure functions and do not access the DOM.
 
+The browser explicitly requests Mock or Live and only accepts session state for
+that mode. A saved session in the wrong mode or returning HTTP 404 starts fresh;
+other failures are shown without retrying or switching modes. Error text is
+displayed as supplied by the local server or harness, without message matching.
+
+The CLI's free compatibility check and the live engine share Function binding
+and chain-head validation. Binding uses MCP directly and needs no payment state.
+
 ## Amounts and session state
 
 Amounts travel through JSON as unsigned decimal integer strings. USDC has six

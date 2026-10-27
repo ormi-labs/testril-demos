@@ -1,9 +1,9 @@
 import { fileURLToPath } from "node:url";
 import { liveConfig } from "./live-config.mjs";
 import { createLiveChain } from "./live-chain.mjs";
-import { connectMcp, succeeded } from "./mcp.mjs";
+import { connectMcp } from "./mcp.mjs";
 import { createLiveDemo } from "./live-demo.mjs";
-import { bindLiveFunctions, createLiveTestril } from "./live-testril.mjs";
+import { bindLiveFunctions, inspectChainHead } from "./live-testril.mjs";
 import { decimalAmount, parseUsdc } from "../public/amounts.js";
 import { demoFailure, describeFailure, failureMessage } from "./errors.mjs";
 
@@ -19,24 +19,9 @@ try {
   const config = liveConfig();
   const chain = createLiveChain(config);
   mcp = await connectMcp(config.mcpUrl);
-  const inspection = succeeded(
-    await mcp.call("inspect", { subject: "chain", chain_id: config.chain.id }),
-    "inspect",
-  );
-  const head = inspection.head?.block;
-  if (
-    inspection.chain_id !== config.chain.id ||
-    !Number.isSafeInteger(head) ||
-    head < 0
-  )
-    throw demoFailure(
-      "TESTRIL_HEAD_UNAVAILABLE",
-      "Testril cannot report the Base Sepolia chain head.",
-    );
+  const head = await inspectChainHead(mcp, config.chain.id);
   if (command === "check") {
-    // Bind-only adapter: the empty state prevents any paid call from proceeding.
-    const bindOnlyTestril = createLiveTestril(config, mcp, {}, async () => {});
-    await bindLiveFunctions(bindOnlyTestril, config);
+    await bindLiveFunctions(mcp, config);
     console.log(
       `Testril reports Base Sepolia block ${head}; live Function bindings and all four signer addresses are valid.`,
     );

@@ -323,7 +323,7 @@ export async function livePeer(t, options = {}) {
           const challenge = {
             x402Version: 2,
             error: "payment_required",
-            accepts,
+            accepts: options.paymentOffers ?? accepts,
           };
           result = {
             content: [

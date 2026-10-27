@@ -4,9 +4,27 @@ import { acceptedQuote, signBatchPayment } from "./batch-payment.mjs";
 import { succeeded } from "./mcp.mjs";
 import { demoFailure, describeFailure, failureMessage } from "./errors.mjs";
 
-async function bindFunction(testril, slug, wallet, params, schemaFixture) {
+async function bindFunction(mcp, chainId, slug, wallet, params, schemaFixture) {
   try {
-    return await testril.bind(slug, params);
+    const result = succeeded(
+      await mcp.call("bind", {
+        function_slug: slug,
+        chain_id: chainId,
+        params,
+      }),
+      "bind",
+    );
+    if (
+      typeof result.bound_function_id !== "string" ||
+      !result.bound_function_id ||
+      result.bound_function_id.length > 512
+    )
+      throw demoFailure(
+        "TESTRIL_RESPONSE_INVALID",
+        "Testril bind returned an invalid Function identifier.",
+        { operation: "bind" },
+      );
+    return result.bound_function_id;
   } catch (error) {
     const failure = describeFailure(error);
     const context = wallet ? ` (${wallet.name})` : "";
@@ -45,10 +63,11 @@ async function bindFunction(testril, slug, wallet, params, schemaFixture) {
   }
 }
 
-export async function bindLiveFunctions(testril, config) {
+export async function bindLiveFunctions(mcp, config) {
   const functions = {
     edges: await bindFunction(
-      testril,
+      mcp,
+      config.chain.id,
       "erc20.transfer_edges",
       undefined,
       { token_address: config.token.address },
@@ -57,7 +76,8 @@ export async function bindLiveFunctions(testril, config) {
   };
   for (const wallet of config.wallets)
     functions[wallet.id] = await bindFunction(
-      testril,
+      mcp,
+      config.chain.id,
       "erc20.token_balance",
       wallet,
       {
@@ -69,6 +89,20 @@ export async function bindLiveFunctions(testril, config) {
       "test/fixtures/erc20-token-balance-params.json",
     );
   return functions;
+}
+
+export async function inspectChainHead(mcp, chainId) {
+  const result = succeeded(
+    await mcp.call("inspect", { subject: "chain", chain_id: chainId }),
+    "inspect",
+  );
+  const head = result.head?.block;
+  if (result.chain_id !== chainId || !Number.isSafeInteger(head) || head < 0)
+    throw demoFailure(
+      "TESTRIL_HEAD_UNAVAILABLE",
+      "Testril cannot report the Base Sepolia chain head.",
+    );
+  return head;
 }
 
 // State is persisted before a signature can authorize a charge or a deposit.
@@ -286,24 +320,7 @@ export function createLiveTestril(
     async head(minimumBlock = 0) {
       const until = Date.now() + 60000;
       do {
-        const result = succeeded(
-          await mcp.call("inspect", {
-            subject: "chain",
-            chain_id: config.chain.id,
-          }),
-          "inspect",
-        );
-        const head = result.head?.block;
-        if (
-          result.chain_id !== config.chain.id ||
-          !Number.isSafeInteger(head) ||
-          head < 0
-        )
-          throw demoFailure(
-            "TESTRIL_HEAD_UNAVAILABLE",
-            "Testril cannot report the Base Sepolia chain head.",
-            {},
-          );
+        const head = await inspectChainHead(mcp, config.chain.id);
         if (head >= minimumBlock) return head;
         await measure("Chain-head polling sleep", () => delay(200));
       } while (Date.now() < until);
@@ -312,27 +329,6 @@ export function createLiveTestril(
         "Testril is still catching up with the transfer. Use Refresh to retry.",
         {},
       );
-    },
-    async bind(slug, params) {
-      const result = succeeded(
-        await mcp.call("bind", {
-          function_slug: slug,
-          chain_id: 84532,
-          params,
-        }),
-        "bind",
-      );
-      if (
-        typeof result.bound_function_id !== "string" ||
-        !result.bound_function_id ||
-        result.bound_function_id.length > 512
-      )
-        throw demoFailure(
-          "TESTRIL_RESPONSE_INVALID",
-          "Testril bind returned an invalid Function identifier.",
-          { operation: "bind" },
-        );
-      return result.bound_function_id;
     },
     read(id, block) {
       const key = JSON.stringify([id, block]);

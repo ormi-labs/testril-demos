@@ -7,6 +7,9 @@ import {
   transportCode,
 } from "./errors.mjs";
 
+const isRecord = (value) =>
+  value !== null && typeof value === "object" && !Array.isArray(value);
+
 export async function connectMcp(url) {
   const client = new Client({ name: "move-money", version: "0.3.0" });
   try {
@@ -69,6 +72,7 @@ export async function connectMcp(url) {
         }
         if (
           !Array.isArray(value.accepts) ||
+          !value.accepts.every(isRecord) ||
           typeof quote?.quote_id !== "string" ||
           !quote.quote_id ||
           !Array.isArray(quote.lines)
@@ -86,12 +90,7 @@ export async function connectMcp(url) {
           outcome: "payment_required",
         };
       }
-      if (
-        !value ||
-        typeof value !== "object" ||
-        Array.isArray(value) ||
-        result.isError
-      )
+      if (!isRecord(value) || result.isError)
         throw demoFailure(
           "TESTRIL_RESPONSE_INVALID",
           `Testril ${operation} returned an invalid response.`,
@@ -131,9 +130,7 @@ export async function connectMcp(url) {
 export function succeeded(result, name) {
   const operation = testrilOperation(name);
   if (
-    !result ||
-    typeof result !== "object" ||
-    Array.isArray(result) ||
+    !isRecord(result) ||
     !["success", "error", "payment_required"].includes(result.outcome)
   )
     throw demoFailure(

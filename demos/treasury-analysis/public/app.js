@@ -65,12 +65,13 @@ async function api(path, input) {
   );
   const result = await response.json();
   if (!response.ok) {
-    if (result.state && (liveAvailable || result.state.mode !== "live")) {
+    if (state && result.state?.mode === mode) {
       state = result.state;
       step = state.historyRead.transfers.length;
       renderState();
     }
     const error = new Error(result.error ?? "Request failed.");
+    error.status = response.status;
     error.timing = result.timing;
     throw error;
   }
@@ -78,22 +79,7 @@ async function api(path, input) {
 }
 const endpoint = (action = "") =>
   `/api/sessions/${state.id}${action ? `/${action}` : ""}`;
-function liveBlockedMessage(message) {
-  return (
-    !liveAvailable &&
-    typeof message === "string" &&
-    (/Select Refresh to prepare and read the snapshot with Testril/.test(
-      message,
-    ) ||
-      /escrow deposit allowance/i.test(message) ||
-      /\bquote\b/i.test(message))
-  );
-}
 function status(message, error = false) {
-  if (liveBlockedMessage(message)) {
-    message = "";
-    error = false;
-  }
   $("status").textContent = message;
   $("status").classList.toggle("error", error);
 }
@@ -620,7 +606,7 @@ async function action(kind) {
       });
     if (timedSend)
       session = progressSession = showTransferProgress(input, started);
-    state = await api(endpoint(kind), input);
+    state = sessionState(await api(endpoint(kind), input));
     timing = state.timing;
     selected = undefined;
     step = state.transferCount;
@@ -735,27 +721,29 @@ function paintSession() {
       : "",
   );
 }
-async function loadSession(nextMode) {
+function sessionState(value) {
+  if (value?.mode !== mode)
+    throw new Error(
+      "The server returned a different demo mode. Reload to try again.",
+    );
+  return value;
+}
+async function loadSession() {
   let saved;
   try {
-    saved = sessionStorage.getItem(`${storageKey}-${nextMode}`);
+    saved = sessionStorage.getItem(`${storageKey}-${mode}`);
   } catch {
     /* Storage is optional. */
   }
   if (saved) {
     try {
       const resumed = await api(`/api/sessions/${encodeURIComponent(saved)}`);
-      if (liveAvailable || resumed.mode !== "live") return resumed;
-    } catch {
-      /* Expired sessions start fresh. */
+      if (resumed.mode === mode) return resumed;
+    } catch (error) {
+      if (error.status !== 404) throw error;
     }
   }
-  const opened = await api(
-    "/api/sessions",
-    nextMode === "live" ? { mode: "live" } : {},
-  );
-  if (!liveAvailable && opened.mode === "live") return api("/api/sessions", {});
-  return opened;
+  return sessionState(await api("/api/sessions", { mode }));
 }
 async function start(nextMode) {
   stop();
@@ -780,36 +768,10 @@ async function start(nextMode) {
   document.querySelector(".histories").hidden = true;
   status(mode === "live" ? "Opening the shared Base Sepolia session…" : "");
   try {
-    state = await loadSession(mode);
-    if (!liveAvailable && state.mode === "live") {
-      mode = "mock";
-      for (const input of document.querySelectorAll('[name="data-mode"]'))
-        input.checked = input.value === "mock";
-      $("network-name").textContent = "Arbitrum";
-      $("balances-heading").textContent = "Balances";
-      $("refresh-live").hidden = true;
-      state = await api("/api/sessions", {});
-    }
+    state = await loadSession();
     rememberSession(state.id);
     paintSession();
   } catch (error) {
-    if (!liveAvailable) {
-      try {
-        mode = "mock";
-        for (const input of document.querySelectorAll('[name="data-mode"]'))
-          input.checked = input.value === "mock";
-        $("network-name").textContent = "Arbitrum";
-        $("balances-heading").textContent = "Balances";
-        $("refresh-live").hidden = true;
-        state = await api("/api/sessions", {});
-        if (state.mode === "live") throw new Error("Live mode is disabled.");
-        rememberSession(state.id);
-        paintSession();
-        return;
-      } catch {
-        /* Show the startup error below when mock cannot be opened. */
-      }
-    }
     status(error.message, true);
     lock(true);
     for (const input of document.querySelectorAll('[name="data-mode"]'))

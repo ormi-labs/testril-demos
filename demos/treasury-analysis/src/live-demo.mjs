@@ -16,14 +16,17 @@ export async function createLiveDemo({
   authorizePayment,
   journal,
 }) {
+  const closeResources = () =>
+    Promise.allSettled([
+      Promise.resolve().then(() => mcp.close()),
+      journalOperation("close", () => journal?.close()),
+    ]);
   try {
     journal ??= await (
       await import("./live-journal.mjs")
     ).createFileJournal(directory);
   } catch (error) {
-    await Promise.resolve()
-      .then(() => mcp.close())
-      .catch(() => {});
+    await closeResources();
     if (describeFailure(error)) throw error;
     throw demoFailure(
       "JOURNAL_UNAVAILABLE",
@@ -284,7 +287,7 @@ export async function createLiveDemo({
       const recovered = await recoverTransfer();
       testril.beginReadBatch();
       if (!bindingsReady) {
-        state.functions = await bindLiveFunctions(testril, config);
+        state.functions = await bindLiveFunctions(mcp, config);
         await save();
         bindingsReady = true;
       }
@@ -599,10 +602,7 @@ export async function createLiveDemo({
       close() {
         closing ??= (async () => {
           await queue;
-          const results = await Promise.allSettled([
-            Promise.resolve().then(() => mcp.close()),
-            journalOperation("close", () => journal.close()),
-          ]);
+          const results = await closeResources();
           const failed = results.find((result) => result.status === "rejected");
           if (failed) throw failed.reason;
         })();
@@ -610,10 +610,7 @@ export async function createLiveDemo({
       },
     };
   } catch (error) {
-    await Promise.allSettled([
-      Promise.resolve().then(() => journal.close()),
-      Promise.resolve().then(() => mcp.close()),
-    ]);
+    await closeResources();
     throw error;
   }
 }
