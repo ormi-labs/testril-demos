@@ -105,6 +105,33 @@ export async function inspectChainHead(mcp, chainId) {
   return head;
 }
 
+function materializationPending(result, block) {
+  if (result.outcome !== "error" || result.kind !== "range_unavailable")
+    return false;
+  const ranges = result.materializing ?? [];
+  if (
+    !Array.isArray(ranges) ||
+    !ranges.every(
+      (range) =>
+        range !== null &&
+        typeof range === "object" &&
+        !Array.isArray(range) &&
+        Number.isSafeInteger(range.from_block) &&
+        Number.isSafeInteger(range.to_block) &&
+        range.from_block >= 0 &&
+        range.to_block > range.from_block,
+    )
+  )
+    throw demoFailure(
+      "TESTRIL_RESPONSE_INVALID",
+      "Testril read returned invalid materialization ranges.",
+      { operation: "read" },
+    );
+  return ranges.some(
+    (range) => range.from_block <= block && range.to_block >= block + 1,
+  );
+}
+
 // State is persisted before a signature can authorize a charge or a deposit.
 export function createLiveTestril(
   config,
@@ -249,13 +276,7 @@ export function createLiveTestril(
     };
     let result = await paid("read", args);
     const until = Date.now() + 60000;
-    while (
-      result.outcome === "error" &&
-      result.kind === "range_unavailable" &&
-      result.materializing?.some(
-        (range) => range.from_block <= block && range.to_block >= block + 1,
-      )
-    ) {
+    while (materializationPending(result, block)) {
       if (Date.now() >= until)
         throw demoFailure(
           "TESTRIL_MATERIALIZING",

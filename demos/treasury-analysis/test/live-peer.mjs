@@ -245,6 +245,8 @@ export async function livePeer(t, options = {}) {
         return { outcome: "success", values, paymentResponse };
       }
       if (name === "read" && !covered.has(JSON.stringify(args))) {
+        if (options.rangeUnavailableResponse)
+          return options.rangeUnavailableResponse(args);
         const key = JSON.stringify(args);
         if (options.existingMaterialization && !pendingRanges.has(key)) {
           pendingRanges.add(key);

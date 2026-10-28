@@ -198,6 +198,107 @@ test("reads wait for existing materialization without paying to index the same r
   assert.equal(peer.calls.filter((c) => !!c.payment).length, 3);
 });
 
+test("malformed materialization ranges retain the read failure classification without paying", async (t) => {
+  for (const materializing of [
+    {},
+    "private-provider-payload",
+    1,
+    false,
+    [null],
+    [[]],
+    [{}],
+    [{ from_block: 100 }],
+    [{ from_block: "100", to_block: 101 }],
+    [{ from_block: 100, to_block: "101" }],
+    [{ from_block: -1, to_block: 101 }],
+    [{ from_block: 100.5, to_block: 101 }],
+    [{ from_block: 100, to_block: 101.5 }],
+    [{ from_block: 100, to_block: Number.MAX_SAFE_INTEGER + 1 }],
+    [{ from_block: 101, to_block: 100 }],
+    [{ from_block: 100, to_block: 100 }],
+    [{ from_block: 100, to_block: 101 }, null],
+  ])
+    await t.test(JSON.stringify(materializing), async (t) => {
+      const peer = await livePeer(t, {
+        rangeUnavailableResponse: () => ({
+          outcome: "error",
+          kind: "range_unavailable",
+          materializing,
+        }),
+      });
+      await assert.rejects(peer.demo.refresh(), (error) => {
+        assert.deepEqual(describeFailure(error), {
+          code: "TESTRIL_RESPONSE_INVALID",
+          details: { operation: "read" },
+        });
+        assert.doesNotMatch(error.message, /private-provider-payload/);
+        return true;
+      });
+      assert.equal(peer.calls.filter((call) => call.payment).length, 0);
+      assert.equal(
+        peer.calls.filter((call) => call.name === "materialize").length,
+        0,
+      );
+      assert.equal(peer.prepares, 0);
+    });
+});
+
+test("absent, empty and unrelated valid materialization ranges allow new materialization", async (t) => {
+  for (const materializing of [
+    undefined,
+    null,
+    [],
+    [{ from_block: 0, to_block: 1 }],
+  ])
+    await t.test(String(JSON.stringify(materializing)), async (t) => {
+      const peer = await livePeer(t, {
+        rangeUnavailableResponse: () => ({
+          outcome: "error",
+          kind: "range_unavailable",
+          ...(materializing !== undefined && { materializing }),
+        }),
+      });
+      assert.equal((await peer.demo.refresh()).actualBalances.a, "500000");
+      assert.equal(
+        peer.calls.filter((call) => call.name === "materialize" && call.payment)
+          .length,
+        3,
+      );
+      assert.equal(peer.calls.filter((call) => call.payment).length, 6);
+      assert.equal(peer.prepares, 0);
+    });
+});
+
+test("materialization ranges are validated again on polling replies", async (t) => {
+  const seen = new Set();
+  const peer = await livePeer(t, {
+    rangeUnavailableResponse: (args) => {
+      const first = !seen.has(args.bound_function_id);
+      seen.add(args.bound_function_id);
+      return {
+        outcome: "error",
+        kind: "range_unavailable",
+        materializing: first
+          ? [{ from_block: args.from_block, to_block: args.to_block }]
+          : [null],
+      };
+    },
+  });
+  await assert.rejects(peer.demo.refresh(), (error) => {
+    assert.deepEqual(describeFailure(error), {
+      code: "TESTRIL_RESPONSE_INVALID",
+      details: { operation: "read" },
+    });
+    return true;
+  });
+  assert.ok(peer.calls.filter((call) => call.name === "read").length > 3);
+  assert.equal(peer.calls.filter((call) => call.payment).length, 0);
+  assert.equal(
+    peer.calls.filter((call) => call.name === "materialize").length,
+    0,
+  );
+});
+
 test("HTTP MCP payments reuse escrow; all wallet funds are available and reset sweeps A and B", async (t) => {
   const peer = await livePeer(t);
   const demo = peer.demo;

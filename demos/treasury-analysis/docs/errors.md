@@ -115,6 +115,12 @@ The CLI also uses `INVALID_COMMAND` and `SMOKE_SEQUENCE_INVALID`, both with `{}`
 details. They describe CLI usage and a saved run that cannot start/resume the
 smoke sequence; engine adapters do not receive them.
 
+Read responses validate every advertised materialization range before using it
+to decide whether to poll or request new materialization. An absent, null, or
+empty list means no work is in progress. Malformed lists or block endpoints
+produce `TESTRIL_RESPONSE_INVALID` with `{operation: "read"}`; they cannot trigger
+a new materialization payment.
+
 ## Authorization and persistence
 
 `authorizePayment` rejections propagate with their original identity. The demo
