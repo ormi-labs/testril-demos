@@ -3,6 +3,10 @@ import { pathToFileURL } from "node:url";
 import spec from "../testril.json" with { type: "json" };
 import { feeDays } from "../src/report.mjs";
 
+const binds = Object.fromEntries(spec.binds.map((bind) => [bind.name, bind]));
+const sweepBlocksPerDay = 100000;
+const dayStartBlock = (dayIndex) => dayIndex * sweepBlocksPerDay;
+
 const recordedAt = "2026-11-02T00:00:00.000Z";
 const launchCount = 48;
 const graduatedCount = 14;
@@ -28,8 +32,8 @@ const milliEth = (thousandths) =>
   (BigInt(Math.round(thousandths)) * wei) / 1000n;
 
 function launchRows(random) {
-  const { factory } = spec.binds[0].params;
-  const blocks = spec.binds[0].window;
+  const { factory } = binds.launches.params;
+  const blocks = binds.launches.window;
   const step = Math.floor((blocks.to_block - blocks.from_block) / launchCount);
   return Array.from({ length: launchCount }, (_, i) => ({
     block: blocks.from_block + i * step + Math.floor(random() * step),
@@ -56,7 +60,9 @@ function volumeRows(launches, random) {
   const days = feeDays();
   return days.flatMap((day, d) =>
     launches
-      .filter((_, i) => i % 3 === d % 3)
+      .filter(
+        (launch, i) => i % 3 === d % 3 && launch.block < dayStartBlock(d + 1),
+      )
       .map((launch) => {
         const buys = 2 + Math.floor(random() * 30);
         const sells = Math.floor(random() * buys);
@@ -79,17 +85,16 @@ function volumeRows(launches, random) {
 
 function sweepRows(graduations, random) {
   const days = feeDays();
-  const blocksPerDay = Math.floor(spec.binds[0].window.to_block / days.length);
-  return graduations.flatMap((graduation, i) =>
+  return graduations.flatMap((graduation) =>
     days.flatMap((day, d) => {
-      if (d < i + 2 || random() < 0.6) return [];
+      if (dayStartBlock(d) <= graduation.block || random() < 0.6) return [];
       return Array.from({ length: 1 + Math.floor(random() * 2) }, (_, n) => {
         const fees = milliEth(5 + random() ** 3 * 400);
         const creator = fees / 2n;
         const buyback = fees / 4n;
         return {
           day,
-          block: d * blocksPerDay + n * 100 + Math.floor(random() * 100),
+          block: dayStartBlock(d) + n * 100 + Math.floor(random() * 100),
           log_index: String(n),
           tx: `0x${address(random)}${"0".repeat(24)}`.slice(0, 66),
           token: graduation.token,
