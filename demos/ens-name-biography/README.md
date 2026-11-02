@@ -61,7 +61,7 @@ Windows are half-open: the end is the first block or month not included.
 | ----------------------------- | -------------------------------------------- | ----------------------- |
 | ENS registry                  | `0x00000000000c2e074ec69a0dfb2997ba6c7d2e1e` |                         |
 | BaseRegistrar                 | `0x57f1887a8bf19b14fc0df6fd9b2acc9af147ea85` |                         |
-| ETHRegistrarController (2019) | `0x283af0b28c62c092c9727f1ee09c02ca627eb7f5` | verify before recording |
+| ETHRegistrarController (2020) | `0x283af0b28c62c092c9727f1ee09c02ca627eb7f5` | verify before recording |
 | ETHRegistrarController (2023) | `0x253553366da8546fc250f225fe3d25d0c782303b` | verify before recording |
 | ETHRegistrarController (2025) | `0x59e16fccd424cc24e280be16e11bcd56fb0ce547` | verify before recording |
 | NameWrapper                   | `0xd4416b13d2b3a9abae7acd5d6c2bbdbe25686401` |                         |
@@ -79,12 +79,12 @@ follows the first row.
 
 ## Binds (`testril.json`)
 
-| Name                              | Function             | Chain | Params                                   | Window              |
-| --------------------------------- | -------------------- | ----- | ---------------------------------------- | ------------------- |
-| `vitalik-domain`, `nick-domain`   | `ens.domain`         | 1     | `registry`, `name`                       | 9380380 → 26323365  |
-| `vitalik-registration`, `nick-…`  | `ens.registration`   | 1     | `base_registrar`, `label`, `controllers` | 9380380 → 26323365  |
-| `vitalik-address`, `nick-address` | `ens.address_record` | 1     | `registry`, `name`, `by` (`month`)       | 2020-02 → 2026-11   |
-| `vitalik-wrapped`, `nick-wrapped` | `ens.wrapped_domain` | 1     | `name_wrapper`, `name`                   | 16925758 → 26323365 |
+| Name                                        | Function             | Chain | Params                                   | Window              |
+| ------------------------------------------- | -------------------- | ----- | ---------------------------------------- | ------------------- |
+| `vitalik-domain`, `nick-domain`             | `ens.domain`         | 1     | `registry`, `name`                       | 9380380 → 26323365  |
+| `vitalik-registration`, `nick-registration` | `ens.registration`   | 1     | `base_registrar`, `label`, `controllers` | 9380380 → 26323365  |
+| `vitalik-address`, `nick-address`           | `ens.address_record` | 1     | `registry`, `name`, `by` (`month`)       | 2020-01 → 2026-11   |
+| `vitalik-wrapped`, `nick-wrapped`           | `ens.wrapped_domain` | 1     | `name_wrapper`, `name`                   | 16925758 → 26323365 |
 
 Address-record months have no block, so the timeline places them by linear
 interpolation across the block window.

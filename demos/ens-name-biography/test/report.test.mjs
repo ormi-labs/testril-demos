@@ -34,6 +34,14 @@ test("check fails when a cost is in ETH instead of wei", () => {
   assert.throws(() => check(corrupted), /non-negative integer of wei/);
 });
 
+test("check fails when a cost is in gwei or 1000x too large", () => {
+  for (const cost of ["5900000", "5900000000000000000000"]) {
+    const corrupted = rows();
+    corrupted[nick.binds.registration][1].cost = cost;
+    assert.throws(() => check(corrupted), /per year, outside/);
+  }
+});
+
 test("check fails when a wrapped expiry lacks the 90-day grace period", () => {
   const corrupted = rows();
   const [first] = corrupted[vitalik.binds.wrapped];
@@ -56,14 +64,14 @@ test("check fails when owner changes are out of block order", () => {
 
 test("check fails when a month of the address record is missing", () => {
   const corrupted = rows();
-  corrupted[nick.binds.address].splice(10, 1);
+  corrupted[nick.binds.address].splice(11, 1);
   assert.throws(() => check(corrupted), /missing 2020-12/);
 });
 
 test("check fails when a month of the address record is duplicated", () => {
   const corrupted = rows();
   corrupted[nick.binds.address][5] = { ...corrupted[nick.binds.address][4] };
-  assert.throws(() => check(corrupted), /extra or duplicate rows for 2020-06/);
+  assert.throws(() => check(corrupted), /extra or duplicate rows for 2020-05/);
 });
 
 test("shape lists events in block order and counts only real changes", () => {
