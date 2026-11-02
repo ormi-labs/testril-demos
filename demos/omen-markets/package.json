@@ -1,0 +1,25 @@
+{
+  "name": "testril-omen-markets",
+  "version": "0.1.0",
+  "private": true,
+  "license": "MIT",
+  "type": "module",
+  "engines": {
+    "node": ">=22.13"
+  },
+  "scripts": {
+    "start": "node src/server.mjs",
+    "test": "node --test test/*.test.mjs",
+    "test:browser": "playwright test",
+    "lint": "eslint .",
+    "format:check": "prettier --check .",
+    "format": "prettier --write .",
+    "fixture": "node test/fixture.mjs",
+    "record": "node ../../tools/prepare/prepare.mjs ."
+  },
+  "devDependencies": {
+    "@playwright/test": "1.63.0",
+    "eslint": "10.12.0",
+    "prettier": "3.9.9"
+  }
+}
