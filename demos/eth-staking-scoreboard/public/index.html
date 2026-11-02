@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>ETH Staking Scoreboard · Testril demos</title>
+    <link rel="icon" href="assets/favicon.svg" />
+    <link rel="stylesheet" href="style.css" />
+    <script type="module" src="app.js"></script>
+  </head>
+  <body>
+    <header class="measure masthead">
+      <a href="https://testril.ai"
+        ><img
+          src="assets/wordmark.svg"
+          alt="Testril"
+          width="115"
+          height="38" /></a
+      ><span>Data demos / ETH staking scoreboard</span>
+    </header>
+    <main class="measure">
+      <p id="source" class="banner">Loading…</p>
+      <div class="eyebrow">ETHEREUM · LIDO, WBETH, EIGENLAYER, STMATIC</div>
+      <h1>Where staked ether sits,<br />day by day.</h1>
+      <p class="intro">
+        Daily balances for a quarter: Lido's pooled ether and its stVaults,
+        Binance's wBETH, EigenLayer's strategies, and Lido's shrinking stMATIC.
+      </p>
+      <section class="scope" aria-label="Report scope">
+        <div>
+          <span class="label">UTC DAYS</span><strong id="window"></strong>
+        </div>
+        <div>
+          <span class="label">ETHER</span
+          ><strong>lido.pooled_ether · wbeth.staked_ether</strong>
+        </div>
+        <div>
+          <span class="label">RESTAKING</span
+          ><strong>eigenlayer.strategy_underlying</strong>
+        </div>
+        <div>
+          <span class="label">MATIC</span><strong>lido.pooled_matic</strong>
+        </div>
+      </section>
+      <section
+        id="headline"
+        class="metrics"
+        aria-label="Headline numbers"
+      ></section>
+      <section class="results">
+        <div class="section-heading">
+          <h2>Staked ETH by venue</h2>
+          <span>
+            stacked; EigenLayer counts restaked tokens, so it overlaps the
+            others
+          </span>
+        </div>
+        <div id="stack" class="flow"></div>
+        <div id="legend" class="legend"></div>
+      </section>
+      <section class="results">
+        <div class="section-heading">
+          <h2>stVault growth and stMATIC wind-down</h2>
+          <span>each on its own scale</span>
+        </div>
+        <div id="lines" class="charts"></div>
+      </section>
+      <section class="results">
+        <div class="section-heading">
+          <h2>First day to latest day</h2>
+          <span>one row per venue</span>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Venue</th>
+                <th>Function</th>
+                <th>First day</th>
+                <th>Latest</th>
+                <th>Change</th>
+              </tr>
+            </thead>
+            <tbody id="venues"></tbody>
+          </table>
+        </div>
+      </section>
+      <section class="method">
+        <h2>Cross-check</h2>
+        <ul id="checks"></ul>
+      </section>
+    </main>
+    <footer class="measure">
+      Data shaped from the recording in <code>recordings/report.json</code>.
+    </footer>
+  </body>
+</html>
