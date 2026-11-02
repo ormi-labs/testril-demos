@@ -1,0 +1,35 @@
+{
+  "demo": "v4-tick-heatmap",
+  "binds": [
+    {
+      "name": "ticks",
+      "function_slug": "uniswap_v4.tick",
+      "chain_id": 1,
+      "params": {
+        "manager": "0x000000000004444c5dc75cb358380d2e3de08a90",
+        "pool": "0xdce6394339af00981949f5f3baf27e3610c76326a700af57e4b3e3ae4977f78d"
+      },
+      "window": {
+        "from_block": 21688329,
+        "to_block": 26323365
+      },
+      "read": {
+        "chunk_blocks": 200000
+      }
+    },
+    {
+      "name": "pool-state",
+      "function_slug": "uniswap_v4.pool_state",
+      "chain_id": 1,
+      "params": {
+        "manager": "0x000000000004444c5dc75cb358380d2e3de08a90",
+        "pool": "0xdce6394339af00981949f5f3baf27e3610c76326a700af57e4b3e3ae4977f78d",
+        "by": "day"
+      },
+      "window": {
+        "from_day": "2026-11-01",
+        "to_day": "2026-11-02"
+      }
+    }
+  ]
+}
