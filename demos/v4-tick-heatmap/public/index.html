@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>V4 tick liquidity histogram · Testril demos</title>
+    <link rel="icon" href="assets/favicon.svg" />
+    <link rel="stylesheet" href="style.css" />
+    <script type="module" src="app.js"></script>
+  </head>
+  <body>
+    <header class="measure masthead">
+      <a href="https://testril.ai"
+        ><img
+          src="assets/wordmark.svg"
+          alt="Testril"
+          width="115"
+          height="38" /></a
+      ><span>Data demos / V4 tick liquidity histogram</span>
+    </header>
+    <main class="measure">
+      <p id="source" class="banner">Loading…</p>
+      <div class="eyebrow">ETHEREUM · UNISWAP V4 · ETH/USDC</div>
+      <h1>Where liquidity providers<br />placed their bets.</h1>
+      <p class="intro">
+        Liquidity by price for one Uniswap v4 pool, rebuilt from every position
+        edge since the pool began, with the current price marked.
+      </p>
+      <section class="scope" aria-label="Report scope">
+        <div><span class="label">POOL</span><strong id="pool-id"></strong></div>
+        <div>
+          <span class="label">TICKS · BLOCKS</span
+          ><strong id="tick-window"></strong>
+        </div>
+        <div>
+          <span class="label">PRICE READ</span><strong id="state-day"></strong>
+        </div>
+        <div>
+          <span class="label">FUNCTIONS</span
+          ><strong>uniswap_v4.tick · uniswap_v4.pool_state</strong>
+        </div>
+      </section>
+      <section
+        id="headline"
+        class="metrics"
+        aria-label="Headline numbers"
+      ></section>
+      <section class="results">
+        <div class="section-heading">
+          <h2>Liquidity at each price</h2>
+          <span id="histogram-note"></span>
+        </div>
+        <div id="histogram" class="flow"></div>
+      </section>
+      <section class="results">
+        <div class="section-heading">
+          <h2>Busiest edge ticks</h2>
+          <span>ticks with the most liquidity on their edge</span>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Tick</th>
+                <th>Price (USDC per ETH)</th>
+                <th>Position</th>
+                <th>Gross liquidity</th>
+                <th>Net liquidity</th>
+              </tr>
+            </thead>
+            <tbody id="ticks"></tbody>
+          </table>
+        </div>
+      </section>
+      <section class="method">
+        <h2>Cross-check</h2>
+        <ul id="checks"></ul>
+      </section>
+    </main>
+    <footer class="measure">
+      Data shaped from the recording in <code>recordings/report.json</code>.
+    </footer>
+  </body>
+</html>
