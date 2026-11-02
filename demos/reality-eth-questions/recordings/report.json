@@ -1,0 +1,1109 @@
+{
+  "demo": "reality-eth-questions",
+  "source": "synthetic",
+  "recordedAt": "2026-11-02T00:00:00.000Z",
+  "boundFunctions": {
+    "ethereum-questions": {
+      "function_slug": "realitio.question",
+      "chain_id": 1
+    },
+    "ethereum-answers": {
+      "function_slug": "realitio.answer",
+      "chain_id": 1
+    },
+    "ethereum-outcomes": {
+      "function_slug": "realitio.question_outcomes",
+      "chain_id": 1
+    },
+    "gnosis-questions": {
+      "function_slug": "realitio.question",
+      "chain_id": 100
+    },
+    "gnosis-answers": {
+      "function_slug": "realitio.answer",
+      "chain_id": 100
+    },
+    "gnosis-outcomes": {
+      "function_slug": "realitio.question_outcomes",
+      "chain_id": 100
+    }
+  },
+  "window": {
+    "ethereum-questions": {
+      "from_block": 26108082,
+      "to_block": 26323365
+    },
+    "ethereum-answers": {
+      "from_block": 26108082,
+      "to_block": 26323365
+    },
+    "ethereum-outcomes": {
+      "from_block": 26108082,
+      "to_block": 26323365
+    },
+    "gnosis-questions": {
+      "from_block": 48558286,
+      "to_block": 49062480
+    },
+    "gnosis-answers": {
+      "from_block": 48558286,
+      "to_block": 49062480
+    },
+    "gnosis-outcomes": {
+      "from_block": 48558286,
+      "to_block": 49062480
+    }
+  },
+  "rows": {
+    "ethereum-questions": [
+      {
+        "block": 26212200,
+        "question_id": "0x3d465913b7d815b71a36c9455b5a84a4647aab6620bbc5094d20930c5cecceba",
+        "template_id": "0",
+        "question_text": "Will the Fed cut rates at its December meeting?␟news␟en_US",
+        "arbitrator": "0x0c5cc60836dc2d48dfc0f0b92776979269409e74",
+        "timeout": "86400",
+        "opening_ts": "0",
+        "title": "Will the Fed cut rates at its December meeting?",
+        "category": "news",
+        "language": "en_US"
+      },
+      {
+        "block": 26155455,
+        "question_id": "0xe6509425061e61a2d8e0e16d5a4ec34b3b0e305268bdb2d8a8f82f4e30b21800",
+        "template_id": "0",
+        "question_text": "Did the proposal pass the DAO vote?␟news␟en_US",
+        "arbitrator": "0x9d16fe7967d6afca07b5e2607978464b814eaa3a",
+        "timeout": "86400",
+        "opening_ts": "0",
+        "title": "Did the proposal pass the DAO vote?",
+        "category": "news",
+        "language": "en_US"
+      },
+      {
+        "block": 26214490,
+        "question_id": "0xdf1a90a861e3e7ab6afa0480acfdad773fb8da3b71e25e12f11b15f18fcefd90",
+        "template_id": "0",
+        "question_text": "Will ETH close above $4,000 on 2026-12-31?␟news␟en_US",
+        "arbitrator": "0xcbc30d4dd89be81b81774c98e5f3fde7498a578b",
+        "timeout": "86400",
+        "opening_ts": "0",
+        "title": "Will ETH close above $4,000 on 2026-12-31?",
+        "category": "news",
+        "language": "en_US"
+      },
+      {
+        "block": 26174915,
+        "question_id": "0x9dde61636c8b364084cad53522e975d8928aa995de40723f7a7dd6e0852a465f",
+        "template_id": "2",
+        "question_text": "Which team wins the final?␟\"Team A\",\"Team B\",\"Team C\"␟sports␟en_US",
+        "arbitrator": "0x694e965a6d57d9c071851b8117e42bbdde83bb80",
+        "timeout": "86400",
+        "opening_ts": "0",
+        "title": "Which team wins the final?",
+        "category": "sports",
+        "language": "en_US"
+      },
+      {
+        "block": 26174030,
+        "question_id": "0xe374455ce9005d73559d2ad2ab7149c57f55dfb293485d0b0f1ae7a9e483f5f7",
+        "template_id": "0",
+        "question_text": "Was the audit report published before 2026-11-15?␟news␟en_US",
+        "arbitrator": "0x271b6a14331a28e6819cec94803e839f58d36a26",
+        "timeout": "86400",
+        "opening_ts": "0",
+        "title": "Was the audit report published before 2026-11-15?",
+        "category": "news",
+        "language": "en_US"
+      },
+      {
+        "block": 26148361,
+        "question_id": "0xef42476ae46114a46db8fa49c0faf1fc9d4254354ed68ca88e727115a41478a9",
+        "template_id": "0",
+        "question_text": "Will the bridge upgrade ship this year?␟news␟en_US",
+        "arbitrator": "0xb9ee5cdb82b70f27346b573e0cc129ec4c95d689",
+        "timeout": "86400",
+        "opening_ts": "0",
+        "title": "Will the bridge upgrade ship this year?",
+        "category": "news",
+        "language": "en_US"
+      },
+      {
+        "block": 26150143,
+        "question_id": "0xa459416a7f0bd774c70bfa00e638b1ec8debf4b7648f7ca7027aac7dbd0f7f5c",
+        "template_id": "0",
+        "question_text": "Did the protocol hit $1B TVL by 2026-12-01?␟news␟en_US",
+        "arbitrator": "0xa58703ffcf458b20e0823266e56ffd2c5ba22e9f",
+        "timeout": "86400",
+        "opening_ts": "0",
+        "title": "Did the protocol hit $1B TVL by 2026-12-01?",
+        "category": "news",
+        "language": "en_US"
+      },
+      {
+        "block": 26125948,
+        "question_id": "0x9269546b7b888a5b7b968c0eb6a9f12f8903ffac8ef6bc15d801d60daaa93a65",
+        "template_id": "2",
+        "question_text": "Which team is awarded the grant?␟\"Team A\",\"Team B\",\"Team C\"␟grants␟en_US",
+        "arbitrator": "0xb783abd9d5aa4fcfbb93ab01645d7e17fb9eb394",
+        "timeout": "86400",
+        "opening_ts": "0",
+        "title": "Which team is awarded the grant?",
+        "category": "grants",
+        "language": "en_US"
+      },
+      {
+        "block": 26195143,
+        "question_id": "0x75a0d464b07d6978b63c0f38f503ccb442a07af8fb63054244b22fd795461e35",
+        "template_id": "0",
+        "question_text": "Does the paper replicate?␟news␟en_US",
+        "arbitrator": "0x6d156f7cc51fec0e3b93d5264fa7ef45e292b46e",
+        "timeout": "86400",
+        "opening_ts": "0",
+        "title": "Does the paper replicate?",
+        "category": "news",
+        "language": "en_US"
+      },
+      {
+        "block": 26116156,
+        "question_id": "0xe38ea70ba33dab313dc46655f9c41075f503c46b0a3dc7e249b199d8b8037cc0",
+        "template_id": "0",
+        "question_text": "Will turnout exceed 60%?␟news␟en_US",
+        "arbitrator": "0x3168b6b29ea763e2707d6e3edb9eb2edff6285c9",
+        "timeout": "86400",
+        "opening_ts": "0",
+        "title": "Will turnout exceed 60%?",
+        "category": "news",
+        "language": "en_US"
+      },
+      {
+        "block": 26165450,
+        "question_id": "0x6cc113474de8050bbe16f5d8488d992ad04772690c3e70c010939e4a0ca0f740",
+        "template_id": "0",
+        "question_text": "Did the airdrop snapshot happen on schedule?␟news␟en_US",
+        "arbitrator": "0x2de410c15c1275e6fe9603606492bd60ebcea261",
+        "timeout": "86400",
+        "opening_ts": "0",
+        "title": "Did the airdrop snapshot happen on schedule?",
+        "category": "news",
+        "language": "en_US"
+      },
+      {
+        "block": 26204383,
+        "question_id": "0x2815ac939340baff0aae92f33dcedf47b2c7b8719dd0fe3e4a7ee1c2ab8e61a5",
+        "template_id": "0",
+        "question_text": "Will the court rule before the end of Q4?␟news␟en_US",
+        "arbitrator": "0xf39d22ea303b747b30527715388fc2baa687818c",
+        "timeout": "86400",
+        "opening_ts": "0",
+        "title": "Will the court rule before the end of Q4?",
+        "category": "news",
+        "language": "en_US"
+      },
+      {
+        "block": 26161253,
+        "question_id": "0x5300441a572bb6a7be183a6bff925213bdf23191c61010cf3046f670898a1e41",
+        "template_id": "0",
+        "question_text": "Did the validator set exceed 1,000,000?␟news␟en_US",
+        "arbitrator": "0xe471468bbbd17283d216850bd806a751f8acaaa7",
+        "timeout": "86400",
+        "opening_ts": "0",
+        "title": "Did the validator set exceed 1,000,000?",
+        "category": "news",
+        "language": "en_US"
+      },
+      {
+        "block": 26186823,
+        "question_id": "0xc3cb0dbb5c5d3499d1556db8f116a4b61f50f98bee3e8a4b757621cbbfb8a7bf",
+        "template_id": "0",
+        "question_text": "Will the token list on a top-5 exchange?␟news␟en_US",
+        "arbitrator": "0x7d7d268331210cfd4dc50a12c8bd05028fdb0d9f",
+        "timeout": "86400",
+        "opening_ts": "0",
+        "title": "Will the token list on a top-5 exchange?",
+        "category": "news",
+        "language": "en_US"
+      }
+    ],
+    "ethereum-answers": [
+      {
+        "block": 26212648,
+        "log_index": "151",
+        "tx": "0x2309b1669547fe242a0a844752bb83338a319e622611b2fb06415ecc5751f98d",
+        "question_id": "0x3d465913b7d815b71a36c9455b5a84a4647aab6620bbc5094d20930c5cecceba",
+        "answer": "0x0000000000000000000000000000000000000000000000000000000000000000",
+        "bond": "10000000000000000",
+        "ts": "1792240392",
+        "finalize_ts": "1792326792"
+      },
+      {
+        "block": 26220437,
+        "log_index": "6",
+        "tx": "0xa5612962e57cf59de93a9b741bae543c85aa7a9ce7a08d19c6b6bc2d6e5c1100",
+        "question_id": "0x3d465913b7d815b71a36c9455b5a84a4647aab6620bbc5094d20930c5cecceba",
+        "answer": "0x0000000000000000000000000000000000000000000000000000000000000001",
+        "bond": "40000000000000000",
+        "ts": "1792333860",
+        "finalize_ts": "1792420260"
+      },
+      {
+        "block": 26221225,
+        "log_index": "116",
+        "tx": "0xeb6e62ed6be7c36626a67c5f2453848069a198437f7ea3acb5c4c04015b79f8d",
+        "question_id": "0x3d465913b7d815b71a36c9455b5a84a4647aab6620bbc5094d20930c5cecceba",
+        "answer": "0x0000000000000000000000000000000000000000000000000000000000000000",
+        "bond": "80000000000000000",
+        "ts": "1792343316",
+        "finalize_ts": "1792429716"
+      },
+      {
+        "block": 26227126,
+        "log_index": "14",
+        "tx": "0xd923b9f6ce18fbd9396747fd228126a7e49816c90e02fe88246a05268d263446",
+        "question_id": "0x3d465913b7d815b71a36c9455b5a84a4647aab6620bbc5094d20930c5cecceba",
+        "answer": "0x0000000000000000000000000000000000000000000000000000000000000001",
+        "bond": "160000000000000000",
+        "ts": "1792414128",
+        "finalize_ts": "1792500528"
+      },
+      {
+        "block": 26228189,
+        "log_index": "134",
+        "tx": "0xa37b2d53b0fbb835a7d4310506a7938399c3e9a162aec5b31e82f2103ab1e4df",
+        "question_id": "0x3d465913b7d815b71a36c9455b5a84a4647aab6620bbc5094d20930c5cecceba",
+        "answer": "0x0000000000000000000000000000000000000000000000000000000000000000",
+        "bond": "320000000000000000",
+        "ts": "1792426884",
+        "finalize_ts": "1792513284"
+      },
+      {
+        "block": 26228370,
+        "log_index": "135",
+        "tx": "0xfff0f06f3f527ca9627775bf90479fa445fd078fd03bcd13f3b0f10e4675fd41",
+        "question_id": "0x3d465913b7d815b71a36c9455b5a84a4647aab6620bbc5094d20930c5cecceba",
+        "answer": "0x0000000000000000000000000000000000000000000000000000000000000001",
+        "bond": "650000000000000000",
+        "ts": "1792429056",
+        "finalize_ts": "1792515456"
+      },
+      {
+        "block": 26232702,
+        "log_index": "121",
+        "tx": "0x87e11777fcf33ced91dccb6acf980e89d6c17744d01eeece67ab0ae3fced79b0",
+        "question_id": "0x3d465913b7d815b71a36c9455b5a84a4647aab6620bbc5094d20930c5cecceba",
+        "answer": "0x0000000000000000000000000000000000000000000000000000000000000000",
+        "bond": "1310000000000000000",
+        "ts": "1792481040",
+        "finalize_ts": "1792567440"
+      },
+      {
+        "block": 26161383,
+        "log_index": "148",
+        "tx": "0x71aee14b10ca37ef8cf5e0b548c1e70599cd8488f792509ebe4e96d0c791cbc5",
+        "question_id": "0xe6509425061e61a2d8e0e16d5a4ec34b3b0e305268bdb2d8a8f82f4e30b21800",
+        "answer": "0x0000000000000000000000000000000000000000000000000000000000000000",
+        "bond": "10000000000000000",
+        "ts": "1791625212",
+        "finalize_ts": "1791711612"
+      },
+      {
+        "block": 26161473,
+        "log_index": "34",
+        "tx": "0x957d6b0888d13d419ca7e5f25f63cf5ff5dbec966253fa555b82002f5009ba02",
+        "question_id": "0xe6509425061e61a2d8e0e16d5a4ec34b3b0e305268bdb2d8a8f82f4e30b21800",
+        "answer": "0x0000000000000000000000000000000000000000000000000000000000000001",
+        "bond": "30000000000000000",
+        "ts": "1791626292",
+        "finalize_ts": "1791712692"
+      },
+      {
+        "block": 26164217,
+        "log_index": "171",
+        "tx": "0x2e66fe652b6aa3805f03389264881e81162146530c0994ab739bd9c452f138f5",
+        "question_id": "0xe6509425061e61a2d8e0e16d5a4ec34b3b0e305268bdb2d8a8f82f4e30b21800",
+        "answer": "0x0000000000000000000000000000000000000000000000000000000000000000",
+        "bond": "70000000000000000",
+        "ts": "1791659220",
+        "finalize_ts": "1791745620"
+      },
+      {
+        "block": 26167681,
+        "log_index": "181",
+        "tx": "0xdf4b33aac289c864ac23c0b5739a6e7db74c679b4df59574e0cd85f1a7a40a06",
+        "question_id": "0xe6509425061e61a2d8e0e16d5a4ec34b3b0e305268bdb2d8a8f82f4e30b21800",
+        "answer": "0x0000000000000000000000000000000000000000000000000000000000000001",
+        "bond": "160000000000000000",
+        "ts": "1791700788",
+        "finalize_ts": "1791787188"
+      },
+      {
+        "block": 26175358,
+        "log_index": "98",
+        "tx": "0x0b6f51375887f012fbfdf51181d4e9771a3394e29da2e9482af314df74314447",
+        "question_id": "0xe6509425061e61a2d8e0e16d5a4ec34b3b0e305268bdb2d8a8f82f4e30b21800",
+        "answer": "0x0000000000000000000000000000000000000000000000000000000000000000",
+        "bond": "330000000000000000",
+        "ts": "1791792912",
+        "finalize_ts": "1791879312"
+      },
+      {
+        "block": 26220871,
+        "log_index": "172",
+        "tx": "0x3ccbd335e24bf383c848d07764306f7e368568cc5c4241a8d934b6b021ff21ce",
+        "question_id": "0xdf1a90a861e3e7ab6afa0480acfdad773fb8da3b71e25e12f11b15f18fcefd90",
+        "answer": "0x0000000000000000000000000000000000000000000000000000000000000000",
+        "bond": "10000000000000000",
+        "ts": "1792339068",
+        "finalize_ts": "1792425468"
+      },
+      {
+        "block": 26227289,
+        "log_index": "70",
+        "tx": "0xfc4e7bb83284d51805aec60cd67f318f99c7aaf79b1ec3efc2ecb2b0319a22d2",
+        "question_id": "0xdf1a90a861e3e7ab6afa0480acfdad773fb8da3b71e25e12f11b15f18fcefd90",
+        "answer": "0x0000000000000000000000000000000000000000000000000000000000000001",
+        "bond": "30000000000000000",
+        "ts": "1792416084",
+        "finalize_ts": "1792502484"
+      },
+      {
+        "block": 26234341,
+        "log_index": "106",
+        "tx": "0x62d3884c187c109cd7d911bbdaab4e223013c2c76ae62f5baaf8e8586277eb2d",
+        "question_id": "0xdf1a90a861e3e7ab6afa0480acfdad773fb8da3b71e25e12f11b15f18fcefd90",
+        "answer": "0x0000000000000000000000000000000000000000000000000000000000000000",
+        "bond": "70000000000000000",
+        "ts": "1792500708",
+        "finalize_ts": "1792587108"
+      },
+      {
+        "block": 26239215,
+        "log_index": "96",
+        "tx": "0xe7c69dd213bdb59cd432ff505258c8a00621f984871e09aedd35a95f7ed762eb",
+        "question_id": "0xdf1a90a861e3e7ab6afa0480acfdad773fb8da3b71e25e12f11b15f18fcefd90",
+        "answer": "0x0000000000000000000000000000000000000000000000000000000000000001",
+        "bond": "150000000000000000",
+        "ts": "1792559196",
+        "finalize_ts": "1792645596"
+      },
+      {
+        "block": 26180024,
+        "log_index": "25",
+        "tx": "0x2162b58b0adc9be3964d1c4e89be66df8ada8faea5af67748228ed17005e4809",
+        "question_id": "0x9dde61636c8b364084cad53522e975d8928aa995de40723f7a7dd6e0852a465f",
+        "answer": "0x0000000000000000000000000000000000000000000000000000000000000000",
+        "bond": "10000000000000000",
+        "ts": "1791848904",
+        "finalize_ts": "1791935304"
+      },
+      {
+        "block": 26181745,
+        "log_index": "55",
+        "tx": "0x5e0b78c4f8a9b08939ef95710c55ccf543cc29628ef1dd6291419593de53fc58",
+        "question_id": "0x9dde61636c8b364084cad53522e975d8928aa995de40723f7a7dd6e0852a465f",
+        "answer": "0x0000000000000000000000000000000000000000000000000000000000000001",
+        "bond": "20000000000000000",
+        "ts": "1791869556",
+        "finalize_ts": "1791955956"
+      },
+      {
+        "block": 26184852,
+        "log_index": "44",
+        "tx": "0x29a3b753f60d4e9d7f864e91a3dadbb00681236a9d3e2d08f4b74d2749116840",
+        "question_id": "0x9dde61636c8b364084cad53522e975d8928aa995de40723f7a7dd6e0852a465f",
+        "answer": "0x0000000000000000000000000000000000000000000000000000000000000002",
+        "bond": "60000000000000000",
+        "ts": "1791906840",
+        "finalize_ts": "1791993240"
+      },
+      {
+        "block": 26185530,
+        "log_index": "199",
+        "tx": "0x68c6c0843dbcf103ab98adeb82f5eae2680c48ef9018511a9ada935f3fb14319",
+        "question_id": "0xe374455ce9005d73559d2ad2ab7149c57f55dfb293485d0b0f1ae7a9e483f5f7",
+        "answer": "0x0000000000000000000000000000000000000000000000000000000000000000",
+        "bond": "10000000000000000",
+        "ts": "1791914976",
+        "finalize_ts": "1792001376"
+      },
+      {
+        "block": 26186913,
+        "log_index": "70",
+        "tx": "0x48feae635a31827452b919fa85f4fa5830915d7dafd80fff2162134fa006c016",
+        "question_id": "0xe374455ce9005d73559d2ad2ab7149c57f55dfb293485d0b0f1ae7a9e483f5f7",
+        "answer": "0x0000000000000000000000000000000000000000000000000000000000000001",
+        "bond": "30000000000000000",
+        "ts": "1791931572",
+        "finalize_ts": "1792017972"
+      },
+      {
+        "block": 26188035,
+        "log_index": "87",
+        "tx": "0xde2b50eb806fd9320f95814a296ff62bf6127e002a39b74fe3492fb73884ef5e",
+        "question_id": "0xe374455ce9005d73559d2ad2ab7149c57f55dfb293485d0b0f1ae7a9e483f5f7",
+        "answer": "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+        "bond": "70000000000000000",
+        "ts": "1791945036",
+        "finalize_ts": "1792031436"
+      },
+      {
+        "block": 26148982,
+        "log_index": "16",
+        "tx": "0x19ad23c2193d5362a77cd61c16fe213973a385620903ce5066e03a3157985458",
+        "question_id": "0xef42476ae46114a46db8fa49c0faf1fc9d4254354ed68ca88e727115a41478a9",
+        "answer": "0x0000000000000000000000000000000000000000000000000000000000000000",
+        "bond": "10000000000000000",
+        "ts": "1791476400",
+        "finalize_ts": "1791562800"
+      },
+      {
+        "block": 26158564,
+        "log_index": "111",
+        "tx": "0xe1c3aea7650c8831f2ed7ddadacb873209263018f8f49e1e7b95ac67e91546f2",
+        "question_id": "0xef42476ae46114a46db8fa49c0faf1fc9d4254354ed68ca88e727115a41478a9",
+        "answer": "0x0000000000000000000000000000000000000000000000000000000000000001",
+        "bond": "30000000000000000",
+        "ts": "1791591384",
+        "finalize_ts": "1791677784"
+      },
+      {
+        "block": 26155652,
+        "log_index": "62",
+        "tx": "0xd2a43d3ef04b535e1abcfc1163dce3700209b8291dc17ccc920aac94a5df0404",
+        "question_id": "0xa459416a7f0bd774c70bfa00e638b1ec8debf4b7648f7ca7027aac7dbd0f7f5c",
+        "answer": "0x0000000000000000000000000000000000000000000000000000000000000000",
+        "bond": "10000000000000000",
+        "ts": "1791556440",
+        "finalize_ts": "1791642840"
+      },
+      {
+        "block": 26156763,
+        "log_index": "139",
+        "tx": "0xec415d22a86b7dcdad62bb9abf8924d2599441b21e633e117103b5ae7dff8019",
+        "question_id": "0xa459416a7f0bd774c70bfa00e638b1ec8debf4b7648f7ca7027aac7dbd0f7f5c",
+        "answer": "0x0000000000000000000000000000000000000000000000000000000000000001",
+        "bond": "40000000000000000",
+        "ts": "1791569772",
+        "finalize_ts": "1791656172"
+      },
+      {
+        "block": 26133305,
+        "log_index": "181",
+        "tx": "0x8d54fd3c80a3e65d5374630c5d796da7f421c9cf5bc5b5e2ca79ef91635a06ce",
+        "question_id": "0x9269546b7b888a5b7b968c0eb6a9f12f8903ffac8ef6bc15d801d60daaa93a65",
+        "answer": "0x0000000000000000000000000000000000000000000000000000000000000000",
+        "bond": "10000000000000000",
+        "ts": "1791288276",
+        "finalize_ts": "1791374676"
+      },
+      {
+        "block": 26138152,
+        "log_index": "40",
+        "tx": "0xdf127a2050a5ff5d116cb16f00e5dab6a254438fd04f11789ae02a1cb23c3f82",
+        "question_id": "0x9269546b7b888a5b7b968c0eb6a9f12f8903ffac8ef6bc15d801d60daaa93a65",
+        "answer": "0x0000000000000000000000000000000000000000000000000000000000000001",
+        "bond": "20000000000000000",
+        "ts": "1791346440",
+        "finalize_ts": "1791432840"
+      },
+      {
+        "block": 26196180,
+        "log_index": "168",
+        "tx": "0xd59a01d18606238d3eb71988cbc4d2ecda3a305561b4103983eff886dffffd07",
+        "question_id": "0x75a0d464b07d6978b63c0f38f503ccb442a07af8fb63054244b22fd795461e35",
+        "answer": "0x0000000000000000000000000000000000000000000000000000000000000000",
+        "bond": "10000000000000000",
+        "ts": "1792042776",
+        "finalize_ts": "1792129176"
+      },
+      {
+        "block": 26124039,
+        "log_index": "183",
+        "tx": "0xc4cec1a583563ef5841229e2ddaff2046c9a032ffc6b807f4cc3d3c847c7f48f",
+        "question_id": "0xe38ea70ba33dab313dc46655f9c41075f503c46b0a3dc7e249b199d8b8037cc0",
+        "answer": "0x0000000000000000000000000000000000000000000000000000000000000000",
+        "bond": "10000000000000000",
+        "ts": "1791177084",
+        "finalize_ts": "1791263484"
+      },
+      {
+        "block": 26175444,
+        "log_index": "199",
+        "tx": "0x515db5a42dd500b89cf966ac4d8c1d56a74f4acec00e116d8c9c8163195ee093",
+        "question_id": "0x6cc113474de8050bbe16f5d8488d992ad04772690c3e70c010939e4a0ca0f740",
+        "answer": "0x0000000000000000000000000000000000000000000000000000000000000000",
+        "bond": "10000000000000000",
+        "ts": "1791793944",
+        "finalize_ts": "1791880344"
+      },
+      {
+        "block": 26209581,
+        "log_index": "84",
+        "tx": "0xc1a23f8e19a3e778c0f8f27285b543cc497ef63bd70a491c49087e7e5b8db531",
+        "question_id": "0x2815ac939340baff0aae92f33dcedf47b2c7b8719dd0fe3e4a7ee1c2ab8e61a5",
+        "answer": "0x0000000000000000000000000000000000000000000000000000000000000000",
+        "bond": "10000000000000000",
+        "ts": "1792203588",
+        "finalize_ts": "1792289988"
+      }
+    ],
+    "ethereum-outcomes": [
+      {
+        "block": 26174915,
+        "question_id": "0x9dde61636c8b364084cad53522e975d8928aa995de40723f7a7dd6e0852a465f",
+        "outcome_index": "0",
+        "outcome": "Team A"
+      },
+      {
+        "block": 26174915,
+        "question_id": "0x9dde61636c8b364084cad53522e975d8928aa995de40723f7a7dd6e0852a465f",
+        "outcome_index": "1",
+        "outcome": "Team B"
+      },
+      {
+        "block": 26174915,
+        "question_id": "0x9dde61636c8b364084cad53522e975d8928aa995de40723f7a7dd6e0852a465f",
+        "outcome_index": "2",
+        "outcome": "Team C"
+      },
+      {
+        "block": 26125948,
+        "question_id": "0x9269546b7b888a5b7b968c0eb6a9f12f8903ffac8ef6bc15d801d60daaa93a65",
+        "outcome_index": "0",
+        "outcome": "Team A"
+      },
+      {
+        "block": 26125948,
+        "question_id": "0x9269546b7b888a5b7b968c0eb6a9f12f8903ffac8ef6bc15d801d60daaa93a65",
+        "outcome_index": "1",
+        "outcome": "Team B"
+      },
+      {
+        "block": 26125948,
+        "question_id": "0x9269546b7b888a5b7b968c0eb6a9f12f8903ffac8ef6bc15d801d60daaa93a65",
+        "outcome_index": "2",
+        "outcome": "Team C"
+      }
+    ],
+    "gnosis-questions": [
+      {
+        "block": 48731842,
+        "question_id": "0xfc356a6d82e02de5f496d4742d61e0de09b26623d28cf214b29e5631be7a317e",
+        "template_id": "0",
+        "question_text": "Will the Fed cut rates at its December meeting?␟news␟en_US",
+        "arbitrator": "0x4545676087efe99306608fb5bc4ff78c695dfc03",
+        "timeout": "86400",
+        "opening_ts": "0",
+        "title": "Will the Fed cut rates at its December meeting?",
+        "category": "news",
+        "language": "en_US"
+      },
+      {
+        "block": 48651779,
+        "question_id": "0x7c3386d54f8f64218aaeea0019455a9a861a5456dee99bb99de356059fff7308",
+        "template_id": "0",
+        "question_text": "Did the proposal pass the DAO vote?␟news␟en_US",
+        "arbitrator": "0x940a9bf6e6ebafc3a7bdfa92964196b0adb52551",
+        "timeout": "86400",
+        "opening_ts": "0",
+        "title": "Did the proposal pass the DAO vote?",
+        "category": "news",
+        "language": "en_US"
+      },
+      {
+        "block": 48681853,
+        "question_id": "0xa5f4b14b5913f9f2bf3d46805a167df7ba448422d282253b35efed1f83f2ee93",
+        "template_id": "0",
+        "question_text": "Will ETH close above $4,000 on 2026-12-31?␟news␟en_US",
+        "arbitrator": "0x898e7891d6bcfed8393826d158d43057d1c4c4a0",
+        "timeout": "86400",
+        "opening_ts": "0",
+        "title": "Will ETH close above $4,000 on 2026-12-31?",
+        "category": "news",
+        "language": "en_US"
+      },
+      {
+        "block": 48746984,
+        "question_id": "0x06a49bc71db0afddb878bcec38885d847f9fe8c36b3edf2731f0933f2c3cb0cf",
+        "template_id": "2",
+        "question_text": "Which team wins the final?␟\"Team A\",\"Team B\",\"Team C\"␟sports␟en_US",
+        "arbitrator": "0x5a6526431a55a7399796d530a05e5012fa20a3d7",
+        "timeout": "86400",
+        "opening_ts": "0",
+        "title": "Which team wins the final?",
+        "category": "sports",
+        "language": "en_US"
+      },
+      {
+        "block": 48621674,
+        "question_id": "0x1106d76b317b1fe00a15378810018cfb53f76d64488d9ccba9c7f6b7ad3b9e19",
+        "template_id": "0",
+        "question_text": "Was the audit report published before 2026-11-15?␟news␟en_US",
+        "arbitrator": "0x395f9d05cf43c7339d8286acc44811d1760e45fe",
+        "timeout": "86400",
+        "opening_ts": "0",
+        "title": "Was the audit report published before 2026-11-15?",
+        "category": "news",
+        "language": "en_US"
+      },
+      {
+        "block": 48607117,
+        "question_id": "0x280f2957e0baa29797eebf194b3e61fc501dab1d02851e907ff6e7f98f74b01e",
+        "template_id": "0",
+        "question_text": "Will the bridge upgrade ship this year?␟news␟en_US",
+        "arbitrator": "0x6a86158199a9f4ed6c64eee7642d2e9272b3ef15",
+        "timeout": "86400",
+        "opening_ts": "0",
+        "title": "Will the bridge upgrade ship this year?",
+        "category": "news",
+        "language": "en_US"
+      },
+      {
+        "block": 48780299,
+        "question_id": "0x02d02420c39477bfe9216c1b0efcbf9196bf3555b1af0f99f8def3536ccbb5b7",
+        "template_id": "0",
+        "question_text": "Did the protocol hit $1B TVL by 2026-12-01?␟news␟en_US",
+        "arbitrator": "0xb2a0a90bfe1ecec09bed0927114171e2a071236e",
+        "timeout": "86400",
+        "opening_ts": "0",
+        "title": "Did the protocol hit $1B TVL by 2026-12-01?",
+        "category": "news",
+        "language": "en_US"
+      },
+      {
+        "block": 48741467,
+        "question_id": "0x2c1035cb0f2204a355fe4bb3fba22a3608051ddce407262e62f64ec915372c8f",
+        "template_id": "2",
+        "question_text": "Which team is awarded the grant?␟\"Team A\",\"Team B\",\"Team C\"␟grants␟en_US",
+        "arbitrator": "0xcb713cd7c29aeeddd3519e5b9e2199246f7d6a6d",
+        "timeout": "86400",
+        "opening_ts": "0",
+        "title": "Which team is awarded the grant?",
+        "category": "grants",
+        "language": "en_US"
+      },
+      {
+        "block": 48602901,
+        "question_id": "0xebfc50d58d478f61f705317556aaa0b824d9330799054fa5e7f15ecceb62dd18",
+        "template_id": "0",
+        "question_text": "Does the paper replicate?␟news␟en_US",
+        "arbitrator": "0x990c785e6aff9bad011012a0a806944c28611c1f",
+        "timeout": "86400",
+        "opening_ts": "0",
+        "title": "Does the paper replicate?",
+        "category": "news",
+        "language": "en_US"
+      },
+      {
+        "block": 48590865,
+        "question_id": "0xe158533567294aeead1cd75f804ebaa6605b7aaa7af94d584b6c68f104a5866d",
+        "template_id": "0",
+        "question_text": "Will turnout exceed 60%?␟news␟en_US",
+        "arbitrator": "0x1ea21bcbce30f4f3be4f604220c05145f0a2ec7d",
+        "timeout": "86400",
+        "opening_ts": "0",
+        "title": "Will turnout exceed 60%?",
+        "category": "news",
+        "language": "en_US"
+      },
+      {
+        "block": 48733718,
+        "question_id": "0x8b2ebb9800f586cf421ae55c8e89ade1f95f790afc54dd268df3ab814af07d10",
+        "template_id": "0",
+        "question_text": "Did the airdrop snapshot happen on schedule?␟news␟en_US",
+        "arbitrator": "0x3d100d82a62b8ca0092722348e452fd8516d68fd",
+        "timeout": "86400",
+        "opening_ts": "0",
+        "title": "Did the airdrop snapshot happen on schedule?",
+        "category": "news",
+        "language": "en_US"
+      },
+      {
+        "block": 48769050,
+        "question_id": "0xda8ae6345c19635a305ea6633494228f4f2383f9b6a2d7d47ba1442c97122c1f",
+        "template_id": "0",
+        "question_text": "Will the court rule before the end of Q4?␟news␟en_US",
+        "arbitrator": "0x59b5d63666f791bb675e9dc0def90a343ec46b70",
+        "timeout": "86400",
+        "opening_ts": "0",
+        "title": "Will the court rule before the end of Q4?",
+        "category": "news",
+        "language": "en_US"
+      },
+      {
+        "block": 48721273,
+        "question_id": "0xe23f9646b03b750c3f1f8c04c9987374459d5bbe63dfa18eaef69e4c7ea2ed42",
+        "template_id": "0",
+        "question_text": "Did the validator set exceed 1,000,000?␟news␟en_US",
+        "arbitrator": "0xb5ab2bed758120d68d701734e8a8648ffaedf76f",
+        "timeout": "86400",
+        "opening_ts": "0",
+        "title": "Did the validator set exceed 1,000,000?",
+        "category": "news",
+        "language": "en_US"
+      },
+      {
+        "block": 48790977,
+        "question_id": "0x5a4f45efbb361449960e9b29190aa9073ecacfd1fbf2b79e0fda2040cefc36df",
+        "template_id": "0",
+        "question_text": "Will the token list on a top-5 exchange?␟news␟en_US",
+        "arbitrator": "0xc933033afc89abbea2f75bac61503f21c8d7cea8",
+        "timeout": "86400",
+        "opening_ts": "0",
+        "title": "Will the token list on a top-5 exchange?",
+        "category": "news",
+        "language": "en_US"
+      }
+    ],
+    "gnosis-answers": [
+      {
+        "block": 48739374,
+        "log_index": "76",
+        "tx": "0xab91d93fa1e3fc1886cb7bebaf99fdfd305e0a90d0c457cabc78c9dde753bbbe",
+        "question_id": "0xfc356a6d82e02de5f496d4742d61e0de09b26623d28cf214b29e5631be7a317e",
+        "answer": "0x0000000000000000000000000000000000000000000000000000000000000000",
+        "bond": "10000000000000000",
+        "ts": "1791891040",
+        "finalize_ts": "1791977440"
+      },
+      {
+        "block": 48758594,
+        "log_index": "103",
+        "tx": "0x0767d44ad214d49fa3360a6eb602b0394722dbbd9e7e9d5b03e689f9e0d20837",
+        "question_id": "0xfc356a6d82e02de5f496d4742d61e0de09b26623d28cf214b29e5631be7a317e",
+        "answer": "0x0000000000000000000000000000000000000000000000000000000000000001",
+        "bond": "30000000000000000",
+        "ts": "1791987140",
+        "finalize_ts": "1792073540"
+      },
+      {
+        "block": 48777535,
+        "log_index": "48",
+        "tx": "0x1468ee667be58ee447ed8c78b01a90503f0bf1e0ac249ec052163b0011d807a1",
+        "question_id": "0xfc356a6d82e02de5f496d4742d61e0de09b26623d28cf214b29e5631be7a317e",
+        "answer": "0x0000000000000000000000000000000000000000000000000000000000000000",
+        "bond": "80000000000000000",
+        "ts": "1792081845",
+        "finalize_ts": "1792168245"
+      },
+      {
+        "block": 48797041,
+        "log_index": "45",
+        "tx": "0x30dd5ef0ac3ceadd3b0d534b4ef04630394cc559685a21e9acb3f5c252a4ff83",
+        "question_id": "0xfc356a6d82e02de5f496d4742d61e0de09b26623d28cf214b29e5631be7a317e",
+        "answer": "0x0000000000000000000000000000000000000000000000000000000000000001",
+        "bond": "180000000000000000",
+        "ts": "1792179375",
+        "finalize_ts": "1792265775"
+      },
+      {
+        "block": 48810261,
+        "log_index": "186",
+        "tx": "0x373c4569ea1075f1a8d4a877b8b6d0a20543ea3603ad421897789bd3b98883ac",
+        "question_id": "0xfc356a6d82e02de5f496d4742d61e0de09b26623d28cf214b29e5631be7a317e",
+        "answer": "0x0000000000000000000000000000000000000000000000000000000000000000",
+        "bond": "380000000000000000",
+        "ts": "1792245475",
+        "finalize_ts": "1792331875"
+      },
+      {
+        "block": 48826065,
+        "log_index": "121",
+        "tx": "0x978ba38fa51fb204ba6976d1aa33691fff9339690e51106c232fd979df19babf",
+        "question_id": "0xfc356a6d82e02de5f496d4742d61e0de09b26623d28cf214b29e5631be7a317e",
+        "answer": "0x0000000000000000000000000000000000000000000000000000000000000001",
+        "bond": "780000000000000000",
+        "ts": "1792324495",
+        "finalize_ts": "1792410895"
+      },
+      {
+        "block": 48674447,
+        "log_index": "85",
+        "tx": "0x551cbbffcfe2b9beedb62d4ec4fb04825c21bfee241b6fbcfbc7e4c262e1c7ec",
+        "question_id": "0x7c3386d54f8f64218aaeea0019455a9a861a5456dee99bb99de356059fff7308",
+        "answer": "0x0000000000000000000000000000000000000000000000000000000000000000",
+        "bond": "10000000000000000",
+        "ts": "1791566405",
+        "finalize_ts": "1791652805"
+      },
+      {
+        "block": 48680348,
+        "log_index": "104",
+        "tx": "0x5a20f163ecc8eafb0ad4650cd5161764253cd537f841654535aae98ee658b57f",
+        "question_id": "0x7c3386d54f8f64218aaeea0019455a9a861a5456dee99bb99de356059fff7308",
+        "answer": "0x0000000000000000000000000000000000000000000000000000000000000001",
+        "bond": "30000000000000000",
+        "ts": "1791595910",
+        "finalize_ts": "1791682310"
+      },
+      {
+        "block": 48682832,
+        "log_index": "100",
+        "tx": "0xd08b0c488d7aff62f453bd791d0f3687aa665607e94a4be821ee01f8f5d2f5e7",
+        "question_id": "0x7c3386d54f8f64218aaeea0019455a9a861a5456dee99bb99de356059fff7308",
+        "answer": "0x0000000000000000000000000000000000000000000000000000000000000000",
+        "bond": "60000000000000000",
+        "ts": "1791608330",
+        "finalize_ts": "1791694730"
+      },
+      {
+        "block": 48696528,
+        "log_index": "126",
+        "tx": "0x01075d304386312480815d379ad6bc9b127ec34b80725831a34ad14522daade4",
+        "question_id": "0x7c3386d54f8f64218aaeea0019455a9a861a5456dee99bb99de356059fff7308",
+        "answer": "0x0000000000000000000000000000000000000000000000000000000000000001",
+        "bond": "120000000000000000",
+        "ts": "1791676810",
+        "finalize_ts": "1791763210"
+      },
+      {
+        "block": 48700390,
+        "log_index": "192",
+        "tx": "0x047c606715cb3dc29c1c1ff2e6ca46e6607749406ac6f644bad0bda2a2b3240d",
+        "question_id": "0x7c3386d54f8f64218aaeea0019455a9a861a5456dee99bb99de356059fff7308",
+        "answer": "0x0000000000000000000000000000000000000000000000000000000000000000",
+        "bond": "240000000000000000",
+        "ts": "1791696120",
+        "finalize_ts": "1791782520"
+      },
+      {
+        "block": 48699562,
+        "log_index": "89",
+        "tx": "0xe739e5701255ff680de338443f3c6fcdb562748e0a2009bedf803668af6acc30",
+        "question_id": "0xa5f4b14b5913f9f2bf3d46805a167df7ba448422d282253b35efed1f83f2ee93",
+        "answer": "0x0000000000000000000000000000000000000000000000000000000000000000",
+        "bond": "10000000000000000",
+        "ts": "1791691980",
+        "finalize_ts": "1791778380"
+      },
+      {
+        "block": 48711901,
+        "log_index": "82",
+        "tx": "0x52a8cf51cfaaddf0d93a86dbf043faa050d11ebc908b8c8a9a34d1036332f197",
+        "question_id": "0xa5f4b14b5913f9f2bf3d46805a167df7ba448422d282253b35efed1f83f2ee93",
+        "answer": "0x0000000000000000000000000000000000000000000000000000000000000001",
+        "bond": "20000000000000000",
+        "ts": "1791753675",
+        "finalize_ts": "1791840075"
+      },
+      {
+        "block": 48726483,
+        "log_index": "93",
+        "tx": "0x85fa8c92731af3022bee07e2c4cc9585952371f6b9479bd70d1711a9e126abbd",
+        "question_id": "0xa5f4b14b5913f9f2bf3d46805a167df7ba448422d282253b35efed1f83f2ee93",
+        "answer": "0x0000000000000000000000000000000000000000000000000000000000000000",
+        "bond": "60000000000000000",
+        "ts": "1791826585",
+        "finalize_ts": "1791912985"
+      },
+      {
+        "block": 48734083,
+        "log_index": "107",
+        "tx": "0x515797eda4849393003d92e3f44fd5805d84211ce4da5a95070cb9b3eee58f2b",
+        "question_id": "0xa5f4b14b5913f9f2bf3d46805a167df7ba448422d282253b35efed1f83f2ee93",
+        "answer": "0x0000000000000000000000000000000000000000000000000000000000000001",
+        "bond": "140000000000000000",
+        "ts": "1791864585",
+        "finalize_ts": "1791950985"
+      },
+      {
+        "block": 48769467,
+        "log_index": "53",
+        "tx": "0xc9bc46bac98b330add9393a9e358a8b431184b5bf8ad0991ce7a31db174a494e",
+        "question_id": "0x06a49bc71db0afddb878bcec38885d847f9fe8c36b3edf2731f0933f2c3cb0cf",
+        "answer": "0x0000000000000000000000000000000000000000000000000000000000000000",
+        "bond": "10000000000000000",
+        "ts": "1792041505",
+        "finalize_ts": "1792127905"
+      },
+      {
+        "block": 48780243,
+        "log_index": "94",
+        "tx": "0x0c8982e0de8f69f0b585d0372fefff366783ba2eb52cc506231801a9b9c4628d",
+        "question_id": "0x06a49bc71db0afddb878bcec38885d847f9fe8c36b3edf2731f0933f2c3cb0cf",
+        "answer": "0x0000000000000000000000000000000000000000000000000000000000000001",
+        "bond": "20000000000000000",
+        "ts": "1792095385",
+        "finalize_ts": "1792181785"
+      },
+      {
+        "block": 48788827,
+        "log_index": "28",
+        "tx": "0x3286e6fbd5d0f333a85efced3d8c8af4023dbdd9fef7ff501d75d1fac9000b19",
+        "question_id": "0x06a49bc71db0afddb878bcec38885d847f9fe8c36b3edf2731f0933f2c3cb0cf",
+        "answer": "0x0000000000000000000000000000000000000000000000000000000000000002",
+        "bond": "60000000000000000",
+        "ts": "1792138305",
+        "finalize_ts": "1792224705"
+      },
+      {
+        "block": 48654484,
+        "log_index": "76",
+        "tx": "0xdead9a67289a78802189ebc91b6c0465490c99cae68d9182c248f71c75f38c2e",
+        "question_id": "0x1106d76b317b1fe00a15378810018cfb53f76d64488d9ccba9c7f6b7ad3b9e19",
+        "answer": "0x0000000000000000000000000000000000000000000000000000000000000000",
+        "bond": "10000000000000000",
+        "ts": "1791466590",
+        "finalize_ts": "1791552990"
+      },
+      {
+        "block": 48656270,
+        "log_index": "175",
+        "tx": "0xb22def3425b416ac20597a935d58fcb25e9e54092810fb5ecc88f571a5ef8bd8",
+        "question_id": "0x1106d76b317b1fe00a15378810018cfb53f76d64488d9ccba9c7f6b7ad3b9e19",
+        "answer": "0x0000000000000000000000000000000000000000000000000000000000000001",
+        "bond": "30000000000000000",
+        "ts": "1791475520",
+        "finalize_ts": "1791561920"
+      },
+      {
+        "block": 48660324,
+        "log_index": "55",
+        "tx": "0xc38457c633428f385918e69d37e1e718b4bb81e3b224d9c6e17c581b5f0f96b1",
+        "question_id": "0x1106d76b317b1fe00a15378810018cfb53f76d64488d9ccba9c7f6b7ad3b9e19",
+        "answer": "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+        "bond": "70000000000000000",
+        "ts": "1791495790",
+        "finalize_ts": "1791582190"
+      },
+      {
+        "block": 48623756,
+        "log_index": "129",
+        "tx": "0x948b0b4bd0c6db3d065377d78e80b032784460c4f0535eee7ebe931099e23efc",
+        "question_id": "0x280f2957e0baa29797eebf194b3e61fc501dab1d02851e907ff6e7f98f74b01e",
+        "answer": "0x0000000000000000000000000000000000000000000000000000000000000000",
+        "bond": "10000000000000000",
+        "ts": "1791312950",
+        "finalize_ts": "1791399350"
+      },
+      {
+        "block": 48645027,
+        "log_index": "168",
+        "tx": "0xd9adbc32c3fad5c9c90709481390d9ce49fd83748801a61488b3c15ab4f1a1a2",
+        "question_id": "0x280f2957e0baa29797eebf194b3e61fc501dab1d02851e907ff6e7f98f74b01e",
+        "answer": "0x0000000000000000000000000000000000000000000000000000000000000001",
+        "bond": "30000000000000000",
+        "ts": "1791419305",
+        "finalize_ts": "1791505705"
+      },
+      {
+        "block": 48799708,
+        "log_index": "26",
+        "tx": "0x714639f9558242602e0367da246417ddc13d245e91749262efa9173e33f99f6d",
+        "question_id": "0x02d02420c39477bfe9216c1b0efcbf9196bf3555b1af0f99f8def3536ccbb5b7",
+        "answer": "0x0000000000000000000000000000000000000000000000000000000000000000",
+        "bond": "10000000000000000",
+        "ts": "1792192710",
+        "finalize_ts": "1792279110"
+      },
+      {
+        "block": 48813393,
+        "log_index": "130",
+        "tx": "0x23273e48f51ac34947ce437856143638185df30c39465a67f33af83797bd2cce",
+        "question_id": "0x02d02420c39477bfe9216c1b0efcbf9196bf3555b1af0f99f8def3536ccbb5b7",
+        "answer": "0x0000000000000000000000000000000000000000000000000000000000000001",
+        "bond": "40000000000000000",
+        "ts": "1792261135",
+        "finalize_ts": "1792347535"
+      },
+      {
+        "block": 48752119,
+        "log_index": "50",
+        "tx": "0xd148622fb1fc2e12121ba67da76fed606afee1dc47ce6c16e5335bf202b8cff5",
+        "question_id": "0x2c1035cb0f2204a355fe4bb3fba22a3608051ddce407262e62f64ec915372c8f",
+        "answer": "0x0000000000000000000000000000000000000000000000000000000000000000",
+        "bond": "10000000000000000",
+        "ts": "1791954765",
+        "finalize_ts": "1792041165"
+      },
+      {
+        "block": 48777852,
+        "log_index": "110",
+        "tx": "0xb77f26a4a2388f3deb6d078cff9ec22dd561a270d781b0555ac9cf41d62409ad",
+        "question_id": "0x2c1035cb0f2204a355fe4bb3fba22a3608051ddce407262e62f64ec915372c8f",
+        "answer": "0x0000000000000000000000000000000000000000000000000000000000000001",
+        "bond": "20000000000000000",
+        "ts": "1792083430",
+        "finalize_ts": "1792169830"
+      },
+      {
+        "block": 48625172,
+        "log_index": "123",
+        "tx": "0xd88a926b1145771b9002cdd92abd125466ffc8fe7bcf240e0c18facc60c5b1fc",
+        "question_id": "0xebfc50d58d478f61f705317556aaa0b824d9330799054fa5e7f15ecceb62dd18",
+        "answer": "0x0000000000000000000000000000000000000000000000000000000000000000",
+        "bond": "10000000000000000",
+        "ts": "1791320030",
+        "finalize_ts": "1791406430"
+      },
+      {
+        "block": 48609292,
+        "log_index": "47",
+        "tx": "0x442e514ec218abbd3d82f38cf92d2e77f71d9fab49607f59712aee3ae2f76237",
+        "question_id": "0xe158533567294aeead1cd75f804ebaa6605b7aaa7af94d584b6c68f104a5866d",
+        "answer": "0x0000000000000000000000000000000000000000000000000000000000000000",
+        "bond": "10000000000000000",
+        "ts": "1791240630",
+        "finalize_ts": "1791327030"
+      },
+      {
+        "block": 48747376,
+        "log_index": "5",
+        "tx": "0xa3f0d0ff131dcd346a766dd19024d759f1e26d717fa86395f4907e5df90cd1f5",
+        "question_id": "0x8b2ebb9800f586cf421ae55c8e89ade1f95f790afc54dd268df3ab814af07d10",
+        "answer": "0x0000000000000000000000000000000000000000000000000000000000000000",
+        "bond": "10000000000000000",
+        "ts": "1791931050",
+        "finalize_ts": "1792017450"
+      },
+      {
+        "block": 48777467,
+        "log_index": "32",
+        "tx": "0x0a762b413fd1fb93e971aa633e1dbdc1527692e9269daaba1be2063e062a068f",
+        "question_id": "0xda8ae6345c19635a305ea6633494228f4f2383f9b6a2d7d47ba1442c97122c1f",
+        "answer": "0x0000000000000000000000000000000000000000000000000000000000000000",
+        "bond": "10000000000000000",
+        "ts": "1792081505",
+        "finalize_ts": "1792167905"
+      }
+    ],
+    "gnosis-outcomes": [
+      {
+        "block": 48746984,
+        "question_id": "0x06a49bc71db0afddb878bcec38885d847f9fe8c36b3edf2731f0933f2c3cb0cf",
+        "outcome_index": "0",
+        "outcome": "Team A"
+      },
+      {
+        "block": 48746984,
+        "question_id": "0x06a49bc71db0afddb878bcec38885d847f9fe8c36b3edf2731f0933f2c3cb0cf",
+        "outcome_index": "1",
+        "outcome": "Team B"
+      },
+      {
+        "block": 48746984,
+        "question_id": "0x06a49bc71db0afddb878bcec38885d847f9fe8c36b3edf2731f0933f2c3cb0cf",
+        "outcome_index": "2",
+        "outcome": "Team C"
+      },
+      {
+        "block": 48741467,
+        "question_id": "0x2c1035cb0f2204a355fe4bb3fba22a3608051ddce407262e62f64ec915372c8f",
+        "outcome_index": "0",
+        "outcome": "Team A"
+      },
+      {
+        "block": 48741467,
+        "question_id": "0x2c1035cb0f2204a355fe4bb3fba22a3608051ddce407262e62f64ec915372c8f",
+        "outcome_index": "1",
+        "outcome": "Team B"
+      },
+      {
+        "block": 48741467,
+        "question_id": "0x2c1035cb0f2204a355fe4bb3fba22a3608051ddce407262e62f64ec915372c8f",
+        "outcome_index": "2",
+        "outcome": "Team C"
+      }
+    ]
+  }
+}
