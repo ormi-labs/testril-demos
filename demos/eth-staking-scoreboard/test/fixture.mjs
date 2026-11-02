@@ -32,7 +32,7 @@ function walk(random, start, dailyDrift, noise, days) {
 
 export function fixture() {
   const random = seeded(11);
-  const days = windowDays();
+  const days = windowDays;
   const pooled = walk(random, 9.05e6, 1500, 6000, days);
   const vaults = walk(random, 21000, 520, 900, days);
   const matic = walk(random, 6.8e6, -26000, 9000, days);

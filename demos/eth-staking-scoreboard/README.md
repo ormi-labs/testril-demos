@@ -3,8 +3,10 @@
 Daily staked ether on Ethereum for a quarter: Lido's pooled ether and its V3
 stVaults, Binance's wBETH, EigenLayer's strategies, and Lido's stMATIC
 shrinking. The page proves its inputs: every series covers every day with raw
-integer amounts, stVault ether stays below pooled ether, and the wBETH exchange
-rate never falls.
+integer amounts in wei, Lido's total equals pooled ether plus stVault ether, and
+the wBETH exchange rate stays at or above 1 ETH. Two checks are heuristics, not
+contract guarantees: stVault ether below pooled ether, and a wBETH rate that
+never falls. A real slashing event would fail the page.
 
 **The shipped recording is synthetic.** `recordings/report.json` is generated
 by `test/fixture.mjs` and the page says so in its banner. Record real data with
@@ -26,9 +28,8 @@ npm start
 ```
 
 Open http://127.0.0.1:4180 (set `PORT` to change it). Expected result: the
-synthetic banner, four headline numbers, a stacked area of staked ETH by venue,
-a stVault growth line, a stMATIC wind-down line, a table of five rows and
-three passed cross-checks.
+synthetic banner, four headline numbers, four line charts (stETH, stVaults, wBETH, stMATIC), each on its own
+scale, a table of five rows and four passed cross-checks.
 
 ## Test
 
@@ -41,7 +42,7 @@ npm run format:check
 ```
 
 `npm test` checks the cross-check passes on the fixture and fails on a missing
-day, an amount in ether instead of wei, stVault ether above pooled ether and a
+day, an amount in whole units instead of wei (Lido, wBETH, stMATIC), stVault ether above pooled ether and a
 falling wBETH rate, and that the server returns the shaped report.
 `npm run test:browser` writes `docs/screenshot-desktop.png` (it needs port 4181
 free). `npm run fixture` regenerates the synthetic recording.
@@ -51,8 +52,9 @@ free). `npm run fixture` regenerates the synthetic recording.
 Window: UTC days `[2026-08-03, 2026-11-02)`, each read at its last block, so the
 last day is 2026-11-01. EigenLayer's `eigenlayer.strategy_underlying` is sparse:
 a strategy has no row before it is whitelisted or while its shares are zero.
-EigenLayer amounts are in each strategy's own token units, so the page labels
-them "tokens" and keep EigenLayer out of the ETH chart, in the table only.
+EigenLayer amounts are in each strategy's own token units and cannot be added,
+so the page validates them and shows only the number of strategies in the
+table.
 
 | Subject                    | Address                                      | Note                    |
 | -------------------------- | -------------------------------------------- | ----------------------- |
@@ -63,8 +65,11 @@ them "tokens" and keep EigenLayer out of the ETH chart, in the table only.
 | Lido VaultHub              | `0x1d201be093d847f6446530efb0e8fb426d176709` | verify before recording |
 
 `vault_hub_from_block` (24000000) is also a placeholder: verify before
-recording. Below it `vault_ether` is 0. The fixture's strategy addresses are
-illustrative; real ones come from `eigenlayer.strategy_list`.
+recording. Below it `vault_ether` is 0. The fixture uses the real mainnet EigenLayer strategy
+addresses for stETH (`0x93c4b944d05dfe6df7645a86cd2206016c51564d`), rETH
+(`0x1bee69b7dfffa4e2d53c2a2df135c388ad25dcd2`) and cbETH
+(`0x54945180db7943c0ed0fee7edab2bd24620256bc`) with synthetic amounts; a real
+recording reads them from `eigenlayer.strategy_list`.
 
 ## Binds (`testril.json`)
 
