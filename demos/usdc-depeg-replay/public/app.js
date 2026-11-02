@@ -139,14 +139,14 @@ function render(report) {
   document
     .querySelector("#timeline")
     .replaceChildren(timelineChart(view.timeline));
-  document.querySelector("#redeemers").replaceChildren(
-    ...view.redeemers.map((redeemer) => {
+  document.querySelector("#burners").replaceChildren(
+    ...view.burners.map((burner) => {
       const row = element("tr");
       row.append(
-        element("td", redeemer.label),
-        element("td", redeemer.redemptions),
-        element("td", redeemer.share),
-        element("td", redeemer.amount),
+        element("td", burner.address),
+        element("td", burner.burns),
+        element("td", burner.share),
+        element("td", burner.amount),
       );
       return row;
     }),

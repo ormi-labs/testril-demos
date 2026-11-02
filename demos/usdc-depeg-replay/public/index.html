@@ -24,7 +24,7 @@
       <h1>The week USDC lost its peg,<br />hour by hour.</h1>
       <p class="intro">
         The Chainlink USDC/USD answer next to what was burned and minted in each
-        hour, and who redeemed the most.
+        hour, and the addresses that burned the most.
       </p>
       <section class="scope" aria-label="Report scope">
         <div>
@@ -42,9 +42,6 @@
             aggregator.latest_answer</strong
           >
         </div>
-        <div>
-          <span class="label">NAMES</span><strong>ens.primary_name</strong>
-        </div>
       </section>
       <section
         id="headline"
@@ -60,8 +57,8 @@
       </section>
       <section class="results">
         <div class="section-heading">
-          <h2>Biggest redeemers</h2>
-          <span>senders to the zero address, names from ENS</span>
+          <h2>Biggest burning addresses</h2>
+          <span>senders to the zero address, Circle-controlled minters</span>
         </div>
         <div class="table-wrap">
           <table>
@@ -73,7 +70,7 @@
                 <th>Amount (USDC)</th>
               </tr>
             </thead>
-            <tbody id="redeemers"></tbody>
+            <tbody id="burners"></tbody>
           </table>
         </div>
       </section>

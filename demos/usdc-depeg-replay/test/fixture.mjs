@@ -2,14 +2,23 @@ import { writeFile } from "node:fs/promises";
 import { pathToFileURL } from "node:url";
 import spec from "../testril.json" with { type: "json" };
 import {
-  ensAddresses,
   feed,
   hourBlocks,
   hours,
+  mintsAndBurns,
   usdc,
   zeroAddress,
 } from "../src/report.mjs";
 
+const circle = "0x55fe002aeff02f77364de339a1292923a15844b8";
+const minters = Array.from(
+  { length: 6 },
+  (_, i) => `0x${String(i + 1).repeat(40)}`,
+);
+const holders = Array.from(
+  { length: 16 },
+  (_, i) => `0x${(i + 10).toString(16).repeat(20)}`,
+);
 const recordedAt = "2023-03-16T00:00:00.000Z";
 const startingSupply = 43900000000n;
 const dipStart = 36;
@@ -49,9 +58,7 @@ function feedRows(random) {
 }
 
 function edgeRows(random) {
-  const [circle, ...holders] = ensAddresses;
-  const redeemers = holders.slice(0, 6);
-  const pickRedeemer = () => redeemers[Math.floor(random() ** 2 * 6)];
+  const pickMinter = () => minters[Math.floor(random() ** 2 * minters.length)];
   const edges = [];
   const add = (hour, slot, from, to, dollars) =>
     edges.push({
@@ -63,17 +70,17 @@ function edgeRows(random) {
     });
   hours.forEach((_, hour) => {
     const depth = (1 - dollarPrice(hour)) / 0.12;
-    add(hour, 0, pickRedeemer(), zeroAddress, 2e6 + depth * 6e8 * random());
+    add(hour, 0, pickMinter(), zeroAddress, 2e6 + depth * 6e8 * random());
     if (depth > 0.4)
-      add(hour, 1, pickRedeemer(), zeroAddress, depth * 3e8 * random());
+      add(hour, 1, pickMinter(), zeroAddress, depth * 3e8 * random());
     if (hour >= mintStart)
       add(hour, 2, zeroAddress, circle, 4e7 + ((hour - mintStart) / 60) * 3e8);
     if (hour % 3 === 0)
       add(
         hour,
         3,
-        holders[6 + (hour % 8)],
-        holders[7 + (hour % 9)],
+        holders[hour % 8],
+        holders[8 + (hour % 8)],
         1e6 + random() * 5e7,
       );
   });
@@ -82,12 +89,9 @@ function edgeRows(random) {
 
 function supplyRows(edges, random) {
   let supply = raw(Number(startingSupply), random);
-  const netByHour = hours.map(() => 0n);
-  for (const edge of edges) {
-    const hour = hours.findIndex((_, i) => hourBlocks(i).to > edge.block);
-    if (edge.from === zeroAddress) netByHour[hour] += BigInt(edge.amount);
-    if (edge.to === zeroAddress) netByHour[hour] -= BigInt(edge.amount);
-  }
+  const netByHour = mintsAndBurns(edges).map(
+    ({ minted, burned }) => minted - burned,
+  );
   return hours.map((hour, index) => {
     if (index > 0) supply += netByHour[index];
     return { hour, token: usdc, total_supply: supply.toString() };
@@ -97,20 +101,6 @@ function supplyRows(edges, random) {
 export function fixture() {
   const random = seeded(7);
   const edges = edgeRows(random);
-  const ensRows = Object.fromEntries(
-    spec.binds
-      .filter((bind) => bind.function_slug === "ens.primary_name")
-      .map((bind) => [
-        bind.name,
-        [
-          {
-            block: bind.window.from_block,
-            address: bind.params.address,
-            name: bind.name === "ens-vitalik" ? "vitalik.eth" : "",
-          },
-        ],
-      ]),
-  );
   return {
     demo: spec.demo,
     source: "synthetic",
@@ -126,7 +116,6 @@ export function fixture() {
       supply: supplyRows(edges, random),
       "usdc-edges": edges,
       "usdc-usd-feed": feedRows(random),
-      ...ensRows,
     },
   };
 }

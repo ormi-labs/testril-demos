@@ -44,11 +44,11 @@ test("check fails when an hour of the answer is missing", () => {
   assert.throws(() => check(corrupted), new RegExp(`missing ${hours.at(-1)}`));
 });
 
-test("shape finds the bottom of the dip and the redeemers", () => {
+test("shape finds the bottom of the dip and the burning addresses", () => {
   const view = shape(rows());
   assert.match(view.lowest.price, /^\$0\.8[78]/);
   assert.ok(view.timeline.some((hour) => hour.netBurnMillions < 0));
   assert.ok(view.timeline.some((hour) => hour.netBurnMillions > 0));
-  assert.equal(view.redeemers.length, 6);
-  assert.ok(Number.parseFloat(view.redeemers[0].share) > 0);
+  assert.equal(view.burners.length, 6);
+  assert.ok(Number.parseFloat(view.burners[0].share) > 0);
 });
