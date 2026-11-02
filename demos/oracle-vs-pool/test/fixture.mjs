@@ -11,7 +11,7 @@ import {
 
 const recordedAt = "2026-11-02T00:00:00.000Z";
 const poolId = spec.binds[0].params.pool;
-const hourlyFeedUpdateBasisPoints = 15;
+const ethDeviationBasisPoints = 50;
 const usdcHeartbeatHours = 24;
 
 function seeded(seed) {
@@ -32,10 +32,14 @@ function marketWalk(random, start, volatility, hours) {
   });
 }
 
-function followMarket(market, thresholdBasisPoints) {
+function followMarket(market, thresholdBasisPoints, heartbeatHours) {
   let answer = market[0];
-  return market.map((price) => {
-    if (Math.abs(price / answer - 1) * 10000 > thresholdBasisPoints)
+  return market.map((price, i) => {
+    const heartbeatDue = i % heartbeatHours === 0;
+    if (
+      heartbeatDue ||
+      Math.abs(price / answer - 1) * 10000 > thresholdBasisPoints
+    )
       answer = price;
     return answer;
   });
@@ -47,8 +51,8 @@ export function fixture() {
   const ethMarket = marketWalk(random, 3180, 0.008, hours);
   const btcMarket = marketWalk(random, 98400, 0.006, hours);
   const feeds = [
-    [ethFeed, followMarket(ethMarket, hourlyFeedUpdateBasisPoints)],
-    [btcFeed, followMarket(btcMarket, 50)],
+    [ethFeed, followMarket(ethMarket, ethDeviationBasisPoints, 1)],
+    [btcFeed, followMarket(btcMarket, 50, Infinity)],
     [
       usdcFeed,
       hours.map((_, i) =>
@@ -75,7 +79,7 @@ export function fixture() {
         hour,
         pool: poolId,
         sqrt_price_x96: sqrtFromPrice(toScaled(poolPrices[i])).toString(),
-        tick: "-197833",
+        tick: String(tickFromDollars(poolPrices[i])),
         liquidity: String(71658789467938n + BigInt(i) * 1000000000n),
         lp_fee: "500",
         protocol_fee_zero_for_one: "0",
@@ -91,6 +95,9 @@ export function fixture() {
     },
   };
 }
+
+const tickFromDollars = (dollarsPerEth) =>
+  Math.floor(Math.log(dollarsPerEth * 1e-12) / Math.log(1.0001));
 
 function holdLast(answers) {
   let last;

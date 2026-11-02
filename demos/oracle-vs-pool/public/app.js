@@ -89,12 +89,12 @@ function priceChart({ series }) {
     ),
     svg(
       "text",
-      { x: pad.left + 12, y: pad.top + 16, class: "series-label" },
+      { x: pad.left + 12, y: pad.top - 40, class: "series-label" },
       "● Uniswap v4 pool",
     ),
     svg(
       "text",
-      { x: pad.left + 12, y: pad.top + 38, class: "series-label oracle" },
+      { x: pad.left + 12, y: pad.top - 18, class: "series-label oracle" },
       "● Chainlink ETH / USD",
     ),
   );
@@ -102,8 +102,16 @@ function priceChart({ series }) {
 }
 
 function render(report) {
-  const view = report.view;
   banner(report);
+  document
+    .querySelector("#checks")
+    .replaceChildren(
+      ...(report.checks.ok
+        ? report.checks.passed.map((text) => element("li", `✓ ${text}`))
+        : [element("li", `✗ ${report.checks.error}`, "failed")]),
+    );
+  if (!report.checks.ok) return;
+  const view = report.view;
   document.querySelector("#pool-window").textContent =
     `${view.poolWindow.from_hour} to ${view.poolWindow.to_hour} (exclusive)`;
   document
@@ -128,13 +136,6 @@ function render(report) {
       return row;
     }),
   );
-  document
-    .querySelector("#checks")
-    .replaceChildren(
-      ...(report.checks.ok
-        ? report.checks.passed.map((text) => element("li", `✓ ${text}`))
-        : [element("li", `✗ ${report.checks.error}`, "failed")]),
-    );
 }
 
 const response = await fetch("/api/report");
