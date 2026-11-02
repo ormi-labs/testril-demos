@@ -26,784 +26,784 @@
     "ticks": [
       {
         "block": 21689329,
-        "pool": "0xdce6394339af00981949f5f3baf27e3610c76326a700af57e4b3e3ae4977f78d",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
         "tick": "-196310",
         "liquidity_gross": "52000000000000",
         "liquidity_net": "52000000000000"
       },
       {
         "block": 21689329,
-        "pool": "0xdce6394339af00981949f5f3baf27e3610c76326a700af57e4b3e3ae4977f78d",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
         "tick": "-196070",
         "liquidity_gross": "52000000000000",
         "liquidity_net": "-52000000000000"
       },
       {
         "block": 21729329,
-        "pool": "0xdce6394339af00981949f5f3baf27e3610c76326a700af57e4b3e3ae4977f78d",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
         "tick": "-887270",
         "liquidity_gross": "9000000000000",
         "liquidity_net": "9000000000000"
       },
       {
         "block": 21729329,
-        "pool": "0xdce6394339af00981949f5f3baf27e3610c76326a700af57e4b3e3ae4977f78d",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
         "tick": "887270",
         "liquidity_gross": "9000000000000",
         "liquidity_net": "-9000000000000"
       },
       {
         "block": 21769329,
-        "pool": "0xdce6394339af00981949f5f3baf27e3610c76326a700af57e4b3e3ae4977f78d",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
         "tick": "-196860",
         "liquidity_gross": "3251407683361",
         "liquidity_net": "3251407683361"
       },
       {
         "block": 21769329,
-        "pool": "0xdce6394339af00981949f5f3baf27e3610c76326a700af57e4b3e3ae4977f78d",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
         "tick": "-196330",
         "liquidity_gross": "3251407683361",
         "liquidity_net": "-3251407683361"
       },
       {
         "block": 21809329,
-        "pool": "0xdce6394339af00981949f5f3baf27e3610c76326a700af57e4b3e3ae4977f78d",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
         "tick": "-195630",
         "liquidity_gross": "22531545652542",
         "liquidity_net": "22531545652542"
       },
       {
         "block": 21809329,
-        "pool": "0xdce6394339af00981949f5f3baf27e3610c76326a700af57e4b3e3ae4977f78d",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
         "tick": "-195530",
         "liquidity_gross": "22531545652542",
         "liquidity_net": "-22531545652542"
       },
       {
         "block": 21849329,
-        "pool": "0xdce6394339af00981949f5f3baf27e3610c76326a700af57e4b3e3ae4977f78d",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
         "tick": "-197810",
         "liquidity_gross": "9114983972628",
         "liquidity_net": "9114983972628"
       },
       {
         "block": 21849329,
-        "pool": "0xdce6394339af00981949f5f3baf27e3610c76326a700af57e4b3e3ae4977f78d",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
         "tick": "-195490",
         "liquidity_gross": "9114983972628",
         "liquidity_net": "-9114983972628"
       },
       {
         "block": 21889329,
-        "pool": "0xdce6394339af00981949f5f3baf27e3610c76326a700af57e4b3e3ae4977f78d",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
         "tick": "-197030",
         "liquidity_gross": "20253946135286",
         "liquidity_net": "20253946135286"
       },
       {
         "block": 21889329,
-        "pool": "0xdce6394339af00981949f5f3baf27e3610c76326a700af57e4b3e3ae4977f78d",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
         "tick": "-195990",
         "liquidity_gross": "20253946135286",
         "liquidity_net": "-20253946135286"
       },
       {
         "block": 21929329,
-        "pool": "0xdce6394339af00981949f5f3baf27e3610c76326a700af57e4b3e3ae4977f78d",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
         "tick": "-197360",
         "liquidity_gross": "12977991752792",
         "liquidity_net": "12977991752792"
       },
       {
         "block": 21929329,
-        "pool": "0xdce6394339af00981949f5f3baf27e3610c76326a700af57e4b3e3ae4977f78d",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
         "tick": "-195670",
         "liquidity_gross": "12977991752792",
         "liquidity_net": "-12977991752792"
       },
       {
         "block": 21969329,
-        "pool": "0xdce6394339af00981949f5f3baf27e3610c76326a700af57e4b3e3ae4977f78d",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
         "tick": "-198520",
         "liquidity_gross": "2079246050213",
         "liquidity_net": "2079246050213"
       },
       {
         "block": 21969329,
-        "pool": "0xdce6394339af00981949f5f3baf27e3610c76326a700af57e4b3e3ae4977f78d",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
         "tick": "-196290",
         "liquidity_gross": "2079246050213",
         "liquidity_net": "-2079246050213"
       },
       {
         "block": 22009329,
-        "pool": "0xdce6394339af00981949f5f3baf27e3610c76326a700af57e4b3e3ae4977f78d",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
         "tick": "-197050",
         "liquidity_gross": "2501926232595",
         "liquidity_net": "2501926232595"
       },
       {
         "block": 22009329,
-        "pool": "0xdce6394339af00981949f5f3baf27e3610c76326a700af57e4b3e3ae4977f78d",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
         "tick": "-195770",
         "liquidity_gross": "2501926232595",
         "liquidity_net": "-2501926232595"
       },
       {
         "block": 22049329,
-        "pool": "0xdce6394339af00981949f5f3baf27e3610c76326a700af57e4b3e3ae4977f78d",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
         "tick": "-198030",
         "liquidity_gross": "22854914727155",
         "liquidity_net": "22854914727155"
       },
       {
         "block": 22049329,
-        "pool": "0xdce6394339af00981949f5f3baf27e3610c76326a700af57e4b3e3ae4977f78d",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
         "tick": "-195610",
         "liquidity_gross": "22854914727155",
         "liquidity_net": "-22854914727155"
       },
       {
         "block": 22089329,
-        "pool": "0xdce6394339af00981949f5f3baf27e3610c76326a700af57e4b3e3ae4977f78d",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
         "tick": "-196500",
         "liquidity_gross": "24266129300464",
         "liquidity_net": "24266129300464"
       },
       {
         "block": 22089329,
-        "pool": "0xdce6394339af00981949f5f3baf27e3610c76326a700af57e4b3e3ae4977f78d",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
         "tick": "-195950",
         "liquidity_gross": "24266129300464",
         "liquidity_net": "-24266129300464"
       },
       {
         "block": 22129329,
-        "pool": "0xdce6394339af00981949f5f3baf27e3610c76326a700af57e4b3e3ae4977f78d",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
         "tick": "-198080",
         "liquidity_gross": "6297440050635",
         "liquidity_net": "6297440050635"
       },
       {
         "block": 22129329,
-        "pool": "0xdce6394339af00981949f5f3baf27e3610c76326a700af57e4b3e3ae4977f78d",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
         "tick": "-195340",
         "liquidity_gross": "6297440050635",
         "liquidity_net": "-6297440050635"
       },
       {
         "block": 22169329,
-        "pool": "0xdce6394339af00981949f5f3baf27e3610c76326a700af57e4b3e3ae4977f78d",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
         "tick": "-198120",
         "liquidity_gross": "29138883274514",
         "liquidity_net": "29138883274514"
       },
       {
         "block": 22169329,
-        "pool": "0xdce6394339af00981949f5f3baf27e3610c76326a700af57e4b3e3ae4977f78d",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
         "tick": "-196010",
         "liquidity_gross": "29138883274514",
         "liquidity_net": "-29138883274514"
       },
       {
         "block": 22209329,
-        "pool": "0xdce6394339af00981949f5f3baf27e3610c76326a700af57e4b3e3ae4977f78d",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
         "tick": "-196590",
         "liquidity_gross": "18800922209863",
         "liquidity_net": "18800922209863"
       },
       {
         "block": 22209329,
-        "pool": "0xdce6394339af00981949f5f3baf27e3610c76326a700af57e4b3e3ae4977f78d",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
         "tick": "-195750",
         "liquidity_gross": "18800922209863",
         "liquidity_net": "-18800922209863"
       },
       {
         "block": 22249329,
-        "pool": "0xdce6394339af00981949f5f3baf27e3610c76326a700af57e4b3e3ae4977f78d",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
         "tick": "-196350",
         "liquidity_gross": "19523504652549",
         "liquidity_net": "19523504652549"
       },
       {
         "block": 22249329,
-        "pool": "0xdce6394339af00981949f5f3baf27e3610c76326a700af57e4b3e3ae4977f78d",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
         "tick": "-196040",
         "liquidity_gross": "19523504652549",
         "liquidity_net": "-19523504652549"
       },
       {
         "block": 22289329,
-        "pool": "0xdce6394339af00981949f5f3baf27e3610c76326a700af57e4b3e3ae4977f78d",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
         "tick": "-197400",
         "liquidity_gross": "5120667448733",
         "liquidity_net": "5120667448733"
       },
       {
         "block": 22289329,
-        "pool": "0xdce6394339af00981949f5f3baf27e3610c76326a700af57e4b3e3ae4977f78d",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
         "tick": "-195240",
         "liquidity_gross": "5120667448733",
         "liquidity_net": "-5120667448733"
       },
       {
         "block": 22329329,
-        "pool": "0xdce6394339af00981949f5f3baf27e3610c76326a700af57e4b3e3ae4977f78d",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
         "tick": "-197920",
         "liquidity_gross": "18479437862057",
         "liquidity_net": "18479437862057"
       },
       {
         "block": 22329329,
-        "pool": "0xdce6394339af00981949f5f3baf27e3610c76326a700af57e4b3e3ae4977f78d",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
         "tick": "-197270",
         "liquidity_gross": "18479437862057",
         "liquidity_net": "-18479437862057"
       },
       {
         "block": 22369329,
-        "pool": "0xdce6394339af00981949f5f3baf27e3610c76326a700af57e4b3e3ae4977f78d",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
         "tick": "-197260",
         "liquidity_gross": "5931781815831",
         "liquidity_net": "5931781815831"
       },
       {
         "block": 22369329,
-        "pool": "0xdce6394339af00981949f5f3baf27e3610c76326a700af57e4b3e3ae4977f78d",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
         "tick": "-197110",
         "liquidity_gross": "5931781815831",
         "liquidity_net": "-5931781815831"
       },
       {
         "block": 22409329,
-        "pool": "0xdce6394339af00981949f5f3baf27e3610c76326a700af57e4b3e3ae4977f78d",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
         "tick": "-197440",
         "liquidity_gross": "10718349010218",
         "liquidity_net": "10718349010218"
       },
       {
         "block": 22409329,
-        "pool": "0xdce6394339af00981949f5f3baf27e3610c76326a700af57e4b3e3ae4977f78d",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
         "tick": "-197080",
         "liquidity_gross": "10718349010218",
         "liquidity_net": "-10718349010218"
       },
       {
         "block": 22449329,
-        "pool": "0xdce6394339af00981949f5f3baf27e3610c76326a700af57e4b3e3ae4977f78d",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
         "tick": "-195950",
         "liquidity_gross": "41528894214891",
         "liquidity_net": "-7003364386037"
       },
       {
         "block": 22449329,
-        "pool": "0xdce6394339af00981949f5f3baf27e3610c76326a700af57e4b3e3ae4977f78d",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
         "tick": "-195720",
         "liquidity_gross": "17262764914427",
         "liquidity_net": "-17262764914427"
       },
       {
         "block": 22489329,
-        "pool": "0xdce6394339af00981949f5f3baf27e3610c76326a700af57e4b3e3ae4977f78d",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
         "tick": "-197370",
         "liquidity_gross": "5475219633896",
         "liquidity_net": "5475219633896"
       },
       {
         "block": 22489329,
-        "pool": "0xdce6394339af00981949f5f3baf27e3610c76326a700af57e4b3e3ae4977f78d",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
         "tick": "-196760",
         "liquidity_gross": "5475219633896",
         "liquidity_net": "-5475219633896"
       },
       {
         "block": 22529329,
-        "pool": "0xdce6394339af00981949f5f3baf27e3610c76326a700af57e4b3e3ae4977f78d",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
         "tick": "-199290",
         "liquidity_gross": "1804103652481",
         "liquidity_net": "1804103652481"
       },
       {
         "block": 22529329,
-        "pool": "0xdce6394339af00981949f5f3baf27e3610c76326a700af57e4b3e3ae4977f78d",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
         "tick": "-195740",
         "liquidity_gross": "1804103652481",
         "liquidity_net": "-1804103652481"
       },
       {
         "block": 22569329,
-        "pool": "0xdce6394339af00981949f5f3baf27e3610c76326a700af57e4b3e3ae4977f78d",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
         "tick": "-197850",
         "liquidity_gross": "11254440449644",
         "liquidity_net": "11254440449644"
       },
       {
         "block": 22569329,
-        "pool": "0xdce6394339af00981949f5f3baf27e3610c76326a700af57e4b3e3ae4977f78d",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
         "tick": "-195480",
         "liquidity_gross": "11254440449644",
         "liquidity_net": "-11254440449644"
       },
       {
         "block": 22609329,
-        "pool": "0xdce6394339af00981949f5f3baf27e3610c76326a700af57e4b3e3ae4977f78d",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
         "tick": "-197600",
         "liquidity_gross": "22091865992639",
         "liquidity_net": "22091865992639"
       },
       {
         "block": 22609329,
-        "pool": "0xdce6394339af00981949f5f3baf27e3610c76326a700af57e4b3e3ae4977f78d",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
         "tick": "-196430",
         "liquidity_gross": "22091865992639",
         "liquidity_net": "-22091865992639"
       },
       {
         "block": 22649329,
-        "pool": "0xdce6394339af00981949f5f3baf27e3610c76326a700af57e4b3e3ae4977f78d",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
         "tick": "-197060",
         "liquidity_gross": "12450905103702",
         "liquidity_net": "12450905103702"
       },
       {
         "block": 22649329,
-        "pool": "0xdce6394339af00981949f5f3baf27e3610c76326a700af57e4b3e3ae4977f78d",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
         "tick": "-195470",
         "liquidity_gross": "12450905103702",
         "liquidity_net": "-12450905103702"
       },
       {
         "block": 22689329,
-        "pool": "0xdce6394339af00981949f5f3baf27e3610c76326a700af57e4b3e3ae4977f78d",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
         "tick": "-198310",
         "liquidity_gross": "15566294702236",
         "liquidity_net": "15566294702236"
       },
       {
         "block": 22689329,
-        "pool": "0xdce6394339af00981949f5f3baf27e3610c76326a700af57e4b3e3ae4977f78d",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
         "tick": "-195350",
         "liquidity_gross": "15566294702236",
         "liquidity_net": "-15566294702236"
       },
       {
         "block": 22689336,
-        "pool": "0xdce6394339af00981949f5f3baf27e3610c76326a700af57e4b3e3ae4977f78d",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
         "tick": "-197030",
         "liquidity_gross": "0",
         "liquidity_net": "0"
       },
       {
         "block": 22689336,
-        "pool": "0xdce6394339af00981949f5f3baf27e3610c76326a700af57e4b3e3ae4977f78d",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
         "tick": "-195990",
         "liquidity_gross": "0",
         "liquidity_net": "0"
       },
       {
         "block": 22729329,
-        "pool": "0xdce6394339af00981949f5f3baf27e3610c76326a700af57e4b3e3ae4977f78d",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
         "tick": "-196720",
         "liquidity_gross": "7846103921998",
         "liquidity_net": "7846103921998"
       },
       {
         "block": 22729329,
-        "pool": "0xdce6394339af00981949f5f3baf27e3610c76326a700af57e4b3e3ae4977f78d",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
         "tick": "-193640",
         "liquidity_gross": "7846103921998",
         "liquidity_net": "-7846103921998"
       },
       {
         "block": 22769329,
-        "pool": "0xdce6394339af00981949f5f3baf27e3610c76326a700af57e4b3e3ae4977f78d",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
         "tick": "-196180",
         "liquidity_gross": "21505401103292",
         "liquidity_net": "21505401103292"
       },
       {
         "block": 22769329,
-        "pool": "0xdce6394339af00981949f5f3baf27e3610c76326a700af57e4b3e3ae4977f78d",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
         "tick": "-196050",
         "liquidity_gross": "21505401103292",
         "liquidity_net": "-21505401103292"
       },
       {
         "block": 22809329,
-        "pool": "0xdce6394339af00981949f5f3baf27e3610c76326a700af57e4b3e3ae4977f78d",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
         "tick": "-197000",
         "liquidity_gross": "20979217660148",
         "liquidity_net": "20979217660148"
       },
       {
         "block": 22809329,
-        "pool": "0xdce6394339af00981949f5f3baf27e3610c76326a700af57e4b3e3ae4977f78d",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
         "tick": "-195940",
         "liquidity_gross": "20979217660148",
         "liquidity_net": "-20979217660148"
       },
       {
         "block": 22849329,
-        "pool": "0xdce6394339af00981949f5f3baf27e3610c76326a700af57e4b3e3ae4977f78d",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
         "tick": "-197870",
         "liquidity_gross": "19833558822516",
         "liquidity_net": "19833558822516"
       },
       {
         "block": 22849329,
-        "pool": "0xdce6394339af00981949f5f3baf27e3610c76326a700af57e4b3e3ae4977f78d",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
         "tick": "-194850",
         "liquidity_gross": "19833558822516",
         "liquidity_net": "-19833558822516"
       },
       {
         "block": 22889329,
-        "pool": "0xdce6394339af00981949f5f3baf27e3610c76326a700af57e4b3e3ae4977f78d",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
         "tick": "-197410",
         "liquidity_gross": "22393211253453",
         "liquidity_net": "22393211253453"
       },
       {
         "block": 22889329,
-        "pool": "0xdce6394339af00981949f5f3baf27e3610c76326a700af57e4b3e3ae4977f78d",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
         "tick": "-195170",
         "liquidity_gross": "22393211253453",
         "liquidity_net": "-22393211253453"
       },
       {
         "block": 22929329,
-        "pool": "0xdce6394339af00981949f5f3baf27e3610c76326a700af57e4b3e3ae4977f78d",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
         "tick": "-196520",
         "liquidity_gross": "11805097541306",
         "liquidity_net": "11805097541306"
       },
       {
         "block": 22929329,
-        "pool": "0xdce6394339af00981949f5f3baf27e3610c76326a700af57e4b3e3ae4977f78d",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
         "tick": "-195760",
         "liquidity_gross": "11805097541306",
         "liquidity_net": "-11805097541306"
       },
       {
         "block": 22929336,
-        "pool": "0xdce6394339af00981949f5f3baf27e3610c76326a700af57e4b3e3ae4977f78d",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
         "tick": "-198080",
         "liquidity_gross": "0",
         "liquidity_net": "0"
       },
       {
         "block": 22929336,
-        "pool": "0xdce6394339af00981949f5f3baf27e3610c76326a700af57e4b3e3ae4977f78d",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
         "tick": "-195340",
         "liquidity_gross": "0",
         "liquidity_net": "0"
       },
       {
         "block": 22969329,
-        "pool": "0xdce6394339af00981949f5f3baf27e3610c76326a700af57e4b3e3ae4977f78d",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
         "tick": "-196360",
         "liquidity_gross": "3755927566905",
         "liquidity_net": "3755927566905"
       },
       {
         "block": 22969329,
-        "pool": "0xdce6394339af00981949f5f3baf27e3610c76326a700af57e4b3e3ae4977f78d",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
         "tick": "-196260",
         "liquidity_gross": "3755927566905",
         "liquidity_net": "-3755927566905"
       },
       {
         "block": 23009329,
-        "pool": "0xdce6394339af00981949f5f3baf27e3610c76326a700af57e4b3e3ae4977f78d",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
         "tick": "-196390",
         "liquidity_gross": "12562896745745",
         "liquidity_net": "12562896745745"
       },
       {
         "block": 23009329,
-        "pool": "0xdce6394339af00981949f5f3baf27e3610c76326a700af57e4b3e3ae4977f78d",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
         "tick": "-195640",
         "liquidity_gross": "12562896745745",
         "liquidity_net": "-12562896745745"
       },
       {
         "block": 23049329,
-        "pool": "0xdce6394339af00981949f5f3baf27e3610c76326a700af57e4b3e3ae4977f78d",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
         "tick": "-197110",
         "liquidity_gross": "29787962961011",
         "liquidity_net": "17924399329349"
       },
       {
         "block": 23049329,
-        "pool": "0xdce6394339af00981949f5f3baf27e3610c76326a700af57e4b3e3ae4977f78d",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
         "tick": "-194080",
         "liquidity_gross": "23856181145180",
         "liquidity_net": "-23856181145180"
       },
       {
         "block": 23089329,
-        "pool": "0xdce6394339af00981949f5f3baf27e3610c76326a700af57e4b3e3ae4977f78d",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
         "tick": "-197170",
         "liquidity_gross": "15571979476605",
         "liquidity_net": "15571979476605"
       },
       {
         "block": 23089329,
-        "pool": "0xdce6394339af00981949f5f3baf27e3610c76326a700af57e4b3e3ae4977f78d",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
         "tick": "-195570",
         "liquidity_gross": "15571979476605",
         "liquidity_net": "-15571979476605"
       },
       {
         "block": 23129329,
-        "pool": "0xdce6394339af00981949f5f3baf27e3610c76326a700af57e4b3e3ae4977f78d",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
         "tick": "-196610",
         "liquidity_gross": "16474851962645",
         "liquidity_net": "16474851962645"
       },
       {
         "block": 23129329,
-        "pool": "0xdce6394339af00981949f5f3baf27e3610c76326a700af57e4b3e3ae4977f78d",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
         "tick": "-196150",
         "liquidity_gross": "16474851962645",
         "liquidity_net": "-16474851962645"
       },
       {
         "block": 23169329,
-        "pool": "0xdce6394339af00981949f5f3baf27e3610c76326a700af57e4b3e3ae4977f78d",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
         "tick": "-197070",
         "liquidity_gross": "18928106079344",
         "liquidity_net": "18928106079344"
       },
       {
         "block": 23169329,
-        "pool": "0xdce6394339af00981949f5f3baf27e3610c76326a700af57e4b3e3ae4977f78d",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
         "tick": "-195550",
         "liquidity_gross": "18928106079344",
         "liquidity_net": "-18928106079344"
       },
       {
         "block": 23169336,
-        "pool": "0xdce6394339af00981949f5f3baf27e3610c76326a700af57e4b3e3ae4977f78d",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
         "tick": "-197260",
         "liquidity_gross": "0",
         "liquidity_net": "0"
       },
       {
         "block": 23169336,
-        "pool": "0xdce6394339af00981949f5f3baf27e3610c76326a700af57e4b3e3ae4977f78d",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
         "tick": "-197110",
         "liquidity_gross": "23856181145180",
         "liquidity_net": "23856181145180"
       },
       {
         "block": 23209329,
-        "pool": "0xdce6394339af00981949f5f3baf27e3610c76326a700af57e4b3e3ae4977f78d",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
         "tick": "-197260",
         "liquidity_gross": "20130979173351",
         "liquidity_net": "20130979173351"
       },
       {
         "block": 23209329,
-        "pool": "0xdce6394339af00981949f5f3baf27e3610c76326a700af57e4b3e3ae4977f78d",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
         "tick": "-196300",
         "liquidity_gross": "20130979173351",
         "liquidity_net": "-20130979173351"
       },
       {
         "block": 23249329,
-        "pool": "0xdce6394339af00981949f5f3baf27e3610c76326a700af57e4b3e3ae4977f78d",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
         "tick": "-196920",
         "liquidity_gross": "23541367954109",
         "liquidity_net": "23541367954109"
       },
       {
         "block": 23249329,
-        "pool": "0xdce6394339af00981949f5f3baf27e3610c76326a700af57e4b3e3ae4977f78d",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
         "tick": "-194720",
         "liquidity_gross": "23541367954109",
         "liquidity_net": "-23541367954109"
       },
       {
         "block": 23289329,
-        "pool": "0xdce6394339af00981949f5f3baf27e3610c76326a700af57e4b3e3ae4977f78d",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
         "tick": "-197360",
         "liquidity_gross": "32680846613832",
         "liquidity_net": "32680846613832"
       },
       {
         "block": 23289329,
-        "pool": "0xdce6394339af00981949f5f3baf27e3610c76326a700af57e4b3e3ae4977f78d",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
         "tick": "-195430",
         "liquidity_gross": "19702854861040",
         "liquidity_net": "-19702854861040"
       },
       {
         "block": 23329329,
-        "pool": "0xdce6394339af00981949f5f3baf27e3610c76326a700af57e4b3e3ae4977f78d",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
         "tick": "-197150",
         "liquidity_gross": "3194781305734",
         "liquidity_net": "3194781305734"
       },
       {
         "block": 23329329,
-        "pool": "0xdce6394339af00981949f5f3baf27e3610c76326a700af57e4b3e3ae4977f78d",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
         "tick": "-195340",
         "liquidity_gross": "3194781305734",
         "liquidity_net": "-3194781305734"
       },
       {
         "block": 23369329,
-        "pool": "0xdce6394339af00981949f5f3baf27e3610c76326a700af57e4b3e3ae4977f78d",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
         "tick": "-197110",
         "liquidity_gross": "53780298934318",
         "liquidity_net": "53780298934318"
       },
       {
         "block": 23369329,
-        "pool": "0xdce6394339af00981949f5f3baf27e3610c76326a700af57e4b3e3ae4977f78d",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
         "tick": "-195130",
         "liquidity_gross": "29924117789138",
         "liquidity_net": "-29924117789138"
       },
       {
         "block": 23409329,
-        "pool": "0xdce6394339af00981949f5f3baf27e3610c76326a700af57e4b3e3ae4977f78d",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
         "tick": "-197960",
         "liquidity_gross": "26477880893741",
         "liquidity_net": "26477880893741"
       },
       {
         "block": 23409329,
-        "pool": "0xdce6394339af00981949f5f3baf27e3610c76326a700af57e4b3e3ae4977f78d",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
         "tick": "-194420",
         "liquidity_gross": "26477880893741",
         "liquidity_net": "-26477880893741"
       },
       {
         "block": 23409336,
-        "pool": "0xdce6394339af00981949f5f3baf27e3610c76326a700af57e4b3e3ae4977f78d",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
         "tick": "-197600",
         "liquidity_gross": "0",
         "liquidity_net": "0"
       },
       {
         "block": 23409336,
-        "pool": "0xdce6394339af00981949f5f3baf27e3610c76326a700af57e4b3e3ae4977f78d",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
         "tick": "-196430",
         "liquidity_gross": "0",
         "liquidity_net": "0"
       },
       {
         "block": 23449329,
-        "pool": "0xdce6394339af00981949f5f3baf27e3610c76326a700af57e4b3e3ae4977f78d",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
         "tick": "-196940",
         "liquidity_gross": "30754847150762",
         "liquidity_net": "30754847150762"
       },
       {
         "block": 23449329,
-        "pool": "0xdce6394339af00981949f5f3baf27e3610c76326a700af57e4b3e3ae4977f78d",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
         "tick": "-196570",
         "liquidity_gross": "30754847150762",
         "liquidity_net": "-30754847150762"
       },
       {
         "block": 23489329,
-        "pool": "0xdce6394339af00981949f5f3baf27e3610c76326a700af57e4b3e3ae4977f78d",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
         "tick": "-197130",
         "liquidity_gross": "20595313782338",
         "liquidity_net": "20595313782338"
       },
       {
         "block": 23489329,
-        "pool": "0xdce6394339af00981949f5f3baf27e3610c76326a700af57e4b3e3ae4977f78d",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
         "tick": "-196970",
         "liquidity_gross": "20595313782338",
         "liquidity_net": "-20595313782338"
       },
       {
         "block": 23529329,
-        "pool": "0xdce6394339af00981949f5f3baf27e3610c76326a700af57e4b3e3ae4977f78d",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
         "tick": "-195430",
         "liquidity_gross": "44330511179753",
         "liquidity_net": "4924801457673"
       },
       {
         "block": 23529329,
-        "pool": "0xdce6394339af00981949f5f3baf27e3610c76326a700af57e4b3e3ae4977f78d",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
         "tick": "-195320",
         "liquidity_gross": "24627656318713",
         "liquidity_net": "-24627656318713"
       },
       {
         "block": 23569329,
-        "pool": "0xdce6394339af00981949f5f3baf27e3610c76326a700af57e4b3e3ae4977f78d",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
         "tick": "-198140",
         "liquidity_gross": "17050433090422",
         "liquidity_net": "17050433090422"
       },
       {
         "block": 23569329,
-        "pool": "0xdce6394339af00981949f5f3baf27e3610c76326a700af57e4b3e3ae4977f78d",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
         "tick": "-194510",
         "liquidity_gross": "17050433090422",
         "liquidity_net": "-17050433090422"
       },
       {
         "block": 23649336,
-        "pool": "0xdce6394339af00981949f5f3baf27e3610c76326a700af57e4b3e3ae4977f78d",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
         "tick": "-197870",
         "liquidity_gross": "0",
         "liquidity_net": "0"
       },
       {
         "block": 23649336,
-        "pool": "0xdce6394339af00981949f5f3baf27e3610c76326a700af57e4b3e3ae4977f78d",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
         "tick": "-194850",
         "liquidity_gross": "0",
         "liquidity_net": "0"
       },
       {
         "block": 23889336,
-        "pool": "0xdce6394339af00981949f5f3baf27e3610c76326a700af57e4b3e3ae4977f78d",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
         "tick": "-197170",
         "liquidity_gross": "0",
         "liquidity_net": "0"
       },
       {
         "block": 23889336,
-        "pool": "0xdce6394339af00981949f5f3baf27e3610c76326a700af57e4b3e3ae4977f78d",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
         "tick": "-195570",
         "liquidity_gross": "0",
         "liquidity_net": "0"
       },
       {
         "block": 24129336,
-        "pool": "0xdce6394339af00981949f5f3baf27e3610c76326a700af57e4b3e3ae4977f78d",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
         "tick": "-197150",
         "liquidity_gross": "0",
         "liquidity_net": "0"
       },
       {
         "block": 24129336,
-        "pool": "0xdce6394339af00981949f5f3baf27e3610c76326a700af57e4b3e3ae4977f78d",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
         "tick": "-195340",
         "liquidity_gross": "0",
         "liquidity_net": "0"
       },
       {
         "block": 24369336,
-        "pool": "0xdce6394339af00981949f5f3baf27e3610c76326a700af57e4b3e3ae4977f78d",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
         "tick": "-198140",
         "liquidity_gross": "0",
         "liquidity_net": "0"
       },
       {
         "block": 24369336,
-        "pool": "0xdce6394339af00981949f5f3baf27e3610c76326a700af57e4b3e3ae4977f78d",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
         "tick": "-194510",
         "liquidity_gross": "0",
         "liquidity_net": "0"
@@ -812,7 +812,7 @@
     "pool-state": [
       {
         "day": "2026-11-01",
-        "pool": "0xdce6394339af00981949f5f3baf27e3610c76326a700af57e4b3e3ae4977f78d",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
         "tick": "-196310",
         "sqrt_price_x96": "4327966681620717368246272",
         "liquidity": "506833708077672",

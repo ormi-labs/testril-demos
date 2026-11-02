@@ -26,7 +26,7 @@ test("check fails when a tick's latest row is dropped and its stale row is read"
   ).tick;
   const latest = corrupted.ticks.findLast((row) => row.tick === tick);
   corrupted.ticks = corrupted.ticks.filter((row) => row !== latest);
-  assert.throws(() => check(corrupted));
+  assert.throws(() => check(corrupted), /in-range liquidity/);
 });
 
 test("check fails when the pool's tick sits below the edge that holds its range", () => {

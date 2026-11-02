@@ -16,6 +16,6 @@ test("server returns the shaped report and the page", async (t) => {
     page.headers.get("content-security-policy"),
     /default-src 'self'/,
   );
-  assert.match(await page.text(), /V4 Tick Heatmap/);
+  assert.match(await page.text(), /V4 tick liquidity histogram/);
   assert.equal((await fetch(`${base}/../testril.json`)).status, 404);
 });
