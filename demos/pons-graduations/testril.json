@@ -1,0 +1,82 @@
+{
+  "demo": "pons-graduations",
+  "binds": [
+    {
+      "name": "launches",
+      "function_slug": "pons.curve_list",
+      "chain_id": 46630,
+      "params": {
+        "factory": "0x7ed598bcef8bd9edd8c97a195c6d13f40801ec7e"
+      },
+      "window": {
+        "from_block": 0,
+        "to_block": 10000000
+      }
+    },
+    {
+      "name": "graduations",
+      "function_slug": "pons.graduated_pool_list",
+      "chain_id": 46630,
+      "params": {
+        "factory": "0x7ed598bcef8bd9edd8c97a195c6d13f40801ec7e",
+        "pool_manager": "REPLACE_WITH_V4_POSITION_MANAGER_ADDRESS"
+      },
+      "window": {
+        "from_block": 0,
+        "to_block": 10000000
+      }
+    },
+    {
+      "name": "curve-volume",
+      "function_slug": "pons.curve_volume",
+      "chain_id": 46630,
+      "params": {
+        "swap": {
+          "curve_list": {
+            "factory": "0x7ed598bcef8bd9edd8c97a195c6d13f40801ec7e"
+          }
+        },
+        "by": "day"
+      },
+      "window": {
+        "from_day": "2026-08-01",
+        "to_day": "2026-11-02"
+      }
+    },
+    {
+      "name": "pool-fees",
+      "function_slug": "pons.pool_fees",
+      "chain_id": 46630,
+      "params": {
+        "swap": {
+          "hook": "REPLACE_WITH_PONS_HOOK_ADDRESS",
+          "graduated_pool_list": {
+            "factory": "0x7ed598bcef8bd9edd8c97a195c6d13f40801ec7e",
+            "pool_manager": "REPLACE_WITH_V4_POSITION_MANAGER_ADDRESS"
+          }
+        },
+        "by": "day"
+      },
+      "window": {
+        "from_day": "2026-08-01",
+        "to_day": "2026-11-02"
+      }
+    },
+    {
+      "name": "pool-fee-sweep",
+      "function_slug": "pons.pool_fee_sweep",
+      "chain_id": 46630,
+      "params": {
+        "hook": "REPLACE_WITH_PONS_HOOK_ADDRESS",
+        "graduated_pool_list": {
+          "factory": "0x7ed598bcef8bd9edd8c97a195c6d13f40801ec7e",
+          "pool_manager": "REPLACE_WITH_V4_POSITION_MANAGER_ADDRESS"
+        }
+      },
+      "window": {
+        "from_block": 0,
+        "to_block": 10000000
+      }
+    }
+  ]
+}
