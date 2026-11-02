@@ -10,10 +10,18 @@ export const knownPools = {
   "0xb2cc224c1c9fee385f8ad6a55b4d94e92359dc59": {
     pair: "WETH / USDC",
     dollarSide: "volume1",
+    otherSide: "volume0",
+    otherDecimals: 18,
+    otherToken: "WETH",
+    priceBand: [500, 20000],
   },
   "0xfbb6eed8e7aa03b138556eedaf5d271a5e1e43ef": {
     pair: "USDC / cbBTC",
     dollarSide: "volume0",
+    otherSide: "volume1",
+    otherDecimals: 8,
+    otherToken: "cbBTC",
+    priceBand: [10000, 500000],
   },
 };
 
@@ -48,20 +56,25 @@ export function totalsByPool(rows) {
 const bySizeDescending = (a, b) => (b > a ? 1 : b < a ? -1 : 0);
 
 export function leaderboard(rows) {
-  return [...totalsByPool(rows)]
-    .map(([pool, total]) => ({ pool, ...total }))
-    .sort((a, b) =>
-      a.dollars !== null && b.dollars !== null
-        ? bySizeDescending(a.dollars, b.dollars)
-        : a.dollars !== null
-          ? -1
-          : b.dollars !== null
-            ? 1
-            : bySizeDescending(a.swaps, b.swaps),
-    );
+  const pools = [...totalsByPool(rows)].map(([pool, total]) => ({
+    pool,
+    ...total,
+  }));
+  const ranked = pools
+    .filter((entry) => entry.dollars !== null)
+    .sort((a, b) => bySizeDescending(a.dollars, b.dollars));
+  const unranked = pools
+    .filter((entry) => entry.dollars === null)
+    .sort((a, b) => bySizeDescending(a.swaps, b.swaps));
+  return { ranked, unranked };
 }
 
-export function check(rows) {
+const impliedPrice = (row, known) =>
+  Number(BigInt(row[known.dollarSide])) /
+  Number(dollar) /
+  (Number(BigInt(row[known.otherSide])) / 10 ** known.otherDecimals);
+
+export function check(rows, { ranked } = leaderboard(rows["pool-volume"])) {
   const poolRows = rows["pool-volume"];
   if (!poolRows.length) throw new Error("No pool volume rows.");
   const seen = new Set();
@@ -76,30 +89,33 @@ export function check(rows) {
     if (seen.has(key))
       throw new Error(`Two rows for ${row.pool} on ${row.day}.`);
     seen.add(key);
+    const known = knownPools[row.pool];
+    if (known) {
+      const price = impliedPrice(row, known);
+      const [low, high] = known.priceBand;
+      if (!(price >= low && price <= high))
+        throw new Error(
+          `${known.pair} on ${row.day} implies ${price} dollars per ${known.otherToken}, outside ${low} to ${high}: the dollar side is misread.`,
+        );
+    }
   }
 
-  const board = leaderboard(poolRows);
-  const ranked = board.filter((entry) => entry.dollars !== null);
-  ranked.slice(1).forEach((entry, index) => {
-    if (entry.dollars > ranked[index].dollars)
+  ranked.forEach((entry, index) => {
+    const summed = poolRows
+      .filter((row) => row.pool === entry.pool)
+      .reduce((sum, row) => sum + dollarVolume(row), 0n);
+    if (entry.dollars !== summed)
+      throw new Error(
+        `${entry.pool} is ranked with ${entry.dollars} but its rows sum to ${summed}.`,
+      );
+    if (index > 0 && entry.dollars > ranked[index - 1].dollars)
       throw new Error(`${entry.pool} outranks a pool with less dollar volume.`);
   });
-  const dollarsPerDay = new Map();
-  for (const row of poolRows) {
-    const dollars = dollarVolume(row);
-    if (dollars !== null)
-      dollarsPerDay.set(row.day, (dollarsPerDay.get(row.day) ?? 0n) + dollars);
-  }
-  const byDay = [...dollarsPerDay.values()].reduce((sum, v) => sum + v, 0n);
-  const byPool = ranked.reduce((sum, entry) => sum + entry.dollars, 0n);
-  if (byDay !== byPool)
-    throw new Error(
-      `Daily dollar volume sums to ${byDay} but pool totals sum to ${byPool}.`,
-    );
+  const total = ranked.reduce((sum, entry) => sum + entry.dollars, 0n);
   return [
     `Every one of the ${poolRows.length} pool-day rows has at least one swap`,
-    `${ranked.length} ranked pools are in descending order of dollar volume, ${formatUsd(byPool)} in total`,
-    `Per-day dollar volume sums to the same ${formatUsd(byDay)} as the pool totals`,
+    `Each known pool's dollar side implies a sane token price on every day, so no wei side was read as dollars`,
+    `${ranked.length} ranked pools are in descending order of dollar volume, each matching an independent sum of its rows, ${formatUsd(total)} in total`,
   ];
 }
 
@@ -131,8 +147,8 @@ function series(rows, pool) {
 
 export function shape(rows) {
   const poolRows = rows["pool-volume"];
-  const board = leaderboard(poolRows);
-  const ranked = board.filter((entry) => entry.dollars !== null);
+  const { ranked, unranked } = leaderboard(poolRows);
+  const board = [...ranked, ...unranked];
   const totalSwaps = board.reduce((sum, entry) => sum + entry.swaps, 0n);
   const totalDollars = ranked.reduce((sum, entry) => sum + entry.dollars, 0n);
   return {
@@ -149,12 +165,16 @@ export function shape(rows) {
       symbol: knownPools[entry.pool].pair,
       series: series(poolRows, entry.pool),
     })),
-    pools: board.map((entry, index) => ({
+    rankedPools: ranked.map((entry, index) => ({
       rank: String(index + 1),
       pool: shortAddress(entry.pool),
-      pair: knownPools[entry.pool]?.pair ?? "dollar side unknown",
+      pair: knownPools[entry.pool].pair,
       swaps: entry.swaps.toLocaleString("en-US"),
-      volume: entry.dollars === null ? "—" : formatUsd(entry.dollars),
+      volume: formatUsd(entry.dollars),
+    })),
+    unrankedPools: unranked.map((entry) => ({
+      pool: shortAddress(entry.pool),
+      swaps: entry.swaps.toLocaleString("en-US"),
     })),
   };
 }

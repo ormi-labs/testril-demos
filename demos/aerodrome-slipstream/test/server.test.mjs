@@ -10,7 +10,7 @@ test("server returns the shaped report and the page", async (t) => {
   const report = await (await fetch(`${base}/api/report`)).json();
   assert.equal(report.source, "synthetic");
   assert.equal(report.checks.ok, true);
-  assert.equal(report.view.charts[1].symbol, "USDC / cbBTC");
+  assert.equal(report.view.charts[0].symbol, "USDC / cbBTC");
   const page = await fetch(base);
   assert.match(
     page.headers.get("content-security-policy"),

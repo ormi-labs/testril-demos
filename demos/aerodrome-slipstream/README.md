@@ -2,9 +2,9 @@
 
 Swaps and volume per pool per day for every pool created by the Aerodrome
 Slipstream factory on Base, ranked by dollars traded. The page proves its
-numbers: every pool-day row has at least one swap, the ranking is in descending
-order of summed dollar volume, and the per-day totals add up to the same figure
-as the per-pool totals.
+numbers: every pool-day row has at least one swap, each known pool's dollar side
+implies a sane token price, and the ranking is in descending order of dollar
+volume that matches an independent sum of each pool's rows.
 
 **The shipped recording is synthetic.** `recordings/report.json` is generated
 by `test/fixture.mjs` and the page says so in its banner. The eight pools
@@ -28,7 +28,7 @@ npm start
 
 Open http://127.0.0.1:4180 (set `PORT` to change it). Expected result: the
 synthetic banner, four headline numbers, a daily dollar-volume line for each
-ranked pool, a table of all pools, and three passed cross-checks.
+ranked pool, a table of ranked pools, a table of unranked pools, and three passed cross-checks.
 
 ## Test
 
@@ -56,7 +56,7 @@ recording.
 - Volume is a pool's tokens paid in plus paid out, in raw units. Pools of
   different token pairs can only be compared in dollars, so the ranking uses
   the dollar side of the pools listed in `knownPools` in `src/report.mjs`. Any
-  other pool is listed after them by swaps, with no dollar volume.
+  other pool is listed in a separate table by swaps, with no dollar volume.
 
 | Pool         | Address                                      | Dollar side      | Note                    |
 | ------------ | -------------------------------------------- | ---------------- | ----------------------- |
@@ -74,7 +74,9 @@ USDC on Base is `0x833589fcd6edb6e08f4c7c32d4f71b54bda02913` with 6 decimals.
 ## Record real data
 
 Needs a funded payment channel and an operator key in `tools/prepare/.env`; both
-are absent after extraction from the repository.
+are absent after extraction from the repository. Verify the USDC / cbBTC pool is
+from the Slipstream factory first. Run from `demos/aerodrome-slipstream`; it
+writes `recordings/report.json` with source `"dev"`.
 
 ```sh
 npm run record
