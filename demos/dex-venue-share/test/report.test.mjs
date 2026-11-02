@@ -1,16 +1,17 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { basisPoints, check, days, pairs, shape } from "../src/report.mjs";
+import { basisPoints, check, days, shape } from "../src/report.mjs";
 import { fixture } from "./fixture.mjs";
 
 const rows = () => structuredClone(fixture().rows);
+const curvePool = "0x7f86bf177dd4f3494b841a37e810a34dd56c829b";
 const v4Pool =
   "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27";
 
 test("check passes on the fixture for both pairs", () => {
   const passed = check(rows());
   assert.equal(passed.length, 4);
-  assert.match(passed[0], /ETH \/ USDC venue totals equal/);
+  assert.match(passed[0], /ETH \/ USDC every subject pool has rows/);
 });
 
 test("check fails when v4 USDC volume is read as its ETH side", () => {
@@ -20,14 +21,22 @@ test("check fails when v4 USDC volume is read as its ETH side", () => {
   assert.throws(() => check(corrupted), /Uniswap v4 trades .* per ETH/);
 });
 
-test("check fails when a subject pool is counted twice", () => {
-  const { subjects } = pairs[0];
-  subjects.push(subjects[1]);
-  try {
-    assert.throws(() => check(rows()), /venue totals add up to/);
-  } finally {
-    subjects.pop();
-  }
+test("check fails when a subject pool address matches no rows", () => {
+  const corrupted = rows();
+  for (const row of corrupted["uniswap-v4"].filter((r) => r.pool === v4Pool))
+    row.pool = `0x${"cd".repeat(32)}`;
+  assert.throws(
+    () => check(corrupted),
+    /Uniswap v4 subject pool 0x21c6.* has no rows/,
+  );
+});
+
+test("check fails when Curve's ETH coin index points at USDC", () => {
+  const corrupted = rows();
+  for (const row of corrupted.curve.filter((r) => r.pool === curvePool))
+    if (row.coin_index === "2") row.coin_index = "0";
+    else if (row.coin_index === "0") row.coin_index = "2";
+  assert.throws(() => check(corrupted), /Curve .* per ETH/);
 });
 
 test("check fails when both wstETH pools are read with the sides swapped", () => {

@@ -4,8 +4,8 @@ Daily share of ETH volume across selected ETH/USDC pools of Uniswap v2, v3,
 v4, Curve and Fluid on Ethereum (four Uniswap v3 fee tiers, one pool each for
 the others, so shares are of the selected pools, not of each venue), how
 Uniswap v3 splits across its fee tiers, and a two-pool comparison of Fluid and
-Uniswap v3 in wstETH/ETH. The page proves its numbers: each day's venue totals
-must equal the subject pools' ETH-side rows, and every priced pool's USDC (or
+Uniswap v3 in wstETH/ETH. The page proves its numbers: every subject pool must have
+rows (a wrong address fails the check), and every priced pool's USDC (or
 wstETH) per ETH must sit within 5% of the first pool's price and inside a
 broad band (500 to 20,000 USDC per ETH, below 1 wstETH per ETH), which fails
 if a pool's ETH side is read from the wrong token column.
@@ -62,9 +62,11 @@ recording.
   sorts native ETH (address 0) first. These side claims are assumptions to
   check against `fluid_dex.pool_list` and the v4 pool key before recording.
   `src/report.mjs` records which field holds the ETH side of each pool.
-- Curve rows are per coin index and cannot isolate a pair. The Curve figure is
-  all WETH volume (coin 2) of the TricryptoUSDC pool, including WETH/WBTC
-  exchanges, and Curve is left out of the price checks. Pair-level flow would
+- Curve rows are per coin index and cannot isolate a pair. The Curve series,
+  labelled "Curve (all WETH in TricryptoUSDC)", is all WETH volume (coin 2) of
+  the TricryptoUSDC pool, including WETH/WBTC exchanges, so its share is not
+  ETH/USDC pair volume. Its USDC (coin 0) volume covers all that pool's trades,
+  so it is only held to the broad price band, which catches a wrong coin index. Pair-level flow would
   need `curve.exchange`.
 - Uniswap v4 and Fluid count native ETH, the others WETH; the demo treats both
   as ETH.

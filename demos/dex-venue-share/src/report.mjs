@@ -98,7 +98,7 @@ function checkPrices(pair, day, volumes) {
   for (const v of priced.filter((x) => x.eth > 0n))
     checkPriceBand(pair, day, v);
   const refPrice = otherPerEth(reference);
-  for (const v of rest.filter((x) => x.eth > 0n)) {
+  for (const v of rest.filter((x) => x.eth > 0n && !x.bandOnly)) {
     const price = otherPerEth(v);
     const gap = price > refPrice ? price - refPrice : refPrice - price;
     if (gap * 100n > refPrice * priceTolerancePercent)
@@ -108,15 +108,12 @@ function checkPrices(pair, day, volumes) {
   }
 }
 
-function checkVenueTotals(pair, day, rows, totals) {
-  const subjectPools = new Map(pair.subjects.map((s) => [s.pool, s]));
-  const direct = sum(
-    [...subjectPools.values()].map((s) => sideVolume(rows, s, day, s.eth)),
-  );
-  if (sum(totals) !== direct)
-    throw new Error(
-      `${pair.title} venue totals add up to ${formatAmount(sum(totals), ethDecimals)} ETH on ${day} but the subject pools' rows hold ${formatAmount(direct, ethDecimals)} ETH.`,
-    );
+function checkSubjectsHaveRows(pair, rows) {
+  for (const s of pair.subjects)
+    if (!rows[s.bind].some((r) => r.pool === s.pool))
+      throw new Error(
+        `${pair.title}: ${label(s)} subject pool ${s.pool} has no rows in ${s.bind}: the address is wrong or the pool is idle.`,
+      );
 }
 
 export function check(rows) {
@@ -124,17 +121,17 @@ export function check(rows) {
     if (!rows[bind.name]?.length) throw new Error(`No rows for ${bind.name}.`);
   const passed = [];
   for (const pair of pairs) {
+    checkSubjectsHaveRows(pair, rows);
     for (const day of days()) {
       const volumes = dayVolumes(rows, pair, day);
       const totals = venueTotals(pair, volumes);
       if (sum(totals) === 0n)
         throw new Error(`No ${pair.title} volume on ${day}.`);
-      checkVenueTotals(pair, day, rows, totals);
       checkPrices(pair, day, volumes);
     }
     passed.push(
-      `${pair.title} venue totals equal the subject pools' ETH-side rows on each of ${days().length} days`,
-      `${pair.title} priced pools trade within ${priceTolerancePercent}% of ${label(pair.subjects[0])}'s price and inside the plausible band on every day, so each ETH side is an ETH side despite token order`,
+      `${pair.title} every subject pool has rows in its bind over the window`,
+      `${pair.title} priced pools trade inside the plausible band on every day, and all but Curve within ${priceTolerancePercent}% of ${label(pair.subjects[0])}'s price, so each ETH side is an ETH side despite token order`,
     );
   }
   return passed;

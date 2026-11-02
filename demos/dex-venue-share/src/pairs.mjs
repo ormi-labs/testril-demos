@@ -13,11 +13,14 @@ const wstethPools = {
   fluid: "0x0b1a513ee24972daef112bc777a5610d4325c9e7",
 };
 
+const curveVenue = "Curve (all WETH in TricryptoUSDC)";
+
 // `eth` and `other` name the row field holding each side. Fluid and Uniswap v2
 // and v3 sort tokens by address: USDC and wstETH sort before WETH and the
 // 0xEeee native-ETH sentinel; v4 sorts native ETH (address 0) first. Curve rows
-// are per coin index and cannot isolate one pair, so its subject has no `other`
-// side: it counts all WETH volume of the tricrypto pool and skips price checks.
+// are per coin index and cannot isolate one pair, so its subject counts all
+// WETH volume (coin 2) of the tricrypto pool. Its `other` side is USDC (coin 0)
+// across all that pool's trades, so it is only held to the plausible band.
 export const pairs = [
   {
     id: "eth-usdc",
@@ -71,7 +74,14 @@ export const pairs = [
         eth: "volume0",
         other: "volume1",
       },
-      { venue: "Curve", bind: "curve", pool: usdcPools.curve, eth: "coin:2" },
+      {
+        venue: curveVenue,
+        bind: "curve",
+        pool: usdcPools.curve,
+        eth: "coin:2",
+        other: "coin:0",
+        bandOnly: true,
+      },
       {
         venue: "Fluid",
         bind: "fluid-dex",
