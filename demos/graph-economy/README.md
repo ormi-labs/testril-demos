@@ -4,8 +4,7 @@ One week of The Graph on Arbitrum: which indexers earned the most indexing
 rewards, how much of that went to their delegators, how large each indexer's
 delegation pool is, and how many query fees the network collected in each Graph
 epoch. The page proves its numbers: on every reward row indexer plus delegator
-rewards must equal the amount, and on every query fee row indexer, curator and
-tax fees must equal the total.
+rewards must equal the amount, and per-indexer rewards must add up to the totals.
 
 **The shipped recording is synthetic.** `recordings/report.json` is generated
 by `test/fixture.mjs` and the page says so in its banner. Record real data with
@@ -29,7 +28,7 @@ npm start
 Open http://127.0.0.1:4180 (set `PORT` to change it). Expected result: the
 synthetic banner, four headline numbers, query fees per epoch as bars, a table
 of the top 10 indexers by rewards with delegators' cut, delegation pool and
-delegator yield, and four passed cross-checks.
+delegator yield, and three passed cross-checks.
 
 ## Test
 
@@ -43,9 +42,9 @@ npm run format:check
 
 `npm test` checks the cross-check passes on the fixture and fails when an
 indexer share is in whole GRT instead of wei, when a reward log is counted
-twice, when a delegator holds more shares than the pool, or when a fee row
-ignores the tax; and that the shaped report ranks indexers, takes each pool
-from the last delegation row and subtracts undelegations. `npm run test:browser`
+twice, or when a delegator holds more shares than the pool; and that the
+shaped report ranks indexers, takes each pool from the last delegation row,
+credits a reward to the indexer its row names and subtracts undelegations. `npm run test:browser`
 writes `docs/screenshot-desktop.png`. `npm run fixture` regenerates the
 synthetic recording.
 
@@ -66,7 +65,7 @@ SubgraphService below.
 | GraphPayments   | `0x7aae8ae011927bc36cb4d0d3e81f2e6e30dae06d` | Controller `GraphPayments`              |
 
 Window: Arbitrum blocks `[518282017, 520415225)`, the seven UTC days
-2026-10-26 to 2026-11-01. Both ends are the first block at or after midnight
+2026-10-26 to 2026-11-01. Both ends were confirmed by block timestamp: 518282017 is 2026-10-26 00:00:00 UTC (its predecessor is 2026-10-25 23:59:59) and 520415225 is 2026-11-02 00:00:00 UTC. Both ends are the first block at or after midnight
 UTC (2026-10-26 and 2026-11-02), found by binary search over the public
 Arbitrum RPC, not through Testril.
 
