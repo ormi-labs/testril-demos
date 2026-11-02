@@ -7,25 +7,26 @@ const recordedAt = "2026-11-02T00:00:00.000Z";
 const wei = 10n ** 18n;
 const wstethPerEth = 0.82;
 const noisePools = {
-  "uniswap-v2": ["0xa478c2975ab1ea89e8196811f51a7b7ade33eb11"],
+  "uniswap-v2": ["0x0d4a11d5eeaac28ec3f61d100daf4d40471f1852"],
   "uniswap-v3": ["0xcbcdf9626bc03e24f779434178a73a0b4bad62ed"],
   "uniswap-v4": [`0x${"ab".repeat(32)}`],
   "fluid-dex": ["0x0000000000000000000000000000000000f1d001"],
+  curve: ["0xf5f5b97624542d72a9e06f04804bf81baa15e2b4"],
 };
-// [ETH-side volume on the first day, change per day]
 const plan = {
-  "0xb4e16d0168e52d35cacd2c6185b44281ec28c9dc": [7000, -300],
-  "0x88e6a0c2ddd26feeb64f039a2c41296fcb3f5640": [64000, -2600],
-  "0x8ad599c3a0ff1de082011efddc58f1908eb6e6d8": [21000, -400],
-  "0xe0554a476a092703abdb3ef35c80e0d76d32939f": [2800, 0],
-  "0x7bea39867e4169dbe237d55c8242a8f2fcdcc387": [900, -40],
-  "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27": [
-    26000, 2200,
-  ],
-  "0x7f86bf177dd4f3494b841a37e810a34dd56c829b": [5200, 100],
-  "0x2886a01a0645390872a9eb99dae1283664b0c524": [3100, 450],
-  "0x109830a1aaad605bbf02a9dfa7b0b92ec2fb7daa": [9000, -650],
-  "0x0b1a513ee24972daef112bc777a5610d4325c9e7": [4200, 700],
+  "0xb4e16d0168e52d35cacd2c6185b44281ec28c9dc": { start: 7000, perDay: -300 },
+  "0x88e6a0c2ddd26feeb64f039a2c41296fcb3f5640": { start: 64000, perDay: -2600 },
+  "0x8ad599c3a0ff1de082011efddc58f1908eb6e6d8": { start: 21000, perDay: -400 },
+  "0xe0554a476a092703abdb3ef35c80e0d76d32939f": { start: 2800, perDay: 0 },
+  "0x7bea39867e4169dbe237d55c8242a8f2fcdcc387": { start: 900, perDay: -40 },
+  "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27": {
+    start: 26000,
+    perDay: 2200,
+  },
+  "0x7f86bf177dd4f3494b841a37e810a34dd56c829b": { start: 5200, perDay: 100 },
+  "0x2886a01a0645390872a9eb99dae1283664b0c524": { start: 3100, perDay: 450 },
+  "0x109830a1aaad605bbf02a9dfa7b0b92ec2fb7daa": { start: 9000, perDay: -650 },
+  "0x0b1a513ee24972daef112bc777a5610d4325c9e7": { start: 4200, perDay: 700 },
 };
 
 function seeded(seed) {
@@ -39,6 +40,20 @@ function seeded(seed) {
 const rawUnits = (amount, decimals, random) =>
   BigInt(Math.round(amount * 100)) * 10n ** BigInt(decimals - 2) +
   BigInt(Math.floor(random() * 1e6));
+
+function coinRows(pool, day, swaps, amounts, random) {
+  return amounts.map((amount, coin) => {
+    const bought = (amount * BigInt(30 + Math.floor(random() * 40))) / 100n;
+    return {
+      coin_index: String(coin),
+      day,
+      pool,
+      swaps,
+      volume_in: (amount - bought).toString(),
+      volume_out: bought.toString(),
+    };
+  });
+}
 
 function poolRows(s, day, eth, other, random) {
   const swaps = String(200 + Math.floor(random() * 4000));
@@ -54,28 +69,26 @@ function poolRows(s, day, eth, other, random) {
         [s.other]: other.toString(),
       },
     ];
-  const coinRow = (coin, amount) => {
-    const bought = (amount * BigInt(30 + Math.floor(random() * 40))) / 100n;
-    return {
-      coin_index: coin,
-      day,
-      pool: s.pool,
-      swaps,
-      volume_in: (amount - bought).toString(),
-      volume_out: bought.toString(),
-    };
-  };
-  return [coinRow("0", other), coinRow("1", wei / 10n), coinRow("2", eth)];
+  return coinRows(s.pool, day, swaps, [other, wei / 10n, eth], random);
 }
 
 function noiseRows(bind, day, random) {
-  return (noisePools[bind] ?? []).map((pool) => ({
-    day,
-    pool,
-    swaps: String(1 + Math.floor(random() * 90)),
-    volume0: rawUnits(40 + random() * 900, 18, random).toString(),
-    volume1: rawUnits(9e4 + random() * 4e6, 6, random).toString(),
-  }));
+  return (noisePools[bind] ?? []).flatMap((pool) => {
+    const swaps = String(1 + Math.floor(random() * 90));
+    const ethSide = rawUnits(40 + random() * 900, 18, random);
+    const usdcSide = rawUnits(9e4 + random() * 4e6, 6, random);
+    if (bind === "curve")
+      return coinRows(pool, day, swaps, [usdcSide, wei / 10n, ethSide], random);
+    return [
+      {
+        day,
+        pool,
+        swaps,
+        volume0: ethSide.toString(),
+        volume1: usdcSide.toString(),
+      },
+    ];
+  });
 }
 
 export function fixture() {
@@ -86,8 +99,8 @@ export function fixture() {
     usdcPerEth *= 1 + (random() - 0.5) * 0.03;
     for (const pair of pairs)
       for (const s of pair.subjects) {
-        const [start, change] = plan[s.pool];
-        const ethAmount = start + change * index;
+        const { start, perDay } = plan[s.pool];
+        const ethAmount = start + perDay * index;
         const otherPerEth = pair.id === "eth-usdc" ? usdcPerEth : wstethPerEth;
         const drift = 1 + (random() - 0.5) * 0.02;
         rows[s.bind].push(

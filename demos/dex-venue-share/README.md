@@ -1,11 +1,14 @@
 # DEX venue share
 
-Daily share of ETH volume across the ETH/USDC pools of Uniswap v2, v3, v4,
-Curve and Fluid on Ethereum, how Uniswap v3 splits across its fee tiers, and
-whether Fluid is taking the wstETH/ETH pair from Uniswap v3. The page proves
-its numbers: each day's venue shares must sum to 100%, and every pool's
-USDC (or wstETH) per ETH must sit within 5% of the first pool's price, which
-fails if a pool's ETH side is read from the wrong token column.
+Daily share of ETH volume across selected ETH/USDC pools of Uniswap v2, v3,
+v4, Curve and Fluid on Ethereum (four Uniswap v3 fee tiers, one pool each for
+the others, so shares are of the selected pools, not of each venue), how
+Uniswap v3 splits across its fee tiers, and a two-pool comparison of Fluid and
+Uniswap v3 in wstETH/ETH. The page proves its numbers: each day's venue totals
+must equal the subject pools' ETH-side rows, and every priced pool's USDC (or
+wstETH) per ETH must sit within 5% of the first pool's price and inside a
+broad band (500 to 20,000 USDC per ETH, below 1 wstETH per ETH), which fails
+if a pool's ETH side is read from the wrong token column.
 
 **The shipped recording is synthetic.** `recordings/report.json` is generated
 by `test/fixture.mjs` and the page says so in its banner. Record real data with
@@ -29,7 +32,7 @@ npm start
 Open http://127.0.0.1:4180 (set `PORT` to change it). Expected result: the
 synthetic banner, four headline numbers, a stacked share chart per day for
 ETH/USDC, the Uniswap v3 fee-tier table, a stacked share chart for
-wstETH/ETH, and four passed cross-checks.
+wstETH/ETH, and four passed cross-checks and the reading notes.
 
 ## Test
 
@@ -42,8 +45,8 @@ npm run format:check
 ```
 
 `npm test` checks the cross-checks pass on the fixture and fail when v4's
-USDC side is read as ETH, when Curve's coin indexes are swapped, or when a day
-has no volume, that leftover basis points go to the largest remainders, and
+USDC side is read as ETH, when a subject pool is counted twice, when both
+wstETH pools have their sides swapped, or when a day has no volume, that leftover basis points go to the largest remainders, and
 that the server returns the shaped report. `npm run test:browser` writes
 `docs/screenshot-desktop.png`. `npm run fixture` regenerates the synthetic
 recording.
@@ -54,14 +57,23 @@ recording.
   is bound to its factory (or the v4 pool manager) and reads every pool; the
   report picks the subject pools below.
 - Measure: the ETH side of each pool, paid in plus paid out, in raw 18-decimal
-  units. Uniswap v2 and v3 list USDC as token0 and WETH as token1, v4 and
-  Fluid list native ETH first, and Curve rows are per coin index (2 is WETH,
-  0 is USDC in the tricrypto pool). `src/report.mjs` records which field holds
-  the ETH side of each pool.
+  units. Uniswap v2, v3 and Fluid sort tokens by address, so USDC and wstETH
+  are token0 and WETH or the native-ETH sentinel (`0xEeee...`) is token1; v4
+  sorts native ETH (address 0) first. These side claims are assumptions to
+  check against `fluid_dex.pool_list` and the v4 pool key before recording.
+  `src/report.mjs` records which field holds the ETH side of each pool.
+- Curve rows are per coin index and cannot isolate a pair. The Curve figure is
+  all WETH volume (coin 2) of the TricryptoUSDC pool, including WETH/WBTC
+  exchanges, and Curve is left out of the price checks. Pair-level flow would
+  need `curve.exchange`.
 - Uniswap v4 and Fluid count native ETH, the others WETH; the demo treats both
   as ETH.
-- wstETH/ETH compares Fluid with Uniswap v3's 0.01% pool. No Uniswap v4
-  wstETH/ETH pool is included.
+- Shares are of the selected pools: four Uniswap v3 fee tiers, one pool each
+  for v2, v4, Curve and Fluid. Other v4 ETH/USDC pool ids are not included.
+- wstETH/ETH is a two-pool comparison of Fluid and Uniswap v3's 0.01% pool.
+  Curve stETH/ETH (`0xdc24316b9ae028f1497c275eb9192a3ea0f67022`) is not
+  deployed by the Tricrypto-NG factory, so the Curve bind cannot reach it, and
+  no Uniswap v4 wstETH/ETH pool is included.
 - All addresses are lowercase.
 
 | Subject                      | Address                                                              | Note                    |
@@ -82,9 +94,10 @@ recording.
 | Uniswap v3 wstETH/WETH 0.01% | `0x109830a1aaad605bbf02a9dfa7b0b92ec2fb7daa`                         | verify before recording |
 | Fluid wstETH/ETH dex pool    | `0x0b1a513ee24972daef112bc777a5610d4325c9e7`                         | verify before recording |
 
-For Uniswap v4 and Fluid, also verify that ETH is the token0 side; for the
-Curve pool, that coin 2 is WETH and coin 0 is USDC. The price cross-check
-fails on a wrong side.
+Also verify token0/token1 of both Fluid pools in `fluid_dex.pool_list` (the
+ETH/USDC pool's address and order are the least certain), that ETH is the
+token0 side of the v4 pool, and that Curve coin 2 is WETH. The price
+cross-check fails on a wrong side.
 
 ## Binds (`testril.json`)
 

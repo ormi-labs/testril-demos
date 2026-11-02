@@ -23,9 +23,10 @@
       <div class="eyebrow">ETHEREUM · UNISWAP V2 / V3 / V4 · CURVE · FLUID</div>
       <h1>Same pair,<br />five venues.</h1>
       <p class="intro">
-        Each day's share of ETH volume in the ETH/USDC pools of five venues, how
-        Uniswap v3 splits across fee tiers, and whether Fluid is taking the
-        wstETH/ETH pair.
+        Each day's share of ETH volume across selected ETH/USDC pools of five
+        venues (four Uniswap v3 fee tiers, one pool each for the others), how
+        Uniswap v3 splits across fee tiers, and a two-pool comparison of Fluid
+        and Uniswap v3 in wstETH/ETH.
       </p>
       <section class="scope" aria-label="Report scope">
         <div>
@@ -51,7 +52,7 @@
       <section class="results">
         <div class="section-heading">
           <h2>ETH / USDC share by venue</h2>
-          <span>each bar is one UTC day, 100% of the five venues</span>
+          <span>each bar is one UTC day, 100% of the selected pools</span>
         </div>
         <div id="chart-eth-usdc" class="chart"></div>
         <ul id="legend-eth-usdc" class="legend"></ul>
@@ -82,6 +83,22 @@
         </div>
         <div id="chart-wsteth-eth" class="chart"></div>
         <ul id="legend-wsteth-eth" class="legend"></ul>
+      </section>
+      <section class="method">
+        <h2>Reading notes</h2>
+        <ul>
+          <li>
+            Shares are of the selected pools, not of every pool a venue runs.
+          </li>
+          <li>
+            Curve's figure is all WETH volume of the TricryptoUSDC pool,
+            including WETH/WBTC exchanges; it is left out of the price checks.
+          </li>
+          <li>
+            wstETH/ETH has two pools. Curve stETH/ETH is not deployed by the
+            Curve factory, so it cannot be bound here.
+          </li>
+        </ul>
       </section>
       <section class="method">
         <h2>Cross-check</h2>
