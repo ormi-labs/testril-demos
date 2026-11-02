@@ -99,7 +99,11 @@ function lineChart({ symbol, series }) {
   return frame(`${symbol} per day`, days, max, (x, y) => [
     svg(
       "text",
-      { x: pad.left + 60, y: pad.top + 18, class: "series-label" },
+      {
+        x: width - pad.right,
+        y: height - pad.bottom - 8,
+        class: "series-label end",
+      },
       symbol,
     ),
     svg("polyline", {
@@ -109,12 +113,24 @@ function lineChart({ symbol, series }) {
   ]);
 }
 
+function renderChecks(checks) {
+  document
+    .querySelector("#checks")
+    .replaceChildren(
+      ...(checks.ok
+        ? checks.passed.map((text) => element("li", `✓ ${text}`))
+        : [element("li", `✗ ${checks.error}`, "failed")]),
+    );
+}
+
 function render(report) {
   const view = report.view;
   banner(report);
+  renderChecks(report.checks);
+  if (!view) return;
   document.querySelector("#window").textContent =
     `${view.window.from_day} to ${view.window.to_day} (exclusive)`;
-  const [steth, vaults, wbeth, eigenlayer] = view.venues;
+  const [, vaults, wbeth] = view.venues;
   document
     .querySelector("#headline")
     .replaceChildren(
@@ -127,9 +143,7 @@ function render(report) {
         `${view.stmatic.change} over the quarter`,
       ),
     );
-  document
-    .querySelector("#stack")
-    .replaceChildren(stackedArea([steth, vaults, wbeth, eigenlayer]));
+  document.querySelector("#stack").replaceChildren(stackedArea(view.venues));
   document.querySelector("#legend").replaceChildren(
     ...view.venues.map((venue, v) => {
       const item = element("span", venue.symbol);
@@ -141,7 +155,7 @@ function render(report) {
     .querySelector("#lines")
     .replaceChildren(lineChart(vaults), lineChart(view.stmatic));
   document.querySelector("#venues").replaceChildren(
-    ...[...view.venues, view.stmatic].map((venue) => {
+    ...[...view.venues, view.eigenlayer, view.stmatic].map((venue) => {
       const row = element("tr");
       row.append(
         element("td", venue.symbol),
@@ -153,13 +167,6 @@ function render(report) {
       return row;
     }),
   );
-  document
-    .querySelector("#checks")
-    .replaceChildren(
-      ...(report.checks.ok
-        ? report.checks.passed.map((text) => element("li", `✓ ${text}`))
-        : [element("li", `✗ ${report.checks.error}`, "failed")]),
-    );
 }
 
 render(await (await fetch("/api/report")).json());

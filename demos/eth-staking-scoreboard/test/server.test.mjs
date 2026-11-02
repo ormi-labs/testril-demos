@@ -1,6 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { createApp } from "../src/server.mjs";
+import { fixture } from "./fixture.mjs";
+import { createApp, report } from "../src/server.mjs";
 
 test("server returns the shaped report and the page", async (t) => {
   const server = createApp();
@@ -18,4 +19,13 @@ test("server returns the shaped report and the page", async (t) => {
   );
   assert.match(await page.text(), /ETH Staking Scoreboard/);
   assert.equal((await fetch(`${base}/../testril.json`)).status, 404);
+});
+
+test("report shows the failed cross-check when a day is missing", () => {
+  const recording = fixture();
+  recording.rows.stmatic.splice(30, 1);
+  const result = report(recording);
+  assert.equal(result.checks.ok, false);
+  assert.match(result.checks.error, /stmatic is missing/);
+  assert.equal(result.view, null);
 });

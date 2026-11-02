@@ -4,6 +4,7 @@ const binds = Object.fromEntries(spec.binds.map((bind) => [bind.name, bind]));
 export const scoreboardWindow = binds.lido.window;
 const weiPerEther = 10n ** 18n;
 const rawAmount = /^[0-9]+$/;
+const minimumPooledEther = 1000n * weiPerEther;
 
 const nextDay = (day) =>
   new Date(Date.parse(`${day}T00:00:00Z`) + 86400000)
@@ -27,13 +28,9 @@ function raw(value, where) {
   return BigInt(value);
 }
 
-function byDay(rows, name, field) {
-  const days = new Map();
-  for (const row of rows[name]) {
-    const value = raw(row[field], `${name} ${field} on ${row.day}`);
-    days.set(row.day, (days.get(row.day) ?? 0n) + value);
-  }
-  return days;
+function requireWindowDay(row, name) {
+  if (!windowDays().includes(row.day))
+    throw new Error(`${name} has a row for ${row.day}, outside the window.`);
 }
 
 function requireEveryDay(series, name) {
@@ -42,18 +39,49 @@ function requireEveryDay(series, name) {
     throw new Error(`${name} is missing ${missing.join(", ")}.`);
 }
 
+function byDay(rows, name, field) {
+  const days = new Map();
+  for (const row of rows[name]) {
+    requireWindowDay(row, name);
+    if (days.has(row.day))
+      throw new Error(`${name} has more than one row for ${row.day}.`);
+    days.set(row.day, raw(row[field], `${name} ${field} on ${row.day}`));
+  }
+  requireEveryDay(days, name);
+  return days;
+}
+
+function eigenlayerByDay(rows) {
+  const days = new Map();
+  const seen = new Set();
+  for (const row of rows.eigenlayer) {
+    requireWindowDay(row, "eigenlayer");
+    const key = `${row.day} ${row.strategy}`;
+    if (seen.has(key))
+      throw new Error(
+        `eigenlayer has more than one row for strategy ${row.strategy} on ${row.day}.`,
+      );
+    seen.add(key);
+    const amount = raw(row.underlying_amount, `eigenlayer on ${row.day}`);
+    days.set(row.day, (days.get(row.day) ?? 0n) + amount);
+  }
+  requireEveryDay(days, "eigenlayer");
+  return days;
+}
+
 export function check(rows) {
   const lido = byDay(rows, "lido", "pooled_ether");
   const vaults = byDay(rows, "lido", "vault_ether");
   const wbethRate = byDay(rows, "wbeth", "exchange_rate");
-  const wbeth = byDay(rows, "wbeth", "staked_ether");
-  const stmatic = byDay(rows, "stmatic", "pooled_matic");
-  const eigenlayer = byDay(rows, "eigenlayer", "underlying_amount");
-  const series = { lido, wbeth, stmatic, eigenlayer };
-  for (const [name, values] of Object.entries(series))
-    requireEveryDay(values, name);
+  byDay(rows, "wbeth", "staked_ether");
+  byDay(rows, "stmatic", "pooled_matic");
+  eigenlayerByDay(rows);
   const days = windowDays();
   for (const day of days) {
+    if (lido.get(day) < minimumPooledEther)
+      throw new Error(
+        `On ${day} Lido's pooled ether is ${lido.get(day)} wei, under 1,000 ETH: the amount is not in wei.`,
+      );
     if (lido.get(day) <= vaults.get(day))
       throw new Error(
         `On ${day} stVault ether ${vaults.get(day)} wei is not below Lido's pooled ether ${lido.get(day)} wei.`,
@@ -67,7 +95,7 @@ export function check(rows) {
   if (rateFell) throw new Error(`The wBETH exchange rate fell on ${rateFell}.`);
   return [
     `All four series cover every one of the ${days.length} days, with raw non-negative amounts`,
-    `stVault ether stays below pooled ether, so Lido's total (pooled plus stVault ether) is well formed on every day`,
+    `Pooled ether is at least 1,000 ETH in wei and above stVault ether on every day`,
     `The wBETH exchange rate never falls and stays at or above 1 ETH`,
   ];
 }
@@ -89,8 +117,12 @@ function compact(value, unit, signed = false) {
   return `${sign}${(abs / scale).toFixed(suffix ? 2 : 0)}${suffix} ${unit}`;
 }
 
-const percent = (change, base) =>
-  `${change < 0n ? "−" : "+"}${(Number(((change < 0n ? -change : change) * 10000n) / base) / 100).toFixed(1)}%`;
+function percent(change, base) {
+  const sign = change < 0n ? "−" : "+";
+  const absoluteChange = change < 0n ? -change : change;
+  const basisPoints = Number((absoluteChange * 10000n) / base);
+  return `${sign}${(basisPoints / 100).toFixed(1)}%`;
+}
 
 function venue(symbol, fn, unit, series) {
   const days = windowDays();
@@ -121,13 +153,13 @@ export function shape(rows) {
       "ETH",
       byDay(rows, "wbeth", "staked_ether"),
     ),
-    venue(
-      "EigenLayer",
-      "eigenlayer.strategy_underlying",
-      "tokens",
-      byDay(rows, "eigenlayer", "underlying_amount"),
-    ),
   ];
+  const eigenlayer = venue(
+    "EigenLayer",
+    "eigenlayer.strategy_underlying",
+    "tokens",
+    eigenlayerByDay(rows),
+  );
   const lido = lidoTotals(rows);
   const days = windowDays();
   const stmatic = venue(
@@ -141,6 +173,7 @@ export function shape(rows) {
     latestDay: days.at(-1),
     lidoTotal: compact(lido.get(days.at(-1)), "ETH"),
     venues,
+    eigenlayer,
     stmatic,
   };
 }

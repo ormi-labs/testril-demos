@@ -27,7 +27,7 @@ npm start
 
 Open http://127.0.0.1:4180 (set `PORT` to change it). Expected result: the
 synthetic banner, four headline numbers, a stacked area of staked ETH by venue,
-a stVault growth line, a stMATIC wind-down line, a table of five venues and
+a stVault growth line, a stMATIC wind-down line, a table of five rows and
 three passed cross-checks.
 
 ## Test
@@ -52,7 +52,7 @@ Window: UTC days `[2026-08-03, 2026-11-02)`, each read at its last block, so the
 last day is 2026-11-01. EigenLayer's `eigenlayer.strategy_underlying` is sparse:
 a strategy has no row before it is whitelisted or while its shares are zero.
 EigenLayer amounts are in each strategy's own token units, so the page labels
-them "tokens" and notes that they overlap the other venues.
+them "tokens" and keep EigenLayer out of the ETH chart, in the table only.
 
 | Subject                    | Address                                      | Note                    |
 | -------------------------- | -------------------------------------------- | ----------------------- |
