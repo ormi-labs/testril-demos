@@ -679,6 +679,7 @@ $("provenance").addEventListener("cancel", (event) => {
 let liveAvailable = false;
 let liveServerUrl;
 let defaultMode = "mock";
+let initialSessionId;
 function rememberSession(id) {
   try {
     sessionStorage.setItem(`${storageKey}-${mode}`, id);
@@ -729,9 +730,9 @@ function sessionState(value) {
   return value;
 }
 async function loadSession() {
-  let saved;
+  let saved = initialSessionId;
   try {
-    saved = sessionStorage.getItem(`${storageKey}-${mode}`);
+    saved ??= sessionStorage.getItem(`${storageKey}-${mode}`);
   } catch {
     /* Storage is optional. */
   }
@@ -782,6 +783,7 @@ for (const input of document.querySelectorAll('[name="data-mode"]'))
   input.addEventListener("change", () => start(input.value));
 try {
   const config = await api("/api/config");
+  initialSessionId = config.sessionId;
   liveAvailable = config.liveAvailable;
   liveServerUrl = config.mcpUrl;
   defaultMode = config.defaultMode === "live" ? "live" : "mock";

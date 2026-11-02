@@ -1160,3 +1160,30 @@ function finishedProgress(revision, outcome, chainMs, testrilMs) {
     },
   };
 }
+
+test("server-selected session takes precedence over a remembered ended session", async ({
+  page,
+}) => {
+  const next = publicState(createDemo());
+  await page.evaluate(() =>
+    sessionStorage.setItem("testril-wallet-demo-v3-mock", "ended-session"),
+  );
+  await page.route("**/api/config", (route) =>
+    route.fulfill({
+      json: { defaultMode: "mock", liveAvailable: false, sessionId: next.id },
+    }),
+  );
+  const requested = [];
+  await page.route("**/api/sessions/**", (route) => {
+    requested.push(new URL(route.request().url()).pathname);
+    return route.fulfill({ json: next });
+  });
+  await page.reload();
+  await expect(page.locator("#balance-treasury")).toHaveText("1");
+  expect(requested).toEqual([`/api/sessions/${next.id}`]);
+  expect(
+    await page.evaluate(() =>
+      sessionStorage.getItem("testril-wallet-demo-v3-mock"),
+    ),
+  ).toBe(next.id);
+});

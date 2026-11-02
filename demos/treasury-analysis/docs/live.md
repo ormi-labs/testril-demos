@@ -237,3 +237,8 @@ exact signed transaction. The saved transaction remains available for recovery;
 do not send a replacement just because submission or confirmation failed.
 Confirmation waits for one receipt and checks its canonical block, without
 transaction-replacement scanning.
+
+A server that allocates sessions before opening this interface can return the
+current `sessionId` from `/api/config`. The browser opens that session directly,
+ahead of any ID remembered in session storage. Without a server-selected ID,
+the standalone interface resumes its remembered session or creates a new one.
