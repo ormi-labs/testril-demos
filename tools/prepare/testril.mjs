@@ -1,8 +1,17 @@
 import { Client } from "@modelcontextprotocol/sdk/client/index.js";
 import { StreamableHTTPClientTransport } from "@modelcontextprotocol/sdk/client/streamableHttp.js";
 
+// Callers switch on each result's `outcome`; the SDK's schema check only adds
+// warnings for the daemon's integer formats.
+const acceptEveryResult = {
+  getValidator: () => (data) => ({ valid: true, data }),
+};
+
 export async function connectTestril(url) {
-  const client = new Client({ name: "testril-prepare", version: "0.1.0" });
+  const client = new Client(
+    { name: "testril-prepare", version: "0.1.0" },
+    { jsonSchemaValidator: acceptEveryResult },
+  );
   await client.connect(new StreamableHTTPClientTransport(new URL(url)));
   return {
     async call(name, args = {}, payment) {
