@@ -42,7 +42,7 @@
         "by": "month"
       },
       "window": {
-        "from_month": "2020-02",
+        "from_month": "2020-01",
         "to_month": "2026-11"
       }
     },
@@ -100,7 +100,7 @@
         "by": "month"
       },
       "window": {
-        "from_month": "2020-02",
+        "from_month": "2020-01",
         "to_month": "2026-11"
       }
     },

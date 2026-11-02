@@ -1,37 +1,46 @@
 import spec from "../testril.json" with { type: "json" };
+import {
+  changes,
+  formatDate,
+  formatEth,
+  kindLabels,
+  nameWrapper,
+  shortAddress,
+  timeline,
+  zeroAddress,
+} from "./timeline.mjs";
 
-export const zeroAddress = "0x0000000000000000000000000000000000000000";
+export { formatEth, nameWrapper, zeroAddress };
+
 export const gracePeriodSeconds = 90 * 86400;
 const basisPoints = 10000n;
-const kindLabels = {
-  owner: "Owner",
-  resolver: "Resolver",
-  address: "Address record",
-  registration: "First in window",
-  renewal: "Renewal",
-  wrapper: "NameWrapper",
-};
 
 const bindByName = Object.fromEntries(spec.binds.map((b) => [b.name, b]));
 export const windowOf = (bindName) => bindByName[bindName].window;
-export const nameWrapper = spec.binds.find(
-  (bind) => bind.function_slug === "ens.wrapped_domain",
-).params.name_wrapper;
+
+const bindKinds = {
+  "ens.domain": "domain",
+  "ens.registration": "registration",
+  "ens.address_record": "address",
+  "ens.wrapped_domain": "wrapped",
+};
+const bindsOfName = (name) =>
+  Object.fromEntries(
+    spec.binds
+      .filter(({ params }) => (params.name ?? `${params.label}.eth`) === name)
+      .map((bind) => [bindKinds[bind.function_slug], bind.name]),
+  );
 
 export const subjects = spec.binds
   .filter((bind) => bind.function_slug === "ens.domain")
   .map((bind) => {
-    const label = bind.params.name.split(".")[0];
-    return {
-      name: bind.params.name,
-      label,
-      binds: Object.fromEntries(
-        ["domain", "registration", "address", "wrapped"].map((kind) => [
-          kind,
-          `${label}-${kind}`,
-        ]),
-      ),
-    };
+    const binds = bindsOfName(bind.params.name);
+    const missing = Object.values(bindKinds).filter((kind) => !binds[kind]);
+    if (missing.length)
+      throw new Error(
+        `testril.json: ${bind.params.name} has no ${missing.join(", ")} bind (matched by params.name, or params.label plus ".eth").`,
+      );
+    return { name: bind.params.name, binds };
   });
 
 export const blockWindow = windowOf(subjects[0].binds.domain);
@@ -82,11 +91,24 @@ function requireAscendingBlocks(subject, bind, list) {
   });
 }
 
-function requireWei(subject, row) {
-  if (!/^[0-9]+$/.test(row.cost))
-    throw new Error(
-      `${subject.name}: cost "${row.cost}" at block ${row.block} is not a non-negative integer of wei.`,
-    );
+const weiPerYearBand = [10n ** 14n, 10n ** 18n];
+const yearSeconds = 365n * 86400n;
+
+function requireWei(subject, list) {
+  list.forEach((row, i) => {
+    if (!/^[0-9]+$/.test(row.cost))
+      throw new Error(
+        `${subject.name}: cost "${row.cost}" at block ${row.block} is not a non-negative integer of wei.`,
+      );
+    if (i === 0) return;
+    const years =
+      (BigInt(row.expires) - BigInt(list[i - 1].expires)) / yearSeconds;
+    const perYear = BigInt(row.cost) / (years || 1n);
+    if (perYear < weiPerYearBand[0] || perYear > weiPerYearBand[1])
+      throw new Error(
+        `${subject.name}: cost ${row.cost} at block ${row.block} is ${perYear} per year, outside ${weiPerYearBand.join(" to ")} wei per year; is it in wei?`,
+      );
+  });
 }
 
 function requireLaterExpiry(subject, list) {
@@ -143,8 +165,6 @@ function requireSameName(subject, domain, checks) {
 
 const totalCost = (list) =>
   list.reduce((sum, row) => sum + BigInt(row.cost), 0n);
-const changes = (list, field) =>
-  list.filter((row, i) => i > 0 && row[field] !== list[i - 1][field]);
 const renewalsOf = (registration) => registration.slice(1);
 
 export function check(rows) {
@@ -155,9 +175,9 @@ export function check(rows) {
     requireAscendingBlocks(subject, subject.binds.domain, domain);
     requireAscendingBlocks(subject, subject.binds.registration, registration);
     requireAscendingBlocks(subject, subject.binds.wrapped, wrapped);
-    registration.forEach((row) => requireWei(subject, row));
     requireLaterExpiry(subject, registration);
     requireGracePeriod(subject, registration, wrapped);
+    requireWei(subject, registration);
     requireEveryMonth(subject, address);
     requireSameName(subject, domain, [
       [subject.binds.registration, registration, "labelhash"],
@@ -172,91 +192,6 @@ export function check(rows) {
   });
 }
 
-export function formatEth(wei) {
-  const tenThousandths = (wei + 5n * 10n ** 13n) / 10n ** 14n;
-  return `${tenThousandths / 10000n}.${String(tenThousandths % 10000n).padStart(4, "0")} ETH`;
-}
-
-const formatDate = (seconds) =>
-  new Date(Number(seconds) * 1000).toISOString().slice(0, 10);
-
-const shortAddress = (address) =>
-  address === zeroAddress
-    ? "none"
-    : address === nameWrapper
-      ? "NameWrapper"
-      : `${address.slice(0, 6)}…${address.slice(-4)}`;
-
-function registryEvents(subject, domain) {
-  const event = (field, row, verb) => ({
-    subject: subject.name,
-    kind: field,
-    block: row.block,
-    when: `block ${row.block}`,
-    text: `${kindLabels[field]} ${verb} ${shortAddress(row[field])}`,
-  });
-  return ["owner", "resolver"].flatMap((field) => [
-    ...(domain[0][field] === zeroAddress
-      ? []
-      : [event(field, domain[0], "set to")]),
-    ...changes(domain, field).map((row) => event(field, row, "changed to")),
-  ]);
-}
-
-function renewalEvents(subject, registration) {
-  return registration.map((row, i) => ({
-    subject: subject.name,
-    kind: i === 0 ? "registration" : "renewal",
-    block: row.block,
-    when: `block ${row.block}`,
-    text: `${i === 0 ? "First in window: paid" : "Renewed"} until ${formatDate(row.expires)} for ${formatEth(BigInt(row.cost))}`,
-    cost: BigInt(row.cost),
-  }));
-}
-
-function addressEvents(subject, address) {
-  return changes(address, "address").map((row) => ({
-    subject: subject.name,
-    kind: "address",
-    block: interpolatedMonthBlock(row.month),
-    when: `month ${row.month}`,
-    text: `Points to ${shortAddress(row.address)} via resolver ${shortAddress(row.resolver)}`,
-  }));
-}
-
-function wrapperEvents(subject, wrapped) {
-  return wrapped.map((row, i) => {
-    const previous = wrapped[i - 1];
-    const parts = [
-      row.owner !== (previous?.owner ?? zeroAddress) &&
-        `owner ${shortAddress(row.owner)}`,
-      row.fuses !== (previous?.fuses ?? "0") && `fuses ${row.fuses}`,
-      row.expiry !== previous?.expiry && `expiry ${formatDate(row.expiry)}`,
-    ].filter(Boolean);
-    const text =
-      row.owner === zeroAddress && previous
-        ? "Unwrapped"
-        : `${i === 0 ? "Wrapped" : "Updated"}: ${parts.join(", ")}`;
-    return {
-      subject: subject.name,
-      kind: "wrapper",
-      block: row.block,
-      when: `block ${row.block}`,
-      text,
-    };
-  });
-}
-
-function timeline(subject, rows) {
-  const { domain, registration, address, wrapped } = rowsOf(subject, rows);
-  return [
-    ...registryEvents(subject, domain),
-    ...renewalEvents(subject, registration),
-    ...addressEvents(subject, address),
-    ...wrapperEvents(subject, wrapped),
-  ].sort((a, b) => a.block - b.block);
-}
-
 export function shape(rows) {
   const span = blockWindow.to_block - blockWindow.from_block;
   const maxCost = subjects
@@ -267,7 +202,11 @@ export function shape(rows) {
     );
   const named = subjects.map((subject) => {
     const { domain, address, registration } = rowsOf(subject, rows);
-    const events = timeline(subject, rows);
+    const events = timeline(
+      subject,
+      rowsOf(subject, rows),
+      interpolatedMonthBlock,
+    );
     return {
       name: subject.name,
       events,
