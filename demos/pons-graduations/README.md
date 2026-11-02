@@ -5,7 +5,8 @@ tokens launched on bonding curves, how many graduated into Uniswap v4 pools,
 and how the fees swept from those pools split between creator, buyback and
 protocol. The page proves its numbers: every graduated token must be a launched
 token, every token with swept fees must have graduated, every traded curve must
-have been launched, and every fee row must split into whole raw-unit amounts.
+have been launched, and each token's fee rows must carry the same sweep count and
+creator, buyback and protocol amounts as the sum of its individual sweeps.
 
 **The shipped recording is synthetic.** `recordings/report.json` is generated
 by `test/fixture.mjs` and the page says so in its banner. Record real data with
@@ -43,37 +44,44 @@ npm run format:check
 
 `npm test` checks the cross-check passes on the fixture and fails when a token
 graduated without being launched, when fees are swept from a pool that never
-graduated, when a fee split is in ether instead of raw units, and when a sweep
-is counted twice, and that the server returns the shaped report.
+graduated, when a fee amount is in ether instead of raw units, when fee rows
+move an amount from creator to protocol, when a sweep is missing, and when a
+sweep is counted twice, and that the server returns the shaped report.
 `npm run test:browser` writes `docs/screenshot-desktop.png`.
 `npm run fixture` regenerates the synthetic recording.
 
 ## Subjects and window
 
-Chain id `46630` is declared for Robinhood Chain. Every address and block
-bound below is a placeholder to confirm before recording.
+Chain id `46630` is declared as the Robinhood Chain testnet id, from memory:
+the local daemon's `inspect chains` does not serve it, so verify it before
+recording. The pool manager and hook addresses below are invented placeholders,
+not real contracts, and must be replaced with the real addresses before
+recording. The factory address is copied from the function's example row.
 
-| Subject                   | Address                                      | Note                    |
-| ------------------------- | -------------------------------------------- | ----------------------- |
-| Pons launch factory       | `0x7ed598bcef8bd9edd8c97a195c6d13f40801ec7e` | verify before recording |
-| Pons fee hook             | `0x5c2e9a4b7d1f3e6a8c0b2d4f6e8a1c3b5d7f09a8` | verify before recording |
-| Uniswap v4 position owner | `0x1b0c5a0e2f1d4c3b8a7f6e5d4c3b2a1908f7e6d5` | verify before recording |
+| Subject                                    | Address                                      | Note                    |
+| ------------------------------------------ | -------------------------------------------- | ----------------------- |
+| Pons launch factory                        | `0x7ed598bcef8bd9edd8c97a195c6d13f40801ec7e` | verify before recording |
+| Pons fee hook                              | `0x5c2e9a4b7d1f3e6a8c0b2d4f6e8a1c3b5d7f09a8` | placeholder, replace    |
+| Uniswap v4 position manager (positionInfo) | `0x1b0c5a0e2f1d4c3b8a7f6e5d4c3b2a1908f7e6d5` | placeholder, replace    |
 
 - Launches and graduations: blocks `[0, 10000000)`, meant to cover everything
   from the factory's creation; replace the end with the chain head.
 - Volume and fees: UTC days `[2026-10-02, 2026-11-02)`.
+- Sweeps: blocks `[0, 10000000)` in the shipped recording; when recording, set
+  them to the blocks of the fees window so the per-token sums are comparable.
 - Amounts are raw wei of the pair token, which is the native coin (ETH).
 
 ## Binds (`testril.json`)
 
 Windows are half-open: the end is the first block or day not included.
 
-| Name           | Function                   | Chain | Params                                        | Window                  |
-| -------------- | -------------------------- | ----- | --------------------------------------------- | ----------------------- |
-| `launches`     | `pons.curve_list`          | 46630 | `factory`                                     | 0 → 10000000            |
-| `graduations`  | `pons.graduated_pool_list` | 46630 | `factory`, `pool_manager`                     | 0 → 10000000            |
-| `curve-volume` | `pons.curve_volume`        | 46630 | `swap.curve_list`, `by`                       | 2026-10-02 → 2026-11-02 |
-| `pool-fees`    | `pons.pool_fees`           | 46630 | `swap.hook`, `swap.graduated_pool_list`, `by` | 2026-10-02 → 2026-11-02 |
+| Name             | Function                   | Chain | Params                                        | Window                  |
+| ---------------- | -------------------------- | ----- | --------------------------------------------- | ----------------------- |
+| `launches`       | `pons.curve_list`          | 46630 | `factory`                                     | 0 → 10000000            |
+| `graduations`    | `pons.graduated_pool_list` | 46630 | `factory`, `pool_manager`                     | 0 → 10000000            |
+| `curve-volume`   | `pons.curve_volume`        | 46630 | `swap.curve_list`, `by`                       | 2026-10-02 → 2026-11-02 |
+| `pool-fees`      | `pons.pool_fees`           | 46630 | `swap.hook`, `swap.graduated_pool_list`, `by` | 2026-10-02 → 2026-11-02 |
+| `pool-fee-sweep` | `pons.pool_fee_sweep`      | 46630 | `hook`, `graduated_pool_list`                 | 0 → 10000000            |
 
 ## Record real data
 

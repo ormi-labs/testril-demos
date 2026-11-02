@@ -17,16 +17,42 @@ export function feeDays() {
   return days;
 }
 
-function raw(value, where) {
+function raw(value, label) {
   if (!/^\d+$/.test(String(value)))
-    throw new Error(`${where} is not a raw integer amount: ${value}.`);
+    throw new Error(`${label} is not a raw integer amount: ${value}.`);
   return BigInt(value);
 }
 
-const splitTotal = (row, where = `Fee row of ${row.token} on ${row.day}`) =>
-  raw(row.creator_amount, where) +
-  raw(row.buyback_amount, where) +
-  raw(row.protocol_amount, where);
+const splitTotal = (row) =>
+  raw(row.creator_amount, "creator_amount") +
+  raw(row.buyback_amount, "buyback_amount") +
+  raw(row.protocol_amount, "protocol_amount");
+
+const splitFields = ["creator", "buyback", "protocol"];
+
+function tokenTotals(rows, sweepsOf) {
+  const totals = new Map();
+  for (const row of rows) {
+    const entry = totals.get(row.token) ?? {
+      token: row.token,
+      sweeps: 0n,
+      creator: 0n,
+      buyback: 0n,
+      protocol: 0n,
+    };
+    entry.sweeps += sweepsOf(row);
+    for (const field of splitFields)
+      entry[field] += raw(row[`${field}_amount`], `${field}_amount`);
+    totals.set(row.token, entry);
+  }
+  return totals;
+}
+
+const feeTotals = (feeRows) =>
+  tokenTotals(feeRows, (row) => raw(row.sweeps, "sweeps"));
+const sweepTotals = (sweepRows) => tokenTotals(sweepRows, () => 1n);
+const totalOf = (entry) => entry.creator + entry.buyback + entry.protocol;
+const byTotalDesc = (a, b) => (totalOf(b) > totalOf(a) ? 1 : -1);
 
 const tokensOf = (rows) => new Set(rows.map((row) => row.token.toLowerCase()));
 
@@ -58,14 +84,24 @@ export function check(rows) {
       throw new Error(`Token ${row.token} has two fee rows on ${row.day}.`);
     seen.add(key);
   }
-  const total = rows["pool-fees"].reduce(
-    (sum, row) => sum + splitTotal(row),
-    0n,
-  );
+  const fromSweeps = sweepTotals(rows["pool-fee-sweep"]);
+  const fromFees = feeTotals(rows["pool-fees"]);
+  for (const token of new Set([...fromSweeps.keys(), ...fromFees.keys()])) {
+    const swept = fromSweeps.get(token);
+    const fees = fromFees.get(token);
+    const mismatch = ["sweeps", ...splitFields].find(
+      (field) => (swept?.[field] ?? 0n) !== (fees?.[field] ?? 0n),
+    );
+    if (mismatch)
+      throw new Error(
+        `Token ${token} fee rows give ${fees?.[mismatch] ?? 0n} ${mismatch}, its sweeps give ${swept?.[mismatch] ?? 0n}.`,
+      );
+  }
+  const total = [...fromSweeps.values()].reduce((s, e) => s + totalOf(e), 0n);
   return [
     `All ${graduated.size} graduated tokens are among the ${launched.size} launched tokens`,
     `All ${sweptTokens.size} tokens with swept fees graduated, and every traded curve was launched`,
-    `${formatEth(total)} swept: every fee row splits into whole-unit creator, buyback and protocol amounts, one row per token per day`,
+    `${formatEth(total)} swept: per token, the fee rows' sweep count and creator, buyback and protocol amounts equal the sums over its individual sweeps, one fee row per token per day`,
   ];
 }
 
@@ -88,30 +124,8 @@ const percent = (part, whole) =>
 const shortAddress = (address) => `${address.slice(0, 6)}…${address.slice(-4)}`;
 const eth = (wei) => Number(wei / 10n ** 12n) / 1e6;
 
-function tokenFees(feeRows) {
-  const totals = new Map();
-  for (const row of feeRows) {
-    const t = totals.get(row.token) ?? {
-      token: row.token,
-      sweeps: 0n,
-      creator: 0n,
-      buyback: 0n,
-      protocol: 0n,
-    };
-    t.sweeps += BigInt(row.sweeps);
-    t.creator += BigInt(row.creator_amount);
-    t.buyback += BigInt(row.buyback_amount);
-    t.protocol += BigInt(row.protocol_amount);
-    totals.set(row.token, t);
-  }
-  return [...totals.values()].sort((a, b) => {
-    const [x, y] = [
-      a.creator + a.buyback + a.protocol,
-      b.creator + b.buyback + b.protocol,
-    ];
-    return y > x ? 1 : y < x ? -1 : 0;
-  });
-}
+const tokenFees = (feeRows) =>
+  [...feeTotals(feeRows).values()].sort(byTotalDesc);
 
 export function shape(rows) {
   const launched = rows.launches.length;
@@ -158,7 +172,7 @@ export function shape(rows) {
       creator: formatEth(t.creator),
       buyback: formatEth(t.buyback),
       protocol: formatEth(t.protocol),
-      total: formatEth(t.creator + t.buyback + t.protocol),
+      total: formatEth(totalOf(t)),
     })),
   };
 }

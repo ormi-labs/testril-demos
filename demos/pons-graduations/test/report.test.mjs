@@ -23,10 +23,29 @@ test("check fails when fees are swept from a pool that never graduated", () => {
   assert.throws(() => check(corrupted), /fees swept but never graduated/);
 });
 
-test("check fails when a fee split is in ether instead of raw units", () => {
+test("check fails when a fee amount is in ether instead of raw units", () => {
   const corrupted = rows();
-  corrupted["pool-fees"][2].creator_amount = "0.0125";
-  assert.throws(() => check(corrupted), /not a raw integer amount/);
+  const row = corrupted["pool-fees"][2];
+  row.creator_amount = String(BigInt(row.creator_amount) / 10n ** 18n);
+  assert.throws(
+    () => check(corrupted),
+    /fee rows give \d+ creator, its sweeps give \d+/,
+  );
+});
+
+test("check fails when fee rows move an amount from creator to protocol", () => {
+  const corrupted = rows();
+  const row = corrupted["pool-fees"][2];
+  const moved = BigInt(row.creator_amount) / 2n;
+  row.creator_amount = String(BigInt(row.creator_amount) - moved);
+  row.protocol_amount = String(BigInt(row.protocol_amount) + moved);
+  assert.throws(() => check(corrupted), /fee rows give \d+ creator/);
+});
+
+test("check fails when a sweep is missing from the sweep list", () => {
+  const corrupted = rows();
+  corrupted["pool-fee-sweep"].splice(5, 1);
+  assert.throws(() => check(corrupted), /fee rows give/);
 });
 
 test("check fails when a sweep is counted twice", () => {
