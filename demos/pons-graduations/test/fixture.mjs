@@ -65,9 +65,9 @@ function volumeRows(launches, random) {
         return {
           day,
           curve: launch.curve,
-          trades: buys + sells,
-          buy_count: buys,
-          sell_count: sells,
+          trades: String(buys + sells),
+          buy_count: String(buys),
+          sell_count: String(sells),
           bought: bought.toString(),
           sold: sold.toString(),
           fees: ((bought + sold) / 100n).toString(),
@@ -77,32 +77,55 @@ function volumeRows(launches, random) {
   );
 }
 
-function feeRows(graduations, random) {
+function sweepRows(graduations, random) {
   const days = feeDays();
+  const blocksPerDay = Math.floor(spec.binds[0].window.to_block / days.length);
   return graduations.flatMap((graduation, i) =>
-    days.slice(i + 2).flatMap((day) => {
-      if (random() < 0.45) return [];
-      const fees = milliEth(5 + random() ** 3 * 400);
-      const creator = fees / 2n;
-      const buyback = fees / 4n;
-      return [
-        {
+    days.flatMap((day, d) => {
+      if (d < i + 2 || random() < 0.6) return [];
+      return Array.from({ length: 1 + Math.floor(random() * 2) }, (_, n) => {
+        const fees = milliEth(5 + random() ** 3 * 400);
+        const creator = fees / 2n;
+        const buyback = fees / 4n;
+        return {
           day,
+          block: d * blocksPerDay + n * 100 + Math.floor(random() * 100),
+          log_index: String(n),
+          tx: `0x${address(random)}${"0".repeat(24)}`.slice(0, 66),
           token: graduation.token,
-          sweeps: 1 + Math.floor(random() * 3),
           protocol_amount: (fees - creator - buyback).toString(),
           buyback_amount: buyback.toString(),
           creator_amount: creator.toString(),
-        },
-      ];
+        };
+      });
     }),
   );
+}
+
+const withoutDay = (sweep) =>
+  Object.fromEntries(Object.entries(sweep).filter(([key]) => key !== "day"));
+
+function feeRows(sweeps) {
+  const perPoolDay = Map.groupBy(sweeps, (s) => `${s.day}/${s.token}`);
+  return [...perPoolDay.values()].map((group) => {
+    const sum = (key) =>
+      group.reduce((total, s) => total + BigInt(s[key]), 0n).toString();
+    return {
+      day: group[0].day,
+      token: group[0].token,
+      sweeps: String(group.length),
+      protocol_amount: sum("protocol_amount"),
+      buyback_amount: sum("buyback_amount"),
+      creator_amount: sum("creator_amount"),
+    };
+  });
 }
 
 export function fixture() {
   const random = seeded(11);
   const launches = launchRows(random);
   const graduations = graduationRows(launches, random);
+  const sweeps = sweepRows(graduations, random);
   return {
     demo: spec.demo,
     source: "synthetic",
@@ -118,7 +141,8 @@ export function fixture() {
       launches,
       graduations,
       "curve-volume": volumeRows(launches, random),
-      "pool-fees": feeRows(graduations, random),
+      "pool-fees": feeRows(sweeps),
+      "pool-fee-sweep": sweeps.map(withoutDay),
     },
   };
 }
