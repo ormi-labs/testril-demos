@@ -96,7 +96,8 @@ function hopGraph({ nodes, edges }) {
       position.set(node.address, { x, y: 30 + slack + row * rowGap });
     });
   });
-  const biggest = Math.max(...edges.map((edge) => edge.units));
+  const lane = 5;
+  const labelAt = 0.62;
   const chart = svg("svg", {
     viewBox: `0 0 ${width} ${height}`,
     role: "img",
@@ -111,27 +112,36 @@ function hopGraph({ nodes, edges }) {
           y: 16,
           class: "tick",
         },
-        `Hop ${hop}`,
+        columns.get(hop)[0].tracked ? `Hop ${hop}` : "Outside",
       ),
     ),
   );
   for (const edge of edges) {
     const from = position.get(edge.from);
     const to = position.get(edge.to);
+    const offset = (edge.tokenIndex - 1) * lane;
     const [x0, y0, x1, y1] = [
       from.x + boxWidth,
-      from.y + boxHeight / 2,
+      from.y + boxHeight / 2 + offset,
       to.x,
-      to.y + boxHeight / 2,
+      to.y + boxHeight / 2 + offset,
     ];
     const mid = (x0 + x1) / 2;
     chart.append(
       svg("path", {
         d: `M${x0},${y0} C${mid},${y0} ${mid},${y1} ${x1},${y1}`,
-        "stroke-width": 1 + (edge.units / biggest) * 9,
-        class: "edge",
+        "stroke-width": 1 + edge.share * 5,
+        class: `edge token-${edge.tokenIndex}`,
       }),
-      svg("text", { x: x1 - 6, y: y1 - 6, class: "tick end" }, edge.amount),
+      svg(
+        "text",
+        {
+          x: x0 + (x1 - x0) * labelAt,
+          y: y0 + (y1 - y0) * labelAt + offset * 2.6 - 4,
+          class: "tick middle edge-label",
+        },
+        `${edge.amount} ${edge.symbol}`,
+      ),
     );
   }
   for (const node of nodes) {
@@ -161,13 +171,14 @@ function render(report) {
     .map((token) => token.symbol)
     .join(" · ");
   const { headline } = view;
+  const [first, ...others] = headline.intoExploiter;
   document
     .querySelector("#headline")
     .replaceChildren(
       metric(
-        "INTO THE EXPLOITER",
-        headline.stolen,
-        "token units, all three tokens",
+        `${first.symbol} INTO THE EXPLOITER`,
+        first.amount,
+        `plus ${others.map((t) => `${t.amount} ${t.symbol}`).join(" and ")}; native ETH is not in this trail`,
       ),
       metric("TRAIL WALLETS REACHED", headline.reached),
       metric(
@@ -178,24 +189,27 @@ function render(report) {
       metric("TRANSFERS COUNTED", headline.transfers, "each once"),
     );
   document.querySelector("#hop-note").textContent =
-    `at most 10 wallets; line width is the amount moved; ${view.hiddenEdges} routes under 1,000 not drawn`;
+    `at most 10 wallets; line width is the amount moved, relative within each token; ${view.hiddenEdges} routes under 1,000 not drawn`;
   document.querySelector("#hops").replaceChildren(hopGraph(view));
   document
     .querySelector("#sparklines")
     .replaceChildren(...view.wallets.map(sparkline));
   document.querySelector("#wallets").replaceChildren(
-    ...view.wallets.map((wallet) => {
-      const row = element("tr");
-      row.append(
-        element("td", wallet.label),
-        element("td", wallet.address),
-        element("td", String(wallet.hop ?? "—")),
-        element("td", wallet.received),
-        element("td", wallet.sent),
-        element("td", wallet.net),
-      );
-      return row;
-    }),
+    ...view.wallets.flatMap((wallet) =>
+      wallet.tokens.map((token) => {
+        const row = element("tr");
+        row.append(
+          element("td", wallet.label),
+          element("td", wallet.address),
+          element("td", String(wallet.hop ?? "—")),
+          element("td", token.symbol),
+          element("td", token.received),
+          element("td", token.sent),
+          element("td", token.net),
+        );
+        return row;
+      }),
+    ),
   );
   document
     .querySelector("#checks")

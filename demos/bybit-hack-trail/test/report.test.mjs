@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { check, shape, wallets } from "../src/report.mjs";
+import { check, hoursInWindow, shape, wallets } from "../src/report.mjs";
 import { fixture } from "./fixture.mjs";
 
 const rows = () => JSON.parse(JSON.stringify(fixture().rows));
@@ -32,13 +32,37 @@ test("check fails when a transfer between trail wallets is missing on one side",
   assert.throws(() => check(corrupted), /is missing from/);
 });
 
-test("check fails when a wallet sends more than it received", () => {
+test("check fails when transfers are scaled but the balances are not", () => {
   const corrupted = rows();
   for (const name of [exploiterBind, "transfers-hop-a4b2"])
     for (const row of corrupted[name])
       if (row.from === exploiter && row.to === walletA)
         row.value = (BigInt(row.value) * 10n).toString();
-  assert.throws(() => check(corrupted), /sends more .* than it received/);
+  assert.throws(() => check(corrupted), /balance moved/);
+});
+
+const balanceRow = (corrupted, bind, hourIndex, token) =>
+  corrupted[bind].find(
+    (row) => row.hour === hoursInWindow()[hourIndex] && row.token === token,
+  );
+const stEth = "0xae7ab96520de3a18e5e111b5eaab095312d7fe84";
+
+test("check fails when one balance is off by a factor of 1e9", () => {
+  const corrupted = rows();
+  const row = balanceRow(corrupted, "token-balance-hop-a4b2", 30, stEth);
+  row.balance = (BigInt(row.balance) * 10n ** 9n).toString();
+  assert.throws(() => check(corrupted), /balance moved/);
+});
+
+test("check fails when one hour's balance change has the wrong sign", () => {
+  const corrupted = rows();
+  const before = balanceRow(corrupted, "token-balance-hop-a4b2", 21, stEth);
+  const after = balanceRow(corrupted, "token-balance-hop-a4b2", 22, stEth);
+  after.balance = (
+    2n * BigInt(before.balance) -
+    BigInt(after.balance)
+  ).toString();
+  assert.throws(() => check(corrupted), /balance moved/);
 });
 
 test("check fails when a balance row falls outside the window", () => {
@@ -47,12 +71,27 @@ test("check fails when a balance row falls outside the window", () => {
   assert.throws(() => check(corrupted), /stray or repeated/);
 });
 
-test("shape counts a transfer read from both wallets once", () => {
+test("shape keeps each token separate and counts a transfer once", () => {
   const view = shape(rows());
   const byLabel = Object.fromEntries(view.wallets.map((w) => [w.label, w]));
-  assert.equal(view.headline.stolen, "424,000");
-  assert.equal(byLabel["Exploiter"].sent, "373,271");
-  assert.equal(byLabel["Wallet 0xa4b2…449e"].received, "165,000");
-  assert.equal(view.headline.transfers, "58");
+  assert.deepEqual(view.headline.intoExploiter, [
+    { symbol: "stETH", amount: "90,000" },
+    { symbol: "mETH", amount: "8,000" },
+    { symbol: "cmETH", amount: "15,000" },
+  ]);
+  const coldWallet = byLabel["Bybit cold wallet"];
+  assert.equal(coldWallet.tokens[1].net, "−8,000");
+  const walletC = byLabel["Wallet 0x0fa0…6d2e"];
+  assert.deepEqual(walletC.tokens, [
+    { symbol: "mETH", received: "8,000", sent: "8,000", net: "0" },
+  ]);
+  assert.equal(view.headline.transfers, "53");
   assert.equal(view.nodes.length, 10);
+});
+
+test("shape puts outside destinations after the deepest tracked hop", () => {
+  const { nodes } = shape(rows());
+  const deepest = Math.max(...nodes.filter((n) => n.tracked).map((n) => n.hop));
+  for (const node of nodes.filter((n) => !n.tracked))
+    assert.equal(node.hop, deepest + 1);
 });

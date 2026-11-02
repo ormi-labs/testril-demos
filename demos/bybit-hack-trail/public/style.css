@@ -174,6 +174,18 @@ svg .edge {
   stroke: var(--accent);
   opacity: 0.35;
 }
+svg .edge.token-1 {
+  stroke: var(--warning);
+}
+svg .edge.token-2 {
+  stroke: var(--ink);
+}
+svg .edge-label {
+  font-size: 11px;
+  paint-order: stroke;
+  stroke: var(--visual);
+  stroke-width: 3px;
+}
 svg .box {
   fill: var(--panel);
   stroke: var(--ink);

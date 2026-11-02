@@ -2,6 +2,7 @@ import { writeFile } from "node:fs/promises";
 import { pathToFileURL } from "node:url";
 import spec from "../testril.json" with { type: "json" };
 import {
+  blocksPerHour,
   hoursInWindow,
   tokens,
   transferWindow,
@@ -9,7 +10,6 @@ import {
 } from "../src/report.mjs";
 
 const recordedAt = "2026-11-02T00:00:00.000Z";
-const blocksPerHour = 300;
 const unit = 10n ** 18n;
 const [stEth, mEth, cmEth] = tokens;
 const [cold, exploiter, walletA, walletB, walletC, walletD] = wallets;
@@ -28,33 +28,34 @@ const raw = (whole, random) =>
   BigInt(whole) * unit +
   (whole < 100 ? BigInt(Math.floor(random() * 1e9)) * 1000000000n : 0n);
 
+const coldHoldings = [
+  [stEth, 90000],
+  [mEth, 8000],
+  [cmEth, 15000],
+];
+
 function transferMoves(random) {
   const outside = Array.from({ length: 4 }, () => `0x${hex(random, 40)}`);
   const [dex, bridge, mixer, otc] = outside;
   const moves = [
-    [14, cold, exploiter, stEth, 401000],
+    [14, cold, exploiter, stEth, 90000],
     [14, cold, exploiter, mEth, 8000],
     [14, cold, exploiter, cmEth, 15000],
-    [15, exploiter, walletA, stEth, 150000],
-    [15, exploiter, walletB, stEth, 100000],
-    [16, exploiter, walletB, mEth, 8000],
-    [16, exploiter, walletA, cmEth, 15000],
-    [17, exploiter, dex, stEth, 100000],
-    [18, walletA, walletD, cmEth, 15000],
-    [19, walletB, walletC, mEth, 8000],
-    [20, walletA, walletD, stEth, 50000],
-    [22, walletA, bridge, stEth, 80000],
-    [24, walletB, dex, stEth, 60000],
-    [30, walletB, walletC, stEth, 40000],
+    [15, exploiter, walletA, stEth, 50000],
+    [15, exploiter, walletB, stEth, 40000],
+    [16, exploiter, walletC, mEth, 8000],
+    [16, exploiter, walletD, cmEth, 15000],
+    [22, walletA, bridge, stEth, 30000],
+    [24, walletB, dex, stEth, 25000],
+    [24, walletB, bridge, stEth, 15000],
     [40, walletC, mixer, mEth, 8000],
-    [50, walletC, bridge, stEth, 40000],
     [60, walletD, otc, cmEth, 15000],
-    [70, walletD, bridge, stEth, 50000],
+    [70, walletA, bridge, stEth, 15000],
   ];
   for (let i = 0; i < 40; i++)
     moves.push([
-      20 + Math.floor(random() * 160),
-      random() < 0.5 ? exploiter : walletA,
+      20 + Math.floor(random() * 50),
+      walletA,
       outside[Math.floor(random() * 4)],
       stEth,
       1 + Math.floor(random() * 30),
@@ -62,9 +63,9 @@ function transferMoves(random) {
   return moves;
 }
 
-function transferRows(random) {
+function transferEvents(random) {
   const moves = transferMoves(random).sort((a, b) => a[0] - b[0]);
-  const events = moves.map(([hour, from, to, token, whole], index) => ({
+  return moves.map(([hour, from, to, token, whole], index) => ({
     block: transferWindow.from_block + hour * blocksPerHour + (index % 250),
     from,
     to,
@@ -73,17 +74,55 @@ function transferRows(random) {
     log_index: String(Math.floor(random() * 300)),
     value: raw(whole, random).toString(),
   }));
+}
+
+const bindsOf = (slug) =>
+  spec.binds.filter((bind) => bind.function_slug === slug);
+
+function transferRows(events) {
   return Object.fromEntries(
-    spec.binds
-      .filter((bind) => bind.function_slug === "erc20.wallet_transfers")
-      .map((bind) => [
-        bind.name,
-        events.filter(
-          (event) =>
-            event.from === bind.params.wallet ||
-            event.to === bind.params.wallet,
-        ),
-      ]),
+    bindsOf("erc20.wallet_transfers").map((bind) => [
+      bind.name,
+      events.filter(
+        (event) =>
+          event.from === bind.params.wallet || event.to === bind.params.wallet,
+      ),
+    ]),
+  );
+}
+
+function tokenBalanceRows(events) {
+  const held = new Map();
+  const add = (wallet, token, amount) =>
+    held.set(
+      `${wallet}:${token}`,
+      (held.get(`${wallet}:${token}`) ?? 0n) + amount,
+    );
+  for (const [token, whole] of coldHoldings)
+    add(cold, token, BigInt(whole) * unit);
+  const rows = Object.fromEntries(wallets.map((wallet) => [wallet, []]));
+  hoursInWindow().forEach((hour, index) => {
+    for (const event of events)
+      if (
+        Math.floor(
+          (event.block - transferWindow.from_block) / blocksPerHour,
+        ) === index
+      ) {
+        add(event.from, event.token, -BigInt(event.value));
+        add(event.to, event.token, BigInt(event.value));
+      }
+    for (const wallet of wallets)
+      for (const token of tokens) {
+        const balance = held.get(`${wallet}:${token}`) ?? 0n;
+        if (balance > 0n)
+          rows[wallet].push({ hour, token, balance: balance.toString() });
+      }
+  });
+  return Object.fromEntries(
+    bindsOf("erc20.token_balance").map((bind) => [
+      bind.name,
+      rows[bind.params.reads.owners[0]],
+    ]),
   );
 }
 
@@ -119,13 +158,15 @@ function balanceRows() {
         });
   });
   return Object.fromEntries(
-    spec.binds
-      .filter((bind) => bind.function_slug === "native.balance")
-      .map((bind) => [bind.name, rows[bind.params.owners[0]]]),
+    bindsOf("native.balance").map((bind) => [
+      bind.name,
+      rows[bind.params.owners[0]],
+    ]),
   );
 }
 
 export function fixture() {
+  const events = transferEvents(seeded(11));
   return {
     demo: spec.demo,
     source: "synthetic",
@@ -137,7 +178,11 @@ export function fixture() {
       ]),
     ),
     window: Object.fromEntries(spec.binds.map((b) => [b.name, b.window])),
-    rows: { ...transferRows(seeded(11)), ...balanceRows() },
+    rows: {
+      ...transferRows(events),
+      ...tokenBalanceRows(events),
+      ...balanceRows(),
+    },
   };
 }
 
