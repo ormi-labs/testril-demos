@@ -9,7 +9,10 @@
         "factory": "0x9083a2b699c0a4ad06f63580bde2635d26a3eef0",
         "conditional_tokens": "0xceafdd6bc0bef976fdcd1112955828e00543c0ce"
       },
-      "window": { "from_block": 48558286, "to_block": 49062480 }
+      "window": {
+        "from_block": 0,
+        "to_block": 49062480
+      }
     },
     {
       "name": "trades",
@@ -21,8 +24,13 @@
           "conditional_tokens": "0xceafdd6bc0bef976fdcd1112955828e00543c0ce"
         }
       },
-      "window": { "from_block": 48558286, "to_block": 49062480 },
-      "read": { "chunk_blocks": 20000 }
+      "window": {
+        "from_block": 48558286,
+        "to_block": 49062480
+      },
+      "read": {
+        "chunk_blocks": 20000
+      }
     },
     {
       "name": "liquidity",
@@ -34,8 +42,31 @@
           "conditional_tokens": "0xceafdd6bc0bef976fdcd1112955828e00543c0ce"
         }
       },
-      "window": { "from_block": 48558286, "to_block": 49062480 },
-      "read": { "chunk_blocks": 20000 }
+      "window": {
+        "from_block": 48558286,
+        "to_block": 49062480
+      },
+      "read": {
+        "chunk_blocks": 20000
+      }
+    },
+    {
+      "name": "market_state",
+      "function_slug": "omen.market_state",
+      "chain_id": 100,
+      "params": {
+        "market_list": {
+          "factory": "0x9083a2b699c0a4ad06f63580bde2635d26a3eef0",
+          "conditional_tokens": "0xceafdd6bc0bef976fdcd1112955828e00543c0ce"
+        }
+      },
+      "window": {
+        "from_block": 48558286,
+        "to_block": 49062480
+      },
+      "read": {
+        "chunk_blocks": 20000
+      }
     },
     {
       "name": "answers",
@@ -44,8 +75,13 @@
       "params": {
         "realitio": "0x79e32ae03fb27b07c89c0c568f80287c01ca2e57"
       },
-      "window": { "from_block": 48558286, "to_block": 49062480 },
-      "read": { "chunk_blocks": 20000 }
+      "window": {
+        "from_block": 48558286,
+        "to_block": 49062480
+      },
+      "read": {
+        "chunk_blocks": 20000
+      }
     }
   ]
 }

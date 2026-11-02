@@ -5,7 +5,7 @@ import { window } from "../src/report.mjs";
 
 const recordedAt = "2026-11-02T00:00:00.000Z";
 const marketCount = 12;
-const randomTradeCount = 200;
+const randomTradeCount = 120;
 const secondsPerBlock = 5;
 const firstBlockTime = 1790985600;
 const answerTimeout = 3 * 86400;
@@ -21,7 +21,13 @@ function seeded(seed) {
   };
 }
 
-const wxdai = (amount) => BigInt(Math.round(amount * 100)) * 10n ** 16n;
+const wxdaiUnit = 10n ** 18n;
+const usdcUnit = 10n ** 6n;
+const usdc = "0xddafbb505ad214d7b80b1f830fccc89b60fb7a83";
+const marketFee = 20000000000000000n;
+const initialPool = 5000n;
+const amount = (units, unit = wxdaiUnit) =>
+  (BigInt(Math.round(units * 100)) * unit) / 100n;
 const hex = (random, length) =>
   Array.from({ length }, () => Math.floor(random() * 16).toString(16)).join("");
 const address = (random) => `0x${hex(random, 40)}`;
@@ -30,7 +36,8 @@ const blockAt = (fraction) =>
   Math.floor(fraction * (window.to_block - window.from_block - 1));
 
 function trade(random, fields) {
-  const fee = (fields.collateral * 2n) / 100n;
+  const feeDivisor = fields.side === "buy" ? wxdaiUnit : wxdaiUnit - marketFee;
+  const fee = (fields.collateral * marketFee) / feeDivisor;
   return {
     block: fields.block,
     log_index: String(Math.floor(random() * 300)),
@@ -45,60 +52,90 @@ function trade(random, fields) {
   };
 }
 
-function tradeRows(random, marketAddresses, traders) {
-  const [top, ...others] = marketAddresses;
+function tradeRows(random, markets, traders) {
+  const [top, ...others] = markets.filter((m) => m.unit === wxdaiUnit);
+  const [other] = markets.filter((m) => m.unit === usdcUnit);
   const trader = traders[0];
-  const topTrades = [
-    [wxdai(1000.25), wxdai(1500), "buy", 0],
-    [wxdai(500.5), wxdai(700), "buy", 1],
-    [wxdai(300.25), wxdai(400), "sell", 0],
-  ].map(([collateral, tokens, side, outcome], index) =>
+  const scripted = [
+    [top, 1000.25, 1500, "buy", 0],
+    [top, 500.5, 700, "buy", 1],
+    [top, 300.25, 400, "sell", 0],
+    [other, 250, 400, "buy", 0],
+    [other, 100, 150, "sell", 1],
+  ].map(([market, collateral, tokens, side, outcome], index) =>
     trade(random, {
       block: blockAt(0.5 + index / 100),
-      market: top,
+      market: market.address,
       trader,
       side,
-      collateral,
-      tokens,
+      collateral: amount(collateral, market.unit),
+      tokens: amount(tokens, market.unit),
       outcome,
     }),
   );
-  const held = new Map();
   const randomTrades = [];
   for (let i = 0; i < randomTradeCount; i++) {
     const market = others[Math.floor(random() ** 1.6 * others.length)];
-    const outcome = Math.floor(random() * 2);
-    const key = `${market}:${outcome}`;
-    const inventory = held.get(key) ?? 0n;
-    const sells = inventory > wxdai(10) && random() < 0.3;
-    const tokens = sells ? inventory / 2n : wxdai(5 + random() * 60);
-    held.set(key, sells ? inventory - tokens : inventory + tokens);
+    const tokens = amount(5 + random() * 60);
     randomTrades.push(
       trade(random, {
         block: blockAt(random()),
-        market,
+        market: market.address,
         trader: traders[Math.floor(random() * traders.length)],
-        side: sells ? "sell" : "buy",
+        side: random() < 0.3 ? "sell" : "buy",
         collateral: (tokens * BigInt(40 + Math.floor(random() * 40))) / 100n,
         tokens,
-        outcome,
+        outcome: Math.floor(random() * 2),
       }),
     );
   }
-  return [...topTrades, ...randomTrades].sort((a, b) => a.block - b.block);
+  return [...scripted, ...randomTrades].sort((a, b) => a.block - b.block);
 }
 
-function liquidityRows(random, marketAddresses, funders) {
-  return marketAddresses.map((market, index) => ({
+function liquidityRows(random, markets, funders) {
+  return markets.map((market, index) => ({
     block: blockAt(index / 40),
     log_index: String(Math.floor(random() * 300)),
     tx: `0x${hex(random, 64)}`,
-    market,
+    market: market.address,
     funder: funders[index % funders.length],
     side: "add",
-    shares: wxdai(50 + random() * 500).toString(),
+    shares: amount(50 + random() * 500, market.unit).toString(),
     collateral_removed_from_fee_pool: "0",
   }));
+}
+
+function marketStateRows(markets, trades, liquidity) {
+  const events = [...trades, ...liquidity].sort((a, b) => a.block - b.block);
+  const rows = [];
+  for (const market of markets) {
+    const pool = [initialPool * market.unit, initialPool * market.unit];
+    const own = events.filter((event) => event.market === market.address);
+    for (const block of new Set(own.map((event) => event.block))) {
+      for (const event of own.filter((e) => e.block === block)) {
+        if (event.side === "add") {
+          for (const outcome of [0, 1]) pool[outcome] += BigInt(event.shares);
+          continue;
+        }
+        const collateral = BigInt(event.collateral_amount);
+        const fee = BigInt(event.fee_amount);
+        const isBuy = event.side === "buy";
+        for (const outcome of [0, 1])
+          pool[outcome] += isBuy ? collateral - fee : -(collateral + fee);
+        pool[event.outcome_index] +=
+          BigInt(event.outcome_tokens) * (isBuy ? -1n : 1n);
+      }
+      pool.forEach((poolAmount, outcome) =>
+        rows.push({
+          block,
+          market: market.address,
+          outcome_index: String(outcome),
+          amount: poolAmount.toString(),
+        }),
+      );
+    }
+  }
+  return rows.sort((a, b) => a.block - b.block);
 }
 
 function answerRow(random, questionId, block, answer, bond) {
@@ -121,10 +158,10 @@ function answerRows(random) {
     const questionId = `0x${hex(random, 64)}`;
     const block = blockAt(0.1 + random() * 0.8);
     rows.push(
-      answerRow(random, questionId, block, i % 5 === 0 ? 0 : 1, wxdai(10)),
+      answerRow(random, questionId, block, i % 5 === 0 ? 0 : 1, amount(10)),
     );
     if (i % 3 === 0)
-      rows.push(answerRow(random, questionId, block + 7000, i % 2, wxdai(25)));
+      rows.push(answerRow(random, questionId, block + 7000, i % 2, amount(25)));
   }
   rows.push(
     answerRow(
@@ -132,7 +169,7 @@ function answerRows(random) {
       `0x${hex(random, 64)}`,
       blockAt(0.7),
       `0x${"f".repeat(64)}`,
-      wxdai(5),
+      amount(5),
     ),
   );
   return rows;
@@ -140,19 +177,27 @@ function answerRows(random) {
 
 export function fixture() {
   const random = seeded(11);
-  const marketAddresses = Array.from({ length: marketCount }, () =>
-    address(random),
-  );
   const creators = Array.from({ length: 4 }, () => address(random));
   const traders = Array.from({ length: 30 }, () => address(random));
-  const markets = marketAddresses.map((market, index) => ({
-    block: blockAt(index / 50),
-    market,
+  const markets = Array.from({ length: marketCount + 1 }, (_, index) => ({
+    address: address(random),
+    unit: index < marketCount ? wxdaiUnit : usdcUnit,
     creator: creators[index % creators.length],
-    conditional_tokens: conditionalTokens,
-    collateral_token: collateralToken,
-    fee: "20000000000000000",
+    createdBlock:
+      index % 3 === 0
+        ? window.from_block - 1000 * (index + 1)
+        : blockAt(index / 50),
   }));
+  const marketList = markets.map((market) => ({
+    block: market.createdBlock,
+    market: market.address,
+    creator: market.creator,
+    conditional_tokens: conditionalTokens,
+    collateral_token: market.unit === wxdaiUnit ? collateralToken : usdc,
+    fee: marketFee.toString(),
+  }));
+  const trades = tradeRows(random, markets, traders);
+  const liquidity = liquidityRows(random, markets, [factory, ...creators]);
   return {
     demo: spec.demo,
     source: "synthetic",
@@ -165,9 +210,10 @@ export function fixture() {
     ),
     window: Object.fromEntries(spec.binds.map((b) => [b.name, b.window])),
     rows: {
-      markets,
-      trades: tradeRows(random, marketAddresses, traders),
-      liquidity: liquidityRows(random, marketAddresses, [factory, ...creators]),
+      markets: marketList,
+      trades,
+      liquidity,
+      market_state: marketStateRows(markets, trades, liquidity),
       answers: answerRows(random),
     },
   };
