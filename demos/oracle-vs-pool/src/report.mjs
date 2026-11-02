@@ -1,14 +1,14 @@
 import spec from "../testril.json" with { type: "json" };
 
 const binds = Object.fromEntries(spec.binds.map((bind) => [bind.name, bind]));
-export const poolWindow = binds.pool.window;
+const poolWindow = binds.pool.window;
 export const [ethFeed, btcFeed, usdcFeed] = binds.feeds.params.feeds;
-export const feedNames = new Map([
+const feedNames = new Map([
   [ethFeed, "ETH / USD"],
   [btcFeed, "BTC / USD"],
   [usdcFeed, "USDC / USD"],
 ]);
-export const feedDecimals = 8n;
+const feedDecimals = 8n;
 const ethDecimals = 18n;
 const usdcDecimals = 6n;
 const maxGapBasisPoints = 200n;
@@ -17,14 +17,11 @@ const q192 = 2n ** 192n;
 const hourStamp = (ms) => new Date(ms).toISOString().slice(0, 13);
 
 export function windowHours() {
-  const hours = [];
-  for (
-    let ms = Date.parse(`${poolWindow.from_hour}:00:00Z`);
-    hourStamp(ms) < poolWindow.to_hour;
-    ms += 3600000
-  )
-    hours.push(hourStamp(ms));
-  return hours;
+  const start = Date.parse(`${poolWindow.from_hour}:00:00Z`);
+  const end = Date.parse(`${poolWindow.to_hour}:00:00Z`);
+  return Array.from({ length: (end - start) / 3600000 }, (_, i) =>
+    hourStamp(start + i * 3600000),
+  );
 }
 
 export const poolPriceFromSqrt = (sqrtPriceX96) =>
@@ -64,14 +61,21 @@ const gapBasisPoints = (pool, oracle) => ((pool - oracle) * 10000n) / oracle;
 
 const abs = (n) => (n < 0n ? -n : n);
 
+const exceedsMaxGap = (pool, oracle) =>
+  abs(pool - oracle) * 10000n > maxGapBasisPoints * oracle;
+
 export function check(rows) {
   const hours = windowHours();
   const pool = poolByHour(rows);
   const oracle = answersByHour(rows, ethFeed);
-  for (const [name, series] of [
+  const required = [
     ["Pool price", pool],
-    ["ETH / USD feed", oracle],
-  ]) {
+    ...[ethFeed, btcFeed, usdcFeed].map((feed) => [
+      `${feedNames.get(feed)} feed`,
+      answersByHour(rows, feed),
+    ]),
+  ];
+  for (const [name, series] of required) {
     const missing = hours.filter((hour) => !series.has(hour));
     if (missing.length) throw new Error(`${name} is missing ${missing[0]}.`);
   }
@@ -83,14 +87,14 @@ export function check(rows) {
   let widest = 0n;
   for (const hour of hours) {
     const gap = abs(gapBasisPoints(pool.get(hour), oracle.get(hour)));
-    if (gap > maxGapBasisPoints)
+    if (exceedsMaxGap(pool.get(hour), oracle.get(hour)))
       throw new Error(
         `At ${hour} the pool price ${formatPrice(pool.get(hour))} is ${formatPercent(gap)} from the feed ${formatPrice(oracle.get(hour))}, beyond ${formatPercent(maxGapBasisPoints)}.`,
       );
     if (gap > widest) widest = gap;
   }
   return [
-    `Pool price and ETH / USD feed present for all ${hours.length} hours`,
+    `Pool price and all ${required.length - 1} feeds present for all ${hours.length} hours`,
     `Every feed answer is positive (${rows.feeds.length} answers)`,
     `Pool price stays within ${formatPercent(maxGapBasisPoints)} of the feed every hour; the widest gap is ${formatPercent(widest)}`,
   ];
