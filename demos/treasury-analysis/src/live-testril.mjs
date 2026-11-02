@@ -143,6 +143,7 @@ export function createLiveTestril(
   authorizePayment = async (_payment) => {},
 ) {
   let payments = Promise.resolve();
+  let paymentFailure;
   let channels;
   const reads = new Map();
   // Cumulative vouchers must settle in order; resource execution can overlap.
@@ -172,10 +173,13 @@ export function createLiveTestril(
     if (quote.outcome !== "payment_required") return quote;
     return settle(async () => {
       if (state.receipts.some((r) => r.status === "paying"))
-        throw demoFailure(
-          "PAYMENT_RECONCILIATION_REQUIRED",
-          "A payment has an uncertain result. Reconcile its quote before authorizing another payment.",
-          { reason: "uncertain-settlement" },
+        throw (
+          paymentFailure ??
+          demoFailure(
+            "PAYMENT_RECONCILIATION_REQUIRED",
+            "A payment has an uncertain result. Reconcile its quote before authorizing another payment.",
+            { reason: "uncertain-settlement" },
+          )
         );
       const accepted = acceptedQuote(quote, config);
       const amount = BigInt(accepted.amount);
@@ -238,23 +242,31 @@ export function createLiveTestril(
       payment.extensions = {
         "payment-identifier": { info: { id: entry.paymentIdentifier } },
       };
-      const result = await measure("Settle Testril payment", () =>
-        mcp.call(verb, args, payment),
-      );
-      const response = result.paymentResponse;
-      if (
-        response?.success !== true ||
-        response.network !== accepted.network ||
-        typeof response.payer !== "string" ||
-        response.payer.toLowerCase() !== config.payer.address.toLowerCase() ||
-        (response.chargedAmount !== undefined &&
-          response.chargedAmount !== accepted.amount)
-      )
-        throw demoFailure(
-          "PAYMENT_RECONCILIATION_REQUIRED",
-          "The paid call returned no matching settlement confirmation. Reconcile its quote before paying again.",
-          { reason: "missing-settlement" },
+      let result;
+      try {
+        result = await measure("Settle Testril payment", () =>
+          mcp.call(verb, args, payment),
         );
+        const response = result.paymentResponse;
+        if (
+          response?.success !== true ||
+          response.network !== accepted.network ||
+          typeof response.payer !== "string" ||
+          response.payer.toLowerCase() !== config.payer.address.toLowerCase() ||
+          (response.chargedAmount !== undefined &&
+            response.chargedAmount !== accepted.amount)
+        )
+          throw demoFailure(
+            "PAYMENT_RECONCILIATION_REQUIRED",
+            "The paid call returned no matching settlement confirmation. Reconcile its quote before paying again.",
+            { reason: "missing-settlement" },
+          );
+      } catch (error) {
+        // Other queued reads must report the cause, rather than hide it behind
+        // their consequent refusal to authorize another payment in this batch.
+        paymentFailure = error;
+        throw error;
+      }
       const index = channels.findIndex(
         (c) => c.channelId === signed.channel.channelId,
       );
@@ -337,6 +349,7 @@ export function createLiveTestril(
   return {
     beginReadBatch() {
       channels = undefined;
+      paymentFailure = undefined;
     },
     async head(minimumBlock = 0) {
       const until = Date.now() + 60000;

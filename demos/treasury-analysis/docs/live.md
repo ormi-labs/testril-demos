@@ -87,7 +87,11 @@ and all saved payments in `allReceipts`, with cumulative payment totals in
 If a transfer or a later read fails, use **Refresh**. The recorded
 transaction hash is recovered without signing another transfer; paid results are
 reused. If a settlement response is lost, the charge and deposit remain reserved
-and new payments are refused until the quote is reconciled. The signed payment
+and new payments are refused until the quote is reconciled.
+Within a refresh, queued reads retain the settlement failure that blocked them,
+so their refusal to pay cannot hide the original cause. A later refresh or restart
+reports the unresolved payment and does not submit another payment.
+The signed payment
 travels only in `_meta["x402/payment"]`; settlement is confirmed by
 `_meta["x402/payment-response"]`. Signatures are never saved in the receipt history. The interface shows
 its quote ID and status. A stalled materialization remains attached to its job.

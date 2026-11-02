@@ -584,6 +584,42 @@ test("an uncertain settlement reserves the caps and refuses any second payment a
   assert.equal(peer.calls.filter((c) => !!c.payment).length, 1);
 });
 
+test("a queued read preserves the payment failure that blocked it", async (t) => {
+  const b = testConfig().config.wallets.find((w) => w.id === "b").address;
+  const peer = await livePeer(t, {
+    beforeTool(name, args, payment) {
+      if (
+        payment &&
+        name === "materialize" &&
+        JSON.parse(args.bound_function_id)[1].reads.owners[0] === b
+      )
+        throw new Error("Simulated lost settlement response");
+    },
+  });
+  await assert.rejects(peer.demo.refresh(), (error) => {
+    const failure = describeFailure(error);
+    assert.equal(failure.code, "TESTRIL_REQUEST_FAILED");
+    assert.equal(failure.details.operation, "materialize");
+    return true;
+  });
+  assert.equal(
+    peer.demo.export().allReceipts.filter((r) => r.status === "paying").length,
+    1,
+  );
+  const submitted = peer.calls.filter((c) => c.payment).length;
+  for (const restart of [false, true]) {
+    if (restart) await peer.restart();
+    await assert.rejects(peer.demo.refresh(), (error) => {
+      assert.deepEqual(describeFailure(error), {
+        code: "PAYMENT_RECONCILIATION_REQUIRED",
+        details: { reason: "uncertain-settlement" },
+      });
+      return true;
+    });
+    assert.equal(peer.calls.filter((c) => c.payment).length, submitted);
+  }
+});
+
 test("MCP payment challenges retain the request arguments and settle through metadata", async (t) => {
   const peer = await livePeer(t);
   await peer.demo.refresh();
