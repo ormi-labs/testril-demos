@@ -1112,3 +1112,240 @@ test("a saved session rebinds after a service restart without erasing payment or
   );
   assert.equal(after.actualBalances.a, peer.balances.a);
 });
+
+test("reconciliation authenticates an existing payment without spending and survives restart", async (t) => {
+  let authorizations = 0;
+  const peer = await livePeer(t, {
+    loseFirstSettlement: true,
+    authorizePayment() {
+      authorizations++;
+    },
+  });
+  await assert.rejects(peer.demo.refresh());
+  const before = peer.demo.export();
+  const channels = JSON.stringify(peer.channels);
+  await peer.restart();
+  await peer.demo.reconcile();
+  assert.equal(authorizations, 1);
+  assert.equal(JSON.stringify(peer.channels), channels);
+  const after = peer.demo.export();
+  assert.equal(after.allReceipts.length, before.allReceipts.length);
+  assert.equal(after.allReceipts[0].status, "done");
+  assert.equal(after.payment.lifetimeSpentRaw, before.payment.lifetimeSpentRaw);
+  assert.equal(after.payment.depositedRaw, before.payment.depositedRaw);
+  const proof = peer.calls.find(
+    (c) => c.payment?.payload.voucher?.maxClaimableAmount === "0",
+  ).payment;
+  assert.equal(proof.payload.type, "voucher");
+  assert.equal(proof.payload.deposit, undefined);
+  assert.equal(
+    proof.extensions["payment-identifier"].info.id,
+    peer.calls.find((c) => c.payment).payment.extensions["payment-identifier"]
+      .info.id,
+  );
+  await peer.restart();
+  await peer.demo.reconcile();
+  assert.equal(
+    peer.calls.filter(
+      (c) => c.payment?.payload.voucher?.maxClaimableAmount === "0",
+    ).length,
+    1,
+  );
+  peer.advanceBlock();
+  await peer.demo.refresh();
+  assert.equal(peer.demo.state().refreshNeeded, false);
+  assert.equal(
+    JSON.stringify(after).includes(proof.payload.voucher.signature),
+    false,
+  );
+});
+
+test("reconciliation supports older journals without saved payment terms", async (t) => {
+  const peer = await livePeer(t, { loseFirstSettlement: true });
+  await assert.rejects(peer.demo.refresh());
+  await peer.demo.close();
+  const path = join(peer.directory, ".live-state.json");
+  const saved = JSON.parse(await readFile(path, "utf8"));
+  delete saved.receipts[0].accepted;
+  await writeFile(path, JSON.stringify(saved));
+  await peer.restart();
+  await peer.demo.reconcile();
+  assert.equal(peer.demo.export().allReceipts[0].status, "done");
+});
+
+for (const ambiguity of ["receiver", "channel hash"])
+  test(`reconciliation refuses ambiguous ${ambiguity} evidence without signing a payment`, async (t) => {
+    const peer = await livePeer(t, { loseFirstSettlement: true });
+    await assert.rejects(peer.demo.refresh());
+    await peer.demo.close();
+    const path = join(peer.directory, ".live-state.json");
+    const saved = JSON.parse(await readFile(path, "utf8"));
+    delete saved.receipts[0].accepted;
+    await writeFile(path, JSON.stringify(saved));
+    if (ambiguity === "receiver") {
+      const alternate = structuredClone(peer.channels[0]);
+      alternate.channelConfig.receiver = peer.config.wallets[1].address;
+      peer.channels.push(alternate);
+    } else peer.channels[0].channelId = "0x" + "0".repeat(64);
+    await peer.restart();
+    await assert.rejects(
+      peer.demo.reconcile(),
+      (error) =>
+        describeFailure(error)?.code === "PAYMENT_RECONCILIATION_REQUIRED",
+    );
+    assert.equal(
+      peer.calls.filter(
+        (c) => c.payment?.payload.voucher?.maxClaimableAmount === "0",
+      ).length,
+      0,
+    );
+    assert.equal(peer.demo.export().allReceipts[0].status, "paying");
+  });
+
+test("an expired receipt confirms payment without pretending it contains read results", async (t) => {
+  const peer = await livePeer(t, {
+    loseFirstSettlement: true,
+    loseSettlementFor: "read",
+  });
+  await assert.rejects(peer.demo.refresh());
+  await peer.demo.reconcile();
+  const original = peer.calls.find((c) => c.payment && c.name === "read");
+  peer.advanceBlock();
+  await peer.demo.refresh();
+  assert.equal(
+    peer.calls.filter(
+      (c) =>
+        c.payment &&
+        c.payment.payload.voucher.maxClaimableAmount !== "0" &&
+        c.name === original.name &&
+        JSON.stringify(c.args) === JSON.stringify(original.args),
+    ).length,
+    1,
+  );
+});
+
+for (const verb of ["materialize", "read"])
+  test(`reconciliation accepts a live ${verb} replay as well as an expired receipt`, async (t) => {
+    const peer = await livePeer(t, {
+      loseFirstSettlement: true,
+      loseSettlementFor: verb,
+      reconciliationResponse(result, { args }) {
+        const { quote_id, paymentResponse } = result;
+        return verb === "materialize"
+          ? {
+              outcome: "success",
+              result: "materializing",
+              job: { job_id: "job:1", quote_id, state: "done" },
+              paymentResponse,
+            }
+          : { outcome: "success", ...args, values: [], paymentResponse };
+      },
+    });
+    await assert.rejects(peer.demo.refresh());
+    const before = peer.demo.export();
+    await peer.demo.reconcile();
+    assert.ok(peer.demo.export().allReceipts.every((r) => r.status === "done"));
+    assert.equal(
+      peer.demo.export().payment.lifetimeSpentRaw,
+      before.payment.lifetimeSpentRaw,
+    );
+  });
+
+test("failed reconciliation persistence keeps the durable payment uncertain and blocks further actions", async (t) => {
+  const peer = await livePeer(t, { loseFirstSettlement: true });
+  await assert.rejects(peer.demo.refresh());
+  await peer.demo.close();
+  const path = join(peer.directory, ".live-state.json");
+  const before = await readFile(path, "utf8");
+  let rejectSave = false;
+  const demo = await createLiveDemo({
+    config: peer.config,
+    chain: peer.chain,
+    mcp: await connectMcp(peer.config.mcpUrl),
+    journal: {
+      load: () => before,
+      save: async () => {
+        if (rejectSave) throw new Error("storage unavailable");
+      },
+      close: async () => {},
+    },
+  });
+  rejectSave = true;
+  const storageFailure = (error) =>
+    describeFailure(error)?.code === "JOURNAL_UNAVAILABLE";
+  await assert.rejects(demo.reconcile(), storageFailure);
+  await assert.rejects(demo.refresh(), storageFailure);
+  await demo.close();
+  assert.equal(await readFile(path, "utf8"), before);
+  await peer.restart();
+  assert.equal(peer.demo.export().allReceipts[0].status, "paying");
+  await peer.demo.reconcile();
+  assert.equal(peer.demo.export().allReceipts[0].status, "done");
+});
+
+for (const [label, alter] of [
+  ["quote", (r) => ({ ...r, quote_id: "quote:other" })],
+  [
+    "network",
+    (r) => ({
+      ...r,
+      paymentResponse: { ...r.paymentResponse, network: "eip155:1" },
+    }),
+  ],
+  [
+    "payer",
+    (r) => ({
+      ...r,
+      paymentResponse: {
+        ...r.paymentResponse,
+        payer: testConfig().config.wallets[0].address,
+      },
+    }),
+  ],
+  [
+    "charge",
+    (r) => ({
+      ...r,
+      paymentResponse: {
+        ...r.paymentResponse,
+        extra: { chargedAmount: "119" },
+      },
+    }),
+  ],
+  [
+    "receipt amount",
+    (r) => ({ ...r, receipt: { ...r.receipt, amount: { atoms: "119" } } }),
+  ],
+  [
+    "receipt quote",
+    (r) => ({ ...r, receipt: { ...r.receipt, quote_id: "quote:other" } }),
+  ],
+  ["pending", () => ({ outcome: "error", kind: "payment_recovery_pending" })],
+])
+  test(`reconciliation preserves uncertainty when ${label} does not confirm the original purchase`, async (t) => {
+    const peer = await livePeer(t, {
+      loseFirstSettlement: true,
+      reconciliationResponse: alter,
+    });
+    await assert.rejects(peer.demo.refresh());
+    const before = peer.demo.export();
+    await assert.rejects(
+      peer.demo.reconcile(),
+      (error) =>
+        describeFailure(error)?.code === "PAYMENT_RECONCILIATION_REQUIRED",
+    );
+    assert.deepEqual(peer.demo.export().allReceipts, before.allReceipts);
+    assert.equal(
+      peer.calls.filter(
+        (c) =>
+          c.payment && c.payment.payload.voucher.maxClaimableAmount !== "0",
+      ).length,
+      1,
+    );
+    await peer.restart();
+    await assert.rejects(
+      peer.demo.refresh(),
+      (error) =>
+        describeFailure(error)?.code === "PAYMENT_RECONCILIATION_REQUIRED",
+    );
+  });

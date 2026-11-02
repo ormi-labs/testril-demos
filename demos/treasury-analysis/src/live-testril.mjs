@@ -1,3 +1,4 @@
+import { lookupPayment } from "./payment-recovery.mjs";
 import { setTimeout as delay } from "node:timers/promises";
 import { randomUUID } from "node:crypto";
 import { acceptedQuote, signBatchPayment } from "./batch-payment.mjs";
@@ -161,13 +162,16 @@ export function createLiveTestril(
     const cached = state.receipts.find(
       (r) => r.cacheKey === key && r.status === "done",
     );
-    if (cached) return cached.result;
-    if (state.receipts.some((r) => r.cacheKey === key && r.status === "paid"))
+    if (
+      cached?.result?.receipt ||
+      state.receipts.some((r) => r.cacheKey === key && r.status === "paid")
+    )
       throw demoFailure(
         "PAYMENT_RECONCILIATION_REQUIRED",
         "A paid request did not finish. Reconcile its quote before paying again.",
         { reason: "unfinished-request" },
       );
+    if (cached) return cached.result;
     const quote = await mcp.call(verb, args);
     if (quote.outcome === "success") return quote;
     if (quote.outcome !== "payment_required") return quote;
@@ -230,6 +234,7 @@ export function createLiveTestril(
         block: args.from_block,
         timestamp: new Date().toISOString(),
         paymentIdentifier: randomUUID(),
+        accepted,
       };
       state.receipts.push(entry);
       state.depositedRaw = (
@@ -347,6 +352,16 @@ export function createLiveTestril(
     return values;
   }
   return {
+    async reconcilePayments() {
+      for (const entry of state.receipts.filter((r) => r.status === "paying")) {
+        const result = await lookupPayment(config, mcp, entry);
+        entry.result = result;
+        entry.status = "done";
+        await save();
+      }
+      channels = undefined;
+      paymentFailure = undefined;
+    },
     beginReadBatch() {
       channels = undefined;
       paymentFailure = undefined;

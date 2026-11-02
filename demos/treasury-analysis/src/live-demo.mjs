@@ -292,10 +292,17 @@ export async function createLiveDemo({
         bindingsReady = true;
       }
       // Freeze one snapshot so retries reuse paid reads instead of charging new blocks.
+      // An expired receipt proves settlement but cannot supply the old data.
+      const minimumBlock = Math.max(
+        state.transfers.at(-1)?.block ?? 0,
+        ...state.receipts
+          .filter((r) => r.result?.receipt)
+          .map((r) => r.args.to_block),
+      );
       state.refreshBlock ??=
         confirmedBlock ??
         recovered?.block ??
-        (await testril.head(state.transfers.at(-1)?.block ?? 0));
+        (await testril.head(minimumBlock));
       await save();
       const block = state.refreshBlock;
       const actual = { ...state.balances };
@@ -429,6 +436,15 @@ export async function createLiveDemo({
       state: publicState,
       progress: () => progress?.snapshot() ?? null,
       refresh: () => serial(refresh),
+      reconcile: () =>
+        serial(async () => {
+          await testril.reconcilePayments();
+          if (state.receipts.some((r) => r.result?.receipt))
+            delete state.refreshBlock;
+          state.refreshNeeded = true;
+          await save();
+          return publicState();
+        }),
       transfer(input) {
         const report = createTransferTiming();
         return serial(async () => {

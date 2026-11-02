@@ -101,7 +101,7 @@ classifications. Host authorization rejections retain their original identity.
 
 `createLiveDemo({ config, chain, mcp, directory, authorizePayment, journal })`
 returns an engine with `state`, `progress`, `refresh`, `transfer`, `reset`,
-`provenance`, `balanceProvenance`, `export`, and `close` methods.
+`reconcile`, `provenance`, `balanceProvenance`, `export`, and `close` methods.
 
 - `config` comes from `liveConfig(env)` and contains validated signers and caps.
 - `chain` comes from `createLiveChain(config)`; `mcp` comes from
@@ -122,6 +122,28 @@ latest state's revision. `reset({ revision })` sweeps all A and B funds back to
 Treasury. `refresh()` recovers pending work and refreshes reads. Call `close()`
 at shutdown; it waits for queued work and closes MCP and the journal. The engine
 owns those resources once passed to it.
+
+`reconcile()` is an explicit, serialized payment recovery operation. It replays
+only saved `paying` entries with their original request scope, amount, and payment
+identifier. It signs a **zero cumulative voucher**, with no deposit authorization,
+to authenticate the payer to Testril's payment-identifier lookup. It never calls
+`authorizePayment`, buys new work, or submits an RPC transfer. Unknown, pending,
+conflicting, or mismatched replies leave the entry uncertain. A successful lookup
+must confirm the payer, network, amount, and original receipt or request scope;
+receipt and materialization replies must also match the saved quote ID.
+
+The private journal saves accepted quote terms for new payments, but no payment
+signatures. Older entries can use inspected channel terms only when they identify
+one receiver unambiguously. Reconciliation saves each confirmation durably without
+changing reserved charges or deposits. A failed save blocks further actions until
+storage is repaired and the engine is reopened.
+
+An expired receipt confirms settlement without supplying expired results. The
+next refresh reads a newer block under normal authorization and caps. Live replay
+results remain cached for their original scope. Ordinary refresh never initiates
+payment reconciliation; the embedding operator decides when to call it. A host
+must keep the sandbox isolated through reconciliation, fresh reads, cleanup,
+verification, and successful closure before reusing it.
 
 Keep keys in the host process. Authentication, user sessions, payment approval
 policy, and durable hosted storage belong to the embedding application. The

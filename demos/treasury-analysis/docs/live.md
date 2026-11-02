@@ -90,7 +90,12 @@ reused. If a settlement response is lost, the charge and deposit remain reserved
 and new payments are refused until the quote is reconciled.
 Within a refresh, queued reads retain the settlement failure that blocked them,
 so their refusal to pay cannot hide the original cause. A later refresh or restart
-reports the unresolved payment and does not submit another payment.
+reports the unresolved payment and does not submit another payment. An embedding
+operator can call the documented [`reconcile()` operation](development.md#embedding-the-live-engine)
+to authenticate an existing payment without authorizing spending. Confirmed
+expired receipts remain in the accounting history; subsequent reads use a newer
+block and the normal caps. Unconfirmed payments keep their reservations and must
+remain isolated.
 The signed payment
 travels only in `_meta["x402/payment"]`; settlement is confirmed by
 `_meta["x402/payment-response"]`. Signatures are never saved in the receipt history. The interface shows

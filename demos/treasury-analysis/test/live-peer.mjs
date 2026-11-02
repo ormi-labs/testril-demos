@@ -1,3 +1,5 @@
+import { recoverTypedDataAddress } from "viem";
+import { batchDomain, voucherTypes } from "../src/batch-payment.mjs";
 import { createServer } from "node:http";
 import { once } from "node:events";
 import { mkdtemp } from "node:fs/promises";
@@ -46,6 +48,8 @@ export async function livePeer(t, options = {}) {
   const pendingRanges = new Set();
   const channels = [];
   const records = new Map();
+  const settled = new Map();
+  let lostSettlement = false;
   let block = 100;
   let prepares = 0;
   let uncertain = false;
@@ -165,6 +169,48 @@ export async function livePeer(t, options = {}) {
           )
         )
           throw new Error("Invalid payment identifier");
+        if (payment.payload?.voucher?.maxClaimableAmount === "0") {
+          const voucher = payment.payload.voucher;
+          const signer = await recoverTypedDataAddress({
+            domain: batchDomain,
+            types: voucherTypes,
+            primaryType: "Voucher",
+            message: { channelId: voucher.channelId, maxClaimableAmount: 0n },
+            signature: voucher.signature,
+          });
+          if (
+            !sameAddress(signer, config.payer.address) ||
+            payment.payload.deposit
+          )
+            throw new Error(
+              "Recovery proof must authenticate without spending",
+            );
+          const old = settled.get(
+            payment.extensions["payment-identifier"].info.id,
+          );
+          if (
+            !old ||
+            old.verb !== name ||
+            JSON.stringify(old.args) !== JSON.stringify(args) ||
+            old.amount !== payment.accepted.amount
+          )
+            return { outcome: "error", kind: "payment_recovery_pending" };
+          const result = {
+            outcome: "success",
+            result: "receipt",
+            quote_id: old.id,
+            amount: { atoms: old.amount },
+            receipt: {
+              quote_id: old.id,
+              amount: { atoms: old.amount },
+              state: "paid",
+            },
+            paymentResponse: old.paymentResponse,
+          };
+          return options.reconciliationResponse
+            ? options.reconciliationResponse(result, { verb: name, args })
+            : result;
+        }
         if (uncertain) {
           uncertain = false;
           throw new Error("uncertain settlement");
@@ -197,6 +243,7 @@ export async function livePeer(t, options = {}) {
           throw new Error("Incorrect cumulative voucher.");
         channel.chargedCumulativeAmount = payload.voucher.maxClaimableAmount;
         quote.paid = true;
+        const quoteId = [...quotes].find(([, value]) => value === quote)[0];
         const paymentResponse = {
           success: true,
           network: "eip155:84532",
@@ -204,6 +251,11 @@ export async function livePeer(t, options = {}) {
           transaction: "0x" + "1".repeat(64),
           extra: { chargedAmount: quote.amount },
         };
+        settled.set(payment.extensions["payment-identifier"].info.id, {
+          ...quote,
+          id: quoteId,
+          paymentResponse,
+        });
         const work = quote.args;
         if (name === "materialize") {
           covered.add(JSON.stringify(work));
@@ -338,6 +390,19 @@ export async function livePeer(t, options = {}) {
           if (options.malformedChallenge) result.content.pop();
         } else {
           const { paymentResponse, ...body } = value;
+          if (
+            paymentResponse &&
+            options.loseFirstSettlement &&
+            (!options.loseSettlementFor ||
+              message.params.name === options.loseSettlementFor) &&
+            !lostSettlement &&
+            message.params._meta?.["x402/payment"]?.payload?.voucher
+              ?.maxClaimableAmount !== "0"
+          ) {
+            lostSettlement = true;
+            response.destroy();
+            return;
+          }
           if (paymentResponse && options.wrongSettlement)
             paymentResponse.network = "eip155:1";
           result = {

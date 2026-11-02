@@ -175,7 +175,14 @@ its raw message is not diagnostic context by default.
 The demo reports uncertainty and its actual state. The harness decides whether
 to end a lease or quarantine a sandbox. An HTTP status or a generic "retryable"
 flag is not evidence that repeating a payment or transfer is safe. Recovery must
-use the demo's reconciliation operations and existing journals.
+use the demo's reconciliation operations and existing journals. The Move Money
+engine's explicit `reconcile()` operation is one example: it authenticates an
+existing payment identifier without spending authority and durably verifies the
+reply. Its demo-local embedding guide specifies that operation; future demos
+must document their own reconciliation interfaces rather than copy its provider
+protocol into common hosting code. A confirmed payment alone does not establish
+fresh data or clean wallets, so the harness must still complete cleanup and
+verification before reuse.
 
 ## Operation lifecycle
 

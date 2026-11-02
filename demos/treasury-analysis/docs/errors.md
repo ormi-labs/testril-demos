@@ -138,7 +138,12 @@ The engine saves payment reservations and signed transactions before submission.
 It drains concurrent read/payment pipelines before reporting failure. A journal
 save failure takes precedence over a secondary uncertain-payment observation in
 another pipeline. Neither a descriptor nor its HTTP presentation grants permission
-to repeat a payment or transfer. Reconciliation must use the saved state.
+to repeat a payment or transfer. Reconciliation must use the saved state. The explicit engine `reconcile()`
+operation authenticates the original identifier with a zero cumulative voucher;
+it cannot authorize a charge or deposit. It validates settlement evidence before
+saving a confirmation and never clears an unresolved entry. See the
+[embedding contract](development.md#embedding-the-live-engine) for reply checks,
+historical journal handling, expired results, and host cleanup responsibilities.
 
 Closing attempts to release both MCP and journal resources. An opening/load
 failure retains its primary classification even if cleanup also fails. A normal
