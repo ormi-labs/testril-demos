@@ -1,7 +1,13 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { check, formatBnb, shape, tradesDay } from "../src/report.mjs";
-import { fixture } from "./fixture.mjs";
+import {
+  check,
+  formatBnb,
+  shape,
+  tradesDay,
+  zeroAddress,
+} from "../src/report.mjs";
+import { fixture, usd1 } from "./fixture.mjs";
 
 const rows = () => structuredClone(fixture().rows);
 
@@ -34,10 +40,34 @@ test("check fails when a trade is missing from the rows", () => {
   assert.throws(() => check(corrupted), /counts \d+ trades|sums/);
 });
 
-test("check fails on a negative fee", () => {
+test("check fails when a fee is scaled by 10^18", () => {
   const corrupted = rows();
-  corrupted.trades[3].fee_amount = "-1";
-  assert.throws(() => check(corrupted), /negative fee/);
+  const trade = corrupted.trades[3];
+  trade.fee_amount = (BigInt(trade.fee_amount) * 10n ** 18n).toString();
+  assert.throws(() => check(corrupted), /has fee/);
+});
+
+test("check fails when fee and quote amount are swapped", () => {
+  const corrupted = rows();
+  const trade = corrupted.trades[3];
+  [trade.fee_amount, trade.quote_amount] = [
+    trade.quote_amount,
+    trade.fee_amount,
+  ];
+  assert.throws(() => check(corrupted), /has fee/);
+});
+
+test("check fails when a trade is relabelled to another quote asset", () => {
+  const corrupted = rows();
+  corrupted.trades.find((t) => t.quote_token === zeroAddress).quote_token =
+    usd1;
+  assert.throws(() => check(corrupted), /On 2026-11-01, .* /);
+});
+
+test("check fails on a volume row outside the window", () => {
+  const corrupted = rows();
+  corrupted.volume.push({ ...corrupted.volume[0], day: "2026-11-05" });
+  assert.throws(() => check(corrupted), /2026-11-05 is outside/);
 });
 
 test("check fails when a volume day is missing", () => {
@@ -49,7 +79,8 @@ test("check fails when a volume day is missing", () => {
 test("shape ranks tokens by buys plus sells and totals match the rows", () => {
   const data = rows();
   const view = shape(data);
-  const buys = data.volume.reduce((s, r) => s + BigInt(r.buy_quote_amount), 0n);
+  const native = data.volume.filter((r) => r.quote_token === zeroAddress);
+  const buys = native.reduce((s, r) => s + BigInt(r.buy_quote_amount), 0n);
   assert.equal(view.buys, formatBnb(buys));
   const volumes = view.tokens.map((t) => t.buysBnb + t.sellsBnb);
   assert.deepEqual(
@@ -57,4 +88,19 @@ test("shape ranks tokens by buys plus sells and totals match the rows", () => {
     [...volumes].sort((a, b) => b - a),
   );
   assert.equal(view.tokens.length, 14);
+});
+
+test("shape leaves out the token quoted in another asset", () => {
+  const data = rows();
+  const view = shape(data);
+  const everyBuy = data.volume.reduce(
+    (s, r) => s + BigInt(r.buy_quote_amount),
+    0n,
+  );
+  const everyFee = data.trades.reduce((s, t) => s + BigInt(t.fee_amount), 0n);
+  const usd1Token = data.trades.find((t) => t.quote_token === usd1).token;
+  assert.notEqual(view.buys, formatBnb(everyBuy));
+  assert.notEqual(view.fees, formatBnb(everyFee));
+  assert.equal(view.tokenCount, 14);
+  assert.ok(!view.tokens.some((t) => t.token === usd1Token));
 });

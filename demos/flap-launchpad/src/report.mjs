@@ -15,14 +15,12 @@ const nextDay = (day, step) =>
     .slice(0, 10);
 
 export function volumeDays() {
-  const days = [];
-  for (
-    let d = volumeWindow.from_day;
-    d < volumeWindow.to_day;
-    d = nextDay(d, 1)
-  )
-    days.push(d);
-  return days;
+  const dayCount =
+    (Date.parse(volumeWindow.to_day) - Date.parse(volumeWindow.from_day)) /
+    86400000;
+  return Array.from({ length: dayCount }, (_, i) =>
+    nextDay(volumeWindow.from_day, i),
+  );
 }
 export const tradesDay = nextDay(volumeWindow.to_day, -1);
 
@@ -61,6 +59,9 @@ export function check(rows) {
   const missing = days.filter((day) => !rows.volume.some((r) => r.day === day));
   if (missing.length)
     throw new Error(`Volume is missing ${missing.join(", ")}.`);
+  const strayDay = rows.volume.find((r) => !days.includes(r.day));
+  if (strayDay)
+    throw new Error(`Volume row for ${strayDay.day} is outside the window.`);
   const outside = rows.trades.filter(
     (t) =>
       t.block < tradesWindow.from_block || t.block >= tradesWindow.to_block,
@@ -69,10 +70,13 @@ export function check(rows) {
     throw new Error(
       `Trade at block ${outside[0].block} is outside the window.`,
     );
-  const negative = rows.trades.find((t) => BigInt(t.fee_amount) < 0n);
-  if (negative)
+  const badFee = rows.trades.find((t) => {
+    const fee = BigInt(t.fee_amount);
+    return fee < 0n || fee > BigInt(t.quote_amount);
+  });
+  if (badFee)
     throw new Error(
-      `Trade ${negative.tx} has a negative fee ${negative.fee_amount}.`,
+      `Trade ${badFee.tx} has fee ${badFee.fee_amount} outside 0..${badFee.quote_amount}.`,
     );
   const sums = sumTrades(rows.trades);
   const volumes = new Map(
@@ -82,11 +86,13 @@ export function check(rows) {
     const problem = mismatch(volumes.get(key), sums.get(key));
     if (problem) throw new Error(`On ${tradesDay}, ${key} ${problem}.`);
   }
-  const fees = rows.trades.reduce((sum, t) => sum + BigInt(t.fee_amount), 0n);
+  const fees = rows.trades
+    .filter((t) => t.quote_token === zeroAddress)
+    .reduce((sum, t) => sum + BigInt(t.fee_amount), 0n);
   return [
     `Volume present for all ${days.length} days`,
     `On ${tradesDay}, buy and sell sums of ${volumes.size} tokens equal the sums of ${rows.trades.length} trade rows`,
-    `All ${rows.trades.length} trade fees are non-negative (${formatBnb(fees)} in total)`,
+    `All ${rows.trades.length} trade fees are between zero and the quote amount (${formatBnb(fees)} in BNB-quoted trades)`,
   ];
 }
 
