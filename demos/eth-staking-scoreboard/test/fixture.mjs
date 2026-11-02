@@ -6,10 +6,9 @@ import { windowDays } from "../src/report.mjs";
 const recordedAt = "2026-11-02T00:00:00.000Z";
 const wei = 10n ** 18n;
 const strategies = [
-  ["0x93c4b944d05dfe6df7645a86cd2206016c51564d", 0],
-  ["0x1bee69b7dfffa4e2d53c2a2df135c388ad25dcd2", 0],
-  ["0x54945180db7943c0ed0fee7edab2bd24620256bc", 0],
-  ["0x298afb19a105d59e74658c4c334ff360bade6dd2", 40],
+  "0x93c4b944d05dfe6df7645a86cd2206016c51564d",
+  "0x1bee69b7dfffa4e2d53c2a2df135c388ad25dcd2",
+  "0x54945180db7943c0ed0fee7edab2bd24620256bc",
 ];
 
 function seeded(seed) {
@@ -55,20 +54,14 @@ export function fixture() {
       staked_ether: ((supply * exchangeRate) / wei).toString(),
     };
   });
-  const eigenRows = strategies.flatMap(([strategy, firstIndex], s) => {
+  const eigenRows = strategies.flatMap((strategy, s) => {
     const sizes = walk(random, 90000 / (s + 1), 120 / (s + 1), 500, days);
-    return days.flatMap((day, i) =>
-      i < firstIndex
-        ? []
-        : [
-            {
-              day,
-              strategy,
-              total_shares: ether(sizes[i] * 0.9, random).toString(),
-              underlying_amount: ether(sizes[i], random).toString(),
-            },
-          ],
-    );
+    return days.map((day, i) => ({
+      day,
+      strategy,
+      total_shares: ether(sizes[i] * 0.9, random).toString(),
+      underlying_amount: ether(sizes[i], random).toString(),
+    }));
   });
   const rows = {
     lido: days.map((day, i) => ({

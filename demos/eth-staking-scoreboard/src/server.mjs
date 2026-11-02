@@ -14,18 +14,17 @@ const types = {
 };
 
 export function report(recording) {
-  let checks;
+  const base = { source: recording.source, recordedAt: recording.recordedAt };
   try {
-    checks = { ok: true, passed: check(recording.rows) };
+    const passed = check(recording.rows);
+    return {
+      ...base,
+      view: shape(recording.rows),
+      checks: { ok: true, passed },
+    };
   } catch (error) {
-    checks = { ok: false, error: error.message };
+    return { ...base, view: null, checks: { ok: false, error: error.message } };
   }
-  return {
-    source: recording.source,
-    recordedAt: recording.recordedAt,
-    view: shape(recording.rows),
-    checks,
-  };
 }
 
 export function createApp(
