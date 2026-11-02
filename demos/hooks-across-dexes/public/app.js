@@ -38,6 +38,7 @@ function splitChart(venues) {
   const barHeight = 28;
   const height = venues.length * rowHeight + 20;
   const widest = Math.max(
+    1e-6,
     ...venues.map((v) => v.hookedMillions + v.hooklessMillions),
   );
   const scale = (width - labelWidth - right) / widest;

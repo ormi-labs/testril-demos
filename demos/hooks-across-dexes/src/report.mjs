@@ -17,7 +17,12 @@ const decimals = 18n;
 const topHookPools = 10;
 
 const binds = Object.fromEntries(spec.binds.map((bind) => [bind.name, bind]));
-export const dayWindow = binds["cl-volume"].window;
+const volumeWindows = ["cl", "bin", "v4"].map(
+  (key) => binds[`${key}-volume`].window,
+);
+if (new Set(volumeWindows.map((w) => JSON.stringify(w))).size !== 1)
+  throw new Error("The three volume binds must share one day window.");
+export const [dayWindow] = volumeWindows;
 export const venues = [
   { key: "cl", dex: "PancakeSwap Infinity", name: "PancakeSwap Infinity CL" },
   { key: "bin", dex: "PancakeSwap Infinity", name: "PancakeSwap Infinity Bin" },
@@ -49,6 +54,17 @@ function stableLegVolume(pool, row) {
   return 0n;
 }
 
+const isStablePair = (pool) =>
+  stablecoins.has(pool.currency0) && stablecoins.has(pool.currency1);
+const legsDisagree = (row) => {
+  const [volume0, volume1] = [BigInt(row.volume0), BigInt(row.volume1)];
+  const gap = volume0 > volume1 ? volume0 - volume1 : volume1 - volume0;
+  return gap * 100n > volume0;
+};
+const registrationDisagrees = (pool) =>
+  pool.hooks_registration !== undefined &&
+  isHooked(pool) === (BigInt(pool.hooks_registration) === 0n);
+
 function poolsById(rows, venue) {
   const pools = new Map();
   for (const pool of rows[venue.poolsBind]) {
@@ -56,12 +72,17 @@ function poolsById(rows, venue) {
       throw new Error(`${venue.name} lists pool ${pool.pool} twice.`);
     pools.set(pool.pool, pool);
   }
+  for (const row of rows[venue.volumeBind])
+    if (!pools.has(row.pool))
+      throw new Error(
+        `${venue.name} has volume for pool ${row.pool}, which is not in its pool list.`,
+      );
   return pools;
 }
 
-function sumRows(rows, venue, pools, include = () => true) {
+function sumRows(volumeRows, pools, include = () => true) {
   const total = { swaps: 0n, stable: 0n };
-  for (const row of rows[venue.volumeBind]) {
+  for (const row of volumeRows) {
     const pool = pools.get(row.pool);
     if (!include(pool)) continue;
     total.swaps += BigInt(row.swaps);
@@ -74,10 +95,6 @@ function checkVenue(rows, venue, days) {
   const pools = poolsById(rows, venue);
   const seen = new Set();
   for (const row of rows[venue.volumeBind]) {
-    if (!pools.has(row.pool))
-      throw new Error(
-        `${venue.name} has volume for pool ${row.pool}, which is not in its pool list.`,
-      );
     if (!days.includes(row.day))
       throw new Error(
         `${venue.name} has a row for ${row.day}, outside the window.`,
@@ -88,22 +105,16 @@ function checkVenue(rows, venue, days) {
         `${venue.name} has two rows for pool ${row.pool} on ${row.day}.`,
       );
     seen.add(key);
-  }
-  for (const day of days) {
-    const dayRows = {
-      [venue.volumeBind]: rows[venue.volumeBind].filter((r) => r.day === day),
-    };
-    const total = sumRows(dayRows, venue, pools);
-    const hooked = sumRows(dayRows, venue, pools, isHooked);
-    const hookless = sumRows(dayRows, venue, pools, (pool) => !isHooked(pool));
-    if (
-      hooked.swaps + hookless.swaps !== total.swaps ||
-      hooked.stable + hookless.stable !== total.stable
-    )
+    if (isStablePair(pools.get(row.pool)) && legsDisagree(row))
       throw new Error(
-        `${venue.name} on ${day}: hooked plus hookless is not the total.`,
+        `${venue.name} pool ${row.pool} on ${row.day}: the two stablecoin legs differ by more than 1%.`,
       );
   }
+  for (const pool of pools.values())
+    if (registrationDisagrees(pool))
+      throw new Error(
+        `${venue.name} pool ${pool.pool}: hooks ${pool.hooks} contradict hooks_registration ${pool.hooks_registration}.`,
+      );
   return { pools: pools.size, rows: seen.size };
 }
 
@@ -111,12 +122,13 @@ export function check(rows) {
   const days = windowDays();
   return venues.map((venue) => {
     const { pools, rows: count } = checkVenue(rows, venue, days);
-    return `${venue.name}: ${count} pool-day rows over ${days.length} days all belong to the ${pools} listed pools, and hooked plus hookless equals the total each day`;
+    return `${venue.name}: ${count} pool-day rows over ${days.length} days all belong to the ${pools} listed pools, stablecoin pairs trade equal legs, and hooks agree with hooks_registration`;
   });
 }
 
 export function formatCompact(raw) {
   const dollars = Number(raw / 10n ** decimals);
+  if (dollars < 1e3) return `$${dollars.toFixed(2)}`;
   const [scale, suffix] =
     dollars >= 1e9 ? [1e9, "B"] : dollars >= 1e6 ? [1e6, "M"] : [1e3, "K"];
   return `$${(dollars / scale).toFixed(2)}${suffix}`;
@@ -134,8 +146,8 @@ const symbol = (address) => symbols.get(address) ?? shortHex(address);
 
 function venueSummary(rows, venue) {
   const pools = poolsById(rows, venue);
-  const all = sumRows(rows, venue, pools);
-  const hooked = sumRows(rows, venue, pools, isHooked);
+  const all = sumRows(rows[venue.volumeBind], pools);
+  const hooked = sumRows(rows[venue.volumeBind], pools, isHooked);
   const active = new Set(rows[venue.volumeBind].map((row) => row.pool));
   const view = {
     name: venue.name,
