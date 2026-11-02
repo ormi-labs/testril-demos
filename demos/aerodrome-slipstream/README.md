@@ -3,8 +3,8 @@
 Swaps and volume per pool per day for every pool created by the Aerodrome
 Slipstream factory on Base, ranked by dollars traded. The page proves its
 numbers: every pool-day row has at least one swap, each known pool's dollar side
-implies a sane token price, and the ranking is in descending order of dollar
-volume that matches an independent sum of each pool's rows.
+implies a sane token price, and the ranking covers every known pool that traded,
+is in descending order of dollar volume and matches the sum of each pool's rows.
 
 **The shipped recording is synthetic.** `recordings/report.json` is generated
 by `test/fixture.mjs` and the page says so in its banner. The eight pools
@@ -28,7 +28,8 @@ npm start
 
 Open http://127.0.0.1:4180 (set `PORT` to change it). Expected result: the
 synthetic banner, four headline numbers, a daily dollar-volume line for each
-ranked pool, a table of ranked pools, a table of unranked pools, and three passed cross-checks.
+ranked pool, a table of ranked pools, a table of unranked pools, and three
+passed cross-checks.
 
 ## Test
 
@@ -41,9 +42,11 @@ npm run format:check
 ```
 
 `npm test` checks the cross-check passes on the fixture and fails on a pool-day
-with zero swaps, a duplicated pool-day, or a day outside the window, that the
-dollar side of each pool (not the 18-decimal side) decides the ranking, and
-that the server returns the shaped report. `npm run test:browser` writes
+with zero swaps, a duplicated pool-day, a day outside the window, a pool whose
+volumes are read swapped, a leaderboard sum that does not match its rows, a
+leaderboard out of order or missing a known pool, that the dollar side of each
+pool (not the 18-decimal side) decides the ranking, and that the server returns
+the shaped report. `npm run test:browser` writes
 `docs/screenshot-desktop.png`. `npm run fixture` regenerates the synthetic
 recording.
 

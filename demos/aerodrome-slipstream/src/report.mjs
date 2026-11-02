@@ -1,6 +1,8 @@
 import spec from "../testril.json" with { type: "json" };
 
-export const poolVolume = spec.binds[0];
+export const poolVolume = spec.binds.find(
+  (bind) => bind.name === "pool-volume",
+);
 export const window = poolVolume.window;
 export const factory = poolVolume.params.swap.pool_list.factory;
 const dollarDecimals = 6n;
@@ -69,12 +71,42 @@ export function leaderboard(rows) {
   return { ranked, unranked };
 }
 
-const impliedPrice = (row, known) =>
-  Number(BigInt(row[known.dollarSide])) /
-  Number(dollar) /
-  (Number(BigInt(row[known.otherSide])) / 10 ** known.otherDecimals);
+const priceOutsideBand = (row, known) => {
+  const [low, high] = known.priceBand;
+  const scaledDollars =
+    BigInt(row[known.dollarSide]) * 10n ** BigInt(known.otherDecimals);
+  const otherVolume = BigInt(row[known.otherSide]);
+  return (
+    scaledDollars < BigInt(low) * dollar * otherVolume ||
+    scaledDollars > BigInt(high) * dollar * otherVolume
+  );
+};
 
-export function check(rows, { ranked } = leaderboard(rows["pool-volume"])) {
+export function checkLeaderboard(poolRows, ranked) {
+  const knownWithRows = new Set(
+    poolRows.map((row) => row.pool).filter((pool) => knownPools[pool]),
+  );
+  if (ranked.length !== knownWithRows.size)
+    throw new Error(
+      `${ranked.length} pools are ranked but ${knownWithRows.size} known pools have rows.`,
+    );
+  ranked.forEach((entry, index) => {
+    const summed = poolRows
+      .filter((row) => row.pool === entry.pool)
+      .reduce(
+        (sum, row) => sum + BigInt(row[knownPools[entry.pool].dollarSide]),
+        0n,
+      );
+    if (entry.dollars !== summed)
+      throw new Error(
+        `${entry.pool} is ranked with ${entry.dollars} but its rows sum to ${summed}.`,
+      );
+    if (index > 0 && entry.dollars > ranked[index - 1].dollars)
+      throw new Error(`${entry.pool} outranks a pool with less dollar volume.`);
+  });
+}
+
+export function check(rows) {
   const poolRows = rows["pool-volume"];
   if (!poolRows.length) throw new Error("No pool volume rows.");
   const seen = new Set();
@@ -90,32 +122,21 @@ export function check(rows, { ranked } = leaderboard(rows["pool-volume"])) {
       throw new Error(`Two rows for ${row.pool} on ${row.day}.`);
     seen.add(key);
     const known = knownPools[row.pool];
-    if (known) {
-      const price = impliedPrice(row, known);
+    if (known && priceOutsideBand(row, known)) {
       const [low, high] = known.priceBand;
-      if (!(price >= low && price <= high))
-        throw new Error(
-          `${known.pair} on ${row.day} implies ${price} dollars per ${known.otherToken}, outside ${low} to ${high}: the dollar side is misread.`,
-        );
+      throw new Error(
+        `${known.pair} on ${row.day} implies a price outside ${low} to ${high} dollars per ${known.otherToken}: the dollar side is misread.`,
+      );
     }
   }
 
-  ranked.forEach((entry, index) => {
-    const summed = poolRows
-      .filter((row) => row.pool === entry.pool)
-      .reduce((sum, row) => sum + dollarVolume(row), 0n);
-    if (entry.dollars !== summed)
-      throw new Error(
-        `${entry.pool} is ranked with ${entry.dollars} but its rows sum to ${summed}.`,
-      );
-    if (index > 0 && entry.dollars > ranked[index - 1].dollars)
-      throw new Error(`${entry.pool} outranks a pool with less dollar volume.`);
-  });
+  const { ranked } = leaderboard(poolRows);
+  checkLeaderboard(poolRows, ranked);
   const total = ranked.reduce((sum, entry) => sum + entry.dollars, 0n);
   return [
     `Every one of the ${poolRows.length} pool-day rows has at least one swap`,
     `Each known pool's dollar side implies a sane token price on every day, so no wei side was read as dollars`,
-    `${ranked.length} ranked pools are in descending order of dollar volume, each matching an independent sum of its rows, ${formatUsd(total)} in total`,
+    `${ranked.length} ranked pools cover every known pool that traded, are in descending order of dollar volume, and each matches the sum of its rows, ${formatUsd(total)} in total`,
   ];
 }
 

@@ -1,13 +1,13 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { fixture } from "./fixture.mjs";
-import { check, knownPools, leaderboard, shape } from "../src/report.mjs";
-
-const t_swap = (known) =>
-  Object.assign(known, {
-    dollarSide: known.otherSide,
-    otherSide: known.dollarSide,
-  });
+import {
+  check,
+  checkLeaderboard,
+  knownPools,
+  leaderboard,
+  shape,
+} from "../src/report.mjs";
 
 const rowsOf = () => structuredClone(fixture().rows);
 
@@ -22,31 +22,45 @@ test("the pool with the most dollars leads, though WETH/USDC has the larger raw 
   assert.equal(view.unrankedPools.length, 8);
 });
 
-test("check fails when a pool's dollar side is read from the wrong token", () => {
+test("check fails when a pool's volume0 and volume1 are read swapped", () => {
   for (const pool of Object.keys(knownPools)) {
-    const known = knownPools[pool];
-    const original = { ...known };
-    t_swap(known);
-    try {
-      assert.throws(() => check(rowsOf()), /dollar side is misread/);
-    } finally {
-      Object.assign(known, original);
-    }
+    const rows = rowsOf();
+    for (const row of rows["pool-volume"])
+      if (row.pool === pool)
+        [row.volume0, row.volume1] = [row.volume1, row.volume0];
+    assert.throws(() => check(rows), /dollar side is misread/);
   }
 });
 
-test("check fails when a ranked total does not match its rows", () => {
+test("check fails when a pool has no volume on the other token", () => {
   const rows = rowsOf();
-  const board = leaderboard(rows["pool-volume"]);
-  board.ranked[0].dollars += 1n;
-  assert.throws(() => check(rows, board), /its rows sum to/);
+  const row = rows["pool-volume"].find((r) => knownPools[r.pool]);
+  row[knownPools[row.pool].otherSide] = "0";
+  assert.throws(() => check(rows), /dollar side is misread/);
 });
 
-test("check fails when the ranking is out of order", () => {
-  const rows = rowsOf();
-  const board = leaderboard(rows["pool-volume"]);
-  board.ranked.reverse();
-  assert.throws(() => check(rows, board), /outranks/);
+test("checkLeaderboard fails when a ranked total does not match its rows", () => {
+  const poolRows = rowsOf()["pool-volume"];
+  const { ranked } = leaderboard(poolRows);
+  ranked[0].dollars += 1n;
+  assert.throws(() => checkLeaderboard(poolRows, ranked), /its rows sum to/);
+});
+
+test("checkLeaderboard fails when the ranking is out of order", () => {
+  const poolRows = rowsOf()["pool-volume"];
+  const { ranked } = leaderboard(poolRows);
+  ranked.reverse();
+  assert.throws(() => checkLeaderboard(poolRows, ranked), /outranks/);
+});
+
+test("checkLeaderboard fails when a known pool with rows is missing", () => {
+  const poolRows = rowsOf()["pool-volume"];
+  const { ranked } = leaderboard(poolRows);
+  ranked.pop();
+  assert.throws(
+    () => checkLeaderboard(poolRows, ranked),
+    /known pools have rows/,
+  );
 });
 
 test("check fails on a pool-day with zero swaps", () => {
