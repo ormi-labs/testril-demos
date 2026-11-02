@@ -1,0 +1,3651 @@
+{
+  "demo": "omen-markets",
+  "source": "synthetic",
+  "recordedAt": "2026-11-02T00:00:00.000Z",
+  "boundFunctions": {
+    "markets": {
+      "function_slug": "omen.market_list",
+      "chain_id": 100
+    },
+    "trades": {
+      "function_slug": "omen.trade",
+      "chain_id": 100
+    },
+    "liquidity": {
+      "function_slug": "omen.liquidity",
+      "chain_id": 100
+    },
+    "market_state": {
+      "function_slug": "omen.market_state",
+      "chain_id": 100
+    },
+    "answers": {
+      "function_slug": "realitio.answer",
+      "chain_id": 100
+    }
+  },
+  "window": {
+    "markets": {
+      "from_block": 0,
+      "to_block": 49062480
+    },
+    "trades": {
+      "from_block": 48558286,
+      "to_block": 49062480
+    },
+    "liquidity": {
+      "from_block": 48558286,
+      "to_block": 49062480
+    },
+    "market_state": {
+      "from_block": 48558286,
+      "to_block": 49062480
+    },
+    "answers": {
+      "from_block": 48558286,
+      "to_block": 49062480
+    }
+  },
+  "rows": {
+    "markets": [
+      {
+        "block": 48557286,
+        "market": "0xc7e9650c143d1725af516b60edba548d4179e21b",
+        "creator": "0x3451bd1b13c4558a67a62bc042905ecbf05c03d2",
+        "conditional_tokens": "0xceafdd6bc0bef976fdcd1112955828e00543c0ce",
+        "collateral_token": "0xe91d153e0b41518a2ce8dd3d7944fa863463a97d",
+        "fee": "20000000000000000"
+      },
+      {
+        "block": 48568369,
+        "market": "0x33807ad6b767b303f0cb4a7ff6044b2d9413c616",
+        "creator": "0x4dcfb279964970c20b694f220845b83839621bf0",
+        "conditional_tokens": "0xceafdd6bc0bef976fdcd1112955828e00543c0ce",
+        "collateral_token": "0xe91d153e0b41518a2ce8dd3d7944fa863463a97d",
+        "fee": "20000000000000000"
+      },
+      {
+        "block": 48578453,
+        "market": "0x7c1e039d24ae4e9b61dd90d80283b18ccded3356",
+        "creator": "0x45c55f8bd0a626e7f9e3971a538a79ea81cbb265",
+        "conditional_tokens": "0xceafdd6bc0bef976fdcd1112955828e00543c0ce",
+        "collateral_token": "0xe91d153e0b41518a2ce8dd3d7944fa863463a97d",
+        "fee": "20000000000000000"
+      },
+      {
+        "block": 48554286,
+        "market": "0xb138ef8dff06e8a0a3a33c65fc17f0c603ce4b9d",
+        "creator": "0x10019e66e6ec62a7525886a9477aabcc41b984b1",
+        "conditional_tokens": "0xceafdd6bc0bef976fdcd1112955828e00543c0ce",
+        "collateral_token": "0xe91d153e0b41518a2ce8dd3d7944fa863463a97d",
+        "fee": "20000000000000000"
+      },
+      {
+        "block": 48598621,
+        "market": "0xb07c136bb9a6e7763d9bef68c7eccca853f812ed",
+        "creator": "0x3451bd1b13c4558a67a62bc042905ecbf05c03d2",
+        "conditional_tokens": "0xceafdd6bc0bef976fdcd1112955828e00543c0ce",
+        "collateral_token": "0xe91d153e0b41518a2ce8dd3d7944fa863463a97d",
+        "fee": "20000000000000000"
+      },
+      {
+        "block": 48608705,
+        "market": "0xaf06902f6874cdc4cf826c144e00b1fd4892d476",
+        "creator": "0x4dcfb279964970c20b694f220845b83839621bf0",
+        "conditional_tokens": "0xceafdd6bc0bef976fdcd1112955828e00543c0ce",
+        "collateral_token": "0xe91d153e0b41518a2ce8dd3d7944fa863463a97d",
+        "fee": "20000000000000000"
+      },
+      {
+        "block": 48551286,
+        "market": "0x037c19940af482e1c517ef90669b6eca6cf55ba2",
+        "creator": "0x45c55f8bd0a626e7f9e3971a538a79ea81cbb265",
+        "conditional_tokens": "0xceafdd6bc0bef976fdcd1112955828e00543c0ce",
+        "collateral_token": "0xe91d153e0b41518a2ce8dd3d7944fa863463a97d",
+        "fee": "20000000000000000"
+      },
+      {
+        "block": 48628873,
+        "market": "0xd0b9f6a4815a44cc016898615e9021a994bf0a9f",
+        "creator": "0x10019e66e6ec62a7525886a9477aabcc41b984b1",
+        "conditional_tokens": "0xceafdd6bc0bef976fdcd1112955828e00543c0ce",
+        "collateral_token": "0xe91d153e0b41518a2ce8dd3d7944fa863463a97d",
+        "fee": "20000000000000000"
+      },
+      {
+        "block": 48638956,
+        "market": "0x3cd4bcb79df347eca86aef92e3377357138cba88",
+        "creator": "0x3451bd1b13c4558a67a62bc042905ecbf05c03d2",
+        "conditional_tokens": "0xceafdd6bc0bef976fdcd1112955828e00543c0ce",
+        "collateral_token": "0xe91d153e0b41518a2ce8dd3d7944fa863463a97d",
+        "fee": "20000000000000000"
+      },
+      {
+        "block": 48548286,
+        "market": "0x886ca381ae7cff78b4c47f3d041407758b345041",
+        "creator": "0x4dcfb279964970c20b694f220845b83839621bf0",
+        "conditional_tokens": "0xceafdd6bc0bef976fdcd1112955828e00543c0ce",
+        "collateral_token": "0xe91d153e0b41518a2ce8dd3d7944fa863463a97d",
+        "fee": "20000000000000000"
+      },
+      {
+        "block": 48659124,
+        "market": "0x52bab136f951bf39c11c34f788147e748bd78d18",
+        "creator": "0x45c55f8bd0a626e7f9e3971a538a79ea81cbb265",
+        "conditional_tokens": "0xceafdd6bc0bef976fdcd1112955828e00543c0ce",
+        "collateral_token": "0xe91d153e0b41518a2ce8dd3d7944fa863463a97d",
+        "fee": "20000000000000000"
+      },
+      {
+        "block": 48669208,
+        "market": "0x0d0a5faaacc0b5539d56bf1ab15f8e384772cbba",
+        "creator": "0x10019e66e6ec62a7525886a9477aabcc41b984b1",
+        "conditional_tokens": "0xceafdd6bc0bef976fdcd1112955828e00543c0ce",
+        "collateral_token": "0xe91d153e0b41518a2ce8dd3d7944fa863463a97d",
+        "fee": "20000000000000000"
+      },
+      {
+        "block": 48545286,
+        "market": "0xbb7728320f4c01cb008d09f3668e2ef9d726ed0b",
+        "creator": "0x3451bd1b13c4558a67a62bc042905ecbf05c03d2",
+        "conditional_tokens": "0xceafdd6bc0bef976fdcd1112955828e00543c0ce",
+        "collateral_token": "0xddafbb505ad214d7b80b1f830fccc89b60fb7a83",
+        "fee": "20000000000000000"
+      }
+    ],
+    "trades": [
+      {
+        "block": 48561831,
+        "log_index": "94",
+        "tx": "0xd4a5982cd8e8509ec2636d96c7796b18e02c3303778970aa40df6924ce62e72d",
+        "market": "0xb07c136bb9a6e7763d9bef68c7eccca853f812ed",
+        "trader": "0x16d25e86d3098426f2f17023b4e42b38e5be446e",
+        "side": "sell",
+        "collateral_amount": "10998600000000000000",
+        "fee_amount": "224461224489795918",
+        "outcome_index": "1",
+        "outcome_tokens": "23910000000000000000"
+      },
+      {
+        "block": 48563517,
+        "log_index": "221",
+        "tx": "0x098dcff3258fa2e99261f6a31afb90f867528f93be7aebe195997739cd609b62",
+        "market": "0xaf06902f6874cdc4cf826c144e00b1fd4892d476",
+        "trader": "0x4cb9a06571f9b97e85f38ae55760576af2cc5cbe",
+        "side": "buy",
+        "collateral_amount": "5516500000000000000",
+        "fee_amount": "110330000000000000",
+        "outcome_index": "1",
+        "outcome_tokens": "9350000000000000000"
+      },
+      {
+        "block": 48576667,
+        "log_index": "103",
+        "tx": "0xe0e9d945dcfdd923baf2d26b4add8c2a0bb01b64cd383ef0bbd7a285057993b3",
+        "market": "0x037c19940af482e1c517ef90669b6eca6cf55ba2",
+        "trader": "0xbdaf243b10791f76dac0be6774484a36b7ae41c3",
+        "side": "buy",
+        "collateral_amount": "31049600000000000000",
+        "fee_amount": "620992000000000000",
+        "outcome_index": "0",
+        "outcome_tokens": "50080000000000000000"
+      },
+      {
+        "block": 48578324,
+        "log_index": "188",
+        "tx": "0xc3ae65a5db49663a857f29ca55f7cef57f73c30ea5299533aeacc53b312050b9",
+        "market": "0x33807ad6b767b303f0cb4a7ff6044b2d9413c616",
+        "trader": "0xcebb392d5e86d841719dd1bda4231cc6e25afe56",
+        "side": "buy",
+        "collateral_amount": "18708000000000000000",
+        "fee_amount": "374160000000000000",
+        "outcome_index": "1",
+        "outcome_tokens": "46770000000000000000"
+      },
+      {
+        "block": 48585597,
+        "log_index": "88",
+        "tx": "0x51ffb348517fb482d8233ee18fe978879dbfd332d5d35dcca87e3e715f60e343",
+        "market": "0xd0b9f6a4815a44cc016898615e9021a994bf0a9f",
+        "trader": "0x558a8ecaa6083fe7ddc830231ff9179a6e14f6a5",
+        "side": "buy",
+        "collateral_amount": "10522200000000000000",
+        "fee_amount": "210444000000000000",
+        "outcome_index": "1",
+        "outcome_tokens": "13490000000000000000"
+      },
+      {
+        "block": 48589489,
+        "log_index": "90",
+        "tx": "0xc50256d721b78dff8446d0c65d62b025638080198c3371db2fe97b33af3a7347",
+        "market": "0x33807ad6b767b303f0cb4a7ff6044b2d9413c616",
+        "trader": "0xe983895d62ef6cc83bf0a9ae8fee604e91519d95",
+        "side": "buy",
+        "collateral_amount": "47278000000000000000",
+        "fee_amount": "945560000000000000",
+        "outcome_index": "1",
+        "outcome_tokens": "61400000000000000000"
+      },
+      {
+        "block": 48594527,
+        "log_index": "78",
+        "tx": "0x312a13d5031a519630d7179d7d52abb4b30b3d6cde9d2da2acdb93ccb93980f4",
+        "market": "0x0d0a5faaacc0b5539d56bf1ab15f8e384772cbba",
+        "trader": "0x4670d7c0f0e3be8efb687a07a7b0756a80fc482e",
+        "side": "sell",
+        "collateral_amount": "5687500000000000000",
+        "fee_amount": "116071428571428571",
+        "outcome_index": "0",
+        "outcome_tokens": "8750000000000000000"
+      },
+      {
+        "block": 48594912,
+        "log_index": "107",
+        "tx": "0x18d952b9a59634141040acfba358e60db14a3593d308c279fbbd2aaa5a131740",
+        "market": "0x33807ad6b767b303f0cb4a7ff6044b2d9413c616",
+        "trader": "0x558a8ecaa6083fe7ddc830231ff9179a6e14f6a5",
+        "side": "buy",
+        "collateral_amount": "33208000000000000000",
+        "fee_amount": "664160000000000000",
+        "outcome_index": "1",
+        "outcome_tokens": "47440000000000000000"
+      },
+      {
+        "block": 48597124,
+        "log_index": "113",
+        "tx": "0xa3edff419d7f3761de888a12b097c582846ae2ab5be5b52b584725ea88b807ce",
+        "market": "0x886ca381ae7cff78b4c47f3d041407758b345041",
+        "trader": "0x4670d7c0f0e3be8efb687a07a7b0756a80fc482e",
+        "side": "buy",
+        "collateral_amount": "16156800000000000000",
+        "fee_amount": "323136000000000000",
+        "outcome_index": "1",
+        "outcome_tokens": "23760000000000000000"
+      },
+      {
+        "block": 48605898,
+        "log_index": "221",
+        "tx": "0xe3dddce6e020eca0851f39a28982973b4cfb141c441ea1324fe406ce86f08f76",
+        "market": "0xb138ef8dff06e8a0a3a33c65fc17f0c603ce4b9d",
+        "trader": "0x836e6f25a2964da33f4551bf16de700b21c7c90a",
+        "side": "buy",
+        "collateral_amount": "9766600000000000000",
+        "fee_amount": "195332000000000000",
+        "outcome_index": "1",
+        "outcome_tokens": "20780000000000000000"
+      },
+      {
+        "block": 48614584,
+        "log_index": "21",
+        "tx": "0x80d62bb0de07fd67ad76a4528663e123deec34769e4eafc1c4fab0135621e369",
+        "market": "0x7c1e039d24ae4e9b61dd90d80283b18ccded3356",
+        "trader": "0x8dc74d1ec6a0efe7bae592016adee654c430356b",
+        "side": "sell",
+        "collateral_amount": "18255600000000000000",
+        "fee_amount": "372563265306122448",
+        "outcome_index": "1",
+        "outcome_tokens": "41490000000000000000"
+      },
+      {
+        "block": 48626905,
+        "log_index": "104",
+        "tx": "0x266ed9a753f7ae971113750d2ed6b06c7789e1f050938fe96cacacc1dc716a05",
+        "market": "0x33807ad6b767b303f0cb4a7ff6044b2d9413c616",
+        "trader": "0x5d432ab5f0497849addb08269320fb424164ce74",
+        "side": "buy",
+        "collateral_amount": "17145600000000000000",
+        "fee_amount": "342912000000000000",
+        "outcome_index": "0",
+        "outcome_tokens": "35720000000000000000"
+      },
+      {
+        "block": 48627751,
+        "log_index": "181",
+        "tx": "0xd011ae2abc48559ea899039ef4d85821ed5900bbee8280a9c1badb7be385879e",
+        "market": "0xb07c136bb9a6e7763d9bef68c7eccca853f812ed",
+        "trader": "0x7e27a7ec9d1bb9d3f555ca02f8810ad3a57d6e79",
+        "side": "buy",
+        "collateral_amount": "27669000000000000000",
+        "fee_amount": "553380000000000000",
+        "outcome_index": "0",
+        "outcome_tokens": "40100000000000000000"
+      },
+      {
+        "block": 48630036,
+        "log_index": "68",
+        "tx": "0x45d69a42776e17bb796e2403f1304f9d0bc15982bd4b8a0227095c0771c1cc01",
+        "market": "0xaf06902f6874cdc4cf826c144e00b1fd4892d476",
+        "trader": "0xc544ad3bb2f2cac5f47b38d10ac0d7389caf91ce",
+        "side": "sell",
+        "collateral_amount": "5846000000000000000",
+        "fee_amount": "119306122448979591",
+        "outcome_index": "0",
+        "outcome_tokens": "7400000000000000000"
+      },
+      {
+        "block": 48635994,
+        "log_index": "148",
+        "tx": "0xde4811c626ea79d29126812ba1d050826066d76c0ccce486640f5a8085e11ffa",
+        "market": "0x037c19940af482e1c517ef90669b6eca6cf55ba2",
+        "trader": "0x56c5fde965f5580250b053d26f626a8503968181",
+        "side": "buy",
+        "collateral_amount": "10228000000000000000",
+        "fee_amount": "204560000000000000",
+        "outcome_index": "0",
+        "outcome_tokens": "25570000000000000000"
+      },
+      {
+        "block": 48637304,
+        "log_index": "61",
+        "tx": "0x90f7dad75a2dbae799c1309dbcdba77c43db65924548531e65a10f0cbd411271",
+        "market": "0x33807ad6b767b303f0cb4a7ff6044b2d9413c616",
+        "trader": "0xfb3ad300a989cea6acb18f13bed50afff6357a67",
+        "side": "buy",
+        "collateral_amount": "29257200000000000000",
+        "fee_amount": "585144000000000000",
+        "outcome_index": "0",
+        "outcome_tokens": "54180000000000000000"
+      },
+      {
+        "block": 48638651,
+        "log_index": "145",
+        "tx": "0xe4b6dc85263e9f93e7bc8c837459474a67b15cc9dce6ba47d414ffd1f68ef88e",
+        "market": "0x33807ad6b767b303f0cb4a7ff6044b2d9413c616",
+        "trader": "0xc04d9e18749effe4858bd3cd3e4f8c4d76367386",
+        "side": "sell",
+        "collateral_amount": "20311200000000000000",
+        "fee_amount": "414514285714285714",
+        "outcome_index": "1",
+        "outcome_tokens": "39060000000000000000"
+      },
+      {
+        "block": 48639778,
+        "log_index": "72",
+        "tx": "0xccdffb90d24cf3dec303f8abaf5a6532cdca978e63cf0b957648820637a68899",
+        "market": "0x33807ad6b767b303f0cb4a7ff6044b2d9413c616",
+        "trader": "0x8dc74d1ec6a0efe7bae592016adee654c430356b",
+        "side": "sell",
+        "collateral_amount": "27284400000000000000",
+        "fee_amount": "556824489795918367",
+        "outcome_index": "0",
+        "outcome_tokens": "41340000000000000000"
+      },
+      {
+        "block": 48646850,
+        "log_index": "160",
+        "tx": "0x820f40b2ff859d731fd08ee585ec962469128afabbc9047353247e6090b1f6d4",
+        "market": "0x52bab136f951bf39c11c34f788147e748bd78d18",
+        "trader": "0xcebb392d5e86d841719dd1bda4231cc6e25afe56",
+        "side": "buy",
+        "collateral_amount": "8002800000000000000",
+        "fee_amount": "160056000000000000",
+        "outcome_index": "0",
+        "outcome_tokens": "10530000000000000000"
+      },
+      {
+        "block": 48654693,
+        "log_index": "174",
+        "tx": "0x28428fbadd7a429121d5bd36f9b659cdf033c675207243df9e7a631bc579e29a",
+        "market": "0xb138ef8dff06e8a0a3a33c65fc17f0c603ce4b9d",
+        "trader": "0xc544ad3bb2f2cac5f47b38d10ac0d7389caf91ce",
+        "side": "buy",
+        "collateral_amount": "14459500000000000000",
+        "fee_amount": "289190000000000000",
+        "outcome_index": "0",
+        "outcome_tokens": "26290000000000000000"
+      },
+      {
+        "block": 48664802,
+        "log_index": "8",
+        "tx": "0xf543a503d1301e37ea81c7f63a6194eab7fa65942e2850e4e46a2a9ddad1a0e7",
+        "market": "0x037c19940af482e1c517ef90669b6eca6cf55ba2",
+        "trader": "0xe8feb4ce09c88f959b49dc9cc60297608d349aef",
+        "side": "sell",
+        "collateral_amount": "20897800000000000000",
+        "fee_amount": "426485714285714285",
+        "outcome_index": "1",
+        "outcome_tokens": "27140000000000000000"
+      },
+      {
+        "block": 48677454,
+        "log_index": "258",
+        "tx": "0xcaf63de7d84a497e80a3e5d3f2f85db02ba5b640a1bd200c8845710f059ed1ee",
+        "market": "0xb07c136bb9a6e7763d9bef68c7eccca853f812ed",
+        "trader": "0x7e27a7ec9d1bb9d3f555ca02f8810ad3a57d6e79",
+        "side": "buy",
+        "collateral_amount": "16372000000000000000",
+        "fee_amount": "327440000000000000",
+        "outcome_index": "0",
+        "outcome_tokens": "40930000000000000000"
+      },
+      {
+        "block": 48677601,
+        "log_index": "259",
+        "tx": "0xd5959292676664d462bf2111a7a6e66fed4c61e35f0bcf0f8b72aa383e608f9c",
+        "market": "0x3cd4bcb79df347eca86aef92e3377357138cba88",
+        "trader": "0x4670d7c0f0e3be8efb687a07a7b0756a80fc482e",
+        "side": "buy",
+        "collateral_amount": "20256000000000000000",
+        "fee_amount": "405120000000000000",
+        "outcome_index": "1",
+        "outcome_tokens": "31650000000000000000"
+      },
+      {
+        "block": 48681305,
+        "log_index": "173",
+        "tx": "0x323bcb562415a399d3a551f2add4cb4bc830d99ae5ab3145fa09c73d14445770",
+        "market": "0x3cd4bcb79df347eca86aef92e3377357138cba88",
+        "trader": "0x836e6f25a2964da33f4551bf16de700b21c7c90a",
+        "side": "sell",
+        "collateral_amount": "14170500000000000000",
+        "fee_amount": "289193877551020408",
+        "outcome_index": "1",
+        "outcome_tokens": "30150000000000000000"
+      },
+      {
+        "block": 48681458,
+        "log_index": "258",
+        "tx": "0x716e48b38f4853f7a92c5ddba1b9eb64af4a782ee5eea50022919b52de41f4db",
+        "market": "0x33807ad6b767b303f0cb4a7ff6044b2d9413c616",
+        "trader": "0x3b419154fa653875b1f8ff53957ad0f2614a0c18",
+        "side": "buy",
+        "collateral_amount": "4365900000000000000",
+        "fee_amount": "87318000000000000",
+        "outcome_index": "1",
+        "outcome_tokens": "8910000000000000000"
+      },
+      {
+        "block": 48682194,
+        "log_index": "162",
+        "tx": "0xc3113fe7a90b47eeab177112f0f46a670a29b53880802fcb76e26e493978b036",
+        "market": "0x33807ad6b767b303f0cb4a7ff6044b2d9413c616",
+        "trader": "0x7e27a7ec9d1bb9d3f555ca02f8810ad3a57d6e79",
+        "side": "buy",
+        "collateral_amount": "15635400000000000000",
+        "fee_amount": "312708000000000000",
+        "outcome_index": "0",
+        "outcome_tokens": "22660000000000000000"
+      },
+      {
+        "block": 48684321,
+        "log_index": "39",
+        "tx": "0xe73d8be9df0e3450b50888cb3f54b69869ac0624816f8d91a6807c6acaa7fe94",
+        "market": "0xb07c136bb9a6e7763d9bef68c7eccca853f812ed",
+        "trader": "0xe10540324507cfab83e9705cf4c268fd69499d5f",
+        "side": "sell",
+        "collateral_amount": "48765600000000000000",
+        "fee_amount": "995216326530612244",
+        "outcome_index": "1",
+        "outcome_tokens": "62520000000000000000"
+      },
+      {
+        "block": 48689268,
+        "log_index": "167",
+        "tx": "0xb2504f1eb0ef3bd378e17abcd82a9117db8bbd9cdabfedec52fc4e89ecdf8c4f",
+        "market": "0x33807ad6b767b303f0cb4a7ff6044b2d9413c616",
+        "trader": "0xfb3ad300a989cea6acb18f13bed50afff6357a67",
+        "side": "buy",
+        "collateral_amount": "9811600000000000000",
+        "fee_amount": "196232000000000000",
+        "outcome_index": "0",
+        "outcome_tokens": "12910000000000000000"
+      },
+      {
+        "block": 48689275,
+        "log_index": "22",
+        "tx": "0xba6cff2c452b4d53515e12449efda1f38ef2177c4f0c18547ed8c2790f8e9050",
+        "market": "0xb138ef8dff06e8a0a3a33c65fc17f0c603ce4b9d",
+        "trader": "0x836e6f25a2964da33f4551bf16de700b21c7c90a",
+        "side": "buy",
+        "collateral_amount": "20184500000000000000",
+        "fee_amount": "403690000000000000",
+        "outcome_index": "0",
+        "outcome_tokens": "27650000000000000000"
+      },
+      {
+        "block": 48689574,
+        "log_index": "66",
+        "tx": "0x0e7b1b92def0f953753253ca434fb1f144979f66b88cb1eff798859190c9a56f",
+        "market": "0x7c1e039d24ae4e9b61dd90d80283b18ccded3356",
+        "trader": "0x4670d7c0f0e3be8efb687a07a7b0756a80fc482e",
+        "side": "buy",
+        "collateral_amount": "43497400000000000000",
+        "fee_amount": "869948000000000000",
+        "outcome_index": "1",
+        "outcome_tokens": "55060000000000000000"
+      },
+      {
+        "block": 48690961,
+        "log_index": "172",
+        "tx": "0x6e7fe2f169aa2af9f21fa0fe7ea3e699b6472000ccc336e758774fb328feec52",
+        "market": "0x7c1e039d24ae4e9b61dd90d80283b18ccded3356",
+        "trader": "0x16d25e86d3098426f2f17023b4e42b38e5be446e",
+        "side": "buy",
+        "collateral_amount": "18390000000000000000",
+        "fee_amount": "367800000000000000",
+        "outcome_index": "1",
+        "outcome_tokens": "30650000000000000000"
+      },
+      {
+        "block": 48691025,
+        "log_index": "139",
+        "tx": "0x83cd5927aab9580e923ba33757be42f6dcc4188a8d9fe42a36c5bcbccaea4220",
+        "market": "0xb138ef8dff06e8a0a3a33c65fc17f0c603ce4b9d",
+        "trader": "0x4cb9a06571f9b97e85f38ae55760576af2cc5cbe",
+        "side": "sell",
+        "collateral_amount": "9613400000000000000",
+        "fee_amount": "196191836734693877",
+        "outcome_index": "0",
+        "outcome_tokens": "13540000000000000000"
+      },
+      {
+        "block": 48691907,
+        "log_index": "19",
+        "tx": "0xc794f40e8a76c1da8091ff91b142fb4d19b7a24fd667ba112f5b58b86cae64b0",
+        "market": "0x33807ad6b767b303f0cb4a7ff6044b2d9413c616",
+        "trader": "0x56c5fde965f5580250b053d26f626a8503968181",
+        "side": "buy",
+        "collateral_amount": "31722800000000000000",
+        "fee_amount": "634456000000000000",
+        "outcome_index": "0",
+        "outcome_tokens": "44680000000000000000"
+      },
+      {
+        "block": 48698972,
+        "log_index": "166",
+        "tx": "0xa2fd10d475bc61c8fd2fc0335af0dfcca598863c7df55e7b0dd6f5b711f996d1",
+        "market": "0x33807ad6b767b303f0cb4a7ff6044b2d9413c616",
+        "trader": "0x78181e2bd8b86226b80d9e94148b6d8d8aaa6782",
+        "side": "sell",
+        "collateral_amount": "5281200000000000000",
+        "fee_amount": "107779591836734693",
+        "outcome_index": "1",
+        "outcome_tokens": "9780000000000000000"
+      },
+      {
+        "block": 48706542,
+        "log_index": "86",
+        "tx": "0x77ec7c8dc17a6445fb696d4fcc2d93d9ff5c590a0e45f214518d3b695d731f79",
+        "market": "0x886ca381ae7cff78b4c47f3d041407758b345041",
+        "trader": "0x9ad00f1be452a67ca6b9b82d594b163170ba7f81",
+        "side": "buy",
+        "collateral_amount": "28420700000000000000",
+        "fee_amount": "568414000000000000",
+        "outcome_index": "1",
+        "outcome_tokens": "36910000000000000000"
+      },
+      {
+        "block": 48715100,
+        "log_index": "39",
+        "tx": "0xbff1e90138b565bbc1d41636c8ae4fda39b74edd2741481cb10f3b11a6f68e5a",
+        "market": "0x7c1e039d24ae4e9b61dd90d80283b18ccded3356",
+        "trader": "0xe8feb4ce09c88f959b49dc9cc60297608d349aef",
+        "side": "buy",
+        "collateral_amount": "11647200000000000000",
+        "fee_amount": "232944000000000000",
+        "outcome_index": "1",
+        "outcome_tokens": "25320000000000000000"
+      },
+      {
+        "block": 48727059,
+        "log_index": "58",
+        "tx": "0x8510d3fd9d79870de227849fa4c73b7255d3906573d1ef30e7166d260f9a2a99",
+        "market": "0x33807ad6b767b303f0cb4a7ff6044b2d9413c616",
+        "trader": "0x3b419154fa653875b1f8ff53957ad0f2614a0c18",
+        "side": "sell",
+        "collateral_amount": "15954400000000000000",
+        "fee_amount": "325600000000000000",
+        "outcome_index": "1",
+        "outcome_tokens": "20720000000000000000"
+      },
+      {
+        "block": 48731648,
+        "log_index": "207",
+        "tx": "0x52025eba99eb1436f51a108197fef87b1368189afe66ee62297be17a9804dcd3",
+        "market": "0x886ca381ae7cff78b4c47f3d041407758b345041",
+        "trader": "0x8dc74d1ec6a0efe7bae592016adee654c430356b",
+        "side": "buy",
+        "collateral_amount": "14368200000000000000",
+        "fee_amount": "287364000000000000",
+        "outcome_index": "1",
+        "outcome_tokens": "34210000000000000000"
+      },
+      {
+        "block": 48737686,
+        "log_index": "102",
+        "tx": "0xf65504e4d186e602333101e0119246d6e1c5fae7ab0ac76f2665a091bca1be2c",
+        "market": "0x037c19940af482e1c517ef90669b6eca6cf55ba2",
+        "trader": "0x4670d7c0f0e3be8efb687a07a7b0756a80fc482e",
+        "side": "sell",
+        "collateral_amount": "10590000000000000000",
+        "fee_amount": "216122448979591836",
+        "outcome_index": "0",
+        "outcome_tokens": "21180000000000000000"
+      },
+      {
+        "block": 48739675,
+        "log_index": "247",
+        "tx": "0x5ba5982783caef43a2e18cb92c39a748cc68831648246af5c29a8f908f0d88fe",
+        "market": "0xb138ef8dff06e8a0a3a33c65fc17f0c603ce4b9d",
+        "trader": "0x8dc74d1ec6a0efe7bae592016adee654c430356b",
+        "side": "sell",
+        "collateral_amount": "19810500000000000000",
+        "fee_amount": "404295918367346938",
+        "outcome_index": "1",
+        "outcome_tokens": "42150000000000000000"
+      },
+      {
+        "block": 48745268,
+        "log_index": "243",
+        "tx": "0xcff042bbe857f7e34d3e823d9a29739005c9c2148649488c606f0b2fa686195d",
+        "market": "0x7c1e039d24ae4e9b61dd90d80283b18ccded3356",
+        "trader": "0x78181e2bd8b86226b80d9e94148b6d8d8aaa6782",
+        "side": "sell",
+        "collateral_amount": "43197200000000000000",
+        "fee_amount": "881575510204081632",
+        "outcome_index": "0",
+        "outcome_tokens": "54680000000000000000"
+      },
+      {
+        "block": 48746885,
+        "log_index": "158",
+        "tx": "0xb915f4ff74509d6ce6a51dbd4a9ecb56a39df65ec44d20c253c7ea0be4892329",
+        "market": "0x33807ad6b767b303f0cb4a7ff6044b2d9413c616",
+        "trader": "0x16d25e86d3098426f2f17023b4e42b38e5be446e",
+        "side": "sell",
+        "collateral_amount": "35955600000000000000",
+        "fee_amount": "733787755102040816",
+        "outcome_index": "1",
+        "outcome_tokens": "63080000000000000000"
+      },
+      {
+        "block": 48748084,
+        "log_index": "69",
+        "tx": "0x1bb360b16350283ebcae9f51f72388f014b04f321973cc1bcce43e2127a1ab38",
+        "market": "0x7c1e039d24ae4e9b61dd90d80283b18ccded3356",
+        "trader": "0x7e27a7ec9d1bb9d3f555ca02f8810ad3a57d6e79",
+        "side": "buy",
+        "collateral_amount": "39392000000000000000",
+        "fee_amount": "787840000000000000",
+        "outcome_index": "1",
+        "outcome_tokens": "61550000000000000000"
+      },
+      {
+        "block": 48748780,
+        "log_index": "137",
+        "tx": "0xc1a1c61e9e835402174b224817813544c9a44f0bf99e42617c37357bd0f5a1d5",
+        "market": "0x7c1e039d24ae4e9b61dd90d80283b18ccded3356",
+        "trader": "0x16d25e86d3098426f2f17023b4e42b38e5be446e",
+        "side": "sell",
+        "collateral_amount": "12919500000000000000",
+        "fee_amount": "263663265306122448",
+        "outcome_index": "0",
+        "outcome_tokens": "23490000000000000000"
+      },
+      {
+        "block": 48750068,
+        "log_index": "134",
+        "tx": "0x6fedc1a5eee0078a69395e594c08fbb9a15bac1418340eb93ce9c06c8f27b3d8",
+        "market": "0x037c19940af482e1c517ef90669b6eca6cf55ba2",
+        "trader": "0xd6668348cd32e7d98a9d47377de82459649565dc",
+        "side": "buy",
+        "collateral_amount": "13844600000000000000",
+        "fee_amount": "276892000000000000",
+        "outcome_index": "0",
+        "outcome_tokens": "22330000000000000000"
+      },
+      {
+        "block": 48750456,
+        "log_index": "237",
+        "tx": "0x73d36acd5669967140cc4a4e8d7092cc28bfe0577a41d3916823512b47b3732a",
+        "market": "0x33807ad6b767b303f0cb4a7ff6044b2d9413c616",
+        "trader": "0x5d432ab5f0497849addb08269320fb424164ce74",
+        "side": "buy",
+        "collateral_amount": "43750200000000000000",
+        "fee_amount": "875004000000000000",
+        "outcome_index": "1",
+        "outcome_tokens": "55380000000000000000"
+      },
+      {
+        "block": 48750561,
+        "log_index": "206",
+        "tx": "0x55cc4d20a5ef5d8486f0375aab2d30904aef5ce6d1290756f9a011aa09426119",
+        "market": "0x33807ad6b767b303f0cb4a7ff6044b2d9413c616",
+        "trader": "0xe983895d62ef6cc83bf0a9ae8fee604e91519d95",
+        "side": "buy",
+        "collateral_amount": "40259500000000000000",
+        "fee_amount": "805190000000000000",
+        "outcome_index": "1",
+        "outcome_tokens": "55150000000000000000"
+      },
+      {
+        "block": 48750818,
+        "log_index": "299",
+        "tx": "0x794f2c10f27a4139d49e815048eeefb11e914915d26fd53df20d09162133d7bc",
+        "market": "0x037c19940af482e1c517ef90669b6eca6cf55ba2",
+        "trader": "0x4cb9a06571f9b97e85f38ae55760576af2cc5cbe",
+        "side": "sell",
+        "collateral_amount": "32208100000000000000",
+        "fee_amount": "657308163265306122",
+        "outcome_index": "0",
+        "outcome_tokens": "60770000000000000000"
+      },
+      {
+        "block": 48755484,
+        "log_index": "186",
+        "tx": "0x4a4f460c262c08092f5230a08b0e1a45d71340d7b367e17009a7592b7630987c",
+        "market": "0x3cd4bcb79df347eca86aef92e3377357138cba88",
+        "trader": "0x4670d7c0f0e3be8efb687a07a7b0756a80fc482e",
+        "side": "buy",
+        "collateral_amount": "4604000000000000000",
+        "fee_amount": "92080000000000000",
+        "outcome_index": "0",
+        "outcome_tokens": "11510000000000000000"
+      },
+      {
+        "block": 48769657,
+        "log_index": "156",
+        "tx": "0xa6bd4c16dee258db94bab6eb08210e14a748c3be06521ce00bb508d3de30e247",
+        "market": "0xd0b9f6a4815a44cc016898615e9021a994bf0a9f",
+        "trader": "0xfb3ad300a989cea6acb18f13bed50afff6357a67",
+        "side": "buy",
+        "collateral_amount": "32963100000000000000",
+        "fee_amount": "659262000000000000",
+        "outcome_index": "1",
+        "outcome_tokens": "57830000000000000000"
+      },
+      {
+        "block": 48773275,
+        "log_index": "46",
+        "tx": "0x34f1c44c47513315f03456f3f39b2ce213c020a5f4bfa23001de0226f4c1328b",
+        "market": "0x0d0a5faaacc0b5539d56bf1ab15f8e384772cbba",
+        "trader": "0x3965678857980baf280fa8fb1d0d0aa362b8adda",
+        "side": "buy",
+        "collateral_amount": "28050000000000000000",
+        "fee_amount": "561000000000000000",
+        "outcome_index": "0",
+        "outcome_tokens": "42500000000000000000"
+      },
+      {
+        "block": 48773988,
+        "log_index": "190",
+        "tx": "0xf22fdd3f98ff1ccf9b5790b4d47a20761675e20214022fc88a8eb5ab1ab57bcd",
+        "market": "0xb138ef8dff06e8a0a3a33c65fc17f0c603ce4b9d",
+        "trader": "0x8dc74d1ec6a0efe7bae592016adee654c430356b",
+        "side": "buy",
+        "collateral_amount": "39095400000000000000",
+        "fee_amount": "781908000000000000",
+        "outcome_index": "1",
+        "outcome_tokens": "56660000000000000000"
+      },
+      {
+        "block": 48775689,
+        "log_index": "139",
+        "tx": "0x4dffadbf4b149cc544e6a31cc75ceeb410164a4ef1b06af82fd9087d7d0d27c0",
+        "market": "0x33807ad6b767b303f0cb4a7ff6044b2d9413c616",
+        "trader": "0x3965678857980baf280fa8fb1d0d0aa362b8adda",
+        "side": "sell",
+        "collateral_amount": "4173000000000000000",
+        "fee_amount": "85163265306122448",
+        "outcome_index": "1",
+        "outcome_tokens": "5350000000000000000"
+      },
+      {
+        "block": 48778498,
+        "log_index": "212",
+        "tx": "0x9e1fb8452e2f1c064c1d67e2b55bb5439ca1d849100f99ae230824a18a39647b",
+        "market": "0x7c1e039d24ae4e9b61dd90d80283b18ccded3356",
+        "trader": "0xd2bfc1fd364f282ae91c00f82602823452aa725b",
+        "side": "buy",
+        "collateral_amount": "4085100000000000000",
+        "fee_amount": "81702000000000000",
+        "outcome_index": "1",
+        "outcome_tokens": "8010000000000000000"
+      },
+      {
+        "block": 48781810,
+        "log_index": "270",
+        "tx": "0xa1322701a15e5a275fa502fd04d5b4ca389831b2ad492ddb83ea83c9693f6389",
+        "market": "0x886ca381ae7cff78b4c47f3d041407758b345041",
+        "trader": "0xd7344fd19a6eea6f08afa73bd37e51f11f8cf9fc",
+        "side": "sell",
+        "collateral_amount": "28146600000000000000",
+        "fee_amount": "574420408163265306",
+        "outcome_index": "0",
+        "outcome_tokens": "49380000000000000000"
+      },
+      {
+        "block": 48782012,
+        "log_index": "276",
+        "tx": "0x3df3ae48a27dc530678f04c774a324d8b40e09c46dff84e03de243edbdd93e82",
+        "market": "0x33807ad6b767b303f0cb4a7ff6044b2d9413c616",
+        "trader": "0x7e27a7ec9d1bb9d3f555ca02f8810ad3a57d6e79",
+        "side": "buy",
+        "collateral_amount": "12535200000000000000",
+        "fee_amount": "250704000000000000",
+        "outcome_index": "0",
+        "outcome_tokens": "17410000000000000000"
+      },
+      {
+        "block": 48784504,
+        "log_index": "123",
+        "tx": "0x70714bd4f0a3e4db49f569858581a7b4fcbaed3ba705a08a8cfd806f8bf175f2",
+        "market": "0x037c19940af482e1c517ef90669b6eca6cf55ba2",
+        "trader": "0x5d432ab5f0497849addb08269320fb424164ce74",
+        "side": "buy",
+        "collateral_amount": "27742000000000000000",
+        "fee_amount": "554840000000000000",
+        "outcome_index": "0",
+        "outcome_tokens": "63050000000000000000"
+      },
+      {
+        "block": 48793691,
+        "log_index": "58",
+        "tx": "0x746cf55e7b919e3f69ddab3cfdcc00419dc4f8780a18bc5bfaa50d22c97be261",
+        "market": "0x33807ad6b767b303f0cb4a7ff6044b2d9413c616",
+        "trader": "0x4670d7c0f0e3be8efb687a07a7b0756a80fc482e",
+        "side": "buy",
+        "collateral_amount": "14742000000000000000",
+        "fee_amount": "294840000000000000",
+        "outcome_index": "1",
+        "outcome_tokens": "24570000000000000000"
+      },
+      {
+        "block": 48801458,
+        "log_index": "281",
+        "tx": "0x142da34e7d25ac2017b51a423d63c3b90620b3ab32286b238fb76a053ba43360",
+        "market": "0xb138ef8dff06e8a0a3a33c65fc17f0c603ce4b9d",
+        "trader": "0x16d25e86d3098426f2f17023b4e42b38e5be446e",
+        "side": "buy",
+        "collateral_amount": "28541800000000000000",
+        "fee_amount": "570836000000000000",
+        "outcome_index": "0",
+        "outcome_tokens": "49210000000000000000"
+      },
+      {
+        "block": 48802067,
+        "log_index": "214",
+        "tx": "0xcf54700929850c4dc1cacfdc03052cf4307cfd9955126acbfca38a4741579e4d",
+        "market": "0xb138ef8dff06e8a0a3a33c65fc17f0c603ce4b9d",
+        "trader": "0xc04d9e18749effe4858bd3cd3e4f8c4d76367386",
+        "side": "sell",
+        "collateral_amount": "12403200000000000000",
+        "fee_amount": "253126530612244897",
+        "outcome_index": "1",
+        "outcome_tokens": "21760000000000000000"
+      },
+      {
+        "block": 48810382,
+        "log_index": "120",
+        "tx": "0x2d8f1b953b737b44668ee9068bb4f865f046a9d3aef18c7ea9ff3509dc5cb7cd",
+        "market": "0xc7e9650c143d1725af516b60edba548d4179e21b",
+        "trader": "0xd2bfc1fd364f282ae91c00f82602823452aa725b",
+        "side": "buy",
+        "collateral_amount": "1000250000000000000000",
+        "fee_amount": "20005000000000000000",
+        "outcome_index": "0",
+        "outcome_tokens": "1500000000000000000000"
+      },
+      {
+        "block": 48815424,
+        "log_index": "271",
+        "tx": "0x5bb6b806d4d1d9a306b0b342db97950e8fed03ab316e67e8e4e87b19530fea29",
+        "market": "0xc7e9650c143d1725af516b60edba548d4179e21b",
+        "trader": "0xd2bfc1fd364f282ae91c00f82602823452aa725b",
+        "side": "buy",
+        "collateral_amount": "500500000000000000000",
+        "fee_amount": "10010000000000000000",
+        "outcome_index": "1",
+        "outcome_tokens": "700000000000000000000"
+      },
+      {
+        "block": 48817277,
+        "log_index": "190",
+        "tx": "0x73d02e70691fce8c58c3c9c984d3d48a8be3e650b5b460029b4ee9f99e715e13",
+        "market": "0xaf06902f6874cdc4cf826c144e00b1fd4892d476",
+        "trader": "0x7b949a4f08d3c1fbf047f46898e17ff3e9dc6c90",
+        "side": "buy",
+        "collateral_amount": "14516000000000000000",
+        "fee_amount": "290320000000000000",
+        "outcome_index": "0",
+        "outcome_tokens": "36290000000000000000"
+      },
+      {
+        "block": 48818676,
+        "log_index": "203",
+        "tx": "0x1bd826cd4e2a5aa48b31d4eabba3e4c43233bdb95e678421e5fae7423edf1a08",
+        "market": "0x3cd4bcb79df347eca86aef92e3377357138cba88",
+        "trader": "0xe983895d62ef6cc83bf0a9ae8fee604e91519d95",
+        "side": "buy",
+        "collateral_amount": "22290900000000000000",
+        "fee_amount": "445818000000000000",
+        "outcome_index": "1",
+        "outcome_tokens": "33270000000000000000"
+      },
+      {
+        "block": 48819563,
+        "log_index": "171",
+        "tx": "0x1b38ef121098cdda0295787e688783f419a8cb9602f22363058549d5799c8d0b",
+        "market": "0xb07c136bb9a6e7763d9bef68c7eccca853f812ed",
+        "trader": "0xe10540324507cfab83e9705cf4c268fd69499d5f",
+        "side": "buy",
+        "collateral_amount": "20982000000000000000",
+        "fee_amount": "419640000000000000",
+        "outcome_index": "0",
+        "outcome_tokens": "34970000000000000000"
+      },
+      {
+        "block": 48820466,
+        "log_index": "225",
+        "tx": "0x51301d0acd33d5fa3ed30544f4334c5652eabfc5af8f9e3346e17fada7bbda04",
+        "market": "0xc7e9650c143d1725af516b60edba548d4179e21b",
+        "trader": "0xd2bfc1fd364f282ae91c00f82602823452aa725b",
+        "side": "sell",
+        "collateral_amount": "300250000000000000000",
+        "fee_amount": "6127551020408163265",
+        "outcome_index": "0",
+        "outcome_tokens": "400000000000000000000"
+      },
+      {
+        "block": 48825508,
+        "log_index": "274",
+        "tx": "0x30a41979db88aec998a8a1b0b67da361f936051622d7d1bb1738d48628ae0145",
+        "market": "0xbb7728320f4c01cb008d09f3668e2ef9d726ed0b",
+        "trader": "0xd2bfc1fd364f282ae91c00f82602823452aa725b",
+        "side": "buy",
+        "collateral_amount": "250000000",
+        "fee_amount": "5000000",
+        "outcome_index": "0",
+        "outcome_tokens": "400000000"
+      },
+      {
+        "block": 48826155,
+        "log_index": "165",
+        "tx": "0x928e4199e721e24e582158ed075b1e74316bb24bd57aa9b9ea6b43c801a1d20f",
+        "market": "0x33807ad6b767b303f0cb4a7ff6044b2d9413c616",
+        "trader": "0x61a6bf4cfff94534d8a8771a17a5be5d8b023653",
+        "side": "buy",
+        "collateral_amount": "11389600000000000000",
+        "fee_amount": "227792000000000000",
+        "outcome_index": "1",
+        "outcome_tokens": "24760000000000000000"
+      },
+      {
+        "block": 48830526,
+        "log_index": "139",
+        "tx": "0x190cd2b156fcf7c2001fc6cbf0e553624ea1d584ba657a7f45466f0a8621a1cc",
+        "market": "0x037c19940af482e1c517ef90669b6eca6cf55ba2",
+        "trader": "0x5d432ab5f0497849addb08269320fb424164ce74",
+        "side": "buy",
+        "collateral_amount": "23440200000000000000",
+        "fee_amount": "468804000000000000",
+        "outcome_index": "0",
+        "outcome_tokens": "55810000000000000000"
+      },
+      {
+        "block": 48830550,
+        "log_index": "180",
+        "tx": "0x8155de9b9e509f705909feeacabf9949bab25a651bfcebbeb24cf0852be216bf",
+        "market": "0xbb7728320f4c01cb008d09f3668e2ef9d726ed0b",
+        "trader": "0xd2bfc1fd364f282ae91c00f82602823452aa725b",
+        "side": "sell",
+        "collateral_amount": "100000000",
+        "fee_amount": "2040816",
+        "outcome_index": "1",
+        "outcome_tokens": "150000000"
+      },
+      {
+        "block": 48836075,
+        "log_index": "274",
+        "tx": "0xd5ae4bfdb6132fcf78e052b598f7ac66009dad9e9ee72100a752c1289408a00f",
+        "market": "0xb138ef8dff06e8a0a3a33c65fc17f0c603ce4b9d",
+        "trader": "0xd7344fd19a6eea6f08afa73bd37e51f11f8cf9fc",
+        "side": "sell",
+        "collateral_amount": "7155000000000000000",
+        "fee_amount": "146020408163265306",
+        "outcome_index": "0",
+        "outcome_tokens": "14310000000000000000"
+      },
+      {
+        "block": 48836807,
+        "log_index": "281",
+        "tx": "0x71b3108a28a0223842d566f70afdf11c3676d92d5fe677a69f975f0df2d8e351",
+        "market": "0x886ca381ae7cff78b4c47f3d041407758b345041",
+        "trader": "0x3965678857980baf280fa8fb1d0d0aa362b8adda",
+        "side": "buy",
+        "collateral_amount": "8484000000000000000",
+        "fee_amount": "169680000000000000",
+        "outcome_index": "0",
+        "outcome_tokens": "14140000000000000000"
+      },
+      {
+        "block": 48849789,
+        "log_index": "130",
+        "tx": "0x6c44f99f1052d1e3f8020d0a8250ec1e697eea65793f89b9a4432b88a146b674",
+        "market": "0x52bab136f951bf39c11c34f788147e748bd78d18",
+        "trader": "0x56c5fde965f5580250b053d26f626a8503968181",
+        "side": "sell",
+        "collateral_amount": "7924900000000000000",
+        "fee_amount": "161732653061224489",
+        "outcome_index": "0",
+        "outcome_tokens": "18430000000000000000"
+      },
+      {
+        "block": 48867170,
+        "log_index": "167",
+        "tx": "0x9cee815d07e7c4046d05da22d612531908d5df7374bef41dbc9799eaf19b8e3d",
+        "market": "0xd0b9f6a4815a44cc016898615e9021a994bf0a9f",
+        "trader": "0xe983895d62ef6cc83bf0a9ae8fee604e91519d95",
+        "side": "buy",
+        "collateral_amount": "21639800000000000000",
+        "fee_amount": "432796000000000000",
+        "outcome_index": "1",
+        "outcome_tokens": "37310000000000000000"
+      },
+      {
+        "block": 48867487,
+        "log_index": "181",
+        "tx": "0xd4cc5c3e48db95de0b633ed6b20fd8661750c2261d2a7e9d76b99fae96c97321",
+        "market": "0x7c1e039d24ae4e9b61dd90d80283b18ccded3356",
+        "trader": "0xc544ad3bb2f2cac5f47b38d10ac0d7389caf91ce",
+        "side": "buy",
+        "collateral_amount": "26302800000000000000",
+        "fee_amount": "526056000000000000",
+        "outcome_index": "0",
+        "outcome_tokens": "38120000000000000000"
+      },
+      {
+        "block": 48869653,
+        "log_index": "57",
+        "tx": "0x3b35ff0b4bd614de725cd393356cb642197e3b341c626e970b19e70cb8517603",
+        "market": "0x886ca381ae7cff78b4c47f3d041407758b345041",
+        "trader": "0x0c2e49d8011a2c1356a7d11f237a8600c56e3359",
+        "side": "buy",
+        "collateral_amount": "12663000000000000000",
+        "fee_amount": "253260000000000000",
+        "outcome_index": "0",
+        "outcome_tokens": "23450000000000000000"
+      },
+      {
+        "block": 48870652,
+        "log_index": "281",
+        "tx": "0x77ab0d3ac459c91003567562fa21ace11239d23f9fff7bc107505500f012e163",
+        "market": "0xb07c136bb9a6e7763d9bef68c7eccca853f812ed",
+        "trader": "0xfb3ad300a989cea6acb18f13bed50afff6357a67",
+        "side": "buy",
+        "collateral_amount": "19568700000000000000",
+        "fee_amount": "391374000000000000",
+        "outcome_index": "0",
+        "outcome_tokens": "38370000000000000000"
+      },
+      {
+        "block": 48871939,
+        "log_index": "150",
+        "tx": "0x8d895ac2c90e4f5fa99edc3ad1fa5d4f799b6dd01aecb1e089f535481aa606df",
+        "market": "0x3cd4bcb79df347eca86aef92e3377357138cba88",
+        "trader": "0x558a8ecaa6083fe7ddc830231ff9179a6e14f6a5",
+        "side": "sell",
+        "collateral_amount": "42256800000000000000",
+        "fee_amount": "862383673469387755",
+        "outcome_index": "0",
+        "outcome_tokens": "58690000000000000000"
+      },
+      {
+        "block": 48875996,
+        "log_index": "171",
+        "tx": "0xfb6c3bfeb9f61b39d411404ec56f294001ae54b1627e1efdbec736c48c3b9d68",
+        "market": "0xb138ef8dff06e8a0a3a33c65fc17f0c603ce4b9d",
+        "trader": "0x3965678857980baf280fa8fb1d0d0aa362b8adda",
+        "side": "buy",
+        "collateral_amount": "37562400000000000000",
+        "fee_amount": "751248000000000000",
+        "outcome_index": "0",
+        "outcome_tokens": "52170000000000000000"
+      },
+      {
+        "block": 48876187,
+        "log_index": "65",
+        "tx": "0x7557a5810a6f561cda78d2c0c411ca986f431d1f742c17de0af929d920dd0388",
+        "market": "0x3cd4bcb79df347eca86aef92e3377357138cba88",
+        "trader": "0x16d25e86d3098426f2f17023b4e42b38e5be446e",
+        "side": "sell",
+        "collateral_amount": "43434200000000000000",
+        "fee_amount": "886412244897959183",
+        "outcome_index": "1",
+        "outcome_tokens": "54980000000000000000"
+      },
+      {
+        "block": 48880058,
+        "log_index": "151",
+        "tx": "0x75e7dab73307b87b1235b2da8da49f877b8ff05518014a99e717c437b763f05c",
+        "market": "0x52bab136f951bf39c11c34f788147e748bd78d18",
+        "trader": "0xfb3ad300a989cea6acb18f13bed50afff6357a67",
+        "side": "buy",
+        "collateral_amount": "28915200000000000000",
+        "fee_amount": "578304000000000000",
+        "outcome_index": "0",
+        "outcome_tokens": "60240000000000000000"
+      },
+      {
+        "block": 48880415,
+        "log_index": "69",
+        "tx": "0x8e1c39d11e838ae26e6feed2d245ecd45904e9276cd0e7225d2b00c77d3d7a24",
+        "market": "0x886ca381ae7cff78b4c47f3d041407758b345041",
+        "trader": "0xe10540324507cfab83e9705cf4c268fd69499d5f",
+        "side": "buy",
+        "collateral_amount": "12125600000000000000",
+        "fee_amount": "242512000000000000",
+        "outcome_index": "1",
+        "outcome_tokens": "26360000000000000000"
+      },
+      {
+        "block": 48882386,
+        "log_index": "62",
+        "tx": "0x0513df9a6e3b6de740664c0e7452824da9d259c220ba62db6c58cb11c66fed92",
+        "market": "0x037c19940af482e1c517ef90669b6eca6cf55ba2",
+        "trader": "0x56c5fde965f5580250b053d26f626a8503968181",
+        "side": "sell",
+        "collateral_amount": "34536000000000000000",
+        "fee_amount": "704816326530612244",
+        "outcome_index": "0",
+        "outcome_tokens": "57560000000000000000"
+      },
+      {
+        "block": 48889464,
+        "log_index": "294",
+        "tx": "0x7be1f68ba3428b49cacc6417a0da06f7b0b5b132227083723f41b89e3b8426e0",
+        "market": "0xaf06902f6874cdc4cf826c144e00b1fd4892d476",
+        "trader": "0x56c5fde965f5580250b053d26f626a8503968181",
+        "side": "buy",
+        "collateral_amount": "11896200000000000000",
+        "fee_amount": "237924000000000000",
+        "outcome_index": "1",
+        "outcome_tokens": "22030000000000000000"
+      },
+      {
+        "block": 48889512,
+        "log_index": "198",
+        "tx": "0x28df7bf34b9c32475721bdeac2dddb6c00296164079b6aaa8c6d47c15d7e3696",
+        "market": "0x3cd4bcb79df347eca86aef92e3377357138cba88",
+        "trader": "0xcebb392d5e86d841719dd1bda4231cc6e25afe56",
+        "side": "sell",
+        "collateral_amount": "11956500000000000000",
+        "fee_amount": "244010204081632653",
+        "outcome_index": "0",
+        "outcome_tokens": "26570000000000000000"
+      },
+      {
+        "block": 48891368,
+        "log_index": "255",
+        "tx": "0x0d5474b6907868fed7ee74f850ad505bb4074929f87ec1209b30a5dfa6651d91",
+        "market": "0x33807ad6b767b303f0cb4a7ff6044b2d9413c616",
+        "trader": "0x97ec8faa00797065358f1fff18de7139e9ae42f1",
+        "side": "buy",
+        "collateral_amount": "25056100000000000000",
+        "fee_amount": "501122000000000000",
+        "outcome_index": "0",
+        "outcome_tokens": "58270000000000000000"
+      },
+      {
+        "block": 48907202,
+        "log_index": "119",
+        "tx": "0x2e8e2da4064bc97b507e1fee1488a64d5791efa89c99d32b46068c2c6a3ae9ef",
+        "market": "0x33807ad6b767b303f0cb4a7ff6044b2d9413c616",
+        "trader": "0x97ec8faa00797065358f1fff18de7139e9ae42f1",
+        "side": "buy",
+        "collateral_amount": "33339600000000000000",
+        "fee_amount": "666792000000000000",
+        "outcome_index": "0",
+        "outcome_tokens": "61740000000000000000"
+      },
+      {
+        "block": 48923407,
+        "log_index": "159",
+        "tx": "0x9d1e94ef53cb42b2cfc8540de533625d961ee96438520e7e11cdf6c3776af7ee",
+        "market": "0x0d0a5faaacc0b5539d56bf1ab15f8e384772cbba",
+        "trader": "0x78181e2bd8b86226b80d9e94148b6d8d8aaa6782",
+        "side": "sell",
+        "collateral_amount": "20347200000000000000",
+        "fee_amount": "415248979591836734",
+        "outcome_index": "0",
+        "outcome_tokens": "42390000000000000000"
+      },
+      {
+        "block": 48929964,
+        "log_index": "39",
+        "tx": "0xef282224f46b6dc278c6422a8f1fe71f37983f22410cf5104dc1e0e7f5c016cd",
+        "market": "0xaf06902f6874cdc4cf826c144e00b1fd4892d476",
+        "trader": "0x4cb9a06571f9b97e85f38ae55760576af2cc5cbe",
+        "side": "sell",
+        "collateral_amount": "6051700000000000000",
+        "fee_amount": "123504081632653061",
+        "outcome_index": "0",
+        "outcome_tokens": "8290000000000000000"
+      },
+      {
+        "block": 48932445,
+        "log_index": "17",
+        "tx": "0x5b0bcc790166ab7762e63a3569ae1e815f43b96c7bb8711cf97aae971ed62120",
+        "market": "0x33807ad6b767b303f0cb4a7ff6044b2d9413c616",
+        "trader": "0xbdaf243b10791f76dac0be6774484a36b7ae41c3",
+        "side": "buy",
+        "collateral_amount": "11471600000000000000",
+        "fee_amount": "229432000000000000",
+        "outcome_index": "1",
+        "outcome_tokens": "16870000000000000000"
+      },
+      {
+        "block": 48932774,
+        "log_index": "229",
+        "tx": "0x13466e13506b9e11e977e826fe1f65adb066ad132f5cbc10632ac48ac9438857",
+        "market": "0xb07c136bb9a6e7763d9bef68c7eccca853f812ed",
+        "trader": "0x5d432ab5f0497849addb08269320fb424164ce74",
+        "side": "sell",
+        "collateral_amount": "6784000000000000000",
+        "fee_amount": "138448979591836734",
+        "outcome_index": "1",
+        "outcome_tokens": "12800000000000000000"
+      },
+      {
+        "block": 48934856,
+        "log_index": "205",
+        "tx": "0xaf1ee83d5f17d68a29d332c5bfec656e4154f83ea1126576f44365141dd2508e",
+        "market": "0xb138ef8dff06e8a0a3a33c65fc17f0c603ce4b9d",
+        "trader": "0x0c2e49d8011a2c1356a7d11f237a8600c56e3359",
+        "side": "buy",
+        "collateral_amount": "5986500000000000000",
+        "fee_amount": "119730000000000000",
+        "outcome_index": "1",
+        "outcome_tokens": "9210000000000000000"
+      },
+      {
+        "block": 48936315,
+        "log_index": "100",
+        "tx": "0xba09fdf56cbbebaa0f1cc9e02147ea726d2743f5846206d261dc3259796ea133",
+        "market": "0x33807ad6b767b303f0cb4a7ff6044b2d9413c616",
+        "trader": "0x5d432ab5f0497849addb08269320fb424164ce74",
+        "side": "buy",
+        "collateral_amount": "44263500000000000000",
+        "fee_amount": "885270000000000000",
+        "outcome_index": "0",
+        "outcome_tokens": "64150000000000000000"
+      },
+      {
+        "block": 48939108,
+        "log_index": "62",
+        "tx": "0xa4ff1d91a5889e9a3df79b6e010d426a6bedd84e8504a3be405d3935cc279fee",
+        "market": "0x7c1e039d24ae4e9b61dd90d80283b18ccded3356",
+        "trader": "0x56c5fde965f5580250b053d26f626a8503968181",
+        "side": "buy",
+        "collateral_amount": "10696700000000000000",
+        "fee_amount": "213934000000000000",
+        "outcome_index": "0",
+        "outcome_tokens": "18130000000000000000"
+      },
+      {
+        "block": 48939471,
+        "log_index": "169",
+        "tx": "0xefa4d696ca86536c790f86132d1aa2754c3f1fffb3ebc6997d7c0b684f00d591",
+        "market": "0x33807ad6b767b303f0cb4a7ff6044b2d9413c616",
+        "trader": "0xd6668348cd32e7d98a9d47377de82459649565dc",
+        "side": "buy",
+        "collateral_amount": "6840000000000000000",
+        "fee_amount": "136800000000000000",
+        "outcome_index": "0",
+        "outcome_tokens": "13680000000000000000"
+      },
+      {
+        "block": 48940261,
+        "log_index": "217",
+        "tx": "0xa64f4ac68d4f8aa4105934b4723397a8df9e5358c357d32af346ff29d5b2c0bf",
+        "market": "0xaf06902f6874cdc4cf826c144e00b1fd4892d476",
+        "trader": "0x5d432ab5f0497849addb08269320fb424164ce74",
+        "side": "buy",
+        "collateral_amount": "11245400000000000000",
+        "fee_amount": "224908000000000000",
+        "outcome_index": "0",
+        "outcome_tokens": "19060000000000000000"
+      },
+      {
+        "block": 48941481,
+        "log_index": "285",
+        "tx": "0x8280eb2e32b1a257955fb595021f5c8f7ae8d914c85c348351e93ee1bb8eb2dc",
+        "market": "0xaf06902f6874cdc4cf826c144e00b1fd4892d476",
+        "trader": "0x97ec8faa00797065358f1fff18de7139e9ae42f1",
+        "side": "buy",
+        "collateral_amount": "15708000000000000000",
+        "fee_amount": "314160000000000000",
+        "outcome_index": "0",
+        "outcome_tokens": "35700000000000000000"
+      },
+      {
+        "block": 48942332,
+        "log_index": "196",
+        "tx": "0x2852f6ecef0d60d11623d3f4643ae8e5b7518d80487f6f5b71038a650e44e2e0",
+        "market": "0x3cd4bcb79df347eca86aef92e3377357138cba88",
+        "trader": "0xc544ad3bb2f2cac5f47b38d10ac0d7389caf91ce",
+        "side": "buy",
+        "collateral_amount": "41648600000000000000",
+        "fee_amount": "832972000000000000",
+        "outcome_index": "1",
+        "outcome_tokens": "58660000000000000000"
+      },
+      {
+        "block": 48943828,
+        "log_index": "132",
+        "tx": "0x53a10609f4f5c1e3aa97dda38b6195501172b2ed1e4741b477eb322838b7eb49",
+        "market": "0xb07c136bb9a6e7763d9bef68c7eccca853f812ed",
+        "trader": "0xc544ad3bb2f2cac5f47b38d10ac0d7389caf91ce",
+        "side": "sell",
+        "collateral_amount": "28285700000000000000",
+        "fee_amount": "577259183673469387",
+        "outcome_index": "0",
+        "outcome_tokens": "46370000000000000000"
+      },
+      {
+        "block": 48948318,
+        "log_index": "178",
+        "tx": "0xe80edb200af93f7a5c712c20505893dd1fb040849e99ce9d8d05cb219743cd2c",
+        "market": "0xaf06902f6874cdc4cf826c144e00b1fd4892d476",
+        "trader": "0x7b949a4f08d3c1fbf047f46898e17ff3e9dc6c90",
+        "side": "buy",
+        "collateral_amount": "28184200000000000000",
+        "fee_amount": "563684000000000000",
+        "outcome_index": "0",
+        "outcome_tokens": "61270000000000000000"
+      },
+      {
+        "block": 48953264,
+        "log_index": "204",
+        "tx": "0x0b5f112e80b4edbaef34418c0b08a2d000f985d249c9b80c9f790f811d44c144",
+        "market": "0x0d0a5faaacc0b5539d56bf1ab15f8e384772cbba",
+        "trader": "0xe983895d62ef6cc83bf0a9ae8fee604e91519d95",
+        "side": "buy",
+        "collateral_amount": "31248000000000000000",
+        "fee_amount": "624960000000000000",
+        "outcome_index": "1",
+        "outcome_tokens": "55800000000000000000"
+      },
+      {
+        "block": 48955717,
+        "log_index": "113",
+        "tx": "0x209bd01bb18eed4e88169377777a356549a72efbf9f72505e533aceb7ced7764",
+        "market": "0xb138ef8dff06e8a0a3a33c65fc17f0c603ce4b9d",
+        "trader": "0x7e27a7ec9d1bb9d3f555ca02f8810ad3a57d6e79",
+        "side": "buy",
+        "collateral_amount": "13748000000000000000",
+        "fee_amount": "274960000000000000",
+        "outcome_index": "1",
+        "outcome_tokens": "19640000000000000000"
+      },
+      {
+        "block": 48956718,
+        "log_index": "129",
+        "tx": "0x399bbfb22311b99225dea2f8876b322a75f969900218b07a0db99c5793dfbaaf",
+        "market": "0x7c1e039d24ae4e9b61dd90d80283b18ccded3356",
+        "trader": "0x836e6f25a2964da33f4551bf16de700b21c7c90a",
+        "side": "buy",
+        "collateral_amount": "19800900000000000000",
+        "fee_amount": "396018000000000000",
+        "outcome_index": "1",
+        "outcome_tokens": "40410000000000000000"
+      },
+      {
+        "block": 48962265,
+        "log_index": "281",
+        "tx": "0x881d1de262814c947d741376037f7c6688da44e5796b3d2e25ce2ed563a59d4b",
+        "market": "0xaf06902f6874cdc4cf826c144e00b1fd4892d476",
+        "trader": "0xcebb392d5e86d841719dd1bda4231cc6e25afe56",
+        "side": "sell",
+        "collateral_amount": "18656000000000000000",
+        "fee_amount": "380734693877551020",
+        "outcome_index": "0",
+        "outcome_tokens": "35200000000000000000"
+      },
+      {
+        "block": 48963015,
+        "log_index": "12",
+        "tx": "0x20bd836a6c30665ac5cadfd38df4fa5d1b988893d063f9f778f8971f02e0ecc9",
+        "market": "0x7c1e039d24ae4e9b61dd90d80283b18ccded3356",
+        "trader": "0x16d25e86d3098426f2f17023b4e42b38e5be446e",
+        "side": "buy",
+        "collateral_amount": "18078600000000000000",
+        "fee_amount": "361572000000000000",
+        "outcome_index": "1",
+        "outcome_tokens": "31170000000000000000"
+      },
+      {
+        "block": 48965026,
+        "log_index": "266",
+        "tx": "0x052122cffe61292fe28ef616232dbda86acd5a0c896387a9aede08de85fac6a7",
+        "market": "0x037c19940af482e1c517ef90669b6eca6cf55ba2",
+        "trader": "0x4670d7c0f0e3be8efb687a07a7b0756a80fc482e",
+        "side": "buy",
+        "collateral_amount": "17310000000000000000",
+        "fee_amount": "346200000000000000",
+        "outcome_index": "1",
+        "outcome_tokens": "28850000000000000000"
+      },
+      {
+        "block": 48965308,
+        "log_index": "120",
+        "tx": "0x8b7de142a3108f23fe2a1cf14cb2c020115f7fb8a2649bd6844f0f1a89c5c835",
+        "market": "0x0d0a5faaacc0b5539d56bf1ab15f8e384772cbba",
+        "trader": "0x5d432ab5f0497849addb08269320fb424164ce74",
+        "side": "sell",
+        "collateral_amount": "26503300000000000000",
+        "fee_amount": "540883673469387755",
+        "outcome_index": "1",
+        "outcome_tokens": "56390000000000000000"
+      },
+      {
+        "block": 48966890,
+        "log_index": "3",
+        "tx": "0x6508357ee39753210be968d168e377dcb6790aa966b2821887609f8576982b3c",
+        "market": "0x52bab136f951bf39c11c34f788147e748bd78d18",
+        "trader": "0xe10540324507cfab83e9705cf4c268fd69499d5f",
+        "side": "buy",
+        "collateral_amount": "31281600000000000000",
+        "fee_amount": "625632000000000000",
+        "outcome_index": "1",
+        "outcome_tokens": "41160000000000000000"
+      },
+      {
+        "block": 48972519,
+        "log_index": "96",
+        "tx": "0x2ebc2ed9395f0cb8c9a77beacef9c994bc09dbadcfdd401ef4eaaa080d2f9f9b",
+        "market": "0x33807ad6b767b303f0cb4a7ff6044b2d9413c616",
+        "trader": "0xe10540324507cfab83e9705cf4c268fd69499d5f",
+        "side": "buy",
+        "collateral_amount": "16367600000000000000",
+        "fee_amount": "327352000000000000",
+        "outcome_index": "1",
+        "outcome_tokens": "24070000000000000000"
+      },
+      {
+        "block": 48973094,
+        "log_index": "190",
+        "tx": "0x0053483288539db917c48753a4d42dae22f07661c3c911fec4e67446cf4bdbaa",
+        "market": "0x0d0a5faaacc0b5539d56bf1ab15f8e384772cbba",
+        "trader": "0x3965678857980baf280fa8fb1d0d0aa362b8adda",
+        "side": "buy",
+        "collateral_amount": "28125000000000000000",
+        "fee_amount": "562500000000000000",
+        "outcome_index": "0",
+        "outcome_tokens": "62500000000000000000"
+      },
+      {
+        "block": 48990580,
+        "log_index": "28",
+        "tx": "0x9cd6f3eb9a327114f8e2b587737002dc31eba787429a043b77fede54f3d18d35",
+        "market": "0x7c1e039d24ae4e9b61dd90d80283b18ccded3356",
+        "trader": "0x61a6bf4cfff94534d8a8771a17a5be5d8b023653",
+        "side": "sell",
+        "collateral_amount": "21988800000000000000",
+        "fee_amount": "448751020408163265",
+        "outcome_index": "1",
+        "outcome_tokens": "30540000000000000000"
+      },
+      {
+        "block": 48992133,
+        "log_index": "232",
+        "tx": "0xcaba8aa656a43cfeef724c2fc92fc2eca7cf3d9fbb0d270f81baac572e2ed767",
+        "market": "0xd0b9f6a4815a44cc016898615e9021a994bf0a9f",
+        "trader": "0xe8feb4ce09c88f959b49dc9cc60297608d349aef",
+        "side": "buy",
+        "collateral_amount": "10584600000000000000",
+        "fee_amount": "211692000000000000",
+        "outcome_index": "1",
+        "outcome_tokens": "15340000000000000000"
+      },
+      {
+        "block": 48992347,
+        "log_index": "117",
+        "tx": "0x13b710bb206beecae3970ef75a8cbdb6a4fef6b43d4c4a877173377f454837b1",
+        "market": "0xb07c136bb9a6e7763d9bef68c7eccca853f812ed",
+        "trader": "0x8dc74d1ec6a0efe7bae592016adee654c430356b",
+        "side": "sell",
+        "collateral_amount": "6212400000000000000",
+        "fee_amount": "126783673469387755",
+        "outcome_index": "1",
+        "outcome_tokens": "10020000000000000000"
+      },
+      {
+        "block": 48997091,
+        "log_index": "70",
+        "tx": "0x9b498df009df021121a95e2e8b49bb15263389fe901421efd765de5241ae2a3b",
+        "market": "0x52bab136f951bf39c11c34f788147e748bd78d18",
+        "trader": "0xfb3ad300a989cea6acb18f13bed50afff6357a67",
+        "side": "buy",
+        "collateral_amount": "20619300000000000000",
+        "fee_amount": "412386000000000000",
+        "outcome_index": "0",
+        "outcome_tokens": "40430000000000000000"
+      },
+      {
+        "block": 49000176,
+        "log_index": "213",
+        "tx": "0x8d32ef368b2b2c0210abc68d5238efddf3a5fe388f03bdfff517dfc001910d63",
+        "market": "0xaf06902f6874cdc4cf826c144e00b1fd4892d476",
+        "trader": "0x836e6f25a2964da33f4551bf16de700b21c7c90a",
+        "side": "buy",
+        "collateral_amount": "19874400000000000000",
+        "fee_amount": "397488000000000000",
+        "outcome_index": "1",
+        "outcome_tokens": "35490000000000000000"
+      },
+      {
+        "block": 49001014,
+        "log_index": "19",
+        "tx": "0x08f5f66489cacfba39143590c4c3988ac41d704fe6da96297828ec1606409ce8",
+        "market": "0xb07c136bb9a6e7763d9bef68c7eccca853f812ed",
+        "trader": "0xfb3ad300a989cea6acb18f13bed50afff6357a67",
+        "side": "sell",
+        "collateral_amount": "5942400000000000000",
+        "fee_amount": "121273469387755102",
+        "outcome_index": "1",
+        "outcome_tokens": "12380000000000000000"
+      },
+      {
+        "block": 49005231,
+        "log_index": "7",
+        "tx": "0x86e394b3703180c977495b6da8af947ae4aba2e782d8713ea68fef6544eb3149",
+        "market": "0xd0b9f6a4815a44cc016898615e9021a994bf0a9f",
+        "trader": "0xd2bfc1fd364f282ae91c00f82602823452aa725b",
+        "side": "sell",
+        "collateral_amount": "4649400000000000000",
+        "fee_amount": "94885714285714285",
+        "outcome_index": "0",
+        "outcome_tokens": "11340000000000000000"
+      },
+      {
+        "block": 49014349,
+        "log_index": "95",
+        "tx": "0xfe75493a3b9ce631dc008696fd02742bb7f7de94f851b0e06aa3d16e528e0b20",
+        "market": "0x3cd4bcb79df347eca86aef92e3377357138cba88",
+        "trader": "0x16d25e86d3098426f2f17023b4e42b38e5be446e",
+        "side": "buy",
+        "collateral_amount": "23932400000000000000",
+        "fee_amount": "478648000000000000",
+        "outcome_index": "1",
+        "outcome_tokens": "50920000000000000000"
+      },
+      {
+        "block": 49032653,
+        "log_index": "101",
+        "tx": "0x3cfa73420568f8921fcfd81ddb6d1778662b95b46cc56e2470a8b0b0296249db",
+        "market": "0x037c19940af482e1c517ef90669b6eca6cf55ba2",
+        "trader": "0x5d432ab5f0497849addb08269320fb424164ce74",
+        "side": "sell",
+        "collateral_amount": "27258000000000000000",
+        "fee_amount": "556285714285714285",
+        "outcome_index": "0",
+        "outcome_tokens": "61950000000000000000"
+      },
+      {
+        "block": 49033076,
+        "log_index": "108",
+        "tx": "0xb8d96f5cdb67bf8ccebf44229cb016ddbf88b3e8f83447a703b03ae2e7b931ed",
+        "market": "0x33807ad6b767b303f0cb4a7ff6044b2d9413c616",
+        "trader": "0xcebb392d5e86d841719dd1bda4231cc6e25afe56",
+        "side": "buy",
+        "collateral_amount": "16456000000000000000",
+        "fee_amount": "329120000000000000",
+        "outcome_index": "1",
+        "outcome_tokens": "24200000000000000000"
+      },
+      {
+        "block": 49033600,
+        "log_index": "159",
+        "tx": "0xb7b7c7ffef8b1dd7dfec014e48309c9648f5e99cad4c76fb47c0f44dcfb9313b",
+        "market": "0x886ca381ae7cff78b4c47f3d041407758b345041",
+        "trader": "0x5e057592da74c75db945001eae8ff92161312e89",
+        "side": "buy",
+        "collateral_amount": "25214400000000000000",
+        "fee_amount": "504288000000000000",
+        "outcome_index": "0",
+        "outcome_tokens": "49440000000000000000"
+      },
+      {
+        "block": 49037538,
+        "log_index": "38",
+        "tx": "0xc54fae7734254c1ab38f8f227f19a467572e3ef63382b90f8c41e588aef570f5",
+        "market": "0x33807ad6b767b303f0cb4a7ff6044b2d9413c616",
+        "trader": "0x61a6bf4cfff94534d8a8771a17a5be5d8b023653",
+        "side": "buy",
+        "collateral_amount": "34232000000000000000",
+        "fee_amount": "684640000000000000",
+        "outcome_index": "0",
+        "outcome_tokens": "62240000000000000000"
+      },
+      {
+        "block": 49048149,
+        "log_index": "184",
+        "tx": "0x29a6b806b32b84cb15ae96514a72051a2a255e49fd1b07a49c62ac0b3d08cb0c",
+        "market": "0x33807ad6b767b303f0cb4a7ff6044b2d9413c616",
+        "trader": "0x61a6bf4cfff94534d8a8771a17a5be5d8b023653",
+        "side": "sell",
+        "collateral_amount": "18169700000000000000",
+        "fee_amount": "370810204081632653",
+        "outcome_index": "1",
+        "outcome_tokens": "24890000000000000000"
+      },
+      {
+        "block": 49049564,
+        "log_index": "49",
+        "tx": "0x77171fbf005187728cc5c496a021998d9a85409c65601127a7427cdf6eb3f9c0",
+        "market": "0xb138ef8dff06e8a0a3a33c65fc17f0c603ce4b9d",
+        "trader": "0xfb3ad300a989cea6acb18f13bed50afff6357a67",
+        "side": "buy",
+        "collateral_amount": "47556600000000000000",
+        "fee_amount": "951132000000000000",
+        "outcome_index": "1",
+        "outcome_tokens": "60970000000000000000"
+      },
+      {
+        "block": 49051677,
+        "log_index": "107",
+        "tx": "0x9a550539009170a6baba1516acbd2b1e039ac82cd0edbcbef5aa2b43ab30a17d",
+        "market": "0xb07c136bb9a6e7763d9bef68c7eccca853f812ed",
+        "trader": "0x5d432ab5f0497849addb08269320fb424164ce74",
+        "side": "buy",
+        "collateral_amount": "16923200000000000000",
+        "fee_amount": "338464000000000000",
+        "outcome_index": "1",
+        "outcome_tokens": "30220000000000000000"
+      }
+    ],
+    "liquidity": [
+      {
+        "block": 48558286,
+        "log_index": "44",
+        "tx": "0x814fa412f3671c73828d22d7adb28bb365a94ebcf9a6d499836f1ebd2cc8156f",
+        "market": "0xc7e9650c143d1725af516b60edba548d4179e21b",
+        "funder": "0x9083a2b699c0a4ad06f63580bde2635d26a3eef0",
+        "side": "add",
+        "shares": "209260000000000000000",
+        "collateral_removed_from_fee_pool": "0"
+      },
+      {
+        "block": 48570890,
+        "log_index": "83",
+        "tx": "0x8b8f25ab3128abafcee4657e42da940dbdf87f6c751552db32bf1f6250a67fe8",
+        "market": "0x33807ad6b767b303f0cb4a7ff6044b2d9413c616",
+        "funder": "0x3451bd1b13c4558a67a62bc042905ecbf05c03d2",
+        "side": "add",
+        "shares": "423790000000000000000",
+        "collateral_removed_from_fee_pool": "0"
+      },
+      {
+        "block": 48583495,
+        "log_index": "234",
+        "tx": "0x0763df0e0be679c397c3e86cf7a9c6e6d5cea7aeb1db606e7fafce1b633b5e3b",
+        "market": "0x7c1e039d24ae4e9b61dd90d80283b18ccded3356",
+        "funder": "0x4dcfb279964970c20b694f220845b83839621bf0",
+        "side": "add",
+        "shares": "310870000000000000000",
+        "collateral_removed_from_fee_pool": "0"
+      },
+      {
+        "block": 48596100,
+        "log_index": "129",
+        "tx": "0x6776333f4651aef787042cdfca725edfe912e6d4b845c4ab76daa9a92d09848b",
+        "market": "0xb138ef8dff06e8a0a3a33c65fc17f0c603ce4b9d",
+        "funder": "0x45c55f8bd0a626e7f9e3971a538a79ea81cbb265",
+        "side": "add",
+        "shares": "74280000000000000000",
+        "collateral_removed_from_fee_pool": "0"
+      },
+      {
+        "block": 48608705,
+        "log_index": "82",
+        "tx": "0x7e1a43100cc3d24b50c661f7160416617e5ab1dec04eb2efa6ff2bf88288e78d",
+        "market": "0xb07c136bb9a6e7763d9bef68c7eccca853f812ed",
+        "funder": "0x10019e66e6ec62a7525886a9477aabcc41b984b1",
+        "side": "add",
+        "shares": "95230000000000000000",
+        "collateral_removed_from_fee_pool": "0"
+      },
+      {
+        "block": 48621310,
+        "log_index": "113",
+        "tx": "0x7f69de63bd4c0d3cde00a0cd8a10fd8b680a6a5d277b796535bebed22ab03ce2",
+        "market": "0xaf06902f6874cdc4cf826c144e00b1fd4892d476",
+        "funder": "0x9083a2b699c0a4ad06f63580bde2635d26a3eef0",
+        "side": "add",
+        "shares": "186360000000000000000",
+        "collateral_removed_from_fee_pool": "0"
+      },
+      {
+        "block": 48633914,
+        "log_index": "50",
+        "tx": "0x975ca168cafdaf1f356d247783a9708389daeaedde198eb5ab78ecd430bcabba",
+        "market": "0x037c19940af482e1c517ef90669b6eca6cf55ba2",
+        "funder": "0x3451bd1b13c4558a67a62bc042905ecbf05c03d2",
+        "side": "add",
+        "shares": "303190000000000000000",
+        "collateral_removed_from_fee_pool": "0"
+      },
+      {
+        "block": 48646519,
+        "log_index": "185",
+        "tx": "0xab39e6e972a287aa17ddc54cb2c8a17ad26a4429b5bd2130e1411116ff5d5ecd",
+        "market": "0xd0b9f6a4815a44cc016898615e9021a994bf0a9f",
+        "funder": "0x4dcfb279964970c20b694f220845b83839621bf0",
+        "side": "add",
+        "shares": "85020000000000000000",
+        "collateral_removed_from_fee_pool": "0"
+      },
+      {
+        "block": 48659124,
+        "log_index": "26",
+        "tx": "0xcfac985591788fecfda2aaacf0ee1d584444eccb007c3e9b6bb3020948bc5517",
+        "market": "0x3cd4bcb79df347eca86aef92e3377357138cba88",
+        "funder": "0x45c55f8bd0a626e7f9e3971a538a79ea81cbb265",
+        "side": "add",
+        "shares": "193760000000000000000",
+        "collateral_removed_from_fee_pool": "0"
+      },
+      {
+        "block": 48671729,
+        "log_index": "223",
+        "tx": "0x35d984fe7717009f81f33c0b89f769f228ddd88ccd6ba935dd2d53f1f48899db",
+        "market": "0x886ca381ae7cff78b4c47f3d041407758b345041",
+        "funder": "0x10019e66e6ec62a7525886a9477aabcc41b984b1",
+        "side": "add",
+        "shares": "300100000000000000000",
+        "collateral_removed_from_fee_pool": "0"
+      },
+      {
+        "block": 48684334,
+        "log_index": "235",
+        "tx": "0x3321be3ecb3750180d7e00240182436ff4a2b7821034cea7de993f3cc18affa4",
+        "market": "0x52bab136f951bf39c11c34f788147e748bd78d18",
+        "funder": "0x9083a2b699c0a4ad06f63580bde2635d26a3eef0",
+        "side": "add",
+        "shares": "139780000000000000000",
+        "collateral_removed_from_fee_pool": "0"
+      },
+      {
+        "block": 48696939,
+        "log_index": "47",
+        "tx": "0xa1dbcc754ce252b5a1789758674bbd8e5f6d499bc79acf959cf0eccd4d4cf2b4",
+        "market": "0x0d0a5faaacc0b5539d56bf1ab15f8e384772cbba",
+        "funder": "0x3451bd1b13c4558a67a62bc042905ecbf05c03d2",
+        "side": "add",
+        "shares": "482470000000000000000",
+        "collateral_removed_from_fee_pool": "0"
+      },
+      {
+        "block": 48709543,
+        "log_index": "273",
+        "tx": "0xb282365d4b5c3b46e10c4adf5f3a1d4b6d079d132105338183d17f4eaa2fed95",
+        "market": "0xbb7728320f4c01cb008d09f3668e2ef9d726ed0b",
+        "funder": "0x4dcfb279964970c20b694f220845b83839621bf0",
+        "side": "add",
+        "shares": "530650000",
+        "collateral_removed_from_fee_pool": "0"
+      }
+    ],
+    "market_state": [
+      {
+        "block": 48558286,
+        "market": "0xc7e9650c143d1725af516b60edba548d4179e21b",
+        "outcome_index": "0",
+        "amount": "5209260000000000000000"
+      },
+      {
+        "block": 48558286,
+        "market": "0xc7e9650c143d1725af516b60edba548d4179e21b",
+        "outcome_index": "1",
+        "amount": "5209260000000000000000"
+      },
+      {
+        "block": 48561831,
+        "market": "0xb07c136bb9a6e7763d9bef68c7eccca853f812ed",
+        "outcome_index": "0",
+        "amount": "4988776938775510204082"
+      },
+      {
+        "block": 48561831,
+        "market": "0xb07c136bb9a6e7763d9bef68c7eccca853f812ed",
+        "outcome_index": "1",
+        "amount": "5012686938775510204082"
+      },
+      {
+        "block": 48563517,
+        "market": "0xaf06902f6874cdc4cf826c144e00b1fd4892d476",
+        "outcome_index": "0",
+        "amount": "5005406170000000000000"
+      },
+      {
+        "block": 48563517,
+        "market": "0xaf06902f6874cdc4cf826c144e00b1fd4892d476",
+        "outcome_index": "1",
+        "amount": "4996056170000000000000"
+      },
+      {
+        "block": 48570890,
+        "market": "0x33807ad6b767b303f0cb4a7ff6044b2d9413c616",
+        "outcome_index": "0",
+        "amount": "5423790000000000000000"
+      },
+      {
+        "block": 48570890,
+        "market": "0x33807ad6b767b303f0cb4a7ff6044b2d9413c616",
+        "outcome_index": "1",
+        "amount": "5423790000000000000000"
+      },
+      {
+        "block": 48576667,
+        "market": "0x037c19940af482e1c517ef90669b6eca6cf55ba2",
+        "outcome_index": "0",
+        "amount": "4980348608000000000000"
+      },
+      {
+        "block": 48576667,
+        "market": "0x037c19940af482e1c517ef90669b6eca6cf55ba2",
+        "outcome_index": "1",
+        "amount": "5030428608000000000000"
+      },
+      {
+        "block": 48578324,
+        "market": "0x33807ad6b767b303f0cb4a7ff6044b2d9413c616",
+        "outcome_index": "0",
+        "amount": "5442123840000000000000"
+      },
+      {
+        "block": 48578324,
+        "market": "0x33807ad6b767b303f0cb4a7ff6044b2d9413c616",
+        "outcome_index": "1",
+        "amount": "5395353840000000000000"
+      },
+      {
+        "block": 48583495,
+        "market": "0x7c1e039d24ae4e9b61dd90d80283b18ccded3356",
+        "outcome_index": "0",
+        "amount": "5310870000000000000000"
+      },
+      {
+        "block": 48583495,
+        "market": "0x7c1e039d24ae4e9b61dd90d80283b18ccded3356",
+        "outcome_index": "1",
+        "amount": "5310870000000000000000"
+      },
+      {
+        "block": 48585597,
+        "market": "0xd0b9f6a4815a44cc016898615e9021a994bf0a9f",
+        "outcome_index": "0",
+        "amount": "5010311756000000000000"
+      },
+      {
+        "block": 48585597,
+        "market": "0xd0b9f6a4815a44cc016898615e9021a994bf0a9f",
+        "outcome_index": "1",
+        "amount": "4996821756000000000000"
+      },
+      {
+        "block": 48589489,
+        "market": "0x33807ad6b767b303f0cb4a7ff6044b2d9413c616",
+        "outcome_index": "0",
+        "amount": "5488456280000000000000"
+      },
+      {
+        "block": 48589489,
+        "market": "0x33807ad6b767b303f0cb4a7ff6044b2d9413c616",
+        "outcome_index": "1",
+        "amount": "5380286280000000000000"
+      },
+      {
+        "block": 48594527,
+        "market": "0x0d0a5faaacc0b5539d56bf1ab15f8e384772cbba",
+        "outcome_index": "0",
+        "amount": "5002946428571428571429"
+      },
+      {
+        "block": 48594527,
+        "market": "0x0d0a5faaacc0b5539d56bf1ab15f8e384772cbba",
+        "outcome_index": "1",
+        "amount": "4994196428571428571429"
+      },
+      {
+        "block": 48594912,
+        "market": "0x33807ad6b767b303f0cb4a7ff6044b2d9413c616",
+        "outcome_index": "0",
+        "amount": "5521000120000000000000"
+      },
+      {
+        "block": 48594912,
+        "market": "0x33807ad6b767b303f0cb4a7ff6044b2d9413c616",
+        "outcome_index": "1",
+        "amount": "5365390120000000000000"
+      },
+      {
+        "block": 48596100,
+        "market": "0xb138ef8dff06e8a0a3a33c65fc17f0c603ce4b9d",
+        "outcome_index": "0",
+        "amount": "5074280000000000000000"
+      },
+      {
+        "block": 48596100,
+        "market": "0xb138ef8dff06e8a0a3a33c65fc17f0c603ce4b9d",
+        "outcome_index": "1",
+        "amount": "5074280000000000000000"
+      },
+      {
+        "block": 48597124,
+        "market": "0x886ca381ae7cff78b4c47f3d041407758b345041",
+        "outcome_index": "0",
+        "amount": "5015833664000000000000"
+      },
+      {
+        "block": 48597124,
+        "market": "0x886ca381ae7cff78b4c47f3d041407758b345041",
+        "outcome_index": "1",
+        "amount": "4992073664000000000000"
+      },
+      {
+        "block": 48605898,
+        "market": "0xb138ef8dff06e8a0a3a33c65fc17f0c603ce4b9d",
+        "outcome_index": "0",
+        "amount": "5083851268000000000000"
+      },
+      {
+        "block": 48605898,
+        "market": "0xb138ef8dff06e8a0a3a33c65fc17f0c603ce4b9d",
+        "outcome_index": "1",
+        "amount": "5063071268000000000000"
+      },
+      {
+        "block": 48608705,
+        "market": "0xb07c136bb9a6e7763d9bef68c7eccca853f812ed",
+        "outcome_index": "0",
+        "amount": "5084006938775510204082"
+      },
+      {
+        "block": 48608705,
+        "market": "0xb07c136bb9a6e7763d9bef68c7eccca853f812ed",
+        "outcome_index": "1",
+        "amount": "5107916938775510204082"
+      },
+      {
+        "block": 48614584,
+        "market": "0x7c1e039d24ae4e9b61dd90d80283b18ccded3356",
+        "outcome_index": "0",
+        "amount": "5292241836734693877552"
+      },
+      {
+        "block": 48614584,
+        "market": "0x7c1e039d24ae4e9b61dd90d80283b18ccded3356",
+        "outcome_index": "1",
+        "amount": "5333731836734693877552"
+      },
+      {
+        "block": 48621310,
+        "market": "0xaf06902f6874cdc4cf826c144e00b1fd4892d476",
+        "outcome_index": "0",
+        "amount": "5191766170000000000000"
+      },
+      {
+        "block": 48621310,
+        "market": "0xaf06902f6874cdc4cf826c144e00b1fd4892d476",
+        "outcome_index": "1",
+        "amount": "5182416170000000000000"
+      },
+      {
+        "block": 48626905,
+        "market": "0x33807ad6b767b303f0cb4a7ff6044b2d9413c616",
+        "outcome_index": "0",
+        "amount": "5502082808000000000000"
+      },
+      {
+        "block": 48626905,
+        "market": "0x33807ad6b767b303f0cb4a7ff6044b2d9413c616",
+        "outcome_index": "1",
+        "amount": "5382192808000000000000"
+      },
+      {
+        "block": 48627751,
+        "market": "0xb07c136bb9a6e7763d9bef68c7eccca853f812ed",
+        "outcome_index": "0",
+        "amount": "5071022558775510204082"
+      },
+      {
+        "block": 48627751,
+        "market": "0xb07c136bb9a6e7763d9bef68c7eccca853f812ed",
+        "outcome_index": "1",
+        "amount": "5135032558775510204082"
+      },
+      {
+        "block": 48630036,
+        "market": "0xaf06902f6874cdc4cf826c144e00b1fd4892d476",
+        "outcome_index": "0",
+        "amount": "5193200863877551020409"
+      },
+      {
+        "block": 48630036,
+        "market": "0xaf06902f6874cdc4cf826c144e00b1fd4892d476",
+        "outcome_index": "1",
+        "amount": "5176450863877551020409"
+      },
+      {
+        "block": 48633914,
+        "market": "0x037c19940af482e1c517ef90669b6eca6cf55ba2",
+        "outcome_index": "0",
+        "amount": "5283538608000000000000"
+      },
+      {
+        "block": 48633914,
+        "market": "0x037c19940af482e1c517ef90669b6eca6cf55ba2",
+        "outcome_index": "1",
+        "amount": "5333618608000000000000"
+      },
+      {
+        "block": 48635994,
+        "market": "0x037c19940af482e1c517ef90669b6eca6cf55ba2",
+        "outcome_index": "0",
+        "amount": "5267992048000000000000"
+      },
+      {
+        "block": 48635994,
+        "market": "0x037c19940af482e1c517ef90669b6eca6cf55ba2",
+        "outcome_index": "1",
+        "amount": "5343642048000000000000"
+      },
+      {
+        "block": 48637304,
+        "market": "0x33807ad6b767b303f0cb4a7ff6044b2d9413c616",
+        "outcome_index": "0",
+        "amount": "5476574864000000000000"
+      },
+      {
+        "block": 48637304,
+        "market": "0x33807ad6b767b303f0cb4a7ff6044b2d9413c616",
+        "outcome_index": "1",
+        "amount": "5410864864000000000000"
+      },
+      {
+        "block": 48638651,
+        "market": "0x33807ad6b767b303f0cb4a7ff6044b2d9413c616",
+        "outcome_index": "0",
+        "amount": "5455849149714285714286"
+      },
+      {
+        "block": 48638651,
+        "market": "0x33807ad6b767b303f0cb4a7ff6044b2d9413c616",
+        "outcome_index": "1",
+        "amount": "5429199149714285714286"
+      },
+      {
+        "block": 48639778,
+        "market": "0x33807ad6b767b303f0cb4a7ff6044b2d9413c616",
+        "outcome_index": "0",
+        "amount": "5469347925224489795919"
+      },
+      {
+        "block": 48639778,
+        "market": "0x33807ad6b767b303f0cb4a7ff6044b2d9413c616",
+        "outcome_index": "1",
+        "amount": "5401357925224489795919"
+      },
+      {
+        "block": 48646519,
+        "market": "0xd0b9f6a4815a44cc016898615e9021a994bf0a9f",
+        "outcome_index": "0",
+        "amount": "5095331756000000000000"
+      },
+      {
+        "block": 48646519,
+        "market": "0xd0b9f6a4815a44cc016898615e9021a994bf0a9f",
+        "outcome_index": "1",
+        "amount": "5081841756000000000000"
+      },
+      {
+        "block": 48646850,
+        "market": "0x52bab136f951bf39c11c34f788147e748bd78d18",
+        "outcome_index": "0",
+        "amount": "4997312744000000000000"
+      },
+      {
+        "block": 48646850,
+        "market": "0x52bab136f951bf39c11c34f788147e748bd78d18",
+        "outcome_index": "1",
+        "amount": "5007842744000000000000"
+      },
+      {
+        "block": 48654693,
+        "market": "0xb138ef8dff06e8a0a3a33c65fc17f0c603ce4b9d",
+        "outcome_index": "0",
+        "amount": "5071731578000000000000"
+      },
+      {
+        "block": 48654693,
+        "market": "0xb138ef8dff06e8a0a3a33c65fc17f0c603ce4b9d",
+        "outcome_index": "1",
+        "amount": "5077241578000000000000"
+      },
+      {
+        "block": 48659124,
+        "market": "0x3cd4bcb79df347eca86aef92e3377357138cba88",
+        "outcome_index": "0",
+        "amount": "5193760000000000000000"
+      },
+      {
+        "block": 48659124,
+        "market": "0x3cd4bcb79df347eca86aef92e3377357138cba88",
+        "outcome_index": "1",
+        "amount": "5193760000000000000000"
+      },
+      {
+        "block": 48664802,
+        "market": "0x037c19940af482e1c517ef90669b6eca6cf55ba2",
+        "outcome_index": "0",
+        "amount": "5246667762285714285715"
+      },
+      {
+        "block": 48664802,
+        "market": "0x037c19940af482e1c517ef90669b6eca6cf55ba2",
+        "outcome_index": "1",
+        "amount": "5349457762285714285715"
+      },
+      {
+        "block": 48671729,
+        "market": "0x886ca381ae7cff78b4c47f3d041407758b345041",
+        "outcome_index": "0",
+        "amount": "5315933664000000000000"
+      },
+      {
+        "block": 48671729,
+        "market": "0x886ca381ae7cff78b4c47f3d041407758b345041",
+        "outcome_index": "1",
+        "amount": "5292173664000000000000"
+      },
+      {
+        "block": 48677454,
+        "market": "0xb07c136bb9a6e7763d9bef68c7eccca853f812ed",
+        "outcome_index": "0",
+        "amount": "5046137118775510204082"
+      },
+      {
+        "block": 48677454,
+        "market": "0xb07c136bb9a6e7763d9bef68c7eccca853f812ed",
+        "outcome_index": "1",
+        "amount": "5151077118775510204082"
+      },
+      {
+        "block": 48677601,
+        "market": "0x3cd4bcb79df347eca86aef92e3377357138cba88",
+        "outcome_index": "0",
+        "amount": "5213610880000000000000"
+      },
+      {
+        "block": 48677601,
+        "market": "0x3cd4bcb79df347eca86aef92e3377357138cba88",
+        "outcome_index": "1",
+        "amount": "5181960880000000000000"
+      },
+      {
+        "block": 48681305,
+        "market": "0x3cd4bcb79df347eca86aef92e3377357138cba88",
+        "outcome_index": "0",
+        "amount": "5199151186122448979592"
+      },
+      {
+        "block": 48681305,
+        "market": "0x3cd4bcb79df347eca86aef92e3377357138cba88",
+        "outcome_index": "1",
+        "amount": "5197651186122448979592"
+      },
+      {
+        "block": 48681458,
+        "market": "0x33807ad6b767b303f0cb4a7ff6044b2d9413c616",
+        "outcome_index": "0",
+        "amount": "5473626507224489795919"
+      },
+      {
+        "block": 48681458,
+        "market": "0x33807ad6b767b303f0cb4a7ff6044b2d9413c616",
+        "outcome_index": "1",
+        "amount": "5396726507224489795919"
+      },
+      {
+        "block": 48682194,
+        "market": "0x33807ad6b767b303f0cb4a7ff6044b2d9413c616",
+        "outcome_index": "0",
+        "amount": "5466289199224489795919"
+      },
+      {
+        "block": 48682194,
+        "market": "0x33807ad6b767b303f0cb4a7ff6044b2d9413c616",
+        "outcome_index": "1",
+        "amount": "5412049199224489795919"
+      },
+      {
+        "block": 48684321,
+        "market": "0xb07c136bb9a6e7763d9bef68c7eccca853f812ed",
+        "outcome_index": "0",
+        "amount": "4996376302448979591838"
+      },
+      {
+        "block": 48684321,
+        "market": "0xb07c136bb9a6e7763d9bef68c7eccca853f812ed",
+        "outcome_index": "1",
+        "amount": "5163836302448979591838"
+      },
+      {
+        "block": 48684334,
+        "market": "0x52bab136f951bf39c11c34f788147e748bd78d18",
+        "outcome_index": "0",
+        "amount": "5137092744000000000000"
+      },
+      {
+        "block": 48684334,
+        "market": "0x52bab136f951bf39c11c34f788147e748bd78d18",
+        "outcome_index": "1",
+        "amount": "5147622744000000000000"
+      },
+      {
+        "block": 48689268,
+        "market": "0x33807ad6b767b303f0cb4a7ff6044b2d9413c616",
+        "outcome_index": "0",
+        "amount": "5462994567224489795919"
+      },
+      {
+        "block": 48689268,
+        "market": "0x33807ad6b767b303f0cb4a7ff6044b2d9413c616",
+        "outcome_index": "1",
+        "amount": "5421664567224489795919"
+      },
+      {
+        "block": 48689275,
+        "market": "0xb138ef8dff06e8a0a3a33c65fc17f0c603ce4b9d",
+        "outcome_index": "0",
+        "amount": "5063862388000000000000"
+      },
+      {
+        "block": 48689275,
+        "market": "0xb138ef8dff06e8a0a3a33c65fc17f0c603ce4b9d",
+        "outcome_index": "1",
+        "amount": "5097022388000000000000"
+      },
+      {
+        "block": 48689574,
+        "market": "0x7c1e039d24ae4e9b61dd90d80283b18ccded3356",
+        "outcome_index": "0",
+        "amount": "5334869288734693877552"
+      },
+      {
+        "block": 48689574,
+        "market": "0x7c1e039d24ae4e9b61dd90d80283b18ccded3356",
+        "outcome_index": "1",
+        "amount": "5321299288734693877552"
+      },
+      {
+        "block": 48690961,
+        "market": "0x7c1e039d24ae4e9b61dd90d80283b18ccded3356",
+        "outcome_index": "0",
+        "amount": "5352891488734693877552"
+      },
+      {
+        "block": 48690961,
+        "market": "0x7c1e039d24ae4e9b61dd90d80283b18ccded3356",
+        "outcome_index": "1",
+        "amount": "5308671488734693877552"
+      },
+      {
+        "block": 48691025,
+        "market": "0xb138ef8dff06e8a0a3a33c65fc17f0c603ce4b9d",
+        "outcome_index": "0",
+        "amount": "5067592796163265306123"
+      },
+      {
+        "block": 48691025,
+        "market": "0xb138ef8dff06e8a0a3a33c65fc17f0c603ce4b9d",
+        "outcome_index": "1",
+        "amount": "5087212796163265306123"
+      },
+      {
+        "block": 48691907,
+        "market": "0x33807ad6b767b303f0cb4a7ff6044b2d9413c616",
+        "outcome_index": "0",
+        "amount": "5449402911224489795919"
+      },
+      {
+        "block": 48691907,
+        "market": "0x33807ad6b767b303f0cb4a7ff6044b2d9413c616",
+        "outcome_index": "1",
+        "amount": "5452752911224489795919"
+      },
+      {
+        "block": 48696939,
+        "market": "0x0d0a5faaacc0b5539d56bf1ab15f8e384772cbba",
+        "outcome_index": "0",
+        "amount": "5485416428571428571429"
+      },
+      {
+        "block": 48696939,
+        "market": "0x0d0a5faaacc0b5539d56bf1ab15f8e384772cbba",
+        "outcome_index": "1",
+        "amount": "5476666428571428571429"
+      },
+      {
+        "block": 48698972,
+        "market": "0x33807ad6b767b303f0cb4a7ff6044b2d9413c616",
+        "outcome_index": "0",
+        "amount": "5444013931632653061226"
+      },
+      {
+        "block": 48698972,
+        "market": "0x33807ad6b767b303f0cb4a7ff6044b2d9413c616",
+        "outcome_index": "1",
+        "amount": "5457143931632653061226"
+      },
+      {
+        "block": 48706542,
+        "market": "0x886ca381ae7cff78b4c47f3d041407758b345041",
+        "outcome_index": "0",
+        "amount": "5343785950000000000000"
+      },
+      {
+        "block": 48706542,
+        "market": "0x886ca381ae7cff78b4c47f3d041407758b345041",
+        "outcome_index": "1",
+        "amount": "5283115950000000000000"
+      },
+      {
+        "block": 48709543,
+        "market": "0xbb7728320f4c01cb008d09f3668e2ef9d726ed0b",
+        "outcome_index": "0",
+        "amount": "5530650000"
+      },
+      {
+        "block": 48709543,
+        "market": "0xbb7728320f4c01cb008d09f3668e2ef9d726ed0b",
+        "outcome_index": "1",
+        "amount": "5530650000"
+      },
+      {
+        "block": 48715100,
+        "market": "0x7c1e039d24ae4e9b61dd90d80283b18ccded3356",
+        "outcome_index": "0",
+        "amount": "5364305744734693877552"
+      },
+      {
+        "block": 48715100,
+        "market": "0x7c1e039d24ae4e9b61dd90d80283b18ccded3356",
+        "outcome_index": "1",
+        "amount": "5294765744734693877552"
+      },
+      {
+        "block": 48727059,
+        "market": "0x33807ad6b767b303f0cb4a7ff6044b2d9413c616",
+        "outcome_index": "0",
+        "amount": "5427733931632653061226"
+      },
+      {
+        "block": 48727059,
+        "market": "0x33807ad6b767b303f0cb4a7ff6044b2d9413c616",
+        "outcome_index": "1",
+        "amount": "5461583931632653061226"
+      },
+      {
+        "block": 48731648,
+        "market": "0x886ca381ae7cff78b4c47f3d041407758b345041",
+        "outcome_index": "0",
+        "amount": "5357866786000000000000"
+      },
+      {
+        "block": 48731648,
+        "market": "0x886ca381ae7cff78b4c47f3d041407758b345041",
+        "outcome_index": "1",
+        "amount": "5262986786000000000000"
+      },
+      {
+        "block": 48737686,
+        "market": "0x037c19940af482e1c517ef90669b6eca6cf55ba2",
+        "outcome_index": "0",
+        "amount": "5257041639836734693879"
+      },
+      {
+        "block": 48737686,
+        "market": "0x037c19940af482e1c517ef90669b6eca6cf55ba2",
+        "outcome_index": "1",
+        "amount": "5338651639836734693879"
+      },
+      {
+        "block": 48739675,
+        "market": "0xb138ef8dff06e8a0a3a33c65fc17f0c603ce4b9d",
+        "outcome_index": "0",
+        "amount": "5047378000244897959185"
+      },
+      {
+        "block": 48739675,
+        "market": "0xb138ef8dff06e8a0a3a33c65fc17f0c603ce4b9d",
+        "outcome_index": "1",
+        "amount": "5109148000244897959185"
+      },
+      {
+        "block": 48745268,
+        "market": "0x7c1e039d24ae4e9b61dd90d80283b18ccded3356",
+        "outcome_index": "0",
+        "amount": "5374906969224489795920"
+      },
+      {
+        "block": 48745268,
+        "market": "0x7c1e039d24ae4e9b61dd90d80283b18ccded3356",
+        "outcome_index": "1",
+        "amount": "5250686969224489795920"
+      },
+      {
+        "block": 48746885,
+        "market": "0x33807ad6b767b303f0cb4a7ff6044b2d9413c616",
+        "outcome_index": "0",
+        "amount": "5391044543877551020410"
+      },
+      {
+        "block": 48746885,
+        "market": "0x33807ad6b767b303f0cb4a7ff6044b2d9413c616",
+        "outcome_index": "1",
+        "amount": "5487974543877551020410"
+      },
+      {
+        "block": 48748084,
+        "market": "0x7c1e039d24ae4e9b61dd90d80283b18ccded3356",
+        "outcome_index": "0",
+        "amount": "5413511129224489795920"
+      },
+      {
+        "block": 48748084,
+        "market": "0x7c1e039d24ae4e9b61dd90d80283b18ccded3356",
+        "outcome_index": "1",
+        "amount": "5227741129224489795920"
+      },
+      {
+        "block": 48748780,
+        "market": "0x7c1e039d24ae4e9b61dd90d80283b18ccded3356",
+        "outcome_index": "0",
+        "amount": "5423817965959183673472"
+      },
+      {
+        "block": 48748780,
+        "market": "0x7c1e039d24ae4e9b61dd90d80283b18ccded3356",
+        "outcome_index": "1",
+        "amount": "5214557965959183673472"
+      },
+      {
+        "block": 48750068,
+        "market": "0x037c19940af482e1c517ef90669b6eca6cf55ba2",
+        "outcome_index": "0",
+        "amount": "5248279347836734693879"
+      },
+      {
+        "block": 48750068,
+        "market": "0x037c19940af482e1c517ef90669b6eca6cf55ba2",
+        "outcome_index": "1",
+        "amount": "5352219347836734693879"
+      },
+      {
+        "block": 48750456,
+        "market": "0x33807ad6b767b303f0cb4a7ff6044b2d9413c616",
+        "outcome_index": "0",
+        "amount": "5433919739877551020410"
+      },
+      {
+        "block": 48750456,
+        "market": "0x33807ad6b767b303f0cb4a7ff6044b2d9413c616",
+        "outcome_index": "1",
+        "amount": "5475469739877551020410"
+      },
+      {
+        "block": 48750561,
+        "market": "0x33807ad6b767b303f0cb4a7ff6044b2d9413c616",
+        "outcome_index": "0",
+        "amount": "5473374049877551020410"
+      },
+      {
+        "block": 48750561,
+        "market": "0x33807ad6b767b303f0cb4a7ff6044b2d9413c616",
+        "outcome_index": "1",
+        "amount": "5459774049877551020410"
+      },
+      {
+        "block": 48750818,
+        "market": "0x037c19940af482e1c517ef90669b6eca6cf55ba2",
+        "outcome_index": "0",
+        "amount": "5276183939673469387757"
+      },
+      {
+        "block": 48750818,
+        "market": "0x037c19940af482e1c517ef90669b6eca6cf55ba2",
+        "outcome_index": "1",
+        "amount": "5319353939673469387757"
+      },
+      {
+        "block": 48755484,
+        "market": "0x3cd4bcb79df347eca86aef92e3377357138cba88",
+        "outcome_index": "0",
+        "amount": "5192153106122448979592"
+      },
+      {
+        "block": 48755484,
+        "market": "0x3cd4bcb79df347eca86aef92e3377357138cba88",
+        "outcome_index": "1",
+        "amount": "5202163106122448979592"
+      },
+      {
+        "block": 48769657,
+        "market": "0xd0b9f6a4815a44cc016898615e9021a994bf0a9f",
+        "outcome_index": "0",
+        "amount": "5127635594000000000000"
+      },
+      {
+        "block": 48769657,
+        "market": "0xd0b9f6a4815a44cc016898615e9021a994bf0a9f",
+        "outcome_index": "1",
+        "amount": "5056315594000000000000"
+      },
+      {
+        "block": 48773275,
+        "market": "0x0d0a5faaacc0b5539d56bf1ab15f8e384772cbba",
+        "outcome_index": "0",
+        "amount": "5470405428571428571429"
+      },
+      {
+        "block": 48773275,
+        "market": "0x0d0a5faaacc0b5539d56bf1ab15f8e384772cbba",
+        "outcome_index": "1",
+        "amount": "5504155428571428571429"
+      },
+      {
+        "block": 48773988,
+        "market": "0xb138ef8dff06e8a0a3a33c65fc17f0c603ce4b9d",
+        "outcome_index": "0",
+        "amount": "5085691492244897959185"
+      },
+      {
+        "block": 48773988,
+        "market": "0xb138ef8dff06e8a0a3a33c65fc17f0c603ce4b9d",
+        "outcome_index": "1",
+        "amount": "5090801492244897959185"
+      },
+      {
+        "block": 48775689,
+        "market": "0x33807ad6b767b303f0cb4a7ff6044b2d9413c616",
+        "outcome_index": "0",
+        "amount": "5469115886612244897962"
+      },
+      {
+        "block": 48775689,
+        "market": "0x33807ad6b767b303f0cb4a7ff6044b2d9413c616",
+        "outcome_index": "1",
+        "amount": "5460865886612244897962"
+      },
+      {
+        "block": 48778498,
+        "market": "0x7c1e039d24ae4e9b61dd90d80283b18ccded3356",
+        "outcome_index": "0",
+        "amount": "5427821363959183673472"
+      },
+      {
+        "block": 48778498,
+        "market": "0x7c1e039d24ae4e9b61dd90d80283b18ccded3356",
+        "outcome_index": "1",
+        "amount": "5210551363959183673472"
+      },
+      {
+        "block": 48781810,
+        "market": "0x886ca381ae7cff78b4c47f3d041407758b345041",
+        "outcome_index": "0",
+        "amount": "5378525765591836734694"
+      },
+      {
+        "block": 48781810,
+        "market": "0x886ca381ae7cff78b4c47f3d041407758b345041",
+        "outcome_index": "1",
+        "amount": "5234265765591836734694"
+      },
+      {
+        "block": 48782012,
+        "market": "0x33807ad6b767b303f0cb4a7ff6044b2d9413c616",
+        "outcome_index": "0",
+        "amount": "5463990382612244897962"
+      },
+      {
+        "block": 48782012,
+        "market": "0x33807ad6b767b303f0cb4a7ff6044b2d9413c616",
+        "outcome_index": "1",
+        "amount": "5473150382612244897962"
+      },
+      {
+        "block": 48784504,
+        "market": "0x037c19940af482e1c517ef90669b6eca6cf55ba2",
+        "outcome_index": "0",
+        "amount": "5240321099673469387757"
+      },
+      {
+        "block": 48784504,
+        "market": "0x037c19940af482e1c517ef90669b6eca6cf55ba2",
+        "outcome_index": "1",
+        "amount": "5346541099673469387757"
+      },
+      {
+        "block": 48793691,
+        "market": "0x33807ad6b767b303f0cb4a7ff6044b2d9413c616",
+        "outcome_index": "0",
+        "amount": "5478437542612244897962"
+      },
+      {
+        "block": 48793691,
+        "market": "0x33807ad6b767b303f0cb4a7ff6044b2d9413c616",
+        "outcome_index": "1",
+        "amount": "5463027542612244897962"
+      },
+      {
+        "block": 48801458,
+        "market": "0xb138ef8dff06e8a0a3a33c65fc17f0c603ce4b9d",
+        "outcome_index": "0",
+        "amount": "5064452456244897959185"
+      },
+      {
+        "block": 48801458,
+        "market": "0xb138ef8dff06e8a0a3a33c65fc17f0c603ce4b9d",
+        "outcome_index": "1",
+        "amount": "5118772456244897959185"
+      },
+      {
+        "block": 48802067,
+        "market": "0xb138ef8dff06e8a0a3a33c65fc17f0c603ce4b9d",
+        "outcome_index": "0",
+        "amount": "5051796129714285714288"
+      },
+      {
+        "block": 48802067,
+        "market": "0xb138ef8dff06e8a0a3a33c65fc17f0c603ce4b9d",
+        "outcome_index": "1",
+        "amount": "5127876129714285714288"
+      },
+      {
+        "block": 48810382,
+        "market": "0xc7e9650c143d1725af516b60edba548d4179e21b",
+        "outcome_index": "0",
+        "amount": "4689505000000000000000"
+      },
+      {
+        "block": 48810382,
+        "market": "0xc7e9650c143d1725af516b60edba548d4179e21b",
+        "outcome_index": "1",
+        "amount": "6189505000000000000000"
+      },
+      {
+        "block": 48815424,
+        "market": "0xc7e9650c143d1725af516b60edba548d4179e21b",
+        "outcome_index": "0",
+        "amount": "5179995000000000000000"
+      },
+      {
+        "block": 48815424,
+        "market": "0xc7e9650c143d1725af516b60edba548d4179e21b",
+        "outcome_index": "1",
+        "amount": "5979995000000000000000"
+      },
+      {
+        "block": 48817277,
+        "market": "0xaf06902f6874cdc4cf826c144e00b1fd4892d476",
+        "outcome_index": "0",
+        "amount": "5171136543877551020409"
+      },
+      {
+        "block": 48817277,
+        "market": "0xaf06902f6874cdc4cf826c144e00b1fd4892d476",
+        "outcome_index": "1",
+        "amount": "5190676543877551020409"
+      },
+      {
+        "block": 48818676,
+        "market": "0x3cd4bcb79df347eca86aef92e3377357138cba88",
+        "outcome_index": "0",
+        "amount": "5213998188122448979592"
+      },
+      {
+        "block": 48818676,
+        "market": "0x3cd4bcb79df347eca86aef92e3377357138cba88",
+        "outcome_index": "1",
+        "amount": "5190738188122448979592"
+      },
+      {
+        "block": 48819563,
+        "market": "0xb07c136bb9a6e7763d9bef68c7eccca853f812ed",
+        "outcome_index": "0",
+        "amount": "4981968662448979591838"
+      },
+      {
+        "block": 48819563,
+        "market": "0xb07c136bb9a6e7763d9bef68c7eccca853f812ed",
+        "outcome_index": "1",
+        "amount": "5184398662448979591838"
+      },
+      {
+        "block": 48820466,
+        "market": "0xc7e9650c143d1725af516b60edba548d4179e21b",
+        "outcome_index": "0",
+        "amount": "5273617448979591836735"
+      },
+      {
+        "block": 48820466,
+        "market": "0xc7e9650c143d1725af516b60edba548d4179e21b",
+        "outcome_index": "1",
+        "amount": "5673617448979591836735"
+      },
+      {
+        "block": 48825508,
+        "market": "0xbb7728320f4c01cb008d09f3668e2ef9d726ed0b",
+        "outcome_index": "0",
+        "amount": "5375650000"
+      },
+      {
+        "block": 48825508,
+        "market": "0xbb7728320f4c01cb008d09f3668e2ef9d726ed0b",
+        "outcome_index": "1",
+        "amount": "5775650000"
+      },
+      {
+        "block": 48826155,
+        "market": "0x33807ad6b767b303f0cb4a7ff6044b2d9413c616",
+        "outcome_index": "0",
+        "amount": "5489599350612244897962"
+      },
+      {
+        "block": 48826155,
+        "market": "0x33807ad6b767b303f0cb4a7ff6044b2d9413c616",
+        "outcome_index": "1",
+        "amount": "5449429350612244897962"
+      },
+      {
+        "block": 48830526,
+        "market": "0x037c19940af482e1c517ef90669b6eca6cf55ba2",
+        "outcome_index": "0",
+        "amount": "5207482495673469387757"
+      },
+      {
+        "block": 48830526,
+        "market": "0x037c19940af482e1c517ef90669b6eca6cf55ba2",
+        "outcome_index": "1",
+        "amount": "5369512495673469387757"
+      },
+      {
+        "block": 48830550,
+        "market": "0xbb7728320f4c01cb008d09f3668e2ef9d726ed0b",
+        "outcome_index": "0",
+        "amount": "5273609184"
+      },
+      {
+        "block": 48830550,
+        "market": "0xbb7728320f4c01cb008d09f3668e2ef9d726ed0b",
+        "outcome_index": "1",
+        "amount": "5823609184"
+      },
+      {
+        "block": 48836075,
+        "market": "0xb138ef8dff06e8a0a3a33c65fc17f0c603ce4b9d",
+        "outcome_index": "0",
+        "amount": "5058805109306122448982"
+      },
+      {
+        "block": 48836075,
+        "market": "0xb138ef8dff06e8a0a3a33c65fc17f0c603ce4b9d",
+        "outcome_index": "1",
+        "amount": "5120575109306122448982"
+      },
+      {
+        "block": 48836807,
+        "market": "0x886ca381ae7cff78b4c47f3d041407758b345041",
+        "outcome_index": "0",
+        "amount": "5372700085591836734694"
+      },
+      {
+        "block": 48836807,
+        "market": "0x886ca381ae7cff78b4c47f3d041407758b345041",
+        "outcome_index": "1",
+        "amount": "5242580085591836734694"
+      },
+      {
+        "block": 48849789,
+        "market": "0x52bab136f951bf39c11c34f788147e748bd78d18",
+        "outcome_index": "0",
+        "amount": "5147436111346938775511"
+      },
+      {
+        "block": 48849789,
+        "market": "0x52bab136f951bf39c11c34f788147e748bd78d18",
+        "outcome_index": "1",
+        "amount": "5139536111346938775511"
+      },
+      {
+        "block": 48867170,
+        "market": "0xd0b9f6a4815a44cc016898615e9021a994bf0a9f",
+        "outcome_index": "0",
+        "amount": "5148842598000000000000"
+      },
+      {
+        "block": 48867170,
+        "market": "0xd0b9f6a4815a44cc016898615e9021a994bf0a9f",
+        "outcome_index": "1",
+        "amount": "5040212598000000000000"
+      },
+      {
+        "block": 48867487,
+        "market": "0x7c1e039d24ae4e9b61dd90d80283b18ccded3356",
+        "outcome_index": "0",
+        "amount": "5415478107959183673472"
+      },
+      {
+        "block": 48867487,
+        "market": "0x7c1e039d24ae4e9b61dd90d80283b18ccded3356",
+        "outcome_index": "1",
+        "amount": "5236328107959183673472"
+      },
+      {
+        "block": 48869653,
+        "market": "0x886ca381ae7cff78b4c47f3d041407758b345041",
+        "outcome_index": "0",
+        "amount": "5361659825591836734694"
+      },
+      {
+        "block": 48869653,
+        "market": "0x886ca381ae7cff78b4c47f3d041407758b345041",
+        "outcome_index": "1",
+        "amount": "5254989825591836734694"
+      },
+      {
+        "block": 48870652,
+        "market": "0xb07c136bb9a6e7763d9bef68c7eccca853f812ed",
+        "outcome_index": "0",
+        "amount": "4962775988448979591838"
+      },
+      {
+        "block": 48870652,
+        "market": "0xb07c136bb9a6e7763d9bef68c7eccca853f812ed",
+        "outcome_index": "1",
+        "amount": "5203575988448979591838"
+      },
+      {
+        "block": 48871939,
+        "market": "0x3cd4bcb79df347eca86aef92e3377357138cba88",
+        "outcome_index": "0",
+        "amount": "5229569004448979591837"
+      },
+      {
+        "block": 48871939,
+        "market": "0x3cd4bcb79df347eca86aef92e3377357138cba88",
+        "outcome_index": "1",
+        "amount": "5147619004448979591837"
+      },
+      {
+        "block": 48875996,
+        "market": "0xb138ef8dff06e8a0a3a33c65fc17f0c603ce4b9d",
+        "outcome_index": "0",
+        "amount": "5043446261306122448982"
+      },
+      {
+        "block": 48875996,
+        "market": "0xb138ef8dff06e8a0a3a33c65fc17f0c603ce4b9d",
+        "outcome_index": "1",
+        "amount": "5157386261306122448982"
+      },
+      {
+        "block": 48876187,
+        "market": "0x3cd4bcb79df347eca86aef92e3377357138cba88",
+        "outcome_index": "0",
+        "amount": "5185248392204081632654"
+      },
+      {
+        "block": 48876187,
+        "market": "0x3cd4bcb79df347eca86aef92e3377357138cba88",
+        "outcome_index": "1",
+        "amount": "5158278392204081632654"
+      },
+      {
+        "block": 48880058,
+        "market": "0x52bab136f951bf39c11c34f788147e748bd78d18",
+        "outcome_index": "0",
+        "amount": "5115533007346938775511"
+      },
+      {
+        "block": 48880058,
+        "market": "0x52bab136f951bf39c11c34f788147e748bd78d18",
+        "outcome_index": "1",
+        "amount": "5167873007346938775511"
+      },
+      {
+        "block": 48880415,
+        "market": "0x886ca381ae7cff78b4c47f3d041407758b345041",
+        "outcome_index": "0",
+        "amount": "5373542913591836734694"
+      },
+      {
+        "block": 48880415,
+        "market": "0x886ca381ae7cff78b4c47f3d041407758b345041",
+        "outcome_index": "1",
+        "amount": "5240512913591836734694"
+      },
+      {
+        "block": 48882386,
+        "market": "0x037c19940af482e1c517ef90669b6eca6cf55ba2",
+        "outcome_index": "0",
+        "amount": "5229801679346938775513"
+      },
+      {
+        "block": 48882386,
+        "market": "0x037c19940af482e1c517ef90669b6eca6cf55ba2",
+        "outcome_index": "1",
+        "amount": "5334271679346938775513"
+      },
+      {
+        "block": 48889464,
+        "market": "0xaf06902f6874cdc4cf826c144e00b1fd4892d476",
+        "outcome_index": "0",
+        "amount": "5182794819877551020409"
+      },
+      {
+        "block": 48889464,
+        "market": "0xaf06902f6874cdc4cf826c144e00b1fd4892d476",
+        "outcome_index": "1",
+        "amount": "5180304819877551020409"
+      },
+      {
+        "block": 48889512,
+        "market": "0x3cd4bcb79df347eca86aef92e3377357138cba88",
+        "outcome_index": "0",
+        "amount": "5199617882000000000001"
+      },
+      {
+        "block": 48889512,
+        "market": "0x3cd4bcb79df347eca86aef92e3377357138cba88",
+        "outcome_index": "1",
+        "amount": "5146077882000000000001"
+      },
+      {
+        "block": 48891368,
+        "market": "0x33807ad6b767b303f0cb4a7ff6044b2d9413c616",
+        "outcome_index": "0",
+        "amount": "5455884328612244897962"
+      },
+      {
+        "block": 48891368,
+        "market": "0x33807ad6b767b303f0cb4a7ff6044b2d9413c616",
+        "outcome_index": "1",
+        "amount": "5473984328612244897962"
+      },
+      {
+        "block": 48907202,
+        "market": "0x33807ad6b767b303f0cb4a7ff6044b2d9413c616",
+        "outcome_index": "0",
+        "amount": "5426817136612244897962"
+      },
+      {
+        "block": 48907202,
+        "market": "0x33807ad6b767b303f0cb4a7ff6044b2d9413c616",
+        "outcome_index": "1",
+        "amount": "5506657136612244897962"
+      },
+      {
+        "block": 48923407,
+        "market": "0x0d0a5faaacc0b5539d56bf1ab15f8e384772cbba",
+        "outcome_index": "0",
+        "amount": "5492032979591836734695"
+      },
+      {
+        "block": 48923407,
+        "market": "0x0d0a5faaacc0b5539d56bf1ab15f8e384772cbba",
+        "outcome_index": "1",
+        "amount": "5483392979591836734695"
+      },
+      {
+        "block": 48929964,
+        "market": "0xaf06902f6874cdc4cf826c144e00b1fd4892d476",
+        "outcome_index": "0",
+        "amount": "5184909615795918367348"
+      },
+      {
+        "block": 48929964,
+        "market": "0xaf06902f6874cdc4cf826c144e00b1fd4892d476",
+        "outcome_index": "1",
+        "amount": "5174129615795918367348"
+      },
+      {
+        "block": 48932445,
+        "market": "0x33807ad6b767b303f0cb4a7ff6044b2d9413c616",
+        "outcome_index": "0",
+        "amount": "5438059304612244897962"
+      },
+      {
+        "block": 48932445,
+        "market": "0x33807ad6b767b303f0cb4a7ff6044b2d9413c616",
+        "outcome_index": "1",
+        "amount": "5501029304612244897962"
+      },
+      {
+        "block": 48932774,
+        "market": "0xb07c136bb9a6e7763d9bef68c7eccca853f812ed",
+        "outcome_index": "0",
+        "amount": "4955853539469387755104"
+      },
+      {
+        "block": 48932774,
+        "market": "0xb07c136bb9a6e7763d9bef68c7eccca853f812ed",
+        "outcome_index": "1",
+        "amount": "5209453539469387755104"
+      },
+      {
+        "block": 48934856,
+        "market": "0xb138ef8dff06e8a0a3a33c65fc17f0c603ce4b9d",
+        "outcome_index": "0",
+        "amount": "5049313031306122448982"
+      },
+      {
+        "block": 48934856,
+        "market": "0xb138ef8dff06e8a0a3a33c65fc17f0c603ce4b9d",
+        "outcome_index": "1",
+        "amount": "5154043031306122448982"
+      },
+      {
+        "block": 48936315,
+        "market": "0x33807ad6b767b303f0cb4a7ff6044b2d9413c616",
+        "outcome_index": "0",
+        "amount": "5417287534612244897962"
+      },
+      {
+        "block": 48936315,
+        "market": "0x33807ad6b767b303f0cb4a7ff6044b2d9413c616",
+        "outcome_index": "1",
+        "amount": "5544407534612244897962"
+      },
+      {
+        "block": 48939108,
+        "market": "0x7c1e039d24ae4e9b61dd90d80283b18ccded3356",
+        "outcome_index": "0",
+        "amount": "5407830873959183673472"
+      },
+      {
+        "block": 48939108,
+        "market": "0x7c1e039d24ae4e9b61dd90d80283b18ccded3356",
+        "outcome_index": "1",
+        "amount": "5246810873959183673472"
+      },
+      {
+        "block": 48939471,
+        "market": "0x33807ad6b767b303f0cb4a7ff6044b2d9413c616",
+        "outcome_index": "0",
+        "amount": "5410310734612244897962"
+      },
+      {
+        "block": 48939471,
+        "market": "0x33807ad6b767b303f0cb4a7ff6044b2d9413c616",
+        "outcome_index": "1",
+        "amount": "5551110734612244897962"
+      },
+      {
+        "block": 48940261,
+        "market": "0xaf06902f6874cdc4cf826c144e00b1fd4892d476",
+        "outcome_index": "0",
+        "amount": "5176870107795918367348"
+      },
+      {
+        "block": 48940261,
+        "market": "0xaf06902f6874cdc4cf826c144e00b1fd4892d476",
+        "outcome_index": "1",
+        "amount": "5185150107795918367348"
+      },
+      {
+        "block": 48941481,
+        "market": "0xaf06902f6874cdc4cf826c144e00b1fd4892d476",
+        "outcome_index": "0",
+        "amount": "5156563947795918367348"
+      },
+      {
+        "block": 48941481,
+        "market": "0xaf06902f6874cdc4cf826c144e00b1fd4892d476",
+        "outcome_index": "1",
+        "amount": "5200543947795918367348"
+      },
+      {
+        "block": 48942332,
+        "market": "0x3cd4bcb79df347eca86aef92e3377357138cba88",
+        "outcome_index": "0",
+        "amount": "5240433510000000000001"
+      },
+      {
+        "block": 48942332,
+        "market": "0x3cd4bcb79df347eca86aef92e3377357138cba88",
+        "outcome_index": "1",
+        "amount": "5128233510000000000001"
+      },
+      {
+        "block": 48943828,
+        "market": "0xb07c136bb9a6e7763d9bef68c7eccca853f812ed",
+        "outcome_index": "0",
+        "amount": "4973360580285714285717"
+      },
+      {
+        "block": 48943828,
+        "market": "0xb07c136bb9a6e7763d9bef68c7eccca853f812ed",
+        "outcome_index": "1",
+        "amount": "5180590580285714285717"
+      },
+      {
+        "block": 48948318,
+        "market": "0xaf06902f6874cdc4cf826c144e00b1fd4892d476",
+        "outcome_index": "0",
+        "amount": "5122914463795918367348"
+      },
+      {
+        "block": 48948318,
+        "market": "0xaf06902f6874cdc4cf826c144e00b1fd4892d476",
+        "outcome_index": "1",
+        "amount": "5228164463795918367348"
+      },
+      {
+        "block": 48953264,
+        "market": "0x0d0a5faaacc0b5539d56bf1ab15f8e384772cbba",
+        "outcome_index": "0",
+        "amount": "5522656019591836734695"
+      },
+      {
+        "block": 48953264,
+        "market": "0x0d0a5faaacc0b5539d56bf1ab15f8e384772cbba",
+        "outcome_index": "1",
+        "amount": "5458216019591836734695"
+      },
+      {
+        "block": 48955717,
+        "market": "0xb138ef8dff06e8a0a3a33c65fc17f0c603ce4b9d",
+        "outcome_index": "0",
+        "amount": "5062786071306122448982"
+      },
+      {
+        "block": 48955717,
+        "market": "0xb138ef8dff06e8a0a3a33c65fc17f0c603ce4b9d",
+        "outcome_index": "1",
+        "amount": "5147876071306122448982"
+      },
+      {
+        "block": 48956718,
+        "market": "0x7c1e039d24ae4e9b61dd90d80283b18ccded3356",
+        "outcome_index": "0",
+        "amount": "5427235755959183673472"
+      },
+      {
+        "block": 48956718,
+        "market": "0x7c1e039d24ae4e9b61dd90d80283b18ccded3356",
+        "outcome_index": "1",
+        "amount": "5225805755959183673472"
+      },
+      {
+        "block": 48962265,
+        "market": "0xaf06902f6874cdc4cf826c144e00b1fd4892d476",
+        "outcome_index": "0",
+        "amount": "5139077729102040816328"
+      },
+      {
+        "block": 48962265,
+        "market": "0xaf06902f6874cdc4cf826c144e00b1fd4892d476",
+        "outcome_index": "1",
+        "amount": "5209127729102040816328"
+      },
+      {
+        "block": 48963015,
+        "market": "0x7c1e039d24ae4e9b61dd90d80283b18ccded3356",
+        "outcome_index": "0",
+        "amount": "5444952783959183673472"
+      },
+      {
+        "block": 48963015,
+        "market": "0x7c1e039d24ae4e9b61dd90d80283b18ccded3356",
+        "outcome_index": "1",
+        "amount": "5212352783959183673472"
+      },
+      {
+        "block": 48965026,
+        "market": "0x037c19940af482e1c517ef90669b6eca6cf55ba2",
+        "outcome_index": "0",
+        "amount": "5246765479346938775513"
+      },
+      {
+        "block": 48965026,
+        "market": "0x037c19940af482e1c517ef90669b6eca6cf55ba2",
+        "outcome_index": "1",
+        "amount": "5322385479346938775513"
+      },
+      {
+        "block": 48965308,
+        "market": "0x0d0a5faaacc0b5539d56bf1ab15f8e384772cbba",
+        "outcome_index": "0",
+        "amount": "5495611835918367346940"
+      },
+      {
+        "block": 48965308,
+        "market": "0x0d0a5faaacc0b5539d56bf1ab15f8e384772cbba",
+        "outcome_index": "1",
+        "amount": "5487561835918367346940"
+      },
+      {
+        "block": 48966890,
+        "market": "0x52bab136f951bf39c11c34f788147e748bd78d18",
+        "outcome_index": "0",
+        "amount": "5146188975346938775511"
+      },
+      {
+        "block": 48966890,
+        "market": "0x52bab136f951bf39c11c34f788147e748bd78d18",
+        "outcome_index": "1",
+        "amount": "5157368975346938775511"
+      },
+      {
+        "block": 48972519,
+        "market": "0x33807ad6b767b303f0cb4a7ff6044b2d9413c616",
+        "outcome_index": "0",
+        "amount": "5426350982612244897962"
+      },
+      {
+        "block": 48972519,
+        "market": "0x33807ad6b767b303f0cb4a7ff6044b2d9413c616",
+        "outcome_index": "1",
+        "amount": "5543080982612244897962"
+      },
+      {
+        "block": 48973094,
+        "market": "0x0d0a5faaacc0b5539d56bf1ab15f8e384772cbba",
+        "outcome_index": "0",
+        "amount": "5460674335918367346940"
+      },
+      {
+        "block": 48973094,
+        "market": "0x0d0a5faaacc0b5539d56bf1ab15f8e384772cbba",
+        "outcome_index": "1",
+        "amount": "5515124335918367346940"
+      },
+      {
+        "block": 48990580,
+        "market": "0x7c1e039d24ae4e9b61dd90d80283b18ccded3356",
+        "outcome_index": "0",
+        "amount": "5422515232938775510207"
+      },
+      {
+        "block": 48990580,
+        "market": "0x7c1e039d24ae4e9b61dd90d80283b18ccded3356",
+        "outcome_index": "1",
+        "amount": "5220455232938775510207"
+      },
+      {
+        "block": 48992133,
+        "market": "0xd0b9f6a4815a44cc016898615e9021a994bf0a9f",
+        "outcome_index": "0",
+        "amount": "5159215506000000000000"
+      },
+      {
+        "block": 48992133,
+        "market": "0xd0b9f6a4815a44cc016898615e9021a994bf0a9f",
+        "outcome_index": "1",
+        "amount": "5035245506000000000000"
+      },
+      {
+        "block": 48992347,
+        "market": "0xb07c136bb9a6e7763d9bef68c7eccca853f812ed",
+        "outcome_index": "0",
+        "amount": "4967021396612244897962"
+      },
+      {
+        "block": 48992347,
+        "market": "0xb07c136bb9a6e7763d9bef68c7eccca853f812ed",
+        "outcome_index": "1",
+        "amount": "5184271396612244897962"
+      },
+      {
+        "block": 48997091,
+        "market": "0x52bab136f951bf39c11c34f788147e748bd78d18",
+        "outcome_index": "0",
+        "amount": "5125965889346938775511"
+      },
+      {
+        "block": 48997091,
+        "market": "0x52bab136f951bf39c11c34f788147e748bd78d18",
+        "outcome_index": "1",
+        "amount": "5177575889346938775511"
+      },
+      {
+        "block": 49000176,
+        "market": "0xaf06902f6874cdc4cf826c144e00b1fd4892d476",
+        "outcome_index": "0",
+        "amount": "5158554641102040816328"
+      },
+      {
+        "block": 49000176,
+        "market": "0xaf06902f6874cdc4cf826c144e00b1fd4892d476",
+        "outcome_index": "1",
+        "amount": "5193114641102040816328"
+      },
+      {
+        "block": 49001014,
+        "market": "0xb07c136bb9a6e7763d9bef68c7eccca853f812ed",
+        "outcome_index": "0",
+        "amount": "4960957723142857142860"
+      },
+      {
+        "block": 49001014,
+        "market": "0xb07c136bb9a6e7763d9bef68c7eccca853f812ed",
+        "outcome_index": "1",
+        "amount": "5190587723142857142860"
+      },
+      {
+        "block": 49005231,
+        "market": "0xd0b9f6a4815a44cc016898615e9021a994bf0a9f",
+        "outcome_index": "0",
+        "amount": "5165811220285714285715"
+      },
+      {
+        "block": 49005231,
+        "market": "0xd0b9f6a4815a44cc016898615e9021a994bf0a9f",
+        "outcome_index": "1",
+        "amount": "5030501220285714285715"
+      },
+      {
+        "block": 49014349,
+        "market": "0x3cd4bcb79df347eca86aef92e3377357138cba88",
+        "outcome_index": "0",
+        "amount": "5263887262000000000001"
+      },
+      {
+        "block": 49014349,
+        "market": "0x3cd4bcb79df347eca86aef92e3377357138cba88",
+        "outcome_index": "1",
+        "amount": "5100767262000000000001"
+      },
+      {
+        "block": 49032653,
+        "market": "0x037c19940af482e1c517ef90669b6eca6cf55ba2",
+        "outcome_index": "0",
+        "amount": "5280901193632653061228"
+      },
+      {
+        "block": 49032653,
+        "market": "0x037c19940af482e1c517ef90669b6eca6cf55ba2",
+        "outcome_index": "1",
+        "amount": "5294571193632653061228"
+      },
+      {
+        "block": 49033076,
+        "market": "0x33807ad6b767b303f0cb4a7ff6044b2d9413c616",
+        "outcome_index": "0",
+        "amount": "5442477862612244897962"
+      },
+      {
+        "block": 49033076,
+        "market": "0x33807ad6b767b303f0cb4a7ff6044b2d9413c616",
+        "outcome_index": "1",
+        "amount": "5535007862612244897962"
+      },
+      {
+        "block": 49033600,
+        "market": "0x886ca381ae7cff78b4c47f3d041407758b345041",
+        "outcome_index": "0",
+        "amount": "5348813025591836734694"
+      },
+      {
+        "block": 49033600,
+        "market": "0x886ca381ae7cff78b4c47f3d041407758b345041",
+        "outcome_index": "1",
+        "amount": "5265223025591836734694"
+      },
+      {
+        "block": 49037538,
+        "market": "0x33807ad6b767b303f0cb4a7ff6044b2d9413c616",
+        "outcome_index": "0",
+        "amount": "5413785222612244897962"
+      },
+      {
+        "block": 49037538,
+        "market": "0x33807ad6b767b303f0cb4a7ff6044b2d9413c616",
+        "outcome_index": "1",
+        "amount": "5568555222612244897962"
+      },
+      {
+        "block": 49048149,
+        "market": "0x33807ad6b767b303f0cb4a7ff6044b2d9413c616",
+        "outcome_index": "0",
+        "amount": "5395244712408163265309"
+      },
+      {
+        "block": 49048149,
+        "market": "0x33807ad6b767b303f0cb4a7ff6044b2d9413c616",
+        "outcome_index": "1",
+        "amount": "5574904712408163265309"
+      },
+      {
+        "block": 49049564,
+        "market": "0xb138ef8dff06e8a0a3a33c65fc17f0c603ce4b9d",
+        "outcome_index": "0",
+        "amount": "5109391539306122448982"
+      },
+      {
+        "block": 49049564,
+        "market": "0xb138ef8dff06e8a0a3a33c65fc17f0c603ce4b9d",
+        "outcome_index": "1",
+        "amount": "5133511539306122448982"
+      },
+      {
+        "block": 49051677,
+        "market": "0xb07c136bb9a6e7763d9bef68c7eccca853f812ed",
+        "outcome_index": "0",
+        "amount": "4977542459142857142860"
+      },
+      {
+        "block": 49051677,
+        "market": "0xb07c136bb9a6e7763d9bef68c7eccca853f812ed",
+        "outcome_index": "1",
+        "amount": "5176952459142857142860"
+      }
+    ],
+    "answers": [
+      {
+        "block": 48755119,
+        "log_index": "179",
+        "tx": "0x11bf0bbc1b518a73c7cabedbe3033bb5af328456ea1d7756345bbd3b102eef1c",
+        "question_id": "0x3d530acb49af3153fa25e26fb0f45e60ae3fd2b407cceb07ded2f6767f923295",
+        "answer": "0x0000000000000000000000000000000000000000000000000000000000000000",
+        "bond": "10000000000000000000",
+        "ts": "1791969765",
+        "finalize_ts": "1792228965"
+      },
+      {
+        "block": 48762119,
+        "log_index": "61",
+        "tx": "0x9202f3dd5c9e8371c00048091b2b1cebfc9744576ad599bd927fb39d889f23bc",
+        "question_id": "0x3d530acb49af3153fa25e26fb0f45e60ae3fd2b407cceb07ded2f6767f923295",
+        "answer": "0x0000000000000000000000000000000000000000000000000000000000000000",
+        "bond": "25000000000000000000",
+        "ts": "1792004765",
+        "finalize_ts": "1792263965"
+      },
+      {
+        "block": 48936154,
+        "log_index": "198",
+        "tx": "0x4e7d7e614076bb607da9a5069a4f6fc6fc75e3e60e9705ccbf96a8ebddd61165",
+        "question_id": "0xb60170eb1a19728c9a4d53e765183c8a9b371627c9cf2898f72ce045b9388ee3",
+        "answer": "0x0000000000000000000000000000000000000000000000000000000000000001",
+        "bond": "10000000000000000000",
+        "ts": "1792874940",
+        "finalize_ts": "1793134140"
+      },
+      {
+        "block": 48710354,
+        "log_index": "56",
+        "tx": "0x401092424b2712a693ef1fe23bcfc53ab1a2c571998b8f7f6646557017e062e1",
+        "question_id": "0x61873cea4e96a2390f18b1c576baf6b42e92e20b4ebe28690937e6da02445533",
+        "answer": "0x0000000000000000000000000000000000000000000000000000000000000001",
+        "bond": "10000000000000000000",
+        "ts": "1791745940",
+        "finalize_ts": "1792005140"
+      },
+      {
+        "block": 48685033,
+        "log_index": "208",
+        "tx": "0x068eb7037d8c156dc35f9f8b1a26040608b524b1f6b029aa52dd0690780b6314",
+        "question_id": "0xbe37a7dd14465d598127570bc0be99d09902069b68ca3f9a3e709e07fe5828c0",
+        "answer": "0x0000000000000000000000000000000000000000000000000000000000000001",
+        "bond": "10000000000000000000",
+        "ts": "1791619335",
+        "finalize_ts": "1791878535"
+      },
+      {
+        "block": 48692033,
+        "log_index": "91",
+        "tx": "0x1efdb3e309a76153313531620850e17fb3cb95a445d4b4b0decc5263cd7a72be",
+        "question_id": "0xbe37a7dd14465d598127570bc0be99d09902069b68ca3f9a3e709e07fe5828c0",
+        "answer": "0x0000000000000000000000000000000000000000000000000000000000000001",
+        "bond": "25000000000000000000",
+        "ts": "1791654335",
+        "finalize_ts": "1791913535"
+      },
+      {
+        "block": 48900006,
+        "log_index": "53",
+        "tx": "0x37c0715d4ee3ad0120d487bd6b9fc5f4bdfa44e8752f488ddf9861f8ad92f1bb",
+        "question_id": "0x3b696f06481129d3ade6f0aaf355b3188274b302df426c6e78b2cede79bb8760",
+        "answer": "0x0000000000000000000000000000000000000000000000000000000000000001",
+        "bond": "10000000000000000000",
+        "ts": "1792694200",
+        "finalize_ts": "1792953400"
+      },
+      {
+        "block": 48722820,
+        "log_index": "200",
+        "tx": "0x6c1bedfdb46fb6b942fd0d7a2147395009a8f813b80fd7810d7409f2704100b5",
+        "question_id": "0xb1346b2f6f78831a3dd31bd5e0e3296acec2aa83dbe02df487ed68d4db0c3c90",
+        "answer": "0x0000000000000000000000000000000000000000000000000000000000000000",
+        "bond": "10000000000000000000",
+        "ts": "1791808270",
+        "finalize_ts": "1792067470"
+      },
+      {
+        "block": 48970485,
+        "log_index": "184",
+        "tx": "0xec260b4bfae17c7368cb5ba70f8d8433ddf203d6537d6c8a5ef5263b966385c7",
+        "question_id": "0x305108d1d96c2b779cb83bef0f6b3b31cd05d313cf4374c8ae689803de82ff1a",
+        "answer": "0x0000000000000000000000000000000000000000000000000000000000000001",
+        "bond": "10000000000000000000",
+        "ts": "1793046595",
+        "finalize_ts": "1793305795"
+      },
+      {
+        "block": 48977485,
+        "log_index": "296",
+        "tx": "0x330cdd4bd9210e8121b1e26c54fc0f45e5b419f1fa8efde82b8e2fd58e8a79af",
+        "question_id": "0x305108d1d96c2b779cb83bef0f6b3b31cd05d313cf4374c8ae689803de82ff1a",
+        "answer": "0x0000000000000000000000000000000000000000000000000000000000000000",
+        "bond": "25000000000000000000",
+        "ts": "1793081595",
+        "finalize_ts": "1793340795"
+      },
+      {
+        "block": 48985622,
+        "log_index": "69",
+        "tx": "0x4780ef600bfaff0581b4610cd7ccba05899c7002086465909359776b504c1814",
+        "question_id": "0x064ae5fbd31e0226cfdbb1eb3277ecc0d437c21861ef9eb94afe7d1d70d243a8",
+        "answer": "0x0000000000000000000000000000000000000000000000000000000000000001",
+        "bond": "10000000000000000000",
+        "ts": "1793122280",
+        "finalize_ts": "1793381480"
+      },
+      {
+        "block": 48630651,
+        "log_index": "31",
+        "tx": "0x8ff8644c0acd3f8d59e43ef66642756511d77ad16d17190c9bac48d22d2ad14c",
+        "question_id": "0x52a560777812bac8769b65b400c154457b12f076db4e9d92c0272cc1783ce1e8",
+        "answer": "0x0000000000000000000000000000000000000000000000000000000000000001",
+        "bond": "10000000000000000000",
+        "ts": "1791347425",
+        "finalize_ts": "1791606625"
+      },
+      {
+        "block": 48676728,
+        "log_index": "72",
+        "tx": "0xdbdefcbbb60df080c26cd7042efd3c0f7b3ef193b9e516c652a99220e7e6fc98",
+        "question_id": "0x7d75955e858dc6e126ecf213373ceab0a8634193460c142471b6dc8b4e4cd82f",
+        "answer": "0x0000000000000000000000000000000000000000000000000000000000000001",
+        "bond": "10000000000000000000",
+        "ts": "1791577810",
+        "finalize_ts": "1791837010"
+      },
+      {
+        "block": 48683728,
+        "log_index": "158",
+        "tx": "0xf26b6e737f96a363e6d22227a6acabce8fd2d43a0f1450dc8149a8cec7a56d6f",
+        "question_id": "0x7d75955e858dc6e126ecf213373ceab0a8634193460c142471b6dc8b4e4cd82f",
+        "answer": "0x0000000000000000000000000000000000000000000000000000000000000001",
+        "bond": "25000000000000000000",
+        "ts": "1791612810",
+        "finalize_ts": "1791872010"
+      },
+      {
+        "block": 48759306,
+        "log_index": "29",
+        "tx": "0x89ac684af5caa498bcbc83f9b6db8c355b4e1228671ed310c471d129678d1c80",
+        "question_id": "0xeba33aa54b0252bfbfa0bda8232b29fd5498095c5221bcc77e13e6b8118265e0",
+        "answer": "0x0000000000000000000000000000000000000000000000000000000000000000",
+        "bond": "10000000000000000000",
+        "ts": "1791990700",
+        "finalize_ts": "1792249900"
+      },
+      {
+        "block": 48725746,
+        "log_index": "7",
+        "tx": "0x2df0df7e2531add802ecf165df47c862daf2de503d0ee281114d1d33a8d9fa56",
+        "question_id": "0x40a6461655a2c7b8b02cd8efdab4c589687e01430587deba317133b0f9d286d6",
+        "answer": "0x0000000000000000000000000000000000000000000000000000000000000001",
+        "bond": "10000000000000000000",
+        "ts": "1791822900",
+        "finalize_ts": "1792082100"
+      },
+      {
+        "block": 48756226,
+        "log_index": "212",
+        "tx": "0xf6c217a2471b7ef592bb07ec97878933a5b5a48a9deda88997af77152eaaa560",
+        "question_id": "0x8b7886dea4302736c1356f5db6d5c20fe41313e1a9ba931ed3c2783286f0d261",
+        "answer": "0x0000000000000000000000000000000000000000000000000000000000000001",
+        "bond": "10000000000000000000",
+        "ts": "1791975300",
+        "finalize_ts": "1792234500"
+      },
+      {
+        "block": 48763226,
+        "log_index": "292",
+        "tx": "0x63e50162ad44a9d12bd0174d56e3fc34e76b9c17723011dd773a985d6b29cce3",
+        "question_id": "0x8b7886dea4302736c1356f5db6d5c20fe41313e1a9ba931ed3c2783286f0d261",
+        "answer": "0x0000000000000000000000000000000000000000000000000000000000000000",
+        "bond": "25000000000000000000",
+        "ts": "1792010300",
+        "finalize_ts": "1792269500"
+      },
+      {
+        "block": 48865845,
+        "log_index": "209",
+        "tx": "0x2f0c694a616a0b00762254bdd87a57ce063ac1730242394dfca36acd882f1897",
+        "question_id": "0x6c8c30dd5ccb7a9e961285910e191c2d66166a48dfb62cbe00bb018a1dfe0cfa",
+        "answer": "0x0000000000000000000000000000000000000000000000000000000000000001",
+        "bond": "10000000000000000000",
+        "ts": "1792523395",
+        "finalize_ts": "1792782595"
+      },
+      {
+        "block": 48911221,
+        "log_index": "113",
+        "tx": "0x7362ad86e1ee8466ed0dbd7fc8138725e328c6a2af057da502dd0ba2f37cca68",
+        "question_id": "0x388f5fa86ec1d3410256a5c452a217f968d88eff2e8e9ba6c59d8f909c6235fb",
+        "answer": "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+        "bond": "5000000000000000000",
+        "ts": "1792750275",
+        "finalize_ts": "1793009475"
+      }
+    ]
+  }
+}
