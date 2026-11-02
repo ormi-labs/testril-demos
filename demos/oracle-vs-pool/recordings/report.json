@@ -1,0 +1,4231 @@
+{
+  "demo": "oracle-vs-pool",
+  "source": "synthetic",
+  "recordedAt": "2026-11-02T00:00:00.000Z",
+  "boundFunctions": {
+    "pool": {
+      "function_slug": "uniswap_v4.pool_state",
+      "chain_id": 1
+    },
+    "feeds": {
+      "function_slug": "aggregator.latest_answer",
+      "chain_id": 1
+    }
+  },
+  "window": {
+    "pool": {
+      "from_hour": "2026-10-25T00",
+      "to_hour": "2026-11-01T00"
+    },
+    "feeds": {
+      "from_hour": "2026-10-25T00",
+      "to_hour": "2026-11-01T00"
+    }
+  },
+  "rows": {
+    "pool": [
+      {
+        "hour": "2026-10-25T00",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
+        "sqrt_price_x96": "4462925378303857257642232",
+        "tick": "-195696",
+        "liquidity": "71658789467938",
+        "lp_fee": "500",
+        "protocol_fee_zero_for_one": "0",
+        "protocol_fee_one_for_zero": "0"
+      },
+      {
+        "hour": "2026-10-25T01",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
+        "sqrt_price_x96": "4458883947877260996570858",
+        "tick": "-195714",
+        "liquidity": "71659789467938",
+        "lp_fee": "500",
+        "protocol_fee_zero_for_one": "0",
+        "protocol_fee_one_for_zero": "0"
+      },
+      {
+        "hour": "2026-10-25T02",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
+        "sqrt_price_x96": "4454492794971193798871638",
+        "tick": "-195734",
+        "liquidity": "71660789467938",
+        "lp_fee": "500",
+        "protocol_fee_zero_for_one": "0",
+        "protocol_fee_one_for_zero": "0"
+      },
+      {
+        "hour": "2026-10-25T03",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
+        "sqrt_price_x96": "4447080744441160089365303",
+        "tick": "-195767",
+        "liquidity": "71661789467938",
+        "lp_fee": "500",
+        "protocol_fee_zero_for_one": "0",
+        "protocol_fee_one_for_zero": "0"
+      },
+      {
+        "hour": "2026-10-25T04",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
+        "sqrt_price_x96": "4452807273627535678306262",
+        "tick": "-195741",
+        "liquidity": "71662789467938",
+        "lp_fee": "500",
+        "protocol_fee_zero_for_one": "0",
+        "protocol_fee_one_for_zero": "0"
+      },
+      {
+        "hour": "2026-10-25T05",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
+        "sqrt_price_x96": "4457194325512302899130278",
+        "tick": "-195722",
+        "liquidity": "71663789467938",
+        "lp_fee": "500",
+        "protocol_fee_zero_for_one": "0",
+        "protocol_fee_one_for_zero": "0"
+      },
+      {
+        "hour": "2026-10-25T06",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
+        "sqrt_price_x96": "4452974376139058219628456",
+        "tick": "-195741",
+        "liquidity": "71664789467938",
+        "lp_fee": "500",
+        "protocol_fee_zero_for_one": "0",
+        "protocol_fee_one_for_zero": "0"
+      },
+      {
+        "hour": "2026-10-25T07",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
+        "sqrt_price_x96": "4452959023513352307624666",
+        "tick": "-195741",
+        "liquidity": "71665789467938",
+        "lp_fee": "500",
+        "protocol_fee_zero_for_one": "0",
+        "protocol_fee_one_for_zero": "0"
+      },
+      {
+        "hour": "2026-10-25T08",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
+        "sqrt_price_x96": "4447633612105178149003984",
+        "tick": "-195765",
+        "liquidity": "71666789467938",
+        "lp_fee": "500",
+        "protocol_fee_zero_for_one": "0",
+        "protocol_fee_one_for_zero": "0"
+      },
+      {
+        "hour": "2026-10-25T09",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
+        "sqrt_price_x96": "4445372945778396763960249",
+        "tick": "-195775",
+        "liquidity": "71667789467938",
+        "lp_fee": "500",
+        "protocol_fee_zero_for_one": "0",
+        "protocol_fee_one_for_zero": "0"
+      },
+      {
+        "hour": "2026-10-25T10",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
+        "sqrt_price_x96": "4447822251750267406704368",
+        "tick": "-195764",
+        "liquidity": "71668789467938",
+        "lp_fee": "500",
+        "protocol_fee_zero_for_one": "0",
+        "protocol_fee_one_for_zero": "0"
+      },
+      {
+        "hour": "2026-10-25T11",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
+        "sqrt_price_x96": "4445856738711560592421836",
+        "tick": "-195773",
+        "liquidity": "71669789467938",
+        "lp_fee": "500",
+        "protocol_fee_zero_for_one": "0",
+        "protocol_fee_one_for_zero": "0"
+      },
+      {
+        "hour": "2026-10-25T12",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
+        "sqrt_price_x96": "4445131824973142231347529",
+        "tick": "-195776",
+        "liquidity": "71670789467938",
+        "lp_fee": "500",
+        "protocol_fee_zero_for_one": "0",
+        "protocol_fee_one_for_zero": "0"
+      },
+      {
+        "hour": "2026-10-25T13",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
+        "sqrt_price_x96": "4437336066637404437229992",
+        "tick": "-195811",
+        "liquidity": "71671789467938",
+        "lp_fee": "500",
+        "protocol_fee_zero_for_one": "0",
+        "protocol_fee_one_for_zero": "0"
+      },
+      {
+        "hour": "2026-10-25T14",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
+        "sqrt_price_x96": "4435624936266458327762551",
+        "tick": "-195819",
+        "liquidity": "71672789467938",
+        "lp_fee": "500",
+        "protocol_fee_zero_for_one": "0",
+        "protocol_fee_one_for_zero": "0"
+      },
+      {
+        "hour": "2026-10-25T15",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
+        "sqrt_price_x96": "4444591763530491641510504",
+        "tick": "-195778",
+        "liquidity": "71673789467938",
+        "lp_fee": "500",
+        "protocol_fee_zero_for_one": "0",
+        "protocol_fee_one_for_zero": "0"
+      },
+      {
+        "hour": "2026-10-25T16",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
+        "sqrt_price_x96": "4437574262924166831154332",
+        "tick": "-195810",
+        "liquidity": "71674789467938",
+        "lp_fee": "500",
+        "protocol_fee_zero_for_one": "0",
+        "protocol_fee_one_for_zero": "0"
+      },
+      {
+        "hour": "2026-10-25T17",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
+        "sqrt_price_x96": "4443603890358599999536470",
+        "tick": "-195783",
+        "liquidity": "71675789467938",
+        "lp_fee": "500",
+        "protocol_fee_zero_for_one": "0",
+        "protocol_fee_one_for_zero": "0"
+      },
+      {
+        "hour": "2026-10-25T18",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
+        "sqrt_price_x96": "4443161829852339060032046",
+        "tick": "-195785",
+        "liquidity": "71676789467938",
+        "lp_fee": "500",
+        "protocol_fee_zero_for_one": "0",
+        "protocol_fee_one_for_zero": "0"
+      },
+      {
+        "hour": "2026-10-25T19",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
+        "sqrt_price_x96": "4444990930379951134867087",
+        "tick": "-195776",
+        "liquidity": "71677789467938",
+        "lp_fee": "500",
+        "protocol_fee_zero_for_one": "0",
+        "protocol_fee_one_for_zero": "0"
+      },
+      {
+        "hour": "2026-10-25T20",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
+        "sqrt_price_x96": "4437650028711074224503975",
+        "tick": "-195810",
+        "liquidity": "71678789467938",
+        "lp_fee": "500",
+        "protocol_fee_zero_for_one": "0",
+        "protocol_fee_one_for_zero": "0"
+      },
+      {
+        "hour": "2026-10-25T21",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
+        "sqrt_price_x96": "4440272396914521875040176",
+        "tick": "-195798",
+        "liquidity": "71679789467938",
+        "lp_fee": "500",
+        "protocol_fee_zero_for_one": "0",
+        "protocol_fee_one_for_zero": "0"
+      },
+      {
+        "hour": "2026-10-25T22",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
+        "sqrt_price_x96": "4441318683581789178806888",
+        "tick": "-195793",
+        "liquidity": "71680789467938",
+        "lp_fee": "500",
+        "protocol_fee_zero_for_one": "0",
+        "protocol_fee_one_for_zero": "0"
+      },
+      {
+        "hour": "2026-10-25T23",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
+        "sqrt_price_x96": "4437278137730104023332629",
+        "tick": "-195811",
+        "liquidity": "71681789467938",
+        "lp_fee": "500",
+        "protocol_fee_zero_for_one": "0",
+        "protocol_fee_one_for_zero": "0"
+      },
+      {
+        "hour": "2026-10-26T00",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
+        "sqrt_price_x96": "4435101753153909152545510",
+        "tick": "-195821",
+        "liquidity": "71682789467938",
+        "lp_fee": "500",
+        "protocol_fee_zero_for_one": "0",
+        "protocol_fee_one_for_zero": "0"
+      },
+      {
+        "hour": "2026-10-26T01",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
+        "sqrt_price_x96": "4420659240580813483352394",
+        "tick": "-195886",
+        "liquidity": "71683789467938",
+        "lp_fee": "500",
+        "protocol_fee_zero_for_one": "0",
+        "protocol_fee_one_for_zero": "0"
+      },
+      {
+        "hour": "2026-10-26T02",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
+        "sqrt_price_x96": "4427093641066244139925994",
+        "tick": "-195857",
+        "liquidity": "71684789467938",
+        "lp_fee": "500",
+        "protocol_fee_zero_for_one": "0",
+        "protocol_fee_one_for_zero": "0"
+      },
+      {
+        "hour": "2026-10-26T03",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
+        "sqrt_price_x96": "4420939618424201830333868",
+        "tick": "-195885",
+        "liquidity": "71685789467938",
+        "lp_fee": "500",
+        "protocol_fee_zero_for_one": "0",
+        "protocol_fee_one_for_zero": "0"
+      },
+      {
+        "hour": "2026-10-26T04",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
+        "sqrt_price_x96": "4415970584051431279774487",
+        "tick": "-195907",
+        "liquidity": "71686789467938",
+        "lp_fee": "500",
+        "protocol_fee_zero_for_one": "0",
+        "protocol_fee_one_for_zero": "0"
+      },
+      {
+        "hour": "2026-10-26T05",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
+        "sqrt_price_x96": "4423596679432434033996517",
+        "tick": "-195873",
+        "liquidity": "71687789467938",
+        "lp_fee": "500",
+        "protocol_fee_zero_for_one": "0",
+        "protocol_fee_one_for_zero": "0"
+      },
+      {
+        "hour": "2026-10-26T06",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
+        "sqrt_price_x96": "4432856684681702926613344",
+        "tick": "-195831",
+        "liquidity": "71688789467938",
+        "lp_fee": "500",
+        "protocol_fee_zero_for_one": "0",
+        "protocol_fee_one_for_zero": "0"
+      },
+      {
+        "hour": "2026-10-26T07",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
+        "sqrt_price_x96": "4433383957578593210002992",
+        "tick": "-195829",
+        "liquidity": "71689789467938",
+        "lp_fee": "500",
+        "protocol_fee_zero_for_one": "0",
+        "protocol_fee_one_for_zero": "0"
+      },
+      {
+        "hour": "2026-10-26T08",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
+        "sqrt_price_x96": "4439372171731621359303930",
+        "tick": "-195802",
+        "liquidity": "71690789467938",
+        "lp_fee": "500",
+        "protocol_fee_zero_for_one": "0",
+        "protocol_fee_one_for_zero": "0"
+      },
+      {
+        "hour": "2026-10-26T09",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
+        "sqrt_price_x96": "4434051810618658019693884",
+        "tick": "-195826",
+        "liquidity": "71691789467938",
+        "lp_fee": "500",
+        "protocol_fee_zero_for_one": "0",
+        "protocol_fee_one_for_zero": "0"
+      },
+      {
+        "hour": "2026-10-26T10",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
+        "sqrt_price_x96": "4432721516313706040905605",
+        "tick": "-195832",
+        "liquidity": "71692789467938",
+        "lp_fee": "500",
+        "protocol_fee_zero_for_one": "0",
+        "protocol_fee_one_for_zero": "0"
+      },
+      {
+        "hour": "2026-10-26T11",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
+        "sqrt_price_x96": "4433719656341382890595650",
+        "tick": "-195827",
+        "liquidity": "71693789467938",
+        "lp_fee": "500",
+        "protocol_fee_zero_for_one": "0",
+        "protocol_fee_one_for_zero": "0"
+      },
+      {
+        "hour": "2026-10-26T12",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
+        "sqrt_price_x96": "4427889527161010852391225",
+        "tick": "-195854",
+        "liquidity": "71694789467938",
+        "lp_fee": "500",
+        "protocol_fee_zero_for_one": "0",
+        "protocol_fee_one_for_zero": "0"
+      },
+      {
+        "hour": "2026-10-26T13",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
+        "sqrt_price_x96": "4424829785302246941336385",
+        "tick": "-195867",
+        "liquidity": "71695789467938",
+        "lp_fee": "500",
+        "protocol_fee_zero_for_one": "0",
+        "protocol_fee_one_for_zero": "0"
+      },
+      {
+        "hour": "2026-10-26T14",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
+        "sqrt_price_x96": "4430885792320987172240633",
+        "tick": "-195840",
+        "liquidity": "71696789467938",
+        "lp_fee": "500",
+        "protocol_fee_zero_for_one": "0",
+        "protocol_fee_one_for_zero": "0"
+      },
+      {
+        "hour": "2026-10-26T15",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
+        "sqrt_price_x96": "4423276483486697169366312",
+        "tick": "-195874",
+        "liquidity": "71697789467938",
+        "lp_fee": "500",
+        "protocol_fee_zero_for_one": "0",
+        "protocol_fee_one_for_zero": "0"
+      },
+      {
+        "hour": "2026-10-26T16",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
+        "sqrt_price_x96": "4421414184468123868348077",
+        "tick": "-195883",
+        "liquidity": "71698789467938",
+        "lp_fee": "500",
+        "protocol_fee_zero_for_one": "0",
+        "protocol_fee_one_for_zero": "0"
+      },
+      {
+        "hour": "2026-10-26T17",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
+        "sqrt_price_x96": "4427783699457849290526986",
+        "tick": "-195854",
+        "liquidity": "71699789467938",
+        "lp_fee": "500",
+        "protocol_fee_zero_for_one": "0",
+        "protocol_fee_one_for_zero": "0"
+      },
+      {
+        "hour": "2026-10-26T18",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
+        "sqrt_price_x96": "4428871443838863694455524",
+        "tick": "-195849",
+        "liquidity": "71700789467938",
+        "lp_fee": "500",
+        "protocol_fee_zero_for_one": "0",
+        "protocol_fee_one_for_zero": "0"
+      },
+      {
+        "hour": "2026-10-26T19",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
+        "sqrt_price_x96": "4433192560483502451293375",
+        "tick": "-195830",
+        "liquidity": "71701789467938",
+        "lp_fee": "500",
+        "protocol_fee_zero_for_one": "0",
+        "protocol_fee_one_for_zero": "0"
+      },
+      {
+        "hour": "2026-10-26T20",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
+        "sqrt_price_x96": "4438672097539338095159937",
+        "tick": "-195805",
+        "liquidity": "71702789467938",
+        "lp_fee": "500",
+        "protocol_fee_zero_for_one": "0",
+        "protocol_fee_one_for_zero": "0"
+      },
+      {
+        "hour": "2026-10-26T21",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
+        "sqrt_price_x96": "4436167669277989108184320",
+        "tick": "-195816",
+        "liquidity": "71703789467938",
+        "lp_fee": "500",
+        "protocol_fee_zero_for_one": "0",
+        "protocol_fee_one_for_zero": "0"
+      },
+      {
+        "hour": "2026-10-26T22",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
+        "sqrt_price_x96": "4434663934703759324491227",
+        "tick": "-195823",
+        "liquidity": "71704789467938",
+        "lp_fee": "500",
+        "protocol_fee_zero_for_one": "0",
+        "protocol_fee_one_for_zero": "0"
+      },
+      {
+        "hour": "2026-10-26T23",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
+        "sqrt_price_x96": "4435715738906744446226350",
+        "tick": "-195818",
+        "liquidity": "71705789467938",
+        "lp_fee": "500",
+        "protocol_fee_zero_for_one": "0",
+        "protocol_fee_one_for_zero": "0"
+      },
+      {
+        "hour": "2026-10-27T00",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
+        "sqrt_price_x96": "4433544160233299606813177",
+        "tick": "-195828",
+        "liquidity": "71706789467938",
+        "lp_fee": "500",
+        "protocol_fee_zero_for_one": "0",
+        "protocol_fee_one_for_zero": "0"
+      },
+      {
+        "hour": "2026-10-27T01",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
+        "sqrt_price_x96": "4436407617476802536041105",
+        "tick": "-195815",
+        "liquidity": "71707789467938",
+        "lp_fee": "500",
+        "protocol_fee_zero_for_one": "0",
+        "protocol_fee_one_for_zero": "0"
+      },
+      {
+        "hour": "2026-10-27T02",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
+        "sqrt_price_x96": "4434578210328240434577098",
+        "tick": "-195823",
+        "liquidity": "71708789467938",
+        "lp_fee": "500",
+        "protocol_fee_zero_for_one": "0",
+        "protocol_fee_one_for_zero": "0"
+      },
+      {
+        "hour": "2026-10-27T03",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
+        "sqrt_price_x96": "4431516006613166017457413",
+        "tick": "-195837",
+        "liquidity": "71709789467938",
+        "lp_fee": "500",
+        "protocol_fee_zero_for_one": "0",
+        "protocol_fee_one_for_zero": "0"
+      },
+      {
+        "hour": "2026-10-27T04",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
+        "sqrt_price_x96": "4430887853737867471222714",
+        "tick": "-195840",
+        "liquidity": "71710789467938",
+        "lp_fee": "500",
+        "protocol_fee_zero_for_one": "0",
+        "protocol_fee_one_for_zero": "0"
+      },
+      {
+        "hour": "2026-10-27T05",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
+        "sqrt_price_x96": "4425982021681566521656707",
+        "tick": "-195862",
+        "liquidity": "71711789467938",
+        "lp_fee": "500",
+        "protocol_fee_zero_for_one": "0",
+        "protocol_fee_one_for_zero": "0"
+      },
+      {
+        "hour": "2026-10-27T06",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
+        "sqrt_price_x96": "4430947012019183540591091",
+        "tick": "-195840",
+        "liquidity": "71712789467938",
+        "lp_fee": "500",
+        "protocol_fee_zero_for_one": "0",
+        "protocol_fee_one_for_zero": "0"
+      },
+      {
+        "hour": "2026-10-27T07",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
+        "sqrt_price_x96": "4426650001223549302155621",
+        "tick": "-195859",
+        "liquidity": "71713789467938",
+        "lp_fee": "500",
+        "protocol_fee_zero_for_one": "0",
+        "protocol_fee_one_for_zero": "0"
+      },
+      {
+        "hour": "2026-10-27T08",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
+        "sqrt_price_x96": "4418869571794410123926659",
+        "tick": "-195894",
+        "liquidity": "71714789467938",
+        "lp_fee": "500",
+        "protocol_fee_zero_for_one": "0",
+        "protocol_fee_one_for_zero": "0"
+      },
+      {
+        "hour": "2026-10-27T09",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
+        "sqrt_price_x96": "4417188219213182601249005",
+        "tick": "-195902",
+        "liquidity": "71715789467938",
+        "lp_fee": "500",
+        "protocol_fee_zero_for_one": "0",
+        "protocol_fee_one_for_zero": "0"
+      },
+      {
+        "hour": "2026-10-27T10",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
+        "sqrt_price_x96": "4415598423628354168175406",
+        "tick": "-195909",
+        "liquidity": "71716789467938",
+        "lp_fee": "500",
+        "protocol_fee_zero_for_one": "0",
+        "protocol_fee_one_for_zero": "0"
+      },
+      {
+        "hour": "2026-10-27T11",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
+        "sqrt_price_x96": "4420774785097922118627363",
+        "tick": "-195886",
+        "liquidity": "71717789467938",
+        "lp_fee": "500",
+        "protocol_fee_zero_for_one": "0",
+        "protocol_fee_one_for_zero": "0"
+      },
+      {
+        "hour": "2026-10-27T12",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
+        "sqrt_price_x96": "4413021703698622324397248",
+        "tick": "-195921",
+        "liquidity": "71718789467938",
+        "lp_fee": "500",
+        "protocol_fee_zero_for_one": "0",
+        "protocol_fee_one_for_zero": "0"
+      },
+      {
+        "hour": "2026-10-27T13",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
+        "sqrt_price_x96": "4426929356539774010826805",
+        "tick": "-195858",
+        "liquidity": "71719789467938",
+        "lp_fee": "500",
+        "protocol_fee_zero_for_one": "0",
+        "protocol_fee_one_for_zero": "0"
+      },
+      {
+        "hour": "2026-10-27T14",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
+        "sqrt_price_x96": "4419695409855220558160993",
+        "tick": "-195891",
+        "liquidity": "71720789467938",
+        "lp_fee": "500",
+        "protocol_fee_zero_for_one": "0",
+        "protocol_fee_one_for_zero": "0"
+      },
+      {
+        "hour": "2026-10-27T15",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
+        "sqrt_price_x96": "4414355094332120521949628",
+        "tick": "-195915",
+        "liquidity": "71721789467938",
+        "lp_fee": "500",
+        "protocol_fee_zero_for_one": "0",
+        "protocol_fee_one_for_zero": "0"
+      },
+      {
+        "hour": "2026-10-27T16",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
+        "sqrt_price_x96": "4403272364471846780381652",
+        "tick": "-195965",
+        "liquidity": "71722789467938",
+        "lp_fee": "500",
+        "protocol_fee_zero_for_one": "0",
+        "protocol_fee_one_for_zero": "0"
+      },
+      {
+        "hour": "2026-10-27T17",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
+        "sqrt_price_x96": "4401741657881845283761554",
+        "tick": "-195972",
+        "liquidity": "71723789467938",
+        "lp_fee": "500",
+        "protocol_fee_zero_for_one": "0",
+        "protocol_fee_one_for_zero": "0"
+      },
+      {
+        "hour": "2026-10-27T18",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
+        "sqrt_price_x96": "4397340431451362601886987",
+        "tick": "-195992",
+        "liquidity": "71724789467938",
+        "lp_fee": "500",
+        "protocol_fee_zero_for_one": "0",
+        "protocol_fee_one_for_zero": "0"
+      },
+      {
+        "hour": "2026-10-27T19",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
+        "sqrt_price_x96": "4399950964889409996340664",
+        "tick": "-195980",
+        "liquidity": "71725789467938",
+        "lp_fee": "500",
+        "protocol_fee_zero_for_one": "0",
+        "protocol_fee_one_for_zero": "0"
+      },
+      {
+        "hour": "2026-10-27T20",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
+        "sqrt_price_x96": "4398397355519578376099633",
+        "tick": "-195987",
+        "liquidity": "71726789467938",
+        "lp_fee": "500",
+        "protocol_fee_zero_for_one": "0",
+        "protocol_fee_one_for_zero": "0"
+      },
+      {
+        "hour": "2026-10-27T21",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
+        "sqrt_price_x96": "4398805997405368858737640",
+        "tick": "-195985",
+        "liquidity": "71727789467938",
+        "lp_fee": "500",
+        "protocol_fee_zero_for_one": "0",
+        "protocol_fee_one_for_zero": "0"
+      },
+      {
+        "hour": "2026-10-27T22",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
+        "sqrt_price_x96": "4394895406584737894274165",
+        "tick": "-196003",
+        "liquidity": "71728789467938",
+        "lp_fee": "500",
+        "protocol_fee_zero_for_one": "0",
+        "protocol_fee_one_for_zero": "0"
+      },
+      {
+        "hour": "2026-10-27T23",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
+        "sqrt_price_x96": "4391156310152247093705153",
+        "tick": "-196020",
+        "liquidity": "71729789467938",
+        "lp_fee": "500",
+        "protocol_fee_zero_for_one": "0",
+        "protocol_fee_one_for_zero": "0"
+      },
+      {
+        "hour": "2026-10-28T00",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
+        "sqrt_price_x96": "4387430240521584532738249",
+        "tick": "-196037",
+        "liquidity": "71730789467938",
+        "lp_fee": "500",
+        "protocol_fee_zero_for_one": "0",
+        "protocol_fee_one_for_zero": "0"
+      },
+      {
+        "hour": "2026-10-28T01",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
+        "sqrt_price_x96": "4390636475245409344829017",
+        "tick": "-196023",
+        "liquidity": "71731789467938",
+        "lp_fee": "500",
+        "protocol_fee_zero_for_one": "0",
+        "protocol_fee_one_for_zero": "0"
+      },
+      {
+        "hour": "2026-10-28T02",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
+        "sqrt_price_x96": "4386164433813405306600368",
+        "tick": "-196043",
+        "liquidity": "71732789467938",
+        "lp_fee": "500",
+        "protocol_fee_zero_for_one": "0",
+        "protocol_fee_one_for_zero": "0"
+      },
+      {
+        "hour": "2026-10-28T03",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
+        "sqrt_price_x96": "4386077912646309356670380",
+        "tick": "-196043",
+        "liquidity": "71733789467938",
+        "lp_fee": "500",
+        "protocol_fee_zero_for_one": "0",
+        "protocol_fee_one_for_zero": "0"
+      },
+      {
+        "hour": "2026-10-28T04",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
+        "sqrt_price_x96": "4372207926040634158336060",
+        "tick": "-196107",
+        "liquidity": "71734789467938",
+        "lp_fee": "500",
+        "protocol_fee_zero_for_one": "0",
+        "protocol_fee_one_for_zero": "0"
+      },
+      {
+        "hour": "2026-10-28T05",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
+        "sqrt_price_x96": "4378868532073454226473949",
+        "tick": "-196076",
+        "liquidity": "71735789467938",
+        "lp_fee": "500",
+        "protocol_fee_zero_for_one": "0",
+        "protocol_fee_one_for_zero": "0"
+      },
+      {
+        "hour": "2026-10-28T06",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
+        "sqrt_price_x96": "4385787038808981317781703",
+        "tick": "-196045",
+        "liquidity": "71736789467938",
+        "lp_fee": "500",
+        "protocol_fee_zero_for_one": "0",
+        "protocol_fee_one_for_zero": "0"
+      },
+      {
+        "hour": "2026-10-28T07",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
+        "sqrt_price_x96": "4383223955054110374256623",
+        "tick": "-196056",
+        "liquidity": "71737789467938",
+        "lp_fee": "500",
+        "protocol_fee_zero_for_one": "0",
+        "protocol_fee_one_for_zero": "0"
+      },
+      {
+        "hour": "2026-10-28T08",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
+        "sqrt_price_x96": "4373040540146910787593879",
+        "tick": "-196103",
+        "liquidity": "71738789467938",
+        "lp_fee": "500",
+        "protocol_fee_zero_for_one": "0",
+        "protocol_fee_one_for_zero": "0"
+      },
+      {
+        "hour": "2026-10-28T09",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
+        "sqrt_price_x96": "4372631289760485411079516",
+        "tick": "-196105",
+        "liquidity": "71739789467938",
+        "lp_fee": "500",
+        "protocol_fee_zero_for_one": "0",
+        "protocol_fee_one_for_zero": "0"
+      },
+      {
+        "hour": "2026-10-28T10",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
+        "sqrt_price_x96": "4383046945310181575816860",
+        "tick": "-196057",
+        "liquidity": "71740789467938",
+        "lp_fee": "500",
+        "protocol_fee_zero_for_one": "0",
+        "protocol_fee_one_for_zero": "0"
+      },
+      {
+        "hour": "2026-10-28T11",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
+        "sqrt_price_x96": "4375026959041628344150453",
+        "tick": "-196094",
+        "liquidity": "71741789467938",
+        "lp_fee": "500",
+        "protocol_fee_zero_for_one": "0",
+        "protocol_fee_one_for_zero": "0"
+      },
+      {
+        "hour": "2026-10-28T12",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
+        "sqrt_price_x96": "4369862867134329704377999",
+        "tick": "-196117",
+        "liquidity": "71742789467938",
+        "lp_fee": "500",
+        "protocol_fee_zero_for_one": "0",
+        "protocol_fee_one_for_zero": "0"
+      },
+      {
+        "hour": "2026-10-28T13",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
+        "sqrt_price_x96": "4380332752557833767121135",
+        "tick": "-196070",
+        "liquidity": "71743789467938",
+        "lp_fee": "500",
+        "protocol_fee_zero_for_one": "0",
+        "protocol_fee_one_for_zero": "0"
+      },
+      {
+        "hour": "2026-10-28T14",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
+        "sqrt_price_x96": "4383203548028681324749210",
+        "tick": "-196056",
+        "liquidity": "71744789467938",
+        "lp_fee": "500",
+        "protocol_fee_zero_for_one": "0",
+        "protocol_fee_one_for_zero": "0"
+      },
+      {
+        "hour": "2026-10-28T15",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
+        "sqrt_price_x96": "4385533280282891125218674",
+        "tick": "-196046",
+        "liquidity": "71745789467938",
+        "lp_fee": "500",
+        "protocol_fee_zero_for_one": "0",
+        "protocol_fee_one_for_zero": "0"
+      },
+      {
+        "hour": "2026-10-28T16",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
+        "sqrt_price_x96": "4390433407995289889803532",
+        "tick": "-196023",
+        "liquidity": "71746789467938",
+        "lp_fee": "500",
+        "protocol_fee_zero_for_one": "0",
+        "protocol_fee_one_for_zero": "0"
+      },
+      {
+        "hour": "2026-10-28T17",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
+        "sqrt_price_x96": "4379083281111911206427756",
+        "tick": "-196075",
+        "liquidity": "71747789467938",
+        "lp_fee": "500",
+        "protocol_fee_zero_for_one": "0",
+        "protocol_fee_one_for_zero": "0"
+      },
+      {
+        "hour": "2026-10-28T18",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
+        "sqrt_price_x96": "4383488290980743384529999",
+        "tick": "-196055",
+        "liquidity": "71748789467938",
+        "lp_fee": "500",
+        "protocol_fee_zero_for_one": "0",
+        "protocol_fee_one_for_zero": "0"
+      },
+      {
+        "hour": "2026-10-28T19",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
+        "sqrt_price_x96": "4384477678552411818687045",
+        "tick": "-196051",
+        "liquidity": "71749789467938",
+        "lp_fee": "500",
+        "protocol_fee_zero_for_one": "0",
+        "protocol_fee_one_for_zero": "0"
+      },
+      {
+        "hour": "2026-10-28T20",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
+        "sqrt_price_x96": "4377010464037119624813756",
+        "tick": "-196085",
+        "liquidity": "71750789467938",
+        "lp_fee": "500",
+        "protocol_fee_zero_for_one": "0",
+        "protocol_fee_one_for_zero": "0"
+      },
+      {
+        "hour": "2026-10-28T21",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
+        "sqrt_price_x96": "4376229432694975433123489",
+        "tick": "-196088",
+        "liquidity": "71751789467938",
+        "lp_fee": "500",
+        "protocol_fee_zero_for_one": "0",
+        "protocol_fee_one_for_zero": "0"
+      },
+      {
+        "hour": "2026-10-28T22",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
+        "sqrt_price_x96": "4379533005904820640430616",
+        "tick": "-196073",
+        "liquidity": "71752789467938",
+        "lp_fee": "500",
+        "protocol_fee_zero_for_one": "0",
+        "protocol_fee_one_for_zero": "0"
+      },
+      {
+        "hour": "2026-10-28T23",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
+        "sqrt_price_x96": "4382663511202552900063060",
+        "tick": "-196059",
+        "liquidity": "71753789467938",
+        "lp_fee": "500",
+        "protocol_fee_zero_for_one": "0",
+        "protocol_fee_one_for_zero": "0"
+      },
+      {
+        "hour": "2026-10-29T00",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
+        "sqrt_price_x96": "4387032168395598614426317",
+        "tick": "-196039",
+        "liquidity": "71754789467938",
+        "lp_fee": "500",
+        "protocol_fee_zero_for_one": "0",
+        "protocol_fee_one_for_zero": "0"
+      },
+      {
+        "hour": "2026-10-29T01",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
+        "sqrt_price_x96": "4389425572932861329765811",
+        "tick": "-196028",
+        "liquidity": "71755789467938",
+        "lp_fee": "500",
+        "protocol_fee_zero_for_one": "0",
+        "protocol_fee_one_for_zero": "0"
+      },
+      {
+        "hour": "2026-10-29T02",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
+        "sqrt_price_x96": "4397940257452873560429198",
+        "tick": "-195989",
+        "liquidity": "71756789467938",
+        "lp_fee": "500",
+        "protocol_fee_zero_for_one": "0",
+        "protocol_fee_one_for_zero": "0"
+      },
+      {
+        "hour": "2026-10-29T03",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
+        "sqrt_price_x96": "4393613351619555100293573",
+        "tick": "-196009",
+        "liquidity": "71757789467938",
+        "lp_fee": "500",
+        "protocol_fee_zero_for_one": "0",
+        "protocol_fee_one_for_zero": "0"
+      },
+      {
+        "hour": "2026-10-29T04",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
+        "sqrt_price_x96": "4427680876901996622999063",
+        "tick": "-195855",
+        "liquidity": "71758789467938",
+        "lp_fee": "500",
+        "protocol_fee_zero_for_one": "0",
+        "protocol_fee_one_for_zero": "0"
+      },
+      {
+        "hour": "2026-10-29T05",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
+        "sqrt_price_x96": "4392264253927030381015501",
+        "tick": "-196015",
+        "liquidity": "71759789467938",
+        "lp_fee": "500",
+        "protocol_fee_zero_for_one": "0",
+        "protocol_fee_one_for_zero": "0"
+      },
+      {
+        "hour": "2026-10-29T06",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
+        "sqrt_price_x96": "4385274246864454767168653",
+        "tick": "-196047",
+        "liquidity": "71760789467938",
+        "lp_fee": "500",
+        "protocol_fee_zero_for_one": "0",
+        "protocol_fee_one_for_zero": "0"
+      },
+      {
+        "hour": "2026-10-29T07",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
+        "sqrt_price_x96": "4393251120151343789016941",
+        "tick": "-196011",
+        "liquidity": "71761789467938",
+        "lp_fee": "500",
+        "protocol_fee_zero_for_one": "0",
+        "protocol_fee_one_for_zero": "0"
+      },
+      {
+        "hour": "2026-10-29T08",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
+        "sqrt_price_x96": "4391031066504041977522918",
+        "tick": "-196021",
+        "liquidity": "71762789467938",
+        "lp_fee": "500",
+        "protocol_fee_zero_for_one": "0",
+        "protocol_fee_one_for_zero": "0"
+      },
+      {
+        "hour": "2026-10-29T09",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
+        "sqrt_price_x96": "4384479450594983939298980",
+        "tick": "-196051",
+        "liquidity": "71763789467938",
+        "lp_fee": "500",
+        "protocol_fee_zero_for_one": "0",
+        "protocol_fee_one_for_zero": "0"
+      },
+      {
+        "hour": "2026-10-29T10",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
+        "sqrt_price_x96": "4386223982224009909877155",
+        "tick": "-196043",
+        "liquidity": "71764789467938",
+        "lp_fee": "500",
+        "protocol_fee_zero_for_one": "0",
+        "protocol_fee_one_for_zero": "0"
+      },
+      {
+        "hour": "2026-10-29T11",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
+        "sqrt_price_x96": "4391278847108613382329838",
+        "tick": "-196020",
+        "liquidity": "71765789467938",
+        "lp_fee": "500",
+        "protocol_fee_zero_for_one": "0",
+        "protocol_fee_one_for_zero": "0"
+      },
+      {
+        "hour": "2026-10-29T12",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
+        "sqrt_price_x96": "4390180969292772647463976",
+        "tick": "-196025",
+        "liquidity": "71766789467938",
+        "lp_fee": "500",
+        "protocol_fee_zero_for_one": "0",
+        "protocol_fee_one_for_zero": "0"
+      },
+      {
+        "hour": "2026-10-29T13",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
+        "sqrt_price_x96": "4388220427812494650619767",
+        "tick": "-196034",
+        "liquidity": "71767789467938",
+        "lp_fee": "500",
+        "protocol_fee_zero_for_one": "0",
+        "protocol_fee_one_for_zero": "0"
+      },
+      {
+        "hour": "2026-10-29T14",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
+        "sqrt_price_x96": "4400771752362629317324214",
+        "tick": "-195976",
+        "liquidity": "71768789467938",
+        "lp_fee": "500",
+        "protocol_fee_zero_for_one": "0",
+        "protocol_fee_one_for_zero": "0"
+      },
+      {
+        "hour": "2026-10-29T15",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
+        "sqrt_price_x96": "4396645359972196301261345",
+        "tick": "-195995",
+        "liquidity": "71769789467938",
+        "lp_fee": "500",
+        "protocol_fee_zero_for_one": "0",
+        "protocol_fee_one_for_zero": "0"
+      },
+      {
+        "hour": "2026-10-29T16",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
+        "sqrt_price_x96": "4404079268728963434537103",
+        "tick": "-195961",
+        "liquidity": "71770789467938",
+        "lp_fee": "500",
+        "protocol_fee_zero_for_one": "0",
+        "protocol_fee_one_for_zero": "0"
+      },
+      {
+        "hour": "2026-10-29T17",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
+        "sqrt_price_x96": "4394707038845408628769687",
+        "tick": "-196004",
+        "liquidity": "71771789467938",
+        "lp_fee": "500",
+        "protocol_fee_zero_for_one": "0",
+        "protocol_fee_one_for_zero": "0"
+      },
+      {
+        "hour": "2026-10-29T18",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
+        "sqrt_price_x96": "4395693662926114836755429",
+        "tick": "-196000",
+        "liquidity": "71772789467938",
+        "lp_fee": "500",
+        "protocol_fee_zero_for_one": "0",
+        "protocol_fee_one_for_zero": "0"
+      },
+      {
+        "hour": "2026-10-29T19",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
+        "sqrt_price_x96": "4405139494948042748507000",
+        "tick": "-195957",
+        "liquidity": "71773789467938",
+        "lp_fee": "500",
+        "protocol_fee_zero_for_one": "0",
+        "protocol_fee_one_for_zero": "0"
+      },
+      {
+        "hour": "2026-10-29T20",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
+        "sqrt_price_x96": "4408960773831595052841810",
+        "tick": "-195939",
+        "liquidity": "71774789467938",
+        "lp_fee": "500",
+        "protocol_fee_zero_for_one": "0",
+        "protocol_fee_one_for_zero": "0"
+      },
+      {
+        "hour": "2026-10-29T21",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
+        "sqrt_price_x96": "4398222497856774177185039",
+        "tick": "-195988",
+        "liquidity": "71775789467938",
+        "lp_fee": "500",
+        "protocol_fee_zero_for_one": "0",
+        "protocol_fee_one_for_zero": "0"
+      },
+      {
+        "hour": "2026-10-29T22",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
+        "sqrt_price_x96": "4396205973946931182540753",
+        "tick": "-195997",
+        "liquidity": "71776789467938",
+        "lp_fee": "500",
+        "protocol_fee_zero_for_one": "0",
+        "protocol_fee_one_for_zero": "0"
+      },
+      {
+        "hour": "2026-10-29T23",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
+        "sqrt_price_x96": "4397841589192817471555861",
+        "tick": "-195990",
+        "liquidity": "71777789467938",
+        "lp_fee": "500",
+        "protocol_fee_zero_for_one": "0",
+        "protocol_fee_one_for_zero": "0"
+      },
+      {
+        "hour": "2026-10-30T00",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
+        "sqrt_price_x96": "4391067411316075072741357",
+        "tick": "-196021",
+        "liquidity": "71778789467938",
+        "lp_fee": "500",
+        "protocol_fee_zero_for_one": "0",
+        "protocol_fee_one_for_zero": "0"
+      },
+      {
+        "hour": "2026-10-30T01",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
+        "sqrt_price_x96": "4380353441095780835776772",
+        "tick": "-196069",
+        "liquidity": "71779789467938",
+        "lp_fee": "500",
+        "protocol_fee_zero_for_one": "0",
+        "protocol_fee_one_for_zero": "0"
+      },
+      {
+        "hour": "2026-10-30T02",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
+        "sqrt_price_x96": "4374769391582448137071497",
+        "tick": "-196095",
+        "liquidity": "71780789467938",
+        "lp_fee": "500",
+        "protocol_fee_zero_for_one": "0",
+        "protocol_fee_one_for_zero": "0"
+      },
+      {
+        "hour": "2026-10-30T03",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
+        "sqrt_price_x96": "4364229968983273892719849",
+        "tick": "-196143",
+        "liquidity": "71781789467938",
+        "lp_fee": "500",
+        "protocol_fee_zero_for_one": "0",
+        "protocol_fee_one_for_zero": "0"
+      },
+      {
+        "hour": "2026-10-30T04",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
+        "sqrt_price_x96": "4368069984017356587478793",
+        "tick": "-196126",
+        "liquidity": "71782789467938",
+        "lp_fee": "500",
+        "protocol_fee_zero_for_one": "0",
+        "protocol_fee_one_for_zero": "0"
+      },
+      {
+        "hour": "2026-10-30T05",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
+        "sqrt_price_x96": "4370736657804974111821031",
+        "tick": "-196113",
+        "liquidity": "71783789467938",
+        "lp_fee": "500",
+        "protocol_fee_zero_for_one": "0",
+        "protocol_fee_one_for_zero": "0"
+      },
+      {
+        "hour": "2026-10-30T06",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
+        "sqrt_price_x96": "4374885692116837051914760",
+        "tick": "-196094",
+        "liquidity": "71784789467938",
+        "lp_fee": "500",
+        "protocol_fee_zero_for_one": "0",
+        "protocol_fee_one_for_zero": "0"
+      },
+      {
+        "hour": "2026-10-30T07",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
+        "sqrt_price_x96": "4372527201106758537431461",
+        "tick": "-196105",
+        "liquidity": "71785789467938",
+        "lp_fee": "500",
+        "protocol_fee_zero_for_one": "0",
+        "protocol_fee_one_for_zero": "0"
+      },
+      {
+        "hour": "2026-10-30T08",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
+        "sqrt_price_x96": "4377718239363908130331756",
+        "tick": "-196081",
+        "liquidity": "71786789467938",
+        "lp_fee": "500",
+        "protocol_fee_zero_for_one": "0",
+        "protocol_fee_one_for_zero": "0"
+      },
+      {
+        "hour": "2026-10-30T09",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
+        "sqrt_price_x96": "4377619197728559699180190",
+        "tick": "-196082",
+        "liquidity": "71787789467938",
+        "lp_fee": "500",
+        "protocol_fee_zero_for_one": "0",
+        "protocol_fee_one_for_zero": "0"
+      },
+      {
+        "hour": "2026-10-30T10",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
+        "sqrt_price_x96": "4383185579573545553175266",
+        "tick": "-196057",
+        "liquidity": "71788789467938",
+        "lp_fee": "500",
+        "protocol_fee_zero_for_one": "0",
+        "protocol_fee_one_for_zero": "0"
+      },
+      {
+        "hour": "2026-10-30T11",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
+        "sqrt_price_x96": "4388272297593005697971645",
+        "tick": "-196033",
+        "liquidity": "71789789467938",
+        "lp_fee": "500",
+        "protocol_fee_zero_for_one": "0",
+        "protocol_fee_one_for_zero": "0"
+      },
+      {
+        "hour": "2026-10-30T12",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
+        "sqrt_price_x96": "4388518108966822890956635",
+        "tick": "-196032",
+        "liquidity": "71790789467938",
+        "lp_fee": "500",
+        "protocol_fee_zero_for_one": "0",
+        "protocol_fee_one_for_zero": "0"
+      },
+      {
+        "hour": "2026-10-30T13",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
+        "sqrt_price_x96": "4378715466743706555756967",
+        "tick": "-196077",
+        "liquidity": "71791789467938",
+        "lp_fee": "500",
+        "protocol_fee_zero_for_one": "0",
+        "protocol_fee_one_for_zero": "0"
+      },
+      {
+        "hour": "2026-10-30T14",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
+        "sqrt_price_x96": "4382294056823275582698821",
+        "tick": "-196061",
+        "liquidity": "71792789467938",
+        "lp_fee": "500",
+        "protocol_fee_zero_for_one": "0",
+        "protocol_fee_one_for_zero": "0"
+      },
+      {
+        "hour": "2026-10-30T15",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
+        "sqrt_price_x96": "4383825175116785724623207",
+        "tick": "-196054",
+        "liquidity": "71793789467938",
+        "lp_fee": "500",
+        "protocol_fee_zero_for_one": "0",
+        "protocol_fee_one_for_zero": "0"
+      },
+      {
+        "hour": "2026-10-30T16",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
+        "sqrt_price_x96": "4378940615077094529654629",
+        "tick": "-196076",
+        "liquidity": "71794789467938",
+        "lp_fee": "500",
+        "protocol_fee_zero_for_one": "0",
+        "protocol_fee_one_for_zero": "0"
+      },
+      {
+        "hour": "2026-10-30T17",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
+        "sqrt_price_x96": "4378423786857987726511090",
+        "tick": "-196078",
+        "liquidity": "71795789467938",
+        "lp_fee": "500",
+        "protocol_fee_zero_for_one": "0",
+        "protocol_fee_one_for_zero": "0"
+      },
+      {
+        "hour": "2026-10-30T18",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
+        "sqrt_price_x96": "4372084533008070171985714",
+        "tick": "-196107",
+        "liquidity": "71796789467938",
+        "lp_fee": "500",
+        "protocol_fee_zero_for_one": "0",
+        "protocol_fee_one_for_zero": "0"
+      },
+      {
+        "hour": "2026-10-30T19",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
+        "sqrt_price_x96": "4371267181667012584804431",
+        "tick": "-196111",
+        "liquidity": "71797789467938",
+        "lp_fee": "500",
+        "protocol_fee_zero_for_one": "0",
+        "protocol_fee_one_for_zero": "0"
+      },
+      {
+        "hour": "2026-10-30T20",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
+        "sqrt_price_x96": "4374962519593582160503239",
+        "tick": "-196094",
+        "liquidity": "71798789467938",
+        "lp_fee": "500",
+        "protocol_fee_zero_for_one": "0",
+        "protocol_fee_one_for_zero": "0"
+      },
+      {
+        "hour": "2026-10-30T21",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
+        "sqrt_price_x96": "4372771657074444302265555",
+        "tick": "-196104",
+        "liquidity": "71799789467938",
+        "lp_fee": "500",
+        "protocol_fee_zero_for_one": "0",
+        "protocol_fee_one_for_zero": "0"
+      },
+      {
+        "hour": "2026-10-30T22",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
+        "sqrt_price_x96": "4372619072257517883316185",
+        "tick": "-196105",
+        "liquidity": "71800789467938",
+        "lp_fee": "500",
+        "protocol_fee_zero_for_one": "0",
+        "protocol_fee_one_for_zero": "0"
+      },
+      {
+        "hour": "2026-10-30T23",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
+        "sqrt_price_x96": "4378014300397697169140191",
+        "tick": "-196080",
+        "liquidity": "71801789467938",
+        "lp_fee": "500",
+        "protocol_fee_zero_for_one": "0",
+        "protocol_fee_one_for_zero": "0"
+      },
+      {
+        "hour": "2026-10-31T00",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
+        "sqrt_price_x96": "4371320946632061842891637",
+        "tick": "-196111",
+        "liquidity": "71802789467938",
+        "lp_fee": "500",
+        "protocol_fee_zero_for_one": "0",
+        "protocol_fee_one_for_zero": "0"
+      },
+      {
+        "hour": "2026-10-31T01",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
+        "sqrt_price_x96": "4371150748310178785031397",
+        "tick": "-196112",
+        "liquidity": "71803789467938",
+        "lp_fee": "500",
+        "protocol_fee_zero_for_one": "0",
+        "protocol_fee_one_for_zero": "0"
+      },
+      {
+        "hour": "2026-10-31T02",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
+        "sqrt_price_x96": "4365811960036879898726996",
+        "tick": "-196136",
+        "liquidity": "71804789467938",
+        "lp_fee": "500",
+        "protocol_fee_zero_for_one": "0",
+        "protocol_fee_one_for_zero": "0"
+      },
+      {
+        "hour": "2026-10-31T03",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
+        "sqrt_price_x96": "4368062219131523651100290",
+        "tick": "-196126",
+        "liquidity": "71805789467938",
+        "lp_fee": "500",
+        "protocol_fee_zero_for_one": "0",
+        "protocol_fee_one_for_zero": "0"
+      },
+      {
+        "hour": "2026-10-31T04",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
+        "sqrt_price_x96": "4374708129961174937479957",
+        "tick": "-196095",
+        "liquidity": "71806789467938",
+        "lp_fee": "500",
+        "protocol_fee_zero_for_one": "0",
+        "protocol_fee_one_for_zero": "0"
+      },
+      {
+        "hour": "2026-10-31T05",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
+        "sqrt_price_x96": "4379705629898555523415947",
+        "tick": "-196072",
+        "liquidity": "71807789467938",
+        "lp_fee": "500",
+        "protocol_fee_zero_for_one": "0",
+        "protocol_fee_one_for_zero": "0"
+      },
+      {
+        "hour": "2026-10-31T06",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
+        "sqrt_price_x96": "4383541797085813499662468",
+        "tick": "-196055",
+        "liquidity": "71808789467938",
+        "lp_fee": "500",
+        "protocol_fee_zero_for_one": "0",
+        "protocol_fee_one_for_zero": "0"
+      },
+      {
+        "hour": "2026-10-31T07",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
+        "sqrt_price_x96": "4383991202400700573555770",
+        "tick": "-196053",
+        "liquidity": "71809789467938",
+        "lp_fee": "500",
+        "protocol_fee_zero_for_one": "0",
+        "protocol_fee_one_for_zero": "0"
+      },
+      {
+        "hour": "2026-10-31T08",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
+        "sqrt_price_x96": "4383084740470916431298406",
+        "tick": "-196057",
+        "liquidity": "71810789467938",
+        "lp_fee": "500",
+        "protocol_fee_zero_for_one": "0",
+        "protocol_fee_one_for_zero": "0"
+      },
+      {
+        "hour": "2026-10-31T09",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
+        "sqrt_price_x96": "4374777812122463335796693",
+        "tick": "-196095",
+        "liquidity": "71811789467938",
+        "lp_fee": "500",
+        "protocol_fee_zero_for_one": "0",
+        "protocol_fee_one_for_zero": "0"
+      },
+      {
+        "hour": "2026-10-31T10",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
+        "sqrt_price_x96": "4377689663492375221804640",
+        "tick": "-196082",
+        "liquidity": "71812789467938",
+        "lp_fee": "500",
+        "protocol_fee_zero_for_one": "0",
+        "protocol_fee_one_for_zero": "0"
+      },
+      {
+        "hour": "2026-10-31T11",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
+        "sqrt_price_x96": "4380953904262599157257701",
+        "tick": "-196067",
+        "liquidity": "71813789467938",
+        "lp_fee": "500",
+        "protocol_fee_zero_for_one": "0",
+        "protocol_fee_one_for_zero": "0"
+      },
+      {
+        "hour": "2026-10-31T12",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
+        "sqrt_price_x96": "4383475543750528373951086",
+        "tick": "-196055",
+        "liquidity": "71814789467938",
+        "lp_fee": "500",
+        "protocol_fee_zero_for_one": "0",
+        "protocol_fee_one_for_zero": "0"
+      },
+      {
+        "hour": "2026-10-31T13",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
+        "sqrt_price_x96": "4383706460262186198437518",
+        "tick": "-196054",
+        "liquidity": "71815789467938",
+        "lp_fee": "500",
+        "protocol_fee_zero_for_one": "0",
+        "protocol_fee_one_for_zero": "0"
+      },
+      {
+        "hour": "2026-10-31T14",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
+        "sqrt_price_x96": "4379493866772707044983581",
+        "tick": "-196073",
+        "liquidity": "71816789467938",
+        "lp_fee": "500",
+        "protocol_fee_zero_for_one": "0",
+        "protocol_fee_one_for_zero": "0"
+      },
+      {
+        "hour": "2026-10-31T15",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
+        "sqrt_price_x96": "4379960186611285635551593",
+        "tick": "-196071",
+        "liquidity": "71817789467938",
+        "lp_fee": "500",
+        "protocol_fee_zero_for_one": "0",
+        "protocol_fee_one_for_zero": "0"
+      },
+      {
+        "hour": "2026-10-31T16",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
+        "sqrt_price_x96": "4386127448331250509840792",
+        "tick": "-196043",
+        "liquidity": "71818789467938",
+        "lp_fee": "500",
+        "protocol_fee_zero_for_one": "0",
+        "protocol_fee_one_for_zero": "0"
+      },
+      {
+        "hour": "2026-10-31T17",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
+        "sqrt_price_x96": "4379515992051546988909743",
+        "tick": "-196073",
+        "liquidity": "71819789467938",
+        "lp_fee": "500",
+        "protocol_fee_zero_for_one": "0",
+        "protocol_fee_one_for_zero": "0"
+      },
+      {
+        "hour": "2026-10-31T18",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
+        "sqrt_price_x96": "4375683129014589399863066",
+        "tick": "-196091",
+        "liquidity": "71820789467938",
+        "lp_fee": "500",
+        "protocol_fee_zero_for_one": "0",
+        "protocol_fee_one_for_zero": "0"
+      },
+      {
+        "hour": "2026-10-31T19",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
+        "sqrt_price_x96": "4387626831352290987118989",
+        "tick": "-196036",
+        "liquidity": "71821789467938",
+        "lp_fee": "500",
+        "protocol_fee_zero_for_one": "0",
+        "protocol_fee_one_for_zero": "0"
+      },
+      {
+        "hour": "2026-10-31T20",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
+        "sqrt_price_x96": "4395873814020497627141921",
+        "tick": "-195999",
+        "liquidity": "71822789467938",
+        "lp_fee": "500",
+        "protocol_fee_zero_for_one": "0",
+        "protocol_fee_one_for_zero": "0"
+      },
+      {
+        "hour": "2026-10-31T21",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
+        "sqrt_price_x96": "4389494732814288868787915",
+        "tick": "-196028",
+        "liquidity": "71823789467938",
+        "lp_fee": "500",
+        "protocol_fee_zero_for_one": "0",
+        "protocol_fee_one_for_zero": "0"
+      },
+      {
+        "hour": "2026-10-31T22",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
+        "sqrt_price_x96": "4393997558542081360722095",
+        "tick": "-196007",
+        "liquidity": "71824789467938",
+        "lp_fee": "500",
+        "protocol_fee_zero_for_one": "0",
+        "protocol_fee_one_for_zero": "0"
+      },
+      {
+        "hour": "2026-10-31T23",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
+        "sqrt_price_x96": "4396958058039361815593610",
+        "tick": "-195994",
+        "liquidity": "71825789467938",
+        "lp_fee": "500",
+        "protocol_fee_zero_for_one": "0",
+        "protocol_fee_one_for_zero": "0"
+      }
+    ],
+    "feeds": [
+      {
+        "hour": "2026-10-25T00",
+        "feed": "0x5f4ec3df9cbd43714fe2740f5e3616155c5b8419",
+        "answer": "317339402190"
+      },
+      {
+        "hour": "2026-10-25T01",
+        "feed": "0x5f4ec3df9cbd43714fe2740f5e3616155c5b8419",
+        "answer": "316771512732"
+      },
+      {
+        "hour": "2026-10-25T02",
+        "feed": "0x5f4ec3df9cbd43714fe2740f5e3616155c5b8419",
+        "answer": "316394744075"
+      },
+      {
+        "hour": "2026-10-25T03",
+        "feed": "0x5f4ec3df9cbd43714fe2740f5e3616155c5b8419",
+        "answer": "315319120714"
+      },
+      {
+        "hour": "2026-10-25T04",
+        "feed": "0x5f4ec3df9cbd43714fe2740f5e3616155c5b8419",
+        "answer": "315861989768"
+      },
+      {
+        "hour": "2026-10-25T05",
+        "feed": "0x5f4ec3df9cbd43714fe2740f5e3616155c5b8419",
+        "answer": "316737880183"
+      },
+      {
+        "hour": "2026-10-25T06",
+        "feed": "0x5f4ec3df9cbd43714fe2740f5e3616155c5b8419",
+        "answer": "315686648153"
+      },
+      {
+        "hour": "2026-10-25T07",
+        "feed": "0x5f4ec3df9cbd43714fe2740f5e3616155c5b8419",
+        "answer": "316236493954"
+      },
+      {
+        "hour": "2026-10-25T08",
+        "feed": "0x5f4ec3df9cbd43714fe2740f5e3616155c5b8419",
+        "answer": "315233757542"
+      },
+      {
+        "hour": "2026-10-25T09",
+        "feed": "0x5f4ec3df9cbd43714fe2740f5e3616155c5b8419",
+        "answer": "314511824259"
+      },
+      {
+        "hour": "2026-10-25T10",
+        "feed": "0x5f4ec3df9cbd43714fe2740f5e3616155c5b8419",
+        "answer": "315235723859"
+      },
+      {
+        "hour": "2026-10-25T11",
+        "feed": "0x5f4ec3df9cbd43714fe2740f5e3616155c5b8419",
+        "answer": "314656949722"
+      },
+      {
+        "hour": "2026-10-25T12",
+        "feed": "0x5f4ec3df9cbd43714fe2740f5e3616155c5b8419",
+        "answer": "314302778342"
+      },
+      {
+        "hour": "2026-10-25T13",
+        "feed": "0x5f4ec3df9cbd43714fe2740f5e3616155c5b8419",
+        "answer": "313938463418"
+      },
+      {
+        "hour": "2026-10-25T14",
+        "feed": "0x5f4ec3df9cbd43714fe2740f5e3616155c5b8419",
+        "answer": "313984531285"
+      },
+      {
+        "hour": "2026-10-25T15",
+        "feed": "0x5f4ec3df9cbd43714fe2740f5e3616155c5b8419",
+        "answer": "314340710828"
+      },
+      {
+        "hour": "2026-10-25T16",
+        "feed": "0x5f4ec3df9cbd43714fe2740f5e3616155c5b8419",
+        "answer": "314070199817"
+      },
+      {
+        "hour": "2026-10-25T17",
+        "feed": "0x5f4ec3df9cbd43714fe2740f5e3616155c5b8419",
+        "answer": "314017131045"
+      },
+      {
+        "hour": "2026-10-25T18",
+        "feed": "0x5f4ec3df9cbd43714fe2740f5e3616155c5b8419",
+        "answer": "314440287592"
+      },
+      {
+        "hour": "2026-10-25T19",
+        "feed": "0x5f4ec3df9cbd43714fe2740f5e3616155c5b8419",
+        "answer": "314186889954"
+      },
+      {
+        "hour": "2026-10-25T20",
+        "feed": "0x5f4ec3df9cbd43714fe2740f5e3616155c5b8419",
+        "answer": "313248883363"
+      },
+      {
+        "hour": "2026-10-25T21",
+        "feed": "0x5f4ec3df9cbd43714fe2740f5e3616155c5b8419",
+        "answer": "313832334717"
+      },
+      {
+        "hour": "2026-10-25T22",
+        "feed": "0x5f4ec3df9cbd43714fe2740f5e3616155c5b8419",
+        "answer": "314517423223"
+      },
+      {
+        "hour": "2026-10-25T23",
+        "feed": "0x5f4ec3df9cbd43714fe2740f5e3616155c5b8419",
+        "answer": "313349871313"
+      },
+      {
+        "hour": "2026-10-26T00",
+        "feed": "0x5f4ec3df9cbd43714fe2740f5e3616155c5b8419",
+        "answer": "312858018070"
+      },
+      {
+        "hour": "2026-10-26T01",
+        "feed": "0x5f4ec3df9cbd43714fe2740f5e3616155c5b8419",
+        "answer": "311920338259"
+      },
+      {
+        "hour": "2026-10-26T02",
+        "feed": "0x5f4ec3df9cbd43714fe2740f5e3616155c5b8419",
+        "answer": "312110377722"
+      },
+      {
+        "hour": "2026-10-26T03",
+        "feed": "0x5f4ec3df9cbd43714fe2740f5e3616155c5b8419",
+        "answer": "310986940682"
+      },
+      {
+        "hour": "2026-10-26T04",
+        "feed": "0x5f4ec3df9cbd43714fe2740f5e3616155c5b8419",
+        "answer": "310642313195"
+      },
+      {
+        "hour": "2026-10-26T05",
+        "feed": "0x5f4ec3df9cbd43714fe2740f5e3616155c5b8419",
+        "answer": "311696078316"
+      },
+      {
+        "hour": "2026-10-26T06",
+        "feed": "0x5f4ec3df9cbd43714fe2740f5e3616155c5b8419",
+        "answer": "312460951952"
+      },
+      {
+        "hour": "2026-10-26T07",
+        "feed": "0x5f4ec3df9cbd43714fe2740f5e3616155c5b8419",
+        "answer": "313032123467"
+      },
+      {
+        "hour": "2026-10-26T08",
+        "feed": "0x5f4ec3df9cbd43714fe2740f5e3616155c5b8419",
+        "answer": "314202300740"
+      },
+      {
+        "hour": "2026-10-26T09",
+        "feed": "0x5f4ec3df9cbd43714fe2740f5e3616155c5b8419",
+        "answer": "313064049075"
+      },
+      {
+        "hour": "2026-10-26T10",
+        "feed": "0x5f4ec3df9cbd43714fe2740f5e3616155c5b8419",
+        "answer": "312719239607"
+      },
+      {
+        "hour": "2026-10-26T11",
+        "feed": "0x5f4ec3df9cbd43714fe2740f5e3616155c5b8419",
+        "answer": "313408566986"
+      },
+      {
+        "hour": "2026-10-26T12",
+        "feed": "0x5f4ec3df9cbd43714fe2740f5e3616155c5b8419",
+        "answer": "312234822144"
+      },
+      {
+        "hour": "2026-10-26T13",
+        "feed": "0x5f4ec3df9cbd43714fe2740f5e3616155c5b8419",
+        "answer": "311521311666"
+      },
+      {
+        "hour": "2026-10-26T14",
+        "feed": "0x5f4ec3df9cbd43714fe2740f5e3616155c5b8419",
+        "answer": "312417283945"
+      },
+      {
+        "hour": "2026-10-26T15",
+        "feed": "0x5f4ec3df9cbd43714fe2740f5e3616155c5b8419",
+        "answer": "311608951298"
+      },
+      {
+        "hour": "2026-10-26T16",
+        "feed": "0x5f4ec3df9cbd43714fe2740f5e3616155c5b8419",
+        "answer": "311067360251"
+      },
+      {
+        "hour": "2026-10-26T17",
+        "feed": "0x5f4ec3df9cbd43714fe2740f5e3616155c5b8419",
+        "answer": "311991293265"
+      },
+      {
+        "hour": "2026-10-26T18",
+        "feed": "0x5f4ec3df9cbd43714fe2740f5e3616155c5b8419",
+        "answer": "312617282090"
+      },
+      {
+        "hour": "2026-10-26T19",
+        "feed": "0x5f4ec3df9cbd43714fe2740f5e3616155c5b8419",
+        "answer": "313712599951"
+      },
+      {
+        "hour": "2026-10-26T20",
+        "feed": "0x5f4ec3df9cbd43714fe2740f5e3616155c5b8419",
+        "answer": "314278499834"
+      },
+      {
+        "hour": "2026-10-26T21",
+        "feed": "0x5f4ec3df9cbd43714fe2740f5e3616155c5b8419",
+        "answer": "313410165027"
+      },
+      {
+        "hour": "2026-10-26T22",
+        "feed": "0x5f4ec3df9cbd43714fe2740f5e3616155c5b8419",
+        "answer": "313315124536"
+      },
+      {
+        "hour": "2026-10-26T23",
+        "feed": "0x5f4ec3df9cbd43714fe2740f5e3616155c5b8419",
+        "answer": "313549143547"
+      },
+      {
+        "hour": "2026-10-27T00",
+        "feed": "0x5f4ec3df9cbd43714fe2740f5e3616155c5b8419",
+        "answer": "313726688514"
+      },
+      {
+        "hour": "2026-10-27T01",
+        "feed": "0x5f4ec3df9cbd43714fe2740f5e3616155c5b8419",
+        "answer": "313507593179"
+      },
+      {
+        "hour": "2026-10-27T02",
+        "feed": "0x5f4ec3df9cbd43714fe2740f5e3616155c5b8419",
+        "answer": "312890212495"
+      },
+      {
+        "hour": "2026-10-27T03",
+        "feed": "0x5f4ec3df9cbd43714fe2740f5e3616155c5b8419",
+        "answer": "313184204527"
+      },
+      {
+        "hour": "2026-10-27T04",
+        "feed": "0x5f4ec3df9cbd43714fe2740f5e3616155c5b8419",
+        "answer": "313072612620"
+      },
+      {
+        "hour": "2026-10-27T05",
+        "feed": "0x5f4ec3df9cbd43714fe2740f5e3616155c5b8419",
+        "answer": "311938578928"
+      },
+      {
+        "hour": "2026-10-27T06",
+        "feed": "0x5f4ec3df9cbd43714fe2740f5e3616155c5b8419",
+        "answer": "312584806859"
+      },
+      {
+        "hour": "2026-10-27T07",
+        "feed": "0x5f4ec3df9cbd43714fe2740f5e3616155c5b8419",
+        "answer": "311677949775"
+      },
+      {
+        "hour": "2026-10-27T08",
+        "feed": "0x5f4ec3df9cbd43714fe2740f5e3616155c5b8419",
+        "answer": "310519932502"
+      },
+      {
+        "hour": "2026-10-27T09",
+        "feed": "0x5f4ec3df9cbd43714fe2740f5e3616155c5b8419",
+        "answer": "310997141641"
+      },
+      {
+        "hour": "2026-10-27T10",
+        "feed": "0x5f4ec3df9cbd43714fe2740f5e3616155c5b8419",
+        "answer": "310749815238"
+      },
+      {
+        "hour": "2026-10-27T11",
+        "feed": "0x5f4ec3df9cbd43714fe2740f5e3616155c5b8419",
+        "answer": "310955277866"
+      },
+      {
+        "hour": "2026-10-27T12",
+        "feed": "0x5f4ec3df9cbd43714fe2740f5e3616155c5b8419",
+        "answer": "310407115953"
+      },
+      {
+        "hour": "2026-10-27T13",
+        "feed": "0x5f4ec3df9cbd43714fe2740f5e3616155c5b8419",
+        "answer": "311635870921"
+      },
+      {
+        "hour": "2026-10-27T14",
+        "feed": "0x5f4ec3df9cbd43714fe2740f5e3616155c5b8419",
+        "answer": "310745672401"
+      },
+      {
+        "hour": "2026-10-27T15",
+        "feed": "0x5f4ec3df9cbd43714fe2740f5e3616155c5b8419",
+        "answer": "309911364339"
+      },
+      {
+        "hour": "2026-10-27T16",
+        "feed": "0x5f4ec3df9cbd43714fe2740f5e3616155c5b8419",
+        "answer": "308771637169"
+      },
+      {
+        "hour": "2026-10-27T17",
+        "feed": "0x5f4ec3df9cbd43714fe2740f5e3616155c5b8419",
+        "answer": "308810707526"
+      },
+      {
+        "hour": "2026-10-27T18",
+        "feed": "0x5f4ec3df9cbd43714fe2740f5e3616155c5b8419",
+        "answer": "308262580501"
+      },
+      {
+        "hour": "2026-10-27T19",
+        "feed": "0x5f4ec3df9cbd43714fe2740f5e3616155c5b8419",
+        "answer": "307828411071"
+      },
+      {
+        "hour": "2026-10-27T20",
+        "feed": "0x5f4ec3df9cbd43714fe2740f5e3616155c5b8419",
+        "answer": "308400419646"
+      },
+      {
+        "hour": "2026-10-27T21",
+        "feed": "0x5f4ec3df9cbd43714fe2740f5e3616155c5b8419",
+        "answer": "308429586112"
+      },
+      {
+        "hour": "2026-10-27T22",
+        "feed": "0x5f4ec3df9cbd43714fe2740f5e3616155c5b8419",
+        "answer": "307695459945"
+      },
+      {
+        "hour": "2026-10-27T23",
+        "feed": "0x5f4ec3df9cbd43714fe2740f5e3616155c5b8419",
+        "answer": "307799072487"
+      },
+      {
+        "hour": "2026-10-28T00",
+        "feed": "0x5f4ec3df9cbd43714fe2740f5e3616155c5b8419",
+        "answer": "307048143356"
+      },
+      {
+        "hour": "2026-10-28T01",
+        "feed": "0x5f4ec3df9cbd43714fe2740f5e3616155c5b8419",
+        "answer": "307339197601"
+      },
+      {
+        "hour": "2026-10-28T02",
+        "feed": "0x5f4ec3df9cbd43714fe2740f5e3616155c5b8419",
+        "answer": "307056374324"
+      },
+      {
+        "hour": "2026-10-28T03",
+        "feed": "0x5f4ec3df9cbd43714fe2740f5e3616155c5b8419",
+        "answer": "306194587418"
+      },
+      {
+        "hour": "2026-10-28T04",
+        "feed": "0x5f4ec3df9cbd43714fe2740f5e3616155c5b8419",
+        "answer": "305136636108"
+      },
+      {
+        "hour": "2026-10-28T05",
+        "feed": "0x5f4ec3df9cbd43714fe2740f5e3616155c5b8419",
+        "answer": "305620301478"
+      },
+      {
+        "hour": "2026-10-28T06",
+        "feed": "0x5f4ec3df9cbd43714fe2740f5e3616155c5b8419",
+        "answer": "306797335695"
+      },
+      {
+        "hour": "2026-10-28T07",
+        "feed": "0x5f4ec3df9cbd43714fe2740f5e3616155c5b8419",
+        "answer": "305635932181"
+      },
+      {
+        "hour": "2026-10-28T08",
+        "feed": "0x5f4ec3df9cbd43714fe2740f5e3616155c5b8419",
+        "answer": "305042117027"
+      },
+      {
+        "hour": "2026-10-28T09",
+        "feed": "0x5f4ec3df9cbd43714fe2740f5e3616155c5b8419",
+        "answer": "304720273103"
+      },
+      {
+        "hour": "2026-10-28T10",
+        "feed": "0x5f4ec3df9cbd43714fe2740f5e3616155c5b8419",
+        "answer": "305444490111"
+      },
+      {
+        "hour": "2026-10-28T11",
+        "feed": "0x5f4ec3df9cbd43714fe2740f5e3616155c5b8419",
+        "answer": "305057955440"
+      },
+      {
+        "hour": "2026-10-28T12",
+        "feed": "0x5f4ec3df9cbd43714fe2740f5e3616155c5b8419",
+        "answer": "304616352133"
+      },
+      {
+        "hour": "2026-10-28T13",
+        "feed": "0x5f4ec3df9cbd43714fe2740f5e3616155c5b8419",
+        "answer": "305775099821"
+      },
+      {
+        "hour": "2026-10-28T14",
+        "feed": "0x5f4ec3df9cbd43714fe2740f5e3616155c5b8419",
+        "answer": "305900414795"
+      },
+      {
+        "hour": "2026-10-28T15",
+        "feed": "0x5f4ec3df9cbd43714fe2740f5e3616155c5b8419",
+        "answer": "306397349284"
+      },
+      {
+        "hour": "2026-10-28T16",
+        "feed": "0x5f4ec3df9cbd43714fe2740f5e3616155c5b8419",
+        "answer": "307240835610"
+      },
+      {
+        "hour": "2026-10-28T17",
+        "feed": "0x5f4ec3df9cbd43714fe2740f5e3616155c5b8419",
+        "answer": "306094540367"
+      },
+      {
+        "hour": "2026-10-28T18",
+        "feed": "0x5f4ec3df9cbd43714fe2740f5e3616155c5b8419",
+        "answer": "306453042979"
+      },
+      {
+        "hour": "2026-10-28T19",
+        "feed": "0x5f4ec3df9cbd43714fe2740f5e3616155c5b8419",
+        "answer": "306163008065"
+      },
+      {
+        "hour": "2026-10-28T20",
+        "feed": "0x5f4ec3df9cbd43714fe2740f5e3616155c5b8419",
+        "answer": "305338390980"
+      },
+      {
+        "hour": "2026-10-28T21",
+        "feed": "0x5f4ec3df9cbd43714fe2740f5e3616155c5b8419",
+        "answer": "305060673747"
+      },
+      {
+        "hour": "2026-10-28T22",
+        "feed": "0x5f4ec3df9cbd43714fe2740f5e3616155c5b8419",
+        "answer": "306026665888"
+      },
+      {
+        "hour": "2026-10-28T23",
+        "feed": "0x5f4ec3df9cbd43714fe2740f5e3616155c5b8419",
+        "answer": "305991272451"
+      },
+      {
+        "hour": "2026-10-29T00",
+        "feed": "0x5f4ec3df9cbd43714fe2740f5e3616155c5b8419",
+        "answer": "307114976679"
+      },
+      {
+        "hour": "2026-10-29T01",
+        "feed": "0x5f4ec3df9cbd43714fe2740f5e3616155c5b8419",
+        "answer": "307397522163"
+      },
+      {
+        "hour": "2026-10-29T02",
+        "feed": "0x5f4ec3df9cbd43714fe2740f5e3616155c5b8419",
+        "answer": "308410336806"
+      },
+      {
+        "hour": "2026-10-29T03",
+        "feed": "0x5f4ec3df9cbd43714fe2740f5e3616155c5b8419",
+        "answer": "307739737916"
+      },
+      {
+        "hour": "2026-10-29T04",
+        "feed": "0x5f4ec3df9cbd43714fe2740f5e3616155c5b8419",
+        "answer": "308003393189"
+      },
+      {
+        "hour": "2026-10-29T05",
+        "feed": "0x5f4ec3df9cbd43714fe2740f5e3616155c5b8419",
+        "answer": "307892448311"
+      },
+      {
+        "hour": "2026-10-29T06",
+        "feed": "0x5f4ec3df9cbd43714fe2740f5e3616155c5b8419",
+        "answer": "306928775067"
+      },
+      {
+        "hour": "2026-10-29T07",
+        "feed": "0x5f4ec3df9cbd43714fe2740f5e3616155c5b8419",
+        "answer": "307379379338"
+      },
+      {
+        "hour": "2026-10-29T08",
+        "feed": "0x5f4ec3df9cbd43714fe2740f5e3616155c5b8419",
+        "answer": "306957531528"
+      },
+      {
+        "hour": "2026-10-29T09",
+        "feed": "0x5f4ec3df9cbd43714fe2740f5e3616155c5b8419",
+        "answer": "306308665379"
+      },
+      {
+        "hour": "2026-10-29T10",
+        "feed": "0x5f4ec3df9cbd43714fe2740f5e3616155c5b8419",
+        "answer": "306364660861"
+      },
+      {
+        "hour": "2026-10-29T11",
+        "feed": "0x5f4ec3df9cbd43714fe2740f5e3616155c5b8419",
+        "answer": "306771449215"
+      },
+      {
+        "hour": "2026-10-29T12",
+        "feed": "0x5f4ec3df9cbd43714fe2740f5e3616155c5b8419",
+        "answer": "306718913298"
+      },
+      {
+        "hour": "2026-10-29T13",
+        "feed": "0x5f4ec3df9cbd43714fe2740f5e3616155c5b8419",
+        "answer": "306993041137"
+      },
+      {
+        "hour": "2026-10-29T14",
+        "feed": "0x5f4ec3df9cbd43714fe2740f5e3616155c5b8419",
+        "answer": "307982978979"
+      },
+      {
+        "hour": "2026-10-29T15",
+        "feed": "0x5f4ec3df9cbd43714fe2740f5e3616155c5b8419",
+        "answer": "308297824544"
+      },
+      {
+        "hour": "2026-10-29T16",
+        "feed": "0x5f4ec3df9cbd43714fe2740f5e3616155c5b8419",
+        "answer": "308427810159"
+      },
+      {
+        "hour": "2026-10-29T17",
+        "feed": "0x5f4ec3df9cbd43714fe2740f5e3616155c5b8419",
+        "answer": "307436305208"
+      },
+      {
+        "hour": "2026-10-29T18",
+        "feed": "0x5f4ec3df9cbd43714fe2740f5e3616155c5b8419",
+        "answer": "308113505242"
+      },
+      {
+        "hour": "2026-10-29T19",
+        "feed": "0x5f4ec3df9cbd43714fe2740f5e3616155c5b8419",
+        "answer": "308638794503"
+      },
+      {
+        "hour": "2026-10-29T20",
+        "feed": "0x5f4ec3df9cbd43714fe2740f5e3616155c5b8419",
+        "answer": "309218516357"
+      },
+      {
+        "hour": "2026-10-29T21",
+        "feed": "0x5f4ec3df9cbd43714fe2740f5e3616155c5b8419",
+        "answer": "308424228045"
+      },
+      {
+        "hour": "2026-10-29T22",
+        "feed": "0x5f4ec3df9cbd43714fe2740f5e3616155c5b8419",
+        "answer": "308260150116"
+      },
+      {
+        "hour": "2026-10-29T23",
+        "feed": "0x5f4ec3df9cbd43714fe2740f5e3616155c5b8419",
+        "answer": "307915317779"
+      },
+      {
+        "hour": "2026-10-30T00",
+        "feed": "0x5f4ec3df9cbd43714fe2740f5e3616155c5b8419",
+        "answer": "306853377940"
+      },
+      {
+        "hour": "2026-10-30T01",
+        "feed": "0x5f4ec3df9cbd43714fe2740f5e3616155c5b8419",
+        "answer": "305627590863"
+      },
+      {
+        "hour": "2026-10-30T02",
+        "feed": "0x5f4ec3df9cbd43714fe2740f5e3616155c5b8419",
+        "answer": "304552497621"
+      },
+      {
+        "hour": "2026-10-30T03",
+        "feed": "0x5f4ec3df9cbd43714fe2740f5e3616155c5b8419",
+        "answer": "303558107530"
+      },
+      {
+        "hour": "2026-10-30T04",
+        "feed": "0x5f4ec3df9cbd43714fe2740f5e3616155c5b8419",
+        "answer": "303753626556"
+      },
+      {
+        "hour": "2026-10-30T05",
+        "feed": "0x5f4ec3df9cbd43714fe2740f5e3616155c5b8419",
+        "answer": "304774027342"
+      },
+      {
+        "hour": "2026-10-30T06",
+        "feed": "0x5f4ec3df9cbd43714fe2740f5e3616155c5b8419",
+        "answer": "304606383673"
+      },
+      {
+        "hour": "2026-10-30T07",
+        "feed": "0x5f4ec3df9cbd43714fe2740f5e3616155c5b8419",
+        "answer": "304327193382"
+      },
+      {
+        "hour": "2026-10-30T08",
+        "feed": "0x5f4ec3df9cbd43714fe2740f5e3616155c5b8419",
+        "answer": "305364969443"
+      },
+      {
+        "hour": "2026-10-30T09",
+        "feed": "0x5f4ec3df9cbd43714fe2740f5e3616155c5b8419",
+        "answer": "305164844072"
+      },
+      {
+        "hour": "2026-10-30T10",
+        "feed": "0x5f4ec3df9cbd43714fe2740f5e3616155c5b8419",
+        "answer": "306152899684"
+      },
+      {
+        "hour": "2026-10-30T11",
+        "feed": "0x5f4ec3df9cbd43714fe2740f5e3616155c5b8419",
+        "answer": "306794284387"
+      },
+      {
+        "hour": "2026-10-30T12",
+        "feed": "0x5f4ec3df9cbd43714fe2740f5e3616155c5b8419",
+        "answer": "306549071484"
+      },
+      {
+        "hour": "2026-10-30T13",
+        "feed": "0x5f4ec3df9cbd43714fe2740f5e3616155c5b8419",
+        "answer": "305691661788"
+      },
+      {
+        "hour": "2026-10-30T14",
+        "feed": "0x5f4ec3df9cbd43714fe2740f5e3616155c5b8419",
+        "answer": "306061560957"
+      },
+      {
+        "hour": "2026-10-30T15",
+        "feed": "0x5f4ec3df9cbd43714fe2740f5e3616155c5b8419",
+        "answer": "306026627456"
+      },
+      {
+        "hour": "2026-10-30T16",
+        "feed": "0x5f4ec3df9cbd43714fe2740f5e3616155c5b8419",
+        "answer": "305718179911"
+      },
+      {
+        "hour": "2026-10-30T17",
+        "feed": "0x5f4ec3df9cbd43714fe2740f5e3616155c5b8419",
+        "answer": "304847814099"
+      },
+      {
+        "hour": "2026-10-30T18",
+        "feed": "0x5f4ec3df9cbd43714fe2740f5e3616155c5b8419",
+        "answer": "304421539456"
+      },
+      {
+        "hour": "2026-10-30T19",
+        "feed": "0x5f4ec3df9cbd43714fe2740f5e3616155c5b8419",
+        "answer": "304460087501"
+      },
+      {
+        "hour": "2026-10-30T20",
+        "feed": "0x5f4ec3df9cbd43714fe2740f5e3616155c5b8419",
+        "answer": "304463754028"
+      },
+      {
+        "hour": "2026-10-30T21",
+        "feed": "0x5f4ec3df9cbd43714fe2740f5e3616155c5b8419",
+        "answer": "304249666301"
+      },
+      {
+        "hour": "2026-10-30T22",
+        "feed": "0x5f4ec3df9cbd43714fe2740f5e3616155c5b8419",
+        "answer": "304570954770"
+      },
+      {
+        "hour": "2026-10-30T23",
+        "feed": "0x5f4ec3df9cbd43714fe2740f5e3616155c5b8419",
+        "answer": "304808772387"
+      },
+      {
+        "hour": "2026-10-31T00",
+        "feed": "0x5f4ec3df9cbd43714fe2740f5e3616155c5b8419",
+        "answer": "304227909182"
+      },
+      {
+        "hour": "2026-10-31T01",
+        "feed": "0x5f4ec3df9cbd43714fe2740f5e3616155c5b8419",
+        "answer": "304219442847"
+      },
+      {
+        "hour": "2026-10-31T02",
+        "feed": "0x5f4ec3df9cbd43714fe2740f5e3616155c5b8419",
+        "answer": "304204635691"
+      },
+      {
+        "hour": "2026-10-31T03",
+        "feed": "0x5f4ec3df9cbd43714fe2740f5e3616155c5b8419",
+        "answer": "304539745828"
+      },
+      {
+        "hour": "2026-10-31T04",
+        "feed": "0x5f4ec3df9cbd43714fe2740f5e3616155c5b8419",
+        "answer": "304961274427"
+      },
+      {
+        "hour": "2026-10-31T05",
+        "feed": "0x5f4ec3df9cbd43714fe2740f5e3616155c5b8419",
+        "answer": "305472026095"
+      },
+      {
+        "hour": "2026-10-31T06",
+        "feed": "0x5f4ec3df9cbd43714fe2740f5e3616155c5b8419",
+        "answer": "306126259741"
+      },
+      {
+        "hour": "2026-10-31T07",
+        "feed": "0x5f4ec3df9cbd43714fe2740f5e3616155c5b8419",
+        "answer": "306741889279"
+      },
+      {
+        "hour": "2026-10-31T08",
+        "feed": "0x5f4ec3df9cbd43714fe2740f5e3616155c5b8419",
+        "answer": "306134610050"
+      },
+      {
+        "hour": "2026-10-31T09",
+        "feed": "0x5f4ec3df9cbd43714fe2740f5e3616155c5b8419",
+        "answer": "305117071748"
+      },
+      {
+        "hour": "2026-10-31T10",
+        "feed": "0x5f4ec3df9cbd43714fe2740f5e3616155c5b8419",
+        "answer": "305646982229"
+      },
+      {
+        "hour": "2026-10-31T11",
+        "feed": "0x5f4ec3df9cbd43714fe2740f5e3616155c5b8419",
+        "answer": "305948786606"
+      },
+      {
+        "hour": "2026-10-31T12",
+        "feed": "0x5f4ec3df9cbd43714fe2740f5e3616155c5b8419",
+        "answer": "306076845447"
+      },
+      {
+        "hour": "2026-10-31T13",
+        "feed": "0x5f4ec3df9cbd43714fe2740f5e3616155c5b8419",
+        "answer": "305605899030"
+      },
+      {
+        "hour": "2026-10-31T14",
+        "feed": "0x5f4ec3df9cbd43714fe2740f5e3616155c5b8419",
+        "answer": "306078174632"
+      },
+      {
+        "hour": "2026-10-31T15",
+        "feed": "0x5f4ec3df9cbd43714fe2740f5e3616155c5b8419",
+        "answer": "305033001842"
+      },
+      {
+        "hour": "2026-10-31T16",
+        "feed": "0x5f4ec3df9cbd43714fe2740f5e3616155c5b8419",
+        "answer": "305881804257"
+      },
+      {
+        "hour": "2026-10-31T17",
+        "feed": "0x5f4ec3df9cbd43714fe2740f5e3616155c5b8419",
+        "answer": "304998527153"
+      },
+      {
+        "hour": "2026-10-31T18",
+        "feed": "0x5f4ec3df9cbd43714fe2740f5e3616155c5b8419",
+        "answer": "305550220400"
+      },
+      {
+        "hour": "2026-10-31T19",
+        "feed": "0x5f4ec3df9cbd43714fe2740f5e3616155c5b8419",
+        "answer": "306684758336"
+      },
+      {
+        "hour": "2026-10-31T20",
+        "feed": "0x5f4ec3df9cbd43714fe2740f5e3616155c5b8419",
+        "answer": "307440838845"
+      },
+      {
+        "hour": "2026-10-31T21",
+        "feed": "0x5f4ec3df9cbd43714fe2740f5e3616155c5b8419",
+        "answer": "306445287395"
+      },
+      {
+        "hour": "2026-10-31T22",
+        "feed": "0x5f4ec3df9cbd43714fe2740f5e3616155c5b8419",
+        "answer": "307624374847"
+      },
+      {
+        "hour": "2026-10-31T23",
+        "feed": "0x5f4ec3df9cbd43714fe2740f5e3616155c5b8419",
+        "answer": "308483908596"
+      },
+      {
+        "hour": "2026-10-25T00",
+        "feed": "0xf4030086522a5beea4988f8ca5b36dbc97bee88c",
+        "answer": "9823816532012"
+      },
+      {
+        "hour": "2026-10-25T01",
+        "feed": "0xf4030086522a5beea4988f8ca5b36dbc97bee88c",
+        "answer": "9823816532012"
+      },
+      {
+        "hour": "2026-10-25T02",
+        "feed": "0xf4030086522a5beea4988f8ca5b36dbc97bee88c",
+        "answer": "9823816532012"
+      },
+      {
+        "hour": "2026-10-25T03",
+        "feed": "0xf4030086522a5beea4988f8ca5b36dbc97bee88c",
+        "answer": "9823816532012"
+      },
+      {
+        "hour": "2026-10-25T04",
+        "feed": "0xf4030086522a5beea4988f8ca5b36dbc97bee88c",
+        "answer": "9823816532012"
+      },
+      {
+        "hour": "2026-10-25T05",
+        "feed": "0xf4030086522a5beea4988f8ca5b36dbc97bee88c",
+        "answer": "9823816532012"
+      },
+      {
+        "hour": "2026-10-25T06",
+        "feed": "0xf4030086522a5beea4988f8ca5b36dbc97bee88c",
+        "answer": "9823816532012"
+      },
+      {
+        "hour": "2026-10-25T07",
+        "feed": "0xf4030086522a5beea4988f8ca5b36dbc97bee88c",
+        "answer": "9823816532012"
+      },
+      {
+        "hour": "2026-10-25T08",
+        "feed": "0xf4030086522a5beea4988f8ca5b36dbc97bee88c",
+        "answer": "9823816532012"
+      },
+      {
+        "hour": "2026-10-25T09",
+        "feed": "0xf4030086522a5beea4988f8ca5b36dbc97bee88c",
+        "answer": "9823816532012"
+      },
+      {
+        "hour": "2026-10-25T10",
+        "feed": "0xf4030086522a5beea4988f8ca5b36dbc97bee88c",
+        "answer": "9823816532012"
+      },
+      {
+        "hour": "2026-10-25T11",
+        "feed": "0xf4030086522a5beea4988f8ca5b36dbc97bee88c",
+        "answer": "9823816532012"
+      },
+      {
+        "hour": "2026-10-25T12",
+        "feed": "0xf4030086522a5beea4988f8ca5b36dbc97bee88c",
+        "answer": "9823816532012"
+      },
+      {
+        "hour": "2026-10-25T13",
+        "feed": "0xf4030086522a5beea4988f8ca5b36dbc97bee88c",
+        "answer": "9767917213549"
+      },
+      {
+        "hour": "2026-10-25T14",
+        "feed": "0xf4030086522a5beea4988f8ca5b36dbc97bee88c",
+        "answer": "9767917213549"
+      },
+      {
+        "hour": "2026-10-25T15",
+        "feed": "0xf4030086522a5beea4988f8ca5b36dbc97bee88c",
+        "answer": "9767917213549"
+      },
+      {
+        "hour": "2026-10-25T16",
+        "feed": "0xf4030086522a5beea4988f8ca5b36dbc97bee88c",
+        "answer": "9767917213549"
+      },
+      {
+        "hour": "2026-10-25T17",
+        "feed": "0xf4030086522a5beea4988f8ca5b36dbc97bee88c",
+        "answer": "9767917213549"
+      },
+      {
+        "hour": "2026-10-25T18",
+        "feed": "0xf4030086522a5beea4988f8ca5b36dbc97bee88c",
+        "answer": "9767917213549"
+      },
+      {
+        "hour": "2026-10-25T19",
+        "feed": "0xf4030086522a5beea4988f8ca5b36dbc97bee88c",
+        "answer": "9767917213549"
+      },
+      {
+        "hour": "2026-10-25T20",
+        "feed": "0xf4030086522a5beea4988f8ca5b36dbc97bee88c",
+        "answer": "9767917213549"
+      },
+      {
+        "hour": "2026-10-25T21",
+        "feed": "0xf4030086522a5beea4988f8ca5b36dbc97bee88c",
+        "answer": "9707245576494"
+      },
+      {
+        "hour": "2026-10-25T22",
+        "feed": "0xf4030086522a5beea4988f8ca5b36dbc97bee88c",
+        "answer": "9707245576494"
+      },
+      {
+        "hour": "2026-10-25T23",
+        "feed": "0xf4030086522a5beea4988f8ca5b36dbc97bee88c",
+        "answer": "9707245576494"
+      },
+      {
+        "hour": "2026-10-26T00",
+        "feed": "0xf4030086522a5beea4988f8ca5b36dbc97bee88c",
+        "answer": "9707245576494"
+      },
+      {
+        "hour": "2026-10-26T01",
+        "feed": "0xf4030086522a5beea4988f8ca5b36dbc97bee88c",
+        "answer": "9645792570282"
+      },
+      {
+        "hour": "2026-10-26T02",
+        "feed": "0xf4030086522a5beea4988f8ca5b36dbc97bee88c",
+        "answer": "9645792570282"
+      },
+      {
+        "hour": "2026-10-26T03",
+        "feed": "0xf4030086522a5beea4988f8ca5b36dbc97bee88c",
+        "answer": "9645792570282"
+      },
+      {
+        "hour": "2026-10-26T04",
+        "feed": "0xf4030086522a5beea4988f8ca5b36dbc97bee88c",
+        "answer": "9645792570282"
+      },
+      {
+        "hour": "2026-10-26T05",
+        "feed": "0xf4030086522a5beea4988f8ca5b36dbc97bee88c",
+        "answer": "9645792570282"
+      },
+      {
+        "hour": "2026-10-26T06",
+        "feed": "0xf4030086522a5beea4988f8ca5b36dbc97bee88c",
+        "answer": "9645792570282"
+      },
+      {
+        "hour": "2026-10-26T07",
+        "feed": "0xf4030086522a5beea4988f8ca5b36dbc97bee88c",
+        "answer": "9645792570282"
+      },
+      {
+        "hour": "2026-10-26T08",
+        "feed": "0xf4030086522a5beea4988f8ca5b36dbc97bee88c",
+        "answer": "9645792570282"
+      },
+      {
+        "hour": "2026-10-26T09",
+        "feed": "0xf4030086522a5beea4988f8ca5b36dbc97bee88c",
+        "answer": "9645792570282"
+      },
+      {
+        "hour": "2026-10-26T10",
+        "feed": "0xf4030086522a5beea4988f8ca5b36dbc97bee88c",
+        "answer": "9645792570282"
+      },
+      {
+        "hour": "2026-10-26T11",
+        "feed": "0xf4030086522a5beea4988f8ca5b36dbc97bee88c",
+        "answer": "9645792570282"
+      },
+      {
+        "hour": "2026-10-26T12",
+        "feed": "0xf4030086522a5beea4988f8ca5b36dbc97bee88c",
+        "answer": "9696737049514"
+      },
+      {
+        "hour": "2026-10-26T13",
+        "feed": "0xf4030086522a5beea4988f8ca5b36dbc97bee88c",
+        "answer": "9696737049514"
+      },
+      {
+        "hour": "2026-10-26T14",
+        "feed": "0xf4030086522a5beea4988f8ca5b36dbc97bee88c",
+        "answer": "9696737049514"
+      },
+      {
+        "hour": "2026-10-26T15",
+        "feed": "0xf4030086522a5beea4988f8ca5b36dbc97bee88c",
+        "answer": "9623739731621"
+      },
+      {
+        "hour": "2026-10-26T16",
+        "feed": "0xf4030086522a5beea4988f8ca5b36dbc97bee88c",
+        "answer": "9623739731621"
+      },
+      {
+        "hour": "2026-10-26T17",
+        "feed": "0xf4030086522a5beea4988f8ca5b36dbc97bee88c",
+        "answer": "9623739731621"
+      },
+      {
+        "hour": "2026-10-26T18",
+        "feed": "0xf4030086522a5beea4988f8ca5b36dbc97bee88c",
+        "answer": "9623739731621"
+      },
+      {
+        "hour": "2026-10-26T19",
+        "feed": "0xf4030086522a5beea4988f8ca5b36dbc97bee88c",
+        "answer": "9623739731621"
+      },
+      {
+        "hour": "2026-10-26T20",
+        "feed": "0xf4030086522a5beea4988f8ca5b36dbc97bee88c",
+        "answer": "9623739731621"
+      },
+      {
+        "hour": "2026-10-26T21",
+        "feed": "0xf4030086522a5beea4988f8ca5b36dbc97bee88c",
+        "answer": "9682742259379"
+      },
+      {
+        "hour": "2026-10-26T22",
+        "feed": "0xf4030086522a5beea4988f8ca5b36dbc97bee88c",
+        "answer": "9682742259379"
+      },
+      {
+        "hour": "2026-10-26T23",
+        "feed": "0xf4030086522a5beea4988f8ca5b36dbc97bee88c",
+        "answer": "9682742259379"
+      },
+      {
+        "hour": "2026-10-27T00",
+        "feed": "0xf4030086522a5beea4988f8ca5b36dbc97bee88c",
+        "answer": "9682742259379"
+      },
+      {
+        "hour": "2026-10-27T01",
+        "feed": "0xf4030086522a5beea4988f8ca5b36dbc97bee88c",
+        "answer": "9682742259379"
+      },
+      {
+        "hour": "2026-10-27T02",
+        "feed": "0xf4030086522a5beea4988f8ca5b36dbc97bee88c",
+        "answer": "9682742259379"
+      },
+      {
+        "hour": "2026-10-27T03",
+        "feed": "0xf4030086522a5beea4988f8ca5b36dbc97bee88c",
+        "answer": "9682742259379"
+      },
+      {
+        "hour": "2026-10-27T04",
+        "feed": "0xf4030086522a5beea4988f8ca5b36dbc97bee88c",
+        "answer": "9682742259379"
+      },
+      {
+        "hour": "2026-10-27T05",
+        "feed": "0xf4030086522a5beea4988f8ca5b36dbc97bee88c",
+        "answer": "9682742259379"
+      },
+      {
+        "hour": "2026-10-27T06",
+        "feed": "0xf4030086522a5beea4988f8ca5b36dbc97bee88c",
+        "answer": "9682742259379"
+      },
+      {
+        "hour": "2026-10-27T07",
+        "feed": "0xf4030086522a5beea4988f8ca5b36dbc97bee88c",
+        "answer": "9682742259379"
+      },
+      {
+        "hour": "2026-10-27T08",
+        "feed": "0xf4030086522a5beea4988f8ca5b36dbc97bee88c",
+        "answer": "9682742259379"
+      },
+      {
+        "hour": "2026-10-27T09",
+        "feed": "0xf4030086522a5beea4988f8ca5b36dbc97bee88c",
+        "answer": "9682742259379"
+      },
+      {
+        "hour": "2026-10-27T10",
+        "feed": "0xf4030086522a5beea4988f8ca5b36dbc97bee88c",
+        "answer": "9740478955929"
+      },
+      {
+        "hour": "2026-10-27T11",
+        "feed": "0xf4030086522a5beea4988f8ca5b36dbc97bee88c",
+        "answer": "9740478955929"
+      },
+      {
+        "hour": "2026-10-27T12",
+        "feed": "0xf4030086522a5beea4988f8ca5b36dbc97bee88c",
+        "answer": "9740478955929"
+      },
+      {
+        "hour": "2026-10-27T13",
+        "feed": "0xf4030086522a5beea4988f8ca5b36dbc97bee88c",
+        "answer": "9740478955929"
+      },
+      {
+        "hour": "2026-10-27T14",
+        "feed": "0xf4030086522a5beea4988f8ca5b36dbc97bee88c",
+        "answer": "9740478955929"
+      },
+      {
+        "hour": "2026-10-27T15",
+        "feed": "0xf4030086522a5beea4988f8ca5b36dbc97bee88c",
+        "answer": "9740478955929"
+      },
+      {
+        "hour": "2026-10-27T16",
+        "feed": "0xf4030086522a5beea4988f8ca5b36dbc97bee88c",
+        "answer": "9795124832452"
+      },
+      {
+        "hour": "2026-10-27T17",
+        "feed": "0xf4030086522a5beea4988f8ca5b36dbc97bee88c",
+        "answer": "9795124832452"
+      },
+      {
+        "hour": "2026-10-27T18",
+        "feed": "0xf4030086522a5beea4988f8ca5b36dbc97bee88c",
+        "answer": "9795124832452"
+      },
+      {
+        "hour": "2026-10-27T19",
+        "feed": "0xf4030086522a5beea4988f8ca5b36dbc97bee88c",
+        "answer": "9795124832452"
+      },
+      {
+        "hour": "2026-10-27T20",
+        "feed": "0xf4030086522a5beea4988f8ca5b36dbc97bee88c",
+        "answer": "9795124832452"
+      },
+      {
+        "hour": "2026-10-27T21",
+        "feed": "0xf4030086522a5beea4988f8ca5b36dbc97bee88c",
+        "answer": "9795124832452"
+      },
+      {
+        "hour": "2026-10-27T22",
+        "feed": "0xf4030086522a5beea4988f8ca5b36dbc97bee88c",
+        "answer": "9795124832452"
+      },
+      {
+        "hour": "2026-10-27T23",
+        "feed": "0xf4030086522a5beea4988f8ca5b36dbc97bee88c",
+        "answer": "9795124832452"
+      },
+      {
+        "hour": "2026-10-28T00",
+        "feed": "0xf4030086522a5beea4988f8ca5b36dbc97bee88c",
+        "answer": "9795124832452"
+      },
+      {
+        "hour": "2026-10-28T01",
+        "feed": "0xf4030086522a5beea4988f8ca5b36dbc97bee88c",
+        "answer": "9795124832452"
+      },
+      {
+        "hour": "2026-10-28T02",
+        "feed": "0xf4030086522a5beea4988f8ca5b36dbc97bee88c",
+        "answer": "9795124832452"
+      },
+      {
+        "hour": "2026-10-28T03",
+        "feed": "0xf4030086522a5beea4988f8ca5b36dbc97bee88c",
+        "answer": "9795124832452"
+      },
+      {
+        "hour": "2026-10-28T04",
+        "feed": "0xf4030086522a5beea4988f8ca5b36dbc97bee88c",
+        "answer": "9795124832452"
+      },
+      {
+        "hour": "2026-10-28T05",
+        "feed": "0xf4030086522a5beea4988f8ca5b36dbc97bee88c",
+        "answer": "9795124832452"
+      },
+      {
+        "hour": "2026-10-28T06",
+        "feed": "0xf4030086522a5beea4988f8ca5b36dbc97bee88c",
+        "answer": "9795124832452"
+      },
+      {
+        "hour": "2026-10-28T07",
+        "feed": "0xf4030086522a5beea4988f8ca5b36dbc97bee88c",
+        "answer": "9795124832452"
+      },
+      {
+        "hour": "2026-10-28T08",
+        "feed": "0xf4030086522a5beea4988f8ca5b36dbc97bee88c",
+        "answer": "9795124832452"
+      },
+      {
+        "hour": "2026-10-28T09",
+        "feed": "0xf4030086522a5beea4988f8ca5b36dbc97bee88c",
+        "answer": "9795124832452"
+      },
+      {
+        "hour": "2026-10-28T10",
+        "feed": "0xf4030086522a5beea4988f8ca5b36dbc97bee88c",
+        "answer": "9795124832452"
+      },
+      {
+        "hour": "2026-10-28T11",
+        "feed": "0xf4030086522a5beea4988f8ca5b36dbc97bee88c",
+        "answer": "9795124832452"
+      },
+      {
+        "hour": "2026-10-28T12",
+        "feed": "0xf4030086522a5beea4988f8ca5b36dbc97bee88c",
+        "answer": "9795124832452"
+      },
+      {
+        "hour": "2026-10-28T13",
+        "feed": "0xf4030086522a5beea4988f8ca5b36dbc97bee88c",
+        "answer": "9795124832452"
+      },
+      {
+        "hour": "2026-10-28T14",
+        "feed": "0xf4030086522a5beea4988f8ca5b36dbc97bee88c",
+        "answer": "9795124832452"
+      },
+      {
+        "hour": "2026-10-28T15",
+        "feed": "0xf4030086522a5beea4988f8ca5b36dbc97bee88c",
+        "answer": "9795124832452"
+      },
+      {
+        "hour": "2026-10-28T16",
+        "feed": "0xf4030086522a5beea4988f8ca5b36dbc97bee88c",
+        "answer": "9795124832452"
+      },
+      {
+        "hour": "2026-10-28T17",
+        "feed": "0xf4030086522a5beea4988f8ca5b36dbc97bee88c",
+        "answer": "9795124832452"
+      },
+      {
+        "hour": "2026-10-28T18",
+        "feed": "0xf4030086522a5beea4988f8ca5b36dbc97bee88c",
+        "answer": "9795124832452"
+      },
+      {
+        "hour": "2026-10-28T19",
+        "feed": "0xf4030086522a5beea4988f8ca5b36dbc97bee88c",
+        "answer": "9795124832452"
+      },
+      {
+        "hour": "2026-10-28T20",
+        "feed": "0xf4030086522a5beea4988f8ca5b36dbc97bee88c",
+        "answer": "9795124832452"
+      },
+      {
+        "hour": "2026-10-28T21",
+        "feed": "0xf4030086522a5beea4988f8ca5b36dbc97bee88c",
+        "answer": "9795124832452"
+      },
+      {
+        "hour": "2026-10-28T22",
+        "feed": "0xf4030086522a5beea4988f8ca5b36dbc97bee88c",
+        "answer": "9795124832452"
+      },
+      {
+        "hour": "2026-10-28T23",
+        "feed": "0xf4030086522a5beea4988f8ca5b36dbc97bee88c",
+        "answer": "9795124832452"
+      },
+      {
+        "hour": "2026-10-29T00",
+        "feed": "0xf4030086522a5beea4988f8ca5b36dbc97bee88c",
+        "answer": "9795124832452"
+      },
+      {
+        "hour": "2026-10-29T01",
+        "feed": "0xf4030086522a5beea4988f8ca5b36dbc97bee88c",
+        "answer": "9795124832452"
+      },
+      {
+        "hour": "2026-10-29T02",
+        "feed": "0xf4030086522a5beea4988f8ca5b36dbc97bee88c",
+        "answer": "9795124832452"
+      },
+      {
+        "hour": "2026-10-29T03",
+        "feed": "0xf4030086522a5beea4988f8ca5b36dbc97bee88c",
+        "answer": "9795124832452"
+      },
+      {
+        "hour": "2026-10-29T04",
+        "feed": "0xf4030086522a5beea4988f8ca5b36dbc97bee88c",
+        "answer": "9795124832452"
+      },
+      {
+        "hour": "2026-10-29T05",
+        "feed": "0xf4030086522a5beea4988f8ca5b36dbc97bee88c",
+        "answer": "9795124832452"
+      },
+      {
+        "hour": "2026-10-29T06",
+        "feed": "0xf4030086522a5beea4988f8ca5b36dbc97bee88c",
+        "answer": "9863496323938"
+      },
+      {
+        "hour": "2026-10-29T07",
+        "feed": "0xf4030086522a5beea4988f8ca5b36dbc97bee88c",
+        "answer": "9863496323938"
+      },
+      {
+        "hour": "2026-10-29T08",
+        "feed": "0xf4030086522a5beea4988f8ca5b36dbc97bee88c",
+        "answer": "9863496323938"
+      },
+      {
+        "hour": "2026-10-29T09",
+        "feed": "0xf4030086522a5beea4988f8ca5b36dbc97bee88c",
+        "answer": "9863496323938"
+      },
+      {
+        "hour": "2026-10-29T10",
+        "feed": "0xf4030086522a5beea4988f8ca5b36dbc97bee88c",
+        "answer": "9863496323938"
+      },
+      {
+        "hour": "2026-10-29T11",
+        "feed": "0xf4030086522a5beea4988f8ca5b36dbc97bee88c",
+        "answer": "9916270282939"
+      },
+      {
+        "hour": "2026-10-29T12",
+        "feed": "0xf4030086522a5beea4988f8ca5b36dbc97bee88c",
+        "answer": "9916270282939"
+      },
+      {
+        "hour": "2026-10-29T13",
+        "feed": "0xf4030086522a5beea4988f8ca5b36dbc97bee88c",
+        "answer": "9916270282939"
+      },
+      {
+        "hour": "2026-10-29T14",
+        "feed": "0xf4030086522a5beea4988f8ca5b36dbc97bee88c",
+        "answer": "9916270282939"
+      },
+      {
+        "hour": "2026-10-29T15",
+        "feed": "0xf4030086522a5beea4988f8ca5b36dbc97bee88c",
+        "answer": "9916270282939"
+      },
+      {
+        "hour": "2026-10-29T16",
+        "feed": "0xf4030086522a5beea4988f8ca5b36dbc97bee88c",
+        "answer": "9916270282939"
+      },
+      {
+        "hour": "2026-10-29T17",
+        "feed": "0xf4030086522a5beea4988f8ca5b36dbc97bee88c",
+        "answer": "9916270282939"
+      },
+      {
+        "hour": "2026-10-29T18",
+        "feed": "0xf4030086522a5beea4988f8ca5b36dbc97bee88c",
+        "answer": "9916270282939"
+      },
+      {
+        "hour": "2026-10-29T19",
+        "feed": "0xf4030086522a5beea4988f8ca5b36dbc97bee88c",
+        "answer": "9916270282939"
+      },
+      {
+        "hour": "2026-10-29T20",
+        "feed": "0xf4030086522a5beea4988f8ca5b36dbc97bee88c",
+        "answer": "9916270282939"
+      },
+      {
+        "hour": "2026-10-29T21",
+        "feed": "0xf4030086522a5beea4988f8ca5b36dbc97bee88c",
+        "answer": "9916270282939"
+      },
+      {
+        "hour": "2026-10-29T22",
+        "feed": "0xf4030086522a5beea4988f8ca5b36dbc97bee88c",
+        "answer": "9916270282939"
+      },
+      {
+        "hour": "2026-10-29T23",
+        "feed": "0xf4030086522a5beea4988f8ca5b36dbc97bee88c",
+        "answer": "9916270282939"
+      },
+      {
+        "hour": "2026-10-30T00",
+        "feed": "0xf4030086522a5beea4988f8ca5b36dbc97bee88c",
+        "answer": "9970571707707"
+      },
+      {
+        "hour": "2026-10-30T01",
+        "feed": "0xf4030086522a5beea4988f8ca5b36dbc97bee88c",
+        "answer": "9970571707707"
+      },
+      {
+        "hour": "2026-10-30T02",
+        "feed": "0xf4030086522a5beea4988f8ca5b36dbc97bee88c",
+        "answer": "9970571707707"
+      },
+      {
+        "hour": "2026-10-30T03",
+        "feed": "0xf4030086522a5beea4988f8ca5b36dbc97bee88c",
+        "answer": "9970571707707"
+      },
+      {
+        "hour": "2026-10-30T04",
+        "feed": "0xf4030086522a5beea4988f8ca5b36dbc97bee88c",
+        "answer": "9970571707707"
+      },
+      {
+        "hour": "2026-10-30T05",
+        "feed": "0xf4030086522a5beea4988f8ca5b36dbc97bee88c",
+        "answer": "9970571707707"
+      },
+      {
+        "hour": "2026-10-30T06",
+        "feed": "0xf4030086522a5beea4988f8ca5b36dbc97bee88c",
+        "answer": "10025077170247"
+      },
+      {
+        "hour": "2026-10-30T07",
+        "feed": "0xf4030086522a5beea4988f8ca5b36dbc97bee88c",
+        "answer": "10025077170247"
+      },
+      {
+        "hour": "2026-10-30T08",
+        "feed": "0xf4030086522a5beea4988f8ca5b36dbc97bee88c",
+        "answer": "10025077170247"
+      },
+      {
+        "hour": "2026-10-30T09",
+        "feed": "0xf4030086522a5beea4988f8ca5b36dbc97bee88c",
+        "answer": "10025077170247"
+      },
+      {
+        "hour": "2026-10-30T10",
+        "feed": "0xf4030086522a5beea4988f8ca5b36dbc97bee88c",
+        "answer": "10025077170247"
+      },
+      {
+        "hour": "2026-10-30T11",
+        "feed": "0xf4030086522a5beea4988f8ca5b36dbc97bee88c",
+        "answer": "10025077170247"
+      },
+      {
+        "hour": "2026-10-30T12",
+        "feed": "0xf4030086522a5beea4988f8ca5b36dbc97bee88c",
+        "answer": "10025077170247"
+      },
+      {
+        "hour": "2026-10-30T13",
+        "feed": "0xf4030086522a5beea4988f8ca5b36dbc97bee88c",
+        "answer": "10025077170247"
+      },
+      {
+        "hour": "2026-10-30T14",
+        "feed": "0xf4030086522a5beea4988f8ca5b36dbc97bee88c",
+        "answer": "10025077170247"
+      },
+      {
+        "hour": "2026-10-30T15",
+        "feed": "0xf4030086522a5beea4988f8ca5b36dbc97bee88c",
+        "answer": "10025077170247"
+      },
+      {
+        "hour": "2026-10-30T16",
+        "feed": "0xf4030086522a5beea4988f8ca5b36dbc97bee88c",
+        "answer": "10025077170247"
+      },
+      {
+        "hour": "2026-10-30T17",
+        "feed": "0xf4030086522a5beea4988f8ca5b36dbc97bee88c",
+        "answer": "10025077170247"
+      },
+      {
+        "hour": "2026-10-30T18",
+        "feed": "0xf4030086522a5beea4988f8ca5b36dbc97bee88c",
+        "answer": "10025077170247"
+      },
+      {
+        "hour": "2026-10-30T19",
+        "feed": "0xf4030086522a5beea4988f8ca5b36dbc97bee88c",
+        "answer": "10025077170247"
+      },
+      {
+        "hour": "2026-10-30T20",
+        "feed": "0xf4030086522a5beea4988f8ca5b36dbc97bee88c",
+        "answer": "10025077170247"
+      },
+      {
+        "hour": "2026-10-30T21",
+        "feed": "0xf4030086522a5beea4988f8ca5b36dbc97bee88c",
+        "answer": "10025077170247"
+      },
+      {
+        "hour": "2026-10-30T22",
+        "feed": "0xf4030086522a5beea4988f8ca5b36dbc97bee88c",
+        "answer": "10025077170247"
+      },
+      {
+        "hour": "2026-10-30T23",
+        "feed": "0xf4030086522a5beea4988f8ca5b36dbc97bee88c",
+        "answer": "10025077170247"
+      },
+      {
+        "hour": "2026-10-31T00",
+        "feed": "0xf4030086522a5beea4988f8ca5b36dbc97bee88c",
+        "answer": "10025077170247"
+      },
+      {
+        "hour": "2026-10-31T01",
+        "feed": "0xf4030086522a5beea4988f8ca5b36dbc97bee88c",
+        "answer": "10025077170247"
+      },
+      {
+        "hour": "2026-10-31T02",
+        "feed": "0xf4030086522a5beea4988f8ca5b36dbc97bee88c",
+        "answer": "10025077170247"
+      },
+      {
+        "hour": "2026-10-31T03",
+        "feed": "0xf4030086522a5beea4988f8ca5b36dbc97bee88c",
+        "answer": "10025077170247"
+      },
+      {
+        "hour": "2026-10-31T04",
+        "feed": "0xf4030086522a5beea4988f8ca5b36dbc97bee88c",
+        "answer": "9972288452886"
+      },
+      {
+        "hour": "2026-10-31T05",
+        "feed": "0xf4030086522a5beea4988f8ca5b36dbc97bee88c",
+        "answer": "9972288452886"
+      },
+      {
+        "hour": "2026-10-31T06",
+        "feed": "0xf4030086522a5beea4988f8ca5b36dbc97bee88c",
+        "answer": "9972288452886"
+      },
+      {
+        "hour": "2026-10-31T07",
+        "feed": "0xf4030086522a5beea4988f8ca5b36dbc97bee88c",
+        "answer": "9972288452886"
+      },
+      {
+        "hour": "2026-10-31T08",
+        "feed": "0xf4030086522a5beea4988f8ca5b36dbc97bee88c",
+        "answer": "9972288452886"
+      },
+      {
+        "hour": "2026-10-31T09",
+        "feed": "0xf4030086522a5beea4988f8ca5b36dbc97bee88c",
+        "answer": "9972288452886"
+      },
+      {
+        "hour": "2026-10-31T10",
+        "feed": "0xf4030086522a5beea4988f8ca5b36dbc97bee88c",
+        "answer": "9972288452886"
+      },
+      {
+        "hour": "2026-10-31T11",
+        "feed": "0xf4030086522a5beea4988f8ca5b36dbc97bee88c",
+        "answer": "10040742837150"
+      },
+      {
+        "hour": "2026-10-31T12",
+        "feed": "0xf4030086522a5beea4988f8ca5b36dbc97bee88c",
+        "answer": "10040742837150"
+      },
+      {
+        "hour": "2026-10-31T13",
+        "feed": "0xf4030086522a5beea4988f8ca5b36dbc97bee88c",
+        "answer": "10040742837150"
+      },
+      {
+        "hour": "2026-10-31T14",
+        "feed": "0xf4030086522a5beea4988f8ca5b36dbc97bee88c",
+        "answer": "10040742837150"
+      },
+      {
+        "hour": "2026-10-31T15",
+        "feed": "0xf4030086522a5beea4988f8ca5b36dbc97bee88c",
+        "answer": "10040742837150"
+      },
+      {
+        "hour": "2026-10-31T16",
+        "feed": "0xf4030086522a5beea4988f8ca5b36dbc97bee88c",
+        "answer": "9979146831447"
+      },
+      {
+        "hour": "2026-10-31T17",
+        "feed": "0xf4030086522a5beea4988f8ca5b36dbc97bee88c",
+        "answer": "9979146831447"
+      },
+      {
+        "hour": "2026-10-31T18",
+        "feed": "0xf4030086522a5beea4988f8ca5b36dbc97bee88c",
+        "answer": "9979146831447"
+      },
+      {
+        "hour": "2026-10-31T19",
+        "feed": "0xf4030086522a5beea4988f8ca5b36dbc97bee88c",
+        "answer": "9979146831447"
+      },
+      {
+        "hour": "2026-10-31T20",
+        "feed": "0xf4030086522a5beea4988f8ca5b36dbc97bee88c",
+        "answer": "9928173725152"
+      },
+      {
+        "hour": "2026-10-31T21",
+        "feed": "0xf4030086522a5beea4988f8ca5b36dbc97bee88c",
+        "answer": "9928173725152"
+      },
+      {
+        "hour": "2026-10-31T22",
+        "feed": "0xf4030086522a5beea4988f8ca5b36dbc97bee88c",
+        "answer": "9928173725152"
+      },
+      {
+        "hour": "2026-10-31T23",
+        "feed": "0xf4030086522a5beea4988f8ca5b36dbc97bee88c",
+        "answer": "9928173725152"
+      },
+      {
+        "hour": "2026-10-25T00",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "100013444"
+      },
+      {
+        "hour": "2026-10-25T01",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "100013444"
+      },
+      {
+        "hour": "2026-10-25T02",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "100013444"
+      },
+      {
+        "hour": "2026-10-25T03",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "100013444"
+      },
+      {
+        "hour": "2026-10-25T04",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "100013444"
+      },
+      {
+        "hour": "2026-10-25T05",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "100013444"
+      },
+      {
+        "hour": "2026-10-25T06",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "100013444"
+      },
+      {
+        "hour": "2026-10-25T07",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "100013444"
+      },
+      {
+        "hour": "2026-10-25T08",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "100013444"
+      },
+      {
+        "hour": "2026-10-25T09",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "100013444"
+      },
+      {
+        "hour": "2026-10-25T10",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "100013444"
+      },
+      {
+        "hour": "2026-10-25T11",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "100013444"
+      },
+      {
+        "hour": "2026-10-25T12",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "100013444"
+      },
+      {
+        "hour": "2026-10-25T13",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "100013444"
+      },
+      {
+        "hour": "2026-10-25T14",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "100013444"
+      },
+      {
+        "hour": "2026-10-25T15",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "100013444"
+      },
+      {
+        "hour": "2026-10-25T16",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "100013444"
+      },
+      {
+        "hour": "2026-10-25T17",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "100013444"
+      },
+      {
+        "hour": "2026-10-25T18",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "100013444"
+      },
+      {
+        "hour": "2026-10-25T19",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "100013444"
+      },
+      {
+        "hour": "2026-10-25T20",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "100013444"
+      },
+      {
+        "hour": "2026-10-25T21",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "100013444"
+      },
+      {
+        "hour": "2026-10-25T22",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "100013444"
+      },
+      {
+        "hour": "2026-10-25T23",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "100013444"
+      },
+      {
+        "hour": "2026-10-26T00",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "100007436"
+      },
+      {
+        "hour": "2026-10-26T01",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "100007436"
+      },
+      {
+        "hour": "2026-10-26T02",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "100007436"
+      },
+      {
+        "hour": "2026-10-26T03",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "100007436"
+      },
+      {
+        "hour": "2026-10-26T04",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "100007436"
+      },
+      {
+        "hour": "2026-10-26T05",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "100007436"
+      },
+      {
+        "hour": "2026-10-26T06",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "100007436"
+      },
+      {
+        "hour": "2026-10-26T07",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "100007436"
+      },
+      {
+        "hour": "2026-10-26T08",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "100007436"
+      },
+      {
+        "hour": "2026-10-26T09",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "100007436"
+      },
+      {
+        "hour": "2026-10-26T10",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "100007436"
+      },
+      {
+        "hour": "2026-10-26T11",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "100007436"
+      },
+      {
+        "hour": "2026-10-26T12",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "100007436"
+      },
+      {
+        "hour": "2026-10-26T13",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "100007436"
+      },
+      {
+        "hour": "2026-10-26T14",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "100007436"
+      },
+      {
+        "hour": "2026-10-26T15",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "100007436"
+      },
+      {
+        "hour": "2026-10-26T16",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "100007436"
+      },
+      {
+        "hour": "2026-10-26T17",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "100007436"
+      },
+      {
+        "hour": "2026-10-26T18",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "100007436"
+      },
+      {
+        "hour": "2026-10-26T19",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "100007436"
+      },
+      {
+        "hour": "2026-10-26T20",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "100007436"
+      },
+      {
+        "hour": "2026-10-26T21",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "100007436"
+      },
+      {
+        "hour": "2026-10-26T22",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "100007436"
+      },
+      {
+        "hour": "2026-10-26T23",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "100007436"
+      },
+      {
+        "hour": "2026-10-27T00",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "100011697"
+      },
+      {
+        "hour": "2026-10-27T01",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "100011697"
+      },
+      {
+        "hour": "2026-10-27T02",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "100011697"
+      },
+      {
+        "hour": "2026-10-27T03",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "100011697"
+      },
+      {
+        "hour": "2026-10-27T04",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "100011697"
+      },
+      {
+        "hour": "2026-10-27T05",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "100011697"
+      },
+      {
+        "hour": "2026-10-27T06",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "100011697"
+      },
+      {
+        "hour": "2026-10-27T07",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "100011697"
+      },
+      {
+        "hour": "2026-10-27T08",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "100011697"
+      },
+      {
+        "hour": "2026-10-27T09",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "100011697"
+      },
+      {
+        "hour": "2026-10-27T10",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "100011697"
+      },
+      {
+        "hour": "2026-10-27T11",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "100011697"
+      },
+      {
+        "hour": "2026-10-27T12",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "100011697"
+      },
+      {
+        "hour": "2026-10-27T13",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "100011697"
+      },
+      {
+        "hour": "2026-10-27T14",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "100011697"
+      },
+      {
+        "hour": "2026-10-27T15",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "100011697"
+      },
+      {
+        "hour": "2026-10-27T16",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "100011697"
+      },
+      {
+        "hour": "2026-10-27T17",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "100011697"
+      },
+      {
+        "hour": "2026-10-27T18",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "100011697"
+      },
+      {
+        "hour": "2026-10-27T19",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "100011697"
+      },
+      {
+        "hour": "2026-10-27T20",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "100011697"
+      },
+      {
+        "hour": "2026-10-27T21",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "100011697"
+      },
+      {
+        "hour": "2026-10-27T22",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "100011697"
+      },
+      {
+        "hour": "2026-10-27T23",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "100011697"
+      },
+      {
+        "hour": "2026-10-28T00",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "99981205"
+      },
+      {
+        "hour": "2026-10-28T01",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "99981205"
+      },
+      {
+        "hour": "2026-10-28T02",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "99981205"
+      },
+      {
+        "hour": "2026-10-28T03",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "99981205"
+      },
+      {
+        "hour": "2026-10-28T04",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "99981205"
+      },
+      {
+        "hour": "2026-10-28T05",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "99981205"
+      },
+      {
+        "hour": "2026-10-28T06",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "99981205"
+      },
+      {
+        "hour": "2026-10-28T07",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "99981205"
+      },
+      {
+        "hour": "2026-10-28T08",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "99981205"
+      },
+      {
+        "hour": "2026-10-28T09",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "99981205"
+      },
+      {
+        "hour": "2026-10-28T10",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "99981205"
+      },
+      {
+        "hour": "2026-10-28T11",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "99981205"
+      },
+      {
+        "hour": "2026-10-28T12",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "99981205"
+      },
+      {
+        "hour": "2026-10-28T13",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "99981205"
+      },
+      {
+        "hour": "2026-10-28T14",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "99981205"
+      },
+      {
+        "hour": "2026-10-28T15",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "99981205"
+      },
+      {
+        "hour": "2026-10-28T16",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "99981205"
+      },
+      {
+        "hour": "2026-10-28T17",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "99981205"
+      },
+      {
+        "hour": "2026-10-28T18",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "99981205"
+      },
+      {
+        "hour": "2026-10-28T19",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "99981205"
+      },
+      {
+        "hour": "2026-10-28T20",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "99981205"
+      },
+      {
+        "hour": "2026-10-28T21",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "99981205"
+      },
+      {
+        "hour": "2026-10-28T22",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "99981205"
+      },
+      {
+        "hour": "2026-10-28T23",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "99981205"
+      },
+      {
+        "hour": "2026-10-29T00",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "100008291"
+      },
+      {
+        "hour": "2026-10-29T01",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "100008291"
+      },
+      {
+        "hour": "2026-10-29T02",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "100008291"
+      },
+      {
+        "hour": "2026-10-29T03",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "100008291"
+      },
+      {
+        "hour": "2026-10-29T04",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "100008291"
+      },
+      {
+        "hour": "2026-10-29T05",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "100008291"
+      },
+      {
+        "hour": "2026-10-29T06",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "100008291"
+      },
+      {
+        "hour": "2026-10-29T07",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "100008291"
+      },
+      {
+        "hour": "2026-10-29T08",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "100008291"
+      },
+      {
+        "hour": "2026-10-29T09",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "100008291"
+      },
+      {
+        "hour": "2026-10-29T10",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "100008291"
+      },
+      {
+        "hour": "2026-10-29T11",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "100008291"
+      },
+      {
+        "hour": "2026-10-29T12",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "100008291"
+      },
+      {
+        "hour": "2026-10-29T13",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "100008291"
+      },
+      {
+        "hour": "2026-10-29T14",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "100008291"
+      },
+      {
+        "hour": "2026-10-29T15",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "100008291"
+      },
+      {
+        "hour": "2026-10-29T16",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "100008291"
+      },
+      {
+        "hour": "2026-10-29T17",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "100008291"
+      },
+      {
+        "hour": "2026-10-29T18",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "100008291"
+      },
+      {
+        "hour": "2026-10-29T19",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "100008291"
+      },
+      {
+        "hour": "2026-10-29T20",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "100008291"
+      },
+      {
+        "hour": "2026-10-29T21",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "100008291"
+      },
+      {
+        "hour": "2026-10-29T22",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "100008291"
+      },
+      {
+        "hour": "2026-10-29T23",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "100008291"
+      },
+      {
+        "hour": "2026-10-30T00",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "100015337"
+      },
+      {
+        "hour": "2026-10-30T01",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "100015337"
+      },
+      {
+        "hour": "2026-10-30T02",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "100015337"
+      },
+      {
+        "hour": "2026-10-30T03",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "100015337"
+      },
+      {
+        "hour": "2026-10-30T04",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "100015337"
+      },
+      {
+        "hour": "2026-10-30T05",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "100015337"
+      },
+      {
+        "hour": "2026-10-30T06",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "100015337"
+      },
+      {
+        "hour": "2026-10-30T07",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "100015337"
+      },
+      {
+        "hour": "2026-10-30T08",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "100015337"
+      },
+      {
+        "hour": "2026-10-30T09",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "100015337"
+      },
+      {
+        "hour": "2026-10-30T10",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "100015337"
+      },
+      {
+        "hour": "2026-10-30T11",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "100015337"
+      },
+      {
+        "hour": "2026-10-30T12",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "100015337"
+      },
+      {
+        "hour": "2026-10-30T13",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "100015337"
+      },
+      {
+        "hour": "2026-10-30T14",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "100015337"
+      },
+      {
+        "hour": "2026-10-30T15",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "100015337"
+      },
+      {
+        "hour": "2026-10-30T16",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "100015337"
+      },
+      {
+        "hour": "2026-10-30T17",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "100015337"
+      },
+      {
+        "hour": "2026-10-30T18",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "100015337"
+      },
+      {
+        "hour": "2026-10-30T19",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "100015337"
+      },
+      {
+        "hour": "2026-10-30T20",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "100015337"
+      },
+      {
+        "hour": "2026-10-30T21",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "100015337"
+      },
+      {
+        "hour": "2026-10-30T22",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "100015337"
+      },
+      {
+        "hour": "2026-10-30T23",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "100015337"
+      },
+      {
+        "hour": "2026-10-31T00",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "99995041"
+      },
+      {
+        "hour": "2026-10-31T01",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "99995041"
+      },
+      {
+        "hour": "2026-10-31T02",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "99995041"
+      },
+      {
+        "hour": "2026-10-31T03",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "99995041"
+      },
+      {
+        "hour": "2026-10-31T04",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "99995041"
+      },
+      {
+        "hour": "2026-10-31T05",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "99995041"
+      },
+      {
+        "hour": "2026-10-31T06",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "99995041"
+      },
+      {
+        "hour": "2026-10-31T07",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "99995041"
+      },
+      {
+        "hour": "2026-10-31T08",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "99995041"
+      },
+      {
+        "hour": "2026-10-31T09",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "99995041"
+      },
+      {
+        "hour": "2026-10-31T10",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "99995041"
+      },
+      {
+        "hour": "2026-10-31T11",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "99995041"
+      },
+      {
+        "hour": "2026-10-31T12",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "99995041"
+      },
+      {
+        "hour": "2026-10-31T13",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "99995041"
+      },
+      {
+        "hour": "2026-10-31T14",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "99995041"
+      },
+      {
+        "hour": "2026-10-31T15",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "99995041"
+      },
+      {
+        "hour": "2026-10-31T16",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "99995041"
+      },
+      {
+        "hour": "2026-10-31T17",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "99995041"
+      },
+      {
+        "hour": "2026-10-31T18",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "99995041"
+      },
+      {
+        "hour": "2026-10-31T19",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "99995041"
+      },
+      {
+        "hour": "2026-10-31T20",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "99995041"
+      },
+      {
+        "hour": "2026-10-31T21",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "99995041"
+      },
+      {
+        "hour": "2026-10-31T22",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "99995041"
+      },
+      {
+        "hour": "2026-10-31T23",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "99995041"
+      }
+    ]
+  }
+}
