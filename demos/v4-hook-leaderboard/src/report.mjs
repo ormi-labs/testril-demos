@@ -14,8 +14,31 @@ const listedHooks = 12;
 const chartedHooks = 10;
 
 const sum = (values) => values.reduce((total, value) => total + value, 0n);
+const compareBigIntDesc = (a, b) => (a > b ? -1 : a < b ? 1 : 0);
 
-function volumeDays() {
+function lowercased(rows) {
+  return {
+    ...rows,
+    pools: rows.pools.map((pool) => ({
+      ...pool,
+      currency0: pool.currency0.toLowerCase(),
+      currency1: pool.currency1.toLowerCase(),
+      hooks: pool.hooks.toLowerCase(),
+    })),
+    "arrakis-hooks": rows["arrakis-hooks"].map((row) => ({
+      ...row,
+      hook: row.hook.toLowerCase(),
+    })),
+  };
+}
+
+function stablecoinSide(pool) {
+  if (stablecoins.has(pool.currency0)) return "volume0";
+  if (stablecoins.has(pool.currency1)) return "volume1";
+  return null;
+}
+
+export function volumeDays() {
   const days = [];
   for (
     let day = Date.parse(`${volumeWindow.from_day}T00:00:00Z`);
@@ -27,9 +50,8 @@ function volumeDays() {
 }
 
 function stablecoinVolume(pool, row) {
-  if (stablecoins.has(pool.currency0)) return BigInt(row.volume0);
-  if (stablecoins.has(pool.currency1)) return BigInt(row.volume1);
-  return 0n;
+  const side = stablecoinSide(pool);
+  return side ? BigInt(row[side]) : 0n;
 }
 
 function poolTotals(rows) {
@@ -61,11 +83,22 @@ export function hookTotals(rows) {
     hooks.set(pool.hooks, hook);
   }
   return [...hooks.values()].sort((a, b) =>
-    b.swaps > a.swaps ? 1 : b.swaps < a.swaps ? -1 : 0,
+    compareBigIntDesc(a.swaps, b.swaps),
   );
 }
 
-export function check(rows) {
+function volumeSummedPerRow(rows) {
+  const pools = new Map(rows.pools.map((pool) => [pool.pool, pool]));
+  return sum(
+    rows.volume.map((row) => {
+      const side = stablecoinSide(pools.get(row.pool));
+      return side ? BigInt(row[side]) : 0n;
+    }),
+  );
+}
+
+export function check(listed) {
+  const rows = lowercased(listed);
   const known = new Set(rows.pools.map((pool) => pool.pool));
   const unknown = rows.volume.find((row) => !known.has(row.pool));
   if (unknown)
@@ -81,21 +114,27 @@ export function check(rows) {
     throw new Error(
       `Hooks add up to ${hookSwaps} swaps, but the pools' volume rows total ${totalSwaps}.`,
     );
+  const hookVolume = sum(hooks.map((hook) => hook.volume));
+  const rowVolume = volumeSummedPerRow(rows);
+  if (hookVolume !== rowVolume)
+    throw new Error(
+      `Hooks add up to ${hookVolume} stablecoin units, but the volume rows total ${rowVolume}.`,
+    );
+  const arrakisHooks = arrakisHookSet(rows);
+  if (arrakisHooks.has(zeroAddress))
+    throw new Error("The Arrakis hook list contains the zero address.");
+  const mislabelled = hooks.find(
+    (hook) =>
+      (hookLabel(hook.hook, arrakisHooks) === "No hook") !==
+      (hook.hook === zeroAddress),
+  );
+  if (mislabelled)
+    throw new Error(`Hook ${mislabelled.hook} has the wrong No hook label.`);
   const unhooked = hooks.find((hook) => hook.hook === zeroAddress);
-  const unhookedPools = new Set(
-    rows.pools
-      .filter((pool) => pool.hooks === zeroAddress)
-      .map((pool) => pool.pool),
-  );
-  const activeUnhooked = new Set(
-    rows.volume.filter((row) => unhookedPools.has(row.pool)).map((r) => r.pool),
-  );
-  if ((unhooked?.pools ?? 0n) !== BigInt(activeUnhooked.size))
-    throw new Error("Pools without a hook are not all counted as No hook.");
   return [
     `All ${new Set(rows.volume.map((row) => row.pool)).size} pools with volume are in pool_list`,
     `Hooks add up to ${hookSwaps} swaps, the same as the volume rows`,
-    `${activeUnhooked.size} pools at the zero address are shown as No hook`,
+    `${unhooked?.pools ?? 0n} pools at the zero address are shown as No hook`,
   ];
 }
 
@@ -105,18 +144,23 @@ const grouped = (value) => value.toLocaleString("en-US");
 export function formatCompact(raw) {
   if (raw === 0n) return "—";
   const dollars = Number(raw / stablecoinDecimals);
+  if (dollars < 1e3) return `$${dollars}`;
   const [scale, suffix] =
     dollars >= 1e9 ? [1e9, "B"] : dollars >= 1e6 ? [1e6, "M"] : [1e3, "K"];
   return `$${(dollars / scale).toFixed(2)}${suffix}`;
 }
+
+const arrakisHookSet = (rows) =>
+  new Set(rows["arrakis-hooks"].map((row) => row.hook));
 
 function hookLabel(hook, arrakisHooks) {
   if (hook === zeroAddress) return "No hook";
   return arrakisHooks.has(hook) ? "Arrakis" : "Unlabelled";
 }
 
-export function shape(rows) {
-  const arrakisHooks = new Set(rows["arrakis-hooks"].map((row) => row.hook));
+export function shape(listed) {
+  const rows = lowercased(listed);
+  const arrakisHooks = arrakisHookSet(rows);
   const hooks = hookTotals(rows);
   const totalSwaps = sum(hooks.map((hook) => hook.swaps));
   const hooked = hooks.filter((hook) => hook.hook !== zeroAddress);
@@ -128,7 +172,10 @@ export function shape(rows) {
     manager,
     totalSwaps: grouped(totalSwaps),
     totalVolume: formatCompact(sum(hooks.map((hook) => hook.volume))),
-    hookedShare: `${((Number(hookedSwaps) / Number(totalSwaps)) * 100).toFixed(1)}%`,
+    hookedShare:
+      totalSwaps === 0n
+        ? "—"
+        : `${((Number(hookedSwaps) / Number(totalSwaps)) * 100).toFixed(1)}%`,
     hookCount: String(hooked.length),
     arrakisCount: String(arrakis.length),
     arrakisSwaps: grouped(sum(arrakis.map((hook) => hook.swaps))),

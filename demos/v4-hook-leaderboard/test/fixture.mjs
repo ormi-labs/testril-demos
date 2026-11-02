@@ -1,7 +1,13 @@
 import { writeFile } from "node:fs/promises";
 import { pathToFileURL } from "node:url";
 import spec from "../testril.json" with { type: "json" };
-import { poolsWindow, usdc, usdt, zeroAddress } from "../src/report.mjs";
+import {
+  poolsWindow,
+  usdc,
+  usdt,
+  volumeDays,
+  zeroAddress,
+} from "../src/report.mjs";
 
 const recordedAt = "2026-11-02T00:00:00.000Z";
 const weth = "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2";
@@ -19,9 +25,7 @@ const pairs = [
 ];
 const poolCount = 90;
 const activePools = 34;
-const days = ["25", "26", "27", "28", "29", "30", "31", "01"].map(
-  (day, index) => `${index === 7 ? "2026-11" : "2026-10"}-${day}`,
-);
+const days = volumeDays();
 
 function seeded(seed) {
   let state = seed;
@@ -44,7 +48,7 @@ function poolRows(random, hooks) {
   ];
   const span = poolsWindow.to_block - poolsWindow.from_block;
   return Array.from({ length: poolCount }, (_, index) => {
-    const [currency0, currency1] = pairs[index % pairs.length];
+    const [currency0, currency1] = [...pairs[index % pairs.length]].sort();
     return {
       block: poolsWindow.from_block + Math.floor((index / poolCount) * span),
       pool: `0x${hex(random, 64)}`,

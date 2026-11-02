@@ -1,6 +1,12 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { check, hookTotals, shape, zeroAddress } from "../src/report.mjs";
+import {
+  check,
+  formatCompact,
+  hookTotals,
+  shape,
+  zeroAddress,
+} from "../src/report.mjs";
 import { fixture } from "./fixture.mjs";
 
 const rows = () => structuredClone(fixture().rows);
@@ -57,4 +63,27 @@ test("stablecoin volume reads the stablecoin side of each pool", () => {
   assert.notEqual(row.volume0, row.volume1);
   const totals = hookTotals({ ...data, pools: [pool], volume: [row] });
   assert.equal(totals[0].volume, BigInt(row.volume1));
+});
+
+test("check fails when the Arrakis hook list contains the zero address", () => {
+  const corrupted = rows();
+  corrupted["arrakis-hooks"][0].hook = zeroAddress;
+  assert.throws(() => check(corrupted), /zero address/);
+});
+
+test("checksummed addresses give the same report as lowercase ones", () => {
+  const shouted = rows();
+  for (const pool of shouted.pools) {
+    pool.currency0 = pool.currency0.toUpperCase().replace("0X", "0x");
+    pool.currency1 = pool.currency1.toUpperCase().replace("0X", "0x");
+    pool.hooks = pool.hooks.toUpperCase().replace("0X", "0x");
+  }
+  for (const row of shouted["arrakis-hooks"])
+    row.hook = row.hook.toUpperCase().replace("0X", "0x");
+  assert.deepEqual(shape(shouted), shape(rows()));
+});
+
+test("compact amounts under a thousand dollars are not shown as thousandths", () => {
+  assert.equal(formatCompact(250_000_000n), "$250");
+  assert.equal(formatCompact(1_500_000_000n), "$1.50K");
 });

@@ -36,7 +36,7 @@
       "function_slug": "arrakis.hook_list",
       "chain_id": 1,
       "params": {
-        "factory": "0x0000000000000000000000000000000000a44a15"
+        "factory": "VERIFY_ARRAKIS_HOOK_FACTORY_BEFORE_RECORDING"
       },
       "window": {
         "from_block": 21688329,

@@ -44,8 +44,8 @@
       {
         "block": 21739829,
         "pool": "0xf626a8503968181245009a79dc5f3fb4ed43ac8c6a2cb7967b4694f97ec8faa0",
-        "currency0": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
-        "currency1": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        "currency0": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        "currency1": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
         "fee": "500",
         "tick_spacing": "10",
         "hooks": "0x0000000000000000000000000000000000000000"
@@ -80,8 +80,8 @@
       {
         "block": 21945831,
         "pool": "0x7ec9d1bb9d3f555ca02f8810ad3a57d6e79d6668348cd32e7d98a9d47377de82",
-        "currency0": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
-        "currency1": "0x2260fac5e5542a773aa44fbcfedf7c193bc2c599",
+        "currency0": "0x2260fac5e5542a773aa44fbcfedf7c193bc2c599",
+        "currency1": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
         "fee": "500",
         "tick_spacing": "60",
         "hooks": "0x3451bd1b13c4558a67a62bc042905ecbf05c03d2"
@@ -116,8 +116,8 @@
       {
         "block": 22151832,
         "pool": "0xfee604e91519d953b419154fa653875b1f8ff53957ad0f2614a0c1816d25e86d",
-        "currency0": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
-        "currency1": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        "currency0": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        "currency1": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
         "fee": "500",
         "tick_spacing": "1",
         "hooks": "0x0000000000000000000000000000000000000000"
@@ -152,8 +152,8 @@
       {
         "block": 22357834,
         "pool": "0xf25a2964da33f4551bf16de700b21c7c90a9ad00f1be452a67ca6b9b82d594b1",
-        "currency0": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
-        "currency1": "0x2260fac5e5542a773aa44fbcfedf7c193bc2c599",
+        "currency0": "0x2260fac5e5542a773aa44fbcfedf7c193bc2c599",
+        "currency1": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
         "fee": "500",
         "tick_spacing": "10",
         "hooks": "0x4dcfb279964970c20b694f220845b83839621bf0"
@@ -188,8 +188,8 @@
       {
         "block": 22563835,
         "pool": "0x283b18ccded3356b138ef8dff06e8a0a3a33c65fc17f0c603ce4b9db07c136bb",
-        "currency0": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
-        "currency1": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        "currency0": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        "currency1": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
         "fee": "500",
         "tick_spacing": "60",
         "hooks": "0x10019e66e6ec62a7525886a9477aabcc41b984b1"
@@ -224,8 +224,8 @@
       {
         "block": 22769837,
         "pool": "0x381ae7cff78b4c47f3d041407758b34504152bab136f951bf39c11c34f788147",
-        "currency0": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
-        "currency1": "0x2260fac5e5542a773aa44fbcfedf7c193bc2c599",
+        "currency0": "0x2260fac5e5542a773aa44fbcfedf7c193bc2c599",
+        "currency1": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
         "fee": "500",
         "tick_spacing": "1",
         "hooks": "0x8dc74d1ec6a0efe7bae592016adee654c430356b"
@@ -260,8 +260,8 @@
       {
         "block": 22975839,
         "pool": "0xb316e67e8e4e87b19530fea29c51301d0acd33d5fa3ed30544f4334c5652eabf",
-        "currency0": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
-        "currency1": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        "currency0": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        "currency1": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
         "fee": "500",
         "tick_spacing": "10",
         "hooks": "0xfb3ad300a989cea6acb18f13bed50afff6357a67"
@@ -296,8 +296,8 @@
       {
         "block": 23181840,
         "pool": "0xb7518d80487f6f5b71038a650e44e2e0ffdfe26a0053483288539db917c48753",
-        "currency0": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
-        "currency1": "0x2260fac5e5542a773aa44fbcfedf7c193bc2c599",
+        "currency0": "0x2260fac5e5542a773aa44fbcfedf7c193bc2c599",
+        "currency1": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
         "fee": "500",
         "tick_spacing": "60",
         "hooks": "0xd2bfc1fd364f282ae91c00f82602823452aa725b"
@@ -332,8 +332,8 @@
       {
         "block": 23387842,
         "pool": "0xae2abc48559ea899039ef4d85821ed5900bbee8280a9c1badb7be385879ec63d",
-        "currency0": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
-        "currency1": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        "currency0": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        "currency1": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
         "fee": "500",
         "tick_spacing": "1",
         "hooks": "0x0000000000000000000000000000000000000000"
@@ -368,8 +368,8 @@
       {
         "block": 23593843,
         "pool": "0x7828ec1606409ce898c4f17f8280eb2e32b1a257955fb595021f5c8f7ae8d914",
-        "currency0": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
-        "currency1": "0x2260fac5e5542a773aa44fbcfedf7c193bc2c599",
+        "currency0": "0x2260fac5e5542a773aa44fbcfedf7c193bc2c599",
+        "currency1": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
         "fee": "500",
         "tick_spacing": "10",
         "hooks": "0xfb3ad300a989cea6acb18f13bed50afff6357a67"
@@ -404,8 +404,8 @@
       {
         "block": 23799845,
         "pool": "0xc9e02147ea726d2743f5846206d261dc3259796ea133f96f9a2234f1c44c4751",
-        "currency0": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
-        "currency1": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        "currency0": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        "currency1": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
         "fee": "500",
         "tick_spacing": "60",
         "hooks": "0x0000000000000000000000000000000000000000"
@@ -440,8 +440,8 @@
       {
         "block": 24005847,
         "pool": "0x9d896147190cd2b156fcf7c2001fc6cbf0e553624ea1d584ba657a7f45466f0a",
-        "currency0": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
-        "currency1": "0x2260fac5e5542a773aa44fbcfedf7c193bc2c599",
+        "currency0": "0x2260fac5e5542a773aa44fbcfedf7c193bc2c599",
+        "currency1": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
         "fee": "500",
         "tick_spacing": "1",
         "hooks": "0x45c55f8bd0a626e7f9e3971a538a79ea81cbb265"
@@ -476,8 +476,8 @@
       {
         "block": 24211848,
         "pool": "0xc675207243df9e7a631bc579e29ab1e0302086e394b3703180c977495b6da8af",
-        "currency0": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
-        "currency1": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        "currency0": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        "currency1": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
         "fee": "500",
         "tick_spacing": "10",
         "hooks": "0x10019e66e6ec62a7525886a9477aabcc41b984b1"
@@ -512,8 +512,8 @@
       {
         "block": 24417850,
         "pool": "0x29850c4dc1cacfdc03052cf4307cfd9955126acbfca38a4741579e4ddbf9d418",
-        "currency0": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
-        "currency1": "0x2260fac5e5542a773aa44fbcfedf7c193bc2c599",
+        "currency0": "0x2260fac5e5542a773aa44fbcfedf7c193bc2c599",
+        "currency1": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
         "fee": "500",
         "tick_spacing": "60",
         "hooks": "0xfb3ad300a989cea6acb18f13bed50afff6357a67"
@@ -548,8 +548,8 @@
       {
         "block": 24623851,
         "pool": "0xc1289408a00f81d208e613b710bb206beecae3970ef75a8cbdb6a4fef6b43d4c",
-        "currency0": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
-        "currency1": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        "currency0": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        "currency1": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
         "fee": "500",
         "tick_spacing": "1",
         "hooks": "0x3451bd1b13c4558a67a62bc042905ecbf05c03d2"
@@ -584,8 +584,8 @@
       {
         "block": 24829853,
         "pool": "0x7d52abb4b30b3d6cde9d2da2acdb93ccb93980f425f64bd5b8d96f5cdb67bf8c",
-        "currency0": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
-        "currency1": "0x2260fac5e5542a773aa44fbcfedf7c193bc2c599",
+        "currency0": "0x2260fac5e5542a773aa44fbcfedf7c193bc2c599",
+        "currency1": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
         "fee": "500",
         "tick_spacing": "10",
         "hooks": "0x7b949a4f08d3c1fbf047f46898e17ff3e9dc6c90"
@@ -620,8 +620,8 @@
       {
         "block": 25035855,
         "pool": "0x55062e8e2da4064bc97b507e1fee1488a64d5791efa89c99d32b46068c2c6a3a",
-        "currency0": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
-        "currency1": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        "currency0": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        "currency1": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
         "fee": "500",
         "tick_spacing": "60",
         "hooks": "0x8dc74d1ec6a0efe7bae592016adee654c430356b"
@@ -656,8 +656,8 @@
       {
         "block": 25241856,
         "pool": "0x778970aa40df6924ce62e72d7890e41f77ab0d3ac459c91003567562fa21ace1",
-        "currency0": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
-        "currency1": "0x2260fac5e5542a773aa44fbcfedf7c193bc2c599",
+        "currency0": "0x2260fac5e5542a773aa44fbcfedf7c193bc2c599",
+        "currency1": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
         "fee": "500",
         "tick_spacing": "1",
         "hooks": "0x0000000000000000000000000000000000000000"
@@ -692,8 +692,8 @@
       {
         "block": 25447858,
         "pool": "0xb87b1235b2da8da49f877b8ff05518014a99e717c437b763f05ce39311166c44",
-        "currency0": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
-        "currency1": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        "currency0": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        "currency1": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
         "fee": "500",
         "tick_spacing": "10",
         "hooks": "0xbdaf243b10791f76dac0be6774484a36b7ae41c3"
@@ -728,8 +728,8 @@
       {
         "block": 25653859,
         "pool": "0x0f9a2a992240ce38b2504f1eb0ef3bd378e17abcd82a9117db8bbd9cdabfedec",
-        "currency0": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
-        "currency1": "0x2260fac5e5542a773aa44fbcfedf7c193bc2c599",
+        "currency0": "0x2260fac5e5542a773aa44fbcfedf7c193bc2c599",
+        "currency1": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
         "fee": "500",
         "tick_spacing": "60",
         "hooks": "0x4dcfb279964970c20b694f220845b83839621bf0"
@@ -764,8 +764,8 @@
       {
         "block": 25859861,
         "pool": "0x656e4154f83ea1126576f44365141dd2508ef9c8fe906508357ee39753210be9",
-        "currency0": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
-        "currency1": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        "currency0": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        "currency1": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
         "fee": "500",
         "tick_spacing": "1",
         "hooks": "0x4dcfb279964970c20b694f220845b83839621bf0"
@@ -800,8 +800,8 @@
       {
         "block": 26065863,
         "pool": "0x6fedc1a5eee0078a69395e594c08fbb9a15bac1418340eb93ce9c06c8f27b3d8",
-        "currency0": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
-        "currency1": "0x2260fac5e5542a773aa44fbcfedf7c193bc2c599",
+        "currency0": "0x2260fac5e5542a773aa44fbcfedf7c193bc2c599",
+        "currency1": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
         "fee": "500",
         "tick_spacing": "10",
         "hooks": "0x0000000000000000000000000000000000000000"
@@ -836,8 +836,8 @@
       {
         "block": 26271864,
         "pool": "0xb07a0db99c5793dfbaaf9881e07a73d02e70691fce8c58c3c9c984d3d48a8be3",
-        "currency0": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
-        "currency1": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        "currency0": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        "currency1": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
         "fee": "500",
         "tick_spacing": "60",
         "hooks": "0x8dc74d1ec6a0efe7bae592016adee654c430356b"
@@ -904,57 +904,57 @@
         "day": "2026-10-25",
         "pool": "0xf626a8503968181245009a79dc5f3fb4ed43ac8c6a2cb7967b4694f97ec8faa0",
         "swaps": "2819",
-        "volume0": "192885000000000000",
-        "volume1": "1609649000000"
+        "volume0": "1609649000000",
+        "volume1": "192885000000000000"
       },
       {
         "day": "2026-10-26",
         "pool": "0xf626a8503968181245009a79dc5f3fb4ed43ac8c6a2cb7967b4694f97ec8faa0",
         "swaps": "4",
-        "volume0": "531282000000000000",
-        "volume1": "4752000000"
+        "volume0": "4752000000",
+        "volume1": "531282000000000000"
       },
       {
         "day": "2026-10-27",
         "pool": "0xf626a8503968181245009a79dc5f3fb4ed43ac8c6a2cb7967b4694f97ec8faa0",
         "swaps": "1696",
-        "volume0": "164314000000000000",
-        "volume1": "4689440000000"
+        "volume0": "4689440000000",
+        "volume1": "164314000000000000"
       },
       {
         "day": "2026-10-28",
         "pool": "0xf626a8503968181245009a79dc5f3fb4ed43ac8c6a2cb7967b4694f97ec8faa0",
         "swaps": "719",
-        "volume0": "598206000000000000",
-        "volume1": "1332307000000"
+        "volume0": "1332307000000",
+        "volume1": "598206000000000000"
       },
       {
         "day": "2026-10-29",
         "pool": "0xf626a8503968181245009a79dc5f3fb4ed43ac8c6a2cb7967b4694f97ec8faa0",
         "swaps": "10",
-        "volume0": "937332000000000000",
-        "volume1": "18100000000"
+        "volume0": "18100000000",
+        "volume1": "937332000000000000"
       },
       {
         "day": "2026-10-30",
         "pool": "0xf626a8503968181245009a79dc5f3fb4ed43ac8c6a2cb7967b4694f97ec8faa0",
         "swaps": "69",
-        "volume0": "597219000000000000",
-        "volume1": "28842000000"
+        "volume0": "28842000000",
+        "volume1": "597219000000000000"
       },
       {
         "day": "2026-10-31",
         "pool": "0xf626a8503968181245009a79dc5f3fb4ed43ac8c6a2cb7967b4694f97ec8faa0",
         "swaps": "893",
-        "volume0": "490419000000000000",
-        "volume1": "2675428000000"
+        "volume0": "2675428000000",
+        "volume1": "490419000000000000"
       },
       {
         "day": "2026-11-01",
         "pool": "0xf626a8503968181245009a79dc5f3fb4ed43ac8c6a2cb7967b4694f97ec8faa0",
         "swaps": "8",
-        "volume0": "923224000000000000",
-        "volume1": "4344000000"
+        "volume0": "4344000000",
+        "volume1": "923224000000000000"
       },
       {
         "day": "2026-10-25",
@@ -1352,57 +1352,57 @@
         "day": "2026-10-25",
         "pool": "0xfee604e91519d953b419154fa653875b1f8ff53957ad0f2614a0c1816d25e86d",
         "swaps": "53",
-        "volume0": "879731000000000000",
-        "volume1": "128048000000"
+        "volume0": "128048000000",
+        "volume1": "879731000000000000"
       },
       {
         "day": "2026-10-26",
         "pool": "0xfee604e91519d953b419154fa653875b1f8ff53957ad0f2614a0c1816d25e86d",
         "swaps": "1",
-        "volume0": "353347000000000000",
-        "volume1": "1384000000"
+        "volume0": "1384000000",
+        "volume1": "353347000000000000"
       },
       {
         "day": "2026-10-27",
         "pool": "0xfee604e91519d953b419154fa653875b1f8ff53957ad0f2614a0c1816d25e86d",
         "swaps": "21",
-        "volume0": "771990000000000000",
-        "volume1": "9198000000"
+        "volume0": "9198000000",
+        "volume1": "771990000000000000"
       },
       {
         "day": "2026-10-28",
         "pool": "0xfee604e91519d953b419154fa653875b1f8ff53957ad0f2614a0c1816d25e86d",
         "swaps": "2715",
-        "volume0": "18760000000000000",
-        "volume1": "1031700000000"
+        "volume0": "1031700000000",
+        "volume1": "18760000000000000"
       },
       {
         "day": "2026-10-29",
         "pool": "0xfee604e91519d953b419154fa653875b1f8ff53957ad0f2614a0c1816d25e86d",
         "swaps": "1492",
-        "volume0": "331949000000000000",
-        "volume1": "3601688000000"
+        "volume0": "3601688000000",
+        "volume1": "331949000000000000"
       },
       {
         "day": "2026-10-30",
         "pool": "0xfee604e91519d953b419154fa653875b1f8ff53957ad0f2614a0c1816d25e86d",
         "swaps": "1",
-        "volume0": "847925000000000000",
-        "volume1": "1817000000"
+        "volume0": "1817000000",
+        "volume1": "847925000000000000"
       },
       {
         "day": "2026-10-31",
         "pool": "0xfee604e91519d953b419154fa653875b1f8ff53957ad0f2614a0c1816d25e86d",
         "swaps": "35",
-        "volume0": "931283000000000000",
-        "volume1": "97300000000"
+        "volume0": "97300000000",
+        "volume1": "931283000000000000"
       },
       {
         "day": "2026-11-01",
         "pool": "0xfee604e91519d953b419154fa653875b1f8ff53957ad0f2614a0c1816d25e86d",
         "swaps": "27",
-        "volume0": "903996000000000000",
-        "volume1": "10071000000"
+        "volume0": "10071000000",
+        "volume1": "903996000000000000"
       },
       {
         "day": "2026-10-25",
@@ -1800,57 +1800,57 @@
         "day": "2026-10-25",
         "pool": "0x283b18ccded3356b138ef8dff06e8a0a3a33c65fc17f0c603ce4b9db07c136bb",
         "swaps": "1124",
-        "volume0": "568672000000000000",
-        "volume1": "3413588000000"
+        "volume0": "3413588000000",
+        "volume1": "568672000000000000"
       },
       {
         "day": "2026-10-26",
         "pool": "0x283b18ccded3356b138ef8dff06e8a0a3a33c65fc17f0c603ce4b9db07c136bb",
         "swaps": "3316",
-        "volume0": "98785000000000000",
-        "volume1": "2036024000000"
+        "volume0": "2036024000000",
+        "volume1": "98785000000000000"
       },
       {
         "day": "2026-10-27",
         "pool": "0x283b18ccded3356b138ef8dff06e8a0a3a33c65fc17f0c603ce4b9db07c136bb",
         "swaps": "3959",
-        "volume0": "50309000000000000",
-        "volume1": "8654374000000"
+        "volume0": "8654374000000",
+        "volume1": "50309000000000000"
       },
       {
         "day": "2026-10-28",
         "pool": "0x283b18ccded3356b138ef8dff06e8a0a3a33c65fc17f0c603ce4b9db07c136bb",
         "swaps": "3856",
-        "volume0": "460803000000000000",
-        "volume1": "11039728000000"
+        "volume0": "11039728000000",
+        "volume1": "460803000000000000"
       },
       {
         "day": "2026-10-29",
         "pool": "0x283b18ccded3356b138ef8dff06e8a0a3a33c65fc17f0c603ce4b9db07c136bb",
         "swaps": "3253",
-        "volume0": "188072000000000000",
-        "volume1": "7098046000000"
+        "volume0": "7098046000000",
+        "volume1": "188072000000000000"
       },
       {
         "day": "2026-10-30",
         "pool": "0x283b18ccded3356b138ef8dff06e8a0a3a33c65fc17f0c603ce4b9db07c136bb",
         "swaps": "2871",
-        "volume0": "568088000000000000",
-        "volume1": "3904560000000"
+        "volume0": "3904560000000",
+        "volume1": "568088000000000000"
       },
       {
         "day": "2026-10-31",
         "pool": "0x283b18ccded3356b138ef8dff06e8a0a3a33c65fc17f0c603ce4b9db07c136bb",
         "swaps": "800",
-        "volume0": "377690000000000000",
-        "volume1": "1953600000000"
+        "volume0": "1953600000000",
+        "volume1": "377690000000000000"
       },
       {
         "day": "2026-11-01",
         "pool": "0x283b18ccded3356b138ef8dff06e8a0a3a33c65fc17f0c603ce4b9db07c136bb",
         "swaps": "113",
-        "volume0": "150091000000000000",
-        "volume1": "185546000000"
+        "volume0": "185546000000",
+        "volume1": "150091000000000000"
       },
       {
         "day": "2026-10-25",
@@ -2248,57 +2248,57 @@
         "day": "2026-10-25",
         "pool": "0xb316e67e8e4e87b19530fea29c51301d0acd33d5fa3ed30544f4334c5652eabf",
         "swaps": "1675",
-        "volume0": "758730000000000000",
-        "volume1": "597975000000"
+        "volume0": "597975000000",
+        "volume1": "758730000000000000"
       },
       {
         "day": "2026-10-26",
         "pool": "0xb316e67e8e4e87b19530fea29c51301d0acd33d5fa3ed30544f4334c5652eabf",
         "swaps": "1976",
-        "volume0": "622090000000000000",
-        "volume1": "5698784000000"
+        "volume0": "5698784000000",
+        "volume1": "622090000000000000"
       },
       {
         "day": "2026-10-27",
         "pool": "0xb316e67e8e4e87b19530fea29c51301d0acd33d5fa3ed30544f4334c5652eabf",
         "swaps": "2272",
-        "volume0": "818607000000000000",
-        "volume1": "543008000000"
+        "volume0": "543008000000",
+        "volume1": "818607000000000000"
       },
       {
         "day": "2026-10-28",
         "pool": "0xb316e67e8e4e87b19530fea29c51301d0acd33d5fa3ed30544f4334c5652eabf",
         "swaps": "1",
-        "volume0": "505388000000000000",
-        "volume1": "1707000000"
+        "volume0": "1707000000",
+        "volume1": "505388000000000000"
       },
       {
         "day": "2026-10-29",
         "pool": "0xb316e67e8e4e87b19530fea29c51301d0acd33d5fa3ed30544f4334c5652eabf",
         "swaps": "2284",
-        "volume0": "582849000000000000",
-        "volume1": "3903356000000"
+        "volume0": "3903356000000",
+        "volume1": "582849000000000000"
       },
       {
         "day": "2026-10-30",
         "pool": "0xb316e67e8e4e87b19530fea29c51301d0acd33d5fa3ed30544f4334c5652eabf",
         "swaps": "178",
-        "volume0": "752823000000000000",
-        "volume1": "384658000000"
+        "volume0": "384658000000",
+        "volume1": "752823000000000000"
       },
       {
         "day": "2026-10-31",
         "pool": "0xb316e67e8e4e87b19530fea29c51301d0acd33d5fa3ed30544f4334c5652eabf",
         "swaps": "24",
-        "volume0": "602101000000000000",
-        "volume1": "60120000000"
+        "volume0": "60120000000",
+        "volume1": "602101000000000000"
       },
       {
         "day": "2026-11-01",
         "pool": "0xb316e67e8e4e87b19530fea29c51301d0acd33d5fa3ed30544f4334c5652eabf",
         "swaps": "1",
-        "volume0": "258190000000000000",
-        "volume1": "2987000000"
+        "volume0": "2987000000",
+        "volume1": "258190000000000000"
       },
       {
         "day": "2026-10-25",
@@ -2696,57 +2696,57 @@
         "day": "2026-10-25",
         "pool": "0xae2abc48559ea899039ef4d85821ed5900bbee8280a9c1badb7be385879ec63d",
         "swaps": "196",
-        "volume0": "198930000000000000",
-        "volume1": "401996000000"
+        "volume0": "401996000000",
+        "volume1": "198930000000000000"
       },
       {
         "day": "2026-10-26",
         "pool": "0xae2abc48559ea899039ef4d85821ed5900bbee8280a9c1badb7be385879ec63d",
         "swaps": "2280",
-        "volume0": "27753000000000000",
-        "volume1": "2161440000000"
+        "volume0": "2161440000000",
+        "volume1": "27753000000000000"
       },
       {
         "day": "2026-10-27",
         "pool": "0xae2abc48559ea899039ef4d85821ed5900bbee8280a9c1badb7be385879ec63d",
         "swaps": "585",
-        "volume0": "146220000000000000",
-        "volume1": "1505205000000"
+        "volume0": "1505205000000",
+        "volume1": "146220000000000000"
       },
       {
         "day": "2026-10-28",
         "pool": "0xae2abc48559ea899039ef4d85821ed5900bbee8280a9c1badb7be385879ec63d",
         "swaps": "353",
-        "volume0": "983572000000000000",
-        "volume1": "728945000000"
+        "volume0": "728945000000",
+        "volume1": "983572000000000000"
       },
       {
         "day": "2026-10-29",
         "pool": "0xae2abc48559ea899039ef4d85821ed5900bbee8280a9c1badb7be385879ec63d",
         "swaps": "1446",
-        "volume0": "843429000000000000",
-        "volume1": "3382194000000"
+        "volume0": "3382194000000",
+        "volume1": "843429000000000000"
       },
       {
         "day": "2026-10-30",
         "pool": "0xae2abc48559ea899039ef4d85821ed5900bbee8280a9c1badb7be385879ec63d",
         "swaps": "17",
-        "volume0": "647249000000000000",
-        "volume1": "35428000000"
+        "volume0": "35428000000",
+        "volume1": "647249000000000000"
       },
       {
         "day": "2026-10-31",
         "pool": "0xae2abc48559ea899039ef4d85821ed5900bbee8280a9c1badb7be385879ec63d",
         "swaps": "1267",
-        "volume0": "626977000000000000",
-        "volume1": "1577415000000"
+        "volume0": "1577415000000",
+        "volume1": "626977000000000000"
       },
       {
         "day": "2026-11-01",
         "pool": "0xae2abc48559ea899039ef4d85821ed5900bbee8280a9c1badb7be385879ec63d",
         "swaps": "7",
-        "volume0": "74972000000000000",
-        "volume1": "5586000000"
+        "volume0": "5586000000",
+        "volume1": "74972000000000000"
       }
     ],
     "arrakis-hooks": [

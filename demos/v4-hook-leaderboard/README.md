@@ -52,20 +52,22 @@ recording.
 ## Subjects and window
 
 - Pools: every pool the PoolManager initialized, from its creation block
-  21688329 to the end of 2026-11-01, `[21688329, 26323365)`.
+  21688329 to the first block of 2026-11-02 UTC, `[21688329, 26323365)`
+  (the end block is an estimate, verify it before recording).
 - Volume: UTC days `[2026-10-25, 2026-11-02)`, one row per pool per day.
 - Volume in dollars is the USDC or USDT side of a pool (6 decimals); pools with
   neither show swaps only.
 - Arrakis hooks: the private hooks created by the Arrakis hook factory over the
   same blocks.
 
-| Subject                | Address                                      | Note                                                      |
-| ---------------------- | -------------------------------------------- | --------------------------------------------------------- |
-| Uniswap v4 PoolManager | `0x000000000004444c5dc75cb358380d2e3de08a90` |                                                           |
-| Arrakis hook factory   | `0x0000000000000000000000000000000000a44a15` | placeholder, verify before recording and replace the bind |
-| PoolManager creation   | block 21688329                               | verify before recording                                   |
-| USDC                   | `0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48` |                                                           |
-| USDT                   | `0xdac17f958d2ee523a2206206994597c13d831ec7` |                                                           |
+| Subject                | Address                                      | Note                                                                           |
+| ---------------------- | -------------------------------------------- | ------------------------------------------------------------------------------ |
+| Uniswap v4 PoolManager | `0x000000000004444c5dc75cb358380d2e3de08a90` |                                                                                |
+| Arrakis hook factory   | not set                                      | set `arrakis-hooks.params.factory` before recording                            |
+| PoolManager creation   | block 21688329                               | verify before recording                                                        |
+| Pool window end        | block 26323365                               | verify before recording: must be the first block at or after 2026-11-02T00:00Z |
+| USDC                   | `0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48` |                                                                                |
+| USDT                   | `0xdac17f958d2ee523a2206206994597c13d831ec7` |                                                                                |
 
 ## Binds (`testril.json`)
 
@@ -80,6 +82,10 @@ Windows are half-open: the end is the first block or day not included.
 `pools` and `arrakis-hooks` are read in chunks of 100000 blocks.
 
 ## Record real data
+
+`npm run record` must not be run until the Arrakis hook factory address in
+`testril.json` replaces its `VERIFY_…` placeholder and the end block is read
+from the chain.
 
 Recording needs `tools/prepare` from this repository and a Testril operator
 key with a funded channel; neither is part of an extracted demo. From the
