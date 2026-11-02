@@ -128,11 +128,15 @@ function render(report) {
   document
     .querySelector("#headline")
     .replaceChildren(
-      metric("ETH/USDC VOLUME", headline.volume, "five venues, whole window"),
+      metric(
+        "ETH/USDC VOLUME",
+        headline.volume,
+        "selected pools, whole window",
+      ),
       metric(
         "LARGEST VENUE",
         headline.leader,
-        `${headline.leaderShare} of ETH/USDC`,
+        `${headline.leaderShare} of selected ETH/USDC pools`,
       ),
       metric(
         "LARGEST V3 TIER",
@@ -140,9 +144,9 @@ function render(report) {
         `${headline.topTier.percent} of v3 ETH/USDC`,
       ),
       metric(
-        "FLUID IN WSTETH/ETH",
+        "FLUID IN WSTETH/ETH (2 POOLS)",
         headline.fluidSteth,
-        `${headline.fluidUsdc} of ETH/USDC`,
+        `${headline.fluidUsdc} of selected ETH/USDC pools`,
       ),
     );
   renderPair(ethUsdc);
