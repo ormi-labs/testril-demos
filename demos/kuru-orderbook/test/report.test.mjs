@@ -18,7 +18,38 @@ test("check fails when a volume row's market was never registered", () => {
 test("check fails when a rebate is negative", () => {
   const corrupted = rows();
   corrupted.volume[3].quote_rebate = "-1";
-  assert.throws(() => check(corrupted), /quote_rebate .* is negative/);
+  assert.throws(() => check(corrupted), /quote_rebate is negative/);
+});
+
+test("check fails when a fee and a rebate are swapped", () => {
+  const corrupted = rows();
+  const row = corrupted.volume.find((r) => r.quote_fee !== r.quote_rebate);
+  [row.quote_fee, row.quote_rebate] = [row.quote_rebate, row.quote_fee];
+  assert.throws(() => check(corrupted), /quote_rebate exceeds quote_fee/);
+});
+
+test("check fails when a fee is read in 6-decimal USDC instead of 18", () => {
+  const corrupted = rows();
+  corrupted.volume[0].quote_fee = (
+    BigInt(corrupted.volume[0].quote_fee) *
+    10n ** 12n
+  ).toString();
+  assert.throws(() => check(corrupted), /quote_fee exceeds .* bps/);
+});
+
+test("check matches market addresses regardless of case", () => {
+  const mixed = rows();
+  mixed.markets[0].market = mixed.markets[0].market
+    .toUpperCase()
+    .replace("0X", "0x");
+  assert.equal(check(mixed).length, 3);
+  assert.equal(shape(mixed).active, 6);
+});
+
+test("shape survives a recording with no USDC-quoted volume", () => {
+  const view = shape({ markets: rows().markets, volume: [] });
+  assert.equal(view.topMarket, "none");
+  assert.equal(view.topShare, "0.0%");
 });
 
 test("check fails when a market has two rows for one day", () => {

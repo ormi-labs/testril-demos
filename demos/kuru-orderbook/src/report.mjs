@@ -13,7 +13,6 @@ const symbols = new Map([
   ["0x0555e30da8f98308edb960aa94c0db47230d2b9c", "WBTC"],
   ["0xe7cd86e13ac4309349f30b3435a9d337750fc82d", "USDT0"],
 ]);
-const unit = 10n ** 18n;
 const chartMarkets = 8;
 
 const nextDay = (day, step) =>
@@ -34,30 +33,50 @@ export function volumeDays() {
 
 const feeFields = ["base_fee", "base_rebate", "quote_fee", "quote_rebate"];
 
+const bpsDenominator = 10000n;
+
+const feeError = (row, message) =>
+  new Error(`Market ${row.market} on ${row.day}: ${message}.`);
+
+function checkFees(row, market) {
+  for (const field of feeFields)
+    if (BigInt(row[field]) < 0n)
+      throw feeError(row, `${field} is negative (${row[field]})`);
+  const takerBps = BigInt(market.taker_fee_bps);
+  if (
+    BigInt(row.quote_fee) * bpsDenominator >
+    BigInt(row.quote_volume) * takerBps
+  )
+    throw feeError(row, `quote_fee exceeds ${takerBps} bps of quote_volume`);
+  if (BigInt(market.maker_fee_bps) > takerBps) return;
+  for (const side of ["base", "quote"])
+    if (BigInt(row[`${side}_rebate`]) > BigInt(row[`${side}_fee`]))
+      throw feeError(row, `${side}_rebate exceeds ${side}_fee`);
+}
+
 export function check(rows) {
-  const registered = new Set(rows.markets.map((market) => market.market));
+  const registered = new Map(
+    rows.markets.map((market) => [market.market.toLowerCase(), market]),
+  );
   const days = new Set(volumeDays());
   const seen = new Set();
   for (const row of rows.volume) {
-    if (!registered.has(row.market))
+    const market = registered.get(row.market.toLowerCase());
+    if (!market)
       throw new Error(
         `Volume row of market ${row.market} on ${row.day} has no market_list row.`,
       );
-    for (const field of feeFields)
-      if (BigInt(row[field]) < 0n)
-        throw new Error(
-          `${field} of market ${row.market} on ${row.day} is negative (${row[field]}).`,
-        );
+    checkFees(row, market);
     if (!days.has(row.day))
       throw new Error(`Volume row on ${row.day} is outside the window.`);
-    const key = `${row.market}@${row.day}`;
+    const key = `${row.market.toLowerCase()}@${row.day}`;
     if (seen.has(key))
       throw new Error(`Market ${row.market} has two rows for ${row.day}.`);
     seen.add(key);
   }
   return [
     `All ${rows.volume.length} volume rows belong to the ${registered.size} registered markets`,
-    `Taker fees and maker rebates are non-negative in all ${rows.volume.length} rows`,
+    `Fees and rebates fit each market's registered rates in all ${rows.volume.length} rows`,
     `Every row is inside ${volumeWindow.from_day} to ${volumeWindow.to_day} (exclusive) and each market has one row per day`,
   ];
 }
@@ -82,7 +101,8 @@ const toFloat = (raw) => Number(raw / 10n ** 14n) / 1e4;
 function totalsByMarket(volume) {
   const totals = new Map();
   for (const row of volume) {
-    const total = totals.get(row.market) ?? {
+    const key = row.market.toLowerCase();
+    const total = totals.get(key) ?? {
       quoteVolume: 0n,
       trades: 0n,
       baseFee: 0n,
@@ -96,7 +116,7 @@ function totalsByMarket(volume) {
     total.baseRebate += BigInt(row.base_rebate);
     total.quoteFee += BigInt(row.quote_fee);
     total.quoteRebate += BigInt(row.quote_rebate);
-    totals.set(row.market, total);
+    totals.set(key, total);
   }
   return totals;
 }
@@ -121,7 +141,6 @@ function marketView(market, total) {
     usdcQuoted: market.quote_asset === usdc,
     volume: `${formatTokens(quoteVolume)} ${quoteSymbol}`,
     amount: toFloat(quoteVolume),
-    rawVolume: quoteVolume,
     trades: (total?.trades ?? 0n).toLocaleString("en-US"),
     takerBps: market.taker_fee_bps,
     makerBps: market.maker_fee_bps,
@@ -140,35 +159,45 @@ function marketView(market, total) {
   };
 }
 
+const compareBigInt = (a, b) => (a > b) - (a < b);
+
+function share(part, whole) {
+  if (whole === 0n) return "0.0%";
+  const tenths = (part * 1000n) / whole;
+  return `${tenths / 10n}.${tenths % 10n}%`;
+}
+
 export function shape(rows) {
   const totals = totalsByMarket(rows.volume);
-  const markets = rows.markets
-    .map((market) => marketView(market, totals.get(market.market)))
+  const entries = rows.markets
+    .map((market) => {
+      const total = totals.get(market.market.toLowerCase());
+      return {
+        view: marketView(market, total),
+        rawVolume: total?.quoteVolume ?? 0n,
+      };
+    })
     .sort(
       (a, b) =>
-        Number(b.usdcQuoted) - Number(a.usdcQuoted) ||
-        (b.rawVolume > a.rawVolume ? 1 : b.rawVolume < a.rawVolume ? -1 : 0),
+        Number(b.view.usdcQuoted) - Number(a.view.usdcQuoted) ||
+        compareBigInt(b.rawVolume, a.rawVolume),
     );
-  const usdcMarkets = markets.filter((market) => market.usdcQuoted);
-  const usdcVolume = usdcMarkets.reduce((sum, m) => sum + m.rawVolume, 0n);
+  const usdcEntries = entries.filter((entry) => entry.view.usdcQuoted);
+  const usdcVolume = usdcEntries.reduce((sum, e) => sum + e.rawVolume, 0n);
   const trades = [...totals.values()].reduce((sum, t) => sum + t.trades, 0n);
-  const top = usdcMarkets[0];
+  const top = usdcEntries[0];
   return {
     volumeWindow,
     router,
-    registered: markets.length,
+    registered: entries.length,
     active: totals.size,
     usdcVolume: `${formatTokens(usdcVolume, 0)} USDC`,
     trades: trades.toLocaleString("en-US"),
-    topMarket: top.pair,
-    topShare: `${((Number(top.rawVolume / unit) / Number(usdcVolume / unit)) * 100).toFixed(1)}%`,
-    bars: usdcMarkets
+    topMarket: top && usdcVolume > 0n ? top.view.pair : "none",
+    topShare: top ? share(top.rawVolume, usdcVolume) : "0.0%",
+    bars: usdcEntries
       .slice(0, chartMarkets)
-      .map(({ pair, volume, amount }) => ({
-        pair,
-        volume,
-        amount,
-      })),
-    markets: markets.map((market) => ({ ...market, rawVolume: undefined })),
+      .map(({ view: { pair, volume, amount } }) => ({ pair, volume, amount })),
+    markets: entries.map((entry) => entry.view),
   };
 }

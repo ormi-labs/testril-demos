@@ -22,71 +22,69 @@ const hexAddress = (random) =>
 
 const tokens = (whole) => BigInt(whole) * 10n ** 18n;
 
-// dailyUsdc: typical daily volume; priceMilli: quote per base, times 1000;
-// takerBps/makerBps: the market's registered rates; active: share of days it trades.
 const marketSpecs = [
   {
     base: zeroAddress,
     quote: usdc,
-    dailyUsdc: 4_200_000,
-    priceMilli: 30,
+    dailyQuote: 4_200_000,
+    quotePerBaseMilli: 30,
     takerBps: 2,
     makerBps: 1,
-    active: 1,
+    activeShare: 1,
   },
   {
     base: weth,
     quote: usdc,
-    dailyUsdc: 1_150_000,
-    priceMilli: 3_400_000,
+    dailyQuote: 1_150_000,
+    quotePerBaseMilli: 3_400_000,
     takerBps: 3,
     makerBps: 1,
-    active: 1,
+    activeShare: 1,
   },
   {
     base: wbtc,
     quote: usdc,
-    dailyUsdc: 780_000,
-    priceMilli: 95_000_000,
+    dailyQuote: 780_000,
+    quotePerBaseMilli: 95_000_000,
     takerBps: 3,
     makerBps: 1,
-    active: 1,
+    activeShare: 1,
   },
   {
     base: wmon,
     quote: usdc,
-    dailyUsdc: 310_000,
-    priceMilli: 30,
+    dailyQuote: 310_000,
+    quotePerBaseMilli: 30,
     takerBps: 5,
     makerBps: 2,
-    active: 0.9,
+    activeShare: 0.9,
   },
   {
     base: usdt0,
     quote: usdc,
-    dailyUsdc: 90_000,
-    priceMilli: 1_000,
+    dailyQuote: 90_000,
+    quotePerBaseMilli: 1_000,
     takerBps: 1,
     makerBps: 0,
-    active: 0.7,
+    activeShare: 0.7,
   },
   {
     base: weth,
     quote: wmon,
-    dailyUsdc: 40_000,
-    priceMilli: 113_000,
+    dailyQuote: 40_000,
+    quotePerBaseMilli: 113_333_000,
     takerBps: 5,
     makerBps: 2,
-    active: 0.5,
+    activeShare: 0.5,
   },
   {
     base: wbtc,
     quote: wmon,
-    dailyUsdc: 0,
-    priceMilli: 3_100_000,
+    dailyQuote: 0,
+    quotePerBaseMilli: 3_166_666_000,
     takerBps: 5,
     makerBps: 2,
-    active: 0,
+    activeShare: 0,
   },
 ];
 
@@ -112,13 +110,13 @@ function volumeRows(random, markets) {
   const rows = [];
   for (const day of volumeDays())
     marketSpecs.forEach((spec, index) => {
-      if (random() >= spec.active) return;
+      if (random() >= spec.activeShare) return;
       const quoteVolume =
-        tokens(Math.round(spec.dailyUsdc * (0.4 + random() * 1.2))) +
+        tokens(Math.round(spec.dailyQuote * (0.4 + random() * 1.2))) +
         BigInt(Math.floor(random() * 1e6)) * 10n ** 12n;
       const buy = (quoteVolume * BigInt(Math.floor(30 + random() * 40))) / 100n;
       const sell = quoteVolume - buy;
-      const price = BigInt(spec.priceMilli);
+      const price = BigInt(spec.quotePerBaseMilli);
       const bps = (amount, rate) => (amount * BigInt(rate)) / 10000n;
       rows.push({
         day,
