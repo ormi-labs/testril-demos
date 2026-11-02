@@ -17,7 +17,7 @@ function element(name, text, className) {
 }
 
 const venueClass = (venue) =>
-  `venue-${venue.toLowerCase().replace(/\W+/g, "-")}`;
+  `venue-${venue.split(" (")[0].toLowerCase().replace(/\W+/g, "-")}`;
 
 function banner(report) {
   const node = document.querySelector("#source");
