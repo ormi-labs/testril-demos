@@ -1,10 +1,9 @@
 import spec from "../testril.json" with { type: "json" };
 
 const binds = Object.fromEntries(spec.binds.map((bind) => [bind.name, bind]));
-export const window = binds["indexing-rewards"].window;
-export const indexerCount = 10;
+export const rewardWindow = binds["indexing-rewards"].window;
+const topIndexerCount = 10;
 const wei = 10n ** 18n;
-const taxedFeeKinds = ["allocation_collected", "rebate_collected"];
 
 const logKey = (row) => `${row.tx}:${row.log_index}`;
 const sum = (values) => values.reduce((total, value) => total + value, 0n);
@@ -14,12 +13,13 @@ const sumBy = (rows, key, value) => {
     totals.set(row[key], (totals.get(row[key]) ?? 0n) + value(row));
   return totals;
 };
-const byLog = (a, b) => a.block - b.block || a.log_index - b.log_index;
-const inWindow = (row) =>
-  row.block >= window.from_block && row.block < window.to_block;
+const byLog = (a, b) =>
+  a.block - b.block || Number(a.log_index) - Number(b.log_index);
+const inWindow = (row, { from_block, to_block }) =>
+  row.block >= from_block && row.block < to_block;
 
 function requireInWindow(name, rows) {
-  const outside = rows.find((row) => !inWindow(row));
+  const outside = rows.find((row) => !inWindow(row, binds[name].window));
   if (outside)
     throw new Error(
       `${name} row at block ${outside.block} is outside the window.`,
@@ -53,17 +53,6 @@ export function check(rows) {
     requireUniqueLogs(name, list);
   }
   requireRewardSplit(rewards);
-  const total = sum(rewards.map((row) => BigInt(row.amount)));
-  const perIndexer = sum([
-    ...sumBy(rewards, "indexer", (row) => BigInt(row.amount)).values(),
-  ]);
-  const perEpoch = sum([
-    ...sumBy(rewards, "epoch", (row) => BigInt(row.amount)).values(),
-  ]);
-  if (perIndexer !== total || perEpoch !== total)
-    throw new Error(
-      `Rewards total ${total}, per indexer ${perIndexer}, per epoch ${perEpoch}.`,
-    );
   const overdrawn = delegation.find(
     (row) => BigInt(row.delegator_shares) > BigInt(row.pool_shares),
   );
@@ -73,7 +62,7 @@ export function check(rows) {
     );
   const unbalanced = fees.find(
     (row) =>
-      taxedFeeKinds.includes(row.kind) &&
+      row.kind !== "payment_collected" &&
       BigInt(row.total) !==
         BigInt(row.indexer_fees) +
           BigInt(row.curator_fees) +
@@ -84,11 +73,11 @@ export function check(rows) {
       `Query fee ${unbalanced.kind} at block ${unbalanced.block}: indexer, curator and tax do not add up to ${unbalanced.total}.`,
     );
   const split = rewards.filter((row) => row.kind === "rewards_collected");
+  const balanced = fees.filter((row) => row.kind !== "payment_collected");
   return [
     `Indexer plus delegator rewards equal the amount on all ${split.length} reward rows`,
-    `Rewards per indexer (${sumBy(rewards, "indexer", () => 0n).size} indexers) and per epoch (${sumBy(rewards, "epoch", () => 0n).size} epochs) each add up to ${formatGrt(total)}`,
     `No delegator holds more shares than their pool, on all ${delegation.length} delegation rows`,
-    `Indexer, curator and tax fees equal the total on ${fees.filter((row) => taxedFeeKinds.includes(row.kind)).length} staking fee rows`,
+    `Indexer, curator and tax fees equal the total on ${balanced.length} query fee rows`,
   ];
 }
 
@@ -119,6 +108,9 @@ export function formatPercent(part, whole) {
 const shortAddress = (address) => `${address.slice(0, 6)}…${address.slice(-4)}`;
 const thousandsOfGrt = (raw) => Number(raw / wei) / 1000;
 
+const splitAmount = (row) =>
+  row.kind === "rewards_collected" ? BigInt(row.amount) : 0n;
+
 function delegationPools(delegation) {
   const pools = new Map();
   for (const row of [...delegation].sort(byLog))
@@ -128,16 +120,14 @@ function delegationPools(delegation) {
 
 function topIndexers(rewards, delegation) {
   const amounts = sumBy(rewards, "indexer", (row) => BigInt(row.amount));
+  const splitAmounts = sumBy(rewards, "indexer", splitAmount);
   const delegators = sumBy(rewards, "indexer", (row) =>
     BigInt(row.delegator_rewards),
-  );
-  const indexerShares = sumBy(rewards, "indexer", (row) =>
-    BigInt(row.indexer_rewards),
   );
   const pools = delegationPools(delegation);
   return [...amounts]
     .sort(([, a], [, b]) => (b > a ? 1 : b < a ? -1 : 0))
-    .slice(0, indexerCount)
+    .slice(0, topIndexerCount)
     .map(([address, amount], index) => {
       const pool = pools.get(address);
       return {
@@ -145,9 +135,11 @@ function topIndexers(rewards, delegation) {
         address,
         label: shortAddress(address),
         rewards: formatGrt(amount),
-        indexerRewards: formatGrt(indexerShares.get(address)),
         delegatorRewards: formatGrt(delegators.get(address)),
-        delegatorShare: formatPercent(delegators.get(address), amount),
+        delegatorShare: formatPercent(
+          delegators.get(address),
+          splitAmounts.get(address),
+        ),
         pool: pool === undefined ? "—" : formatGrt(pool),
         delegatorYield:
           pool === undefined
@@ -182,10 +174,13 @@ export function shape(rows) {
   const feeTotal = sum(fees.map((row) => BigInt(row.total)));
   const epochs = feesPerEpoch(fees);
   return {
-    window,
+    window: rewardWindow,
     epochs: { first: epochs[0].epoch, last: epochs.at(-1).epoch },
     rewards: formatGrt(total),
-    delegatorShare: formatPercent(delegatorTotal, total),
+    delegatorShare: formatPercent(
+      delegatorTotal,
+      sum(rewards.map(splitAmount)),
+    ),
     netDelegation: formatGrt(net, true),
     queryFees: formatGrt(feeTotal),
     indexers: topIndexers(rewards, delegation),

@@ -6,14 +6,25 @@ import { fixture } from "./fixture.mjs";
 const rows = () => structuredClone(fixture().rows);
 const collected = (list) => list.find((r) => r.kind === "rewards_collected");
 
-test("check passes on the fixture with four proven sentences", () => {
-  assert.equal(check(rows()).length, 4);
+test("check passes on the fixture with three proven sentences", () => {
+  assert.equal(check(rows()).length, 3);
 });
 
 test("check fails when the indexer share is in whole GRT instead of wei", () => {
   const corrupted = rows();
   const row = collected(corrupted["indexing-rewards"]);
   row.indexer_rewards = (BigInt(row.indexer_rewards) / 10n ** 18n).toString();
+  assert.throws(() => check(corrupted), /indexer .* \+ delegator/);
+});
+
+test("check fails when a delegator reward moves to another indexer", () => {
+  const corrupted = rows();
+  const [a, b] = corrupted["indexing-rewards"].filter(
+    (r) => r.kind === "rewards_collected" && r.indexer !== undefined,
+  );
+  const moved = BigInt(a.delegator_rewards);
+  a.delegator_rewards = "0";
+  b.delegator_rewards = (BigInt(b.delegator_rewards) + moved).toString();
   assert.throws(() => check(corrupted), /indexer .* \+ delegator/);
 });
 

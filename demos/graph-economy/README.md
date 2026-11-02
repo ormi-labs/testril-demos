@@ -4,8 +4,8 @@ One week of The Graph on Arbitrum: which indexers earned the most indexing
 rewards, how much of that went to their delegators, how large each indexer's
 delegation pool is, and how many query fees the network collected in each Graph
 epoch. The page proves its numbers: on every reward row indexer plus delegator
-rewards must equal the amount, and rewards summed per indexer and per epoch
-must both equal the total.
+rewards must equal the amount, and on every query fee row indexer, curator and
+tax fees must equal the total.
 
 **The shipped recording is synthetic.** `recordings/report.json` is generated
 by `test/fixture.mjs` and the page says so in its banner. Record real data with
