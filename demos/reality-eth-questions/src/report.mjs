@@ -2,6 +2,7 @@ import spec from "../testril.json" with { type: "json" };
 
 const invalidAnswer = `0x${"f".repeat(64)}`;
 const topQuestions = 20;
+export const unitSeparator = "␟";
 
 export const chains = [
   { key: "ethereum", name: "Ethereum", token: "ETH" },
@@ -59,30 +60,34 @@ export function formatBond(wei, token) {
   return `${tokens.toFixed(tokens < 1 ? 4 : 2)} ${token}`;
 }
 
-function answerLabel(answer, outcomes) {
-  if (answer === invalidAnswer) return "Invalid";
-  const index = BigInt(answer);
-  if (outcomes?.has(index)) return outcomes.get(index);
-  return index === 0n ? "No" : index === 1n ? "Yes" : `Option ${index}`;
+function answerLabel(answer, question, outcomes) {
+  if (answer.toLowerCase() === invalidAnswer) return "Invalid";
+  const value = BigInt(answer);
+  if (question.template_id === "0") return value === 0n ? "No" : "Yes";
+  if (question.template_id === "2")
+    return outcomes?.get(value) ?? `Option ${value}`;
+  return String(value);
 }
 
 function questionRow(chain, question, ladder, outcomes) {
   const bonds = ladder.map((a) => BigInt(a.bond));
   const final = ladder.at(-1);
-  return {
+  const row = {
     chain: chain.name,
-    title: question.title || question.question_text.split("␟")[0],
+    title: question.title || question.question_text.split(unitSeparator)[0],
     category: question.category,
     answers: ladder.length,
     topBond: bonds.length ? formatBond(bonds.at(-1), chain.token) : "—",
-    topBondWei: bonds.at(-1) ?? 0n,
-    leading: final ? answerLabel(final.answer, outcomes) : "unanswered",
+    leading: final
+      ? answerLabel(final.answer, question, outcomes)
+      : "unanswered",
     ladder: ladder.map((a) => ({
-      answer: answerLabel(a.answer, outcomes),
+      answer: answerLabel(a.answer, question, outcomes),
       bond: formatBond(a.bond, chain.token),
       level: Math.log2(Number(BigInt(a.bond) / 10n ** 12n) || 1),
     })),
   };
+  return { row, topBondWei: bonds.at(-1) ?? 0n };
 }
 
 function chainQuestions(rows, chain) {
@@ -103,18 +108,20 @@ function chainQuestions(rows, chain) {
   );
 }
 
+const compareBigInt = (a, b) => (a < b ? -1 : a > b ? 1 : 0);
+
 export function shape(rows) {
-  const questions = chains
-    .flatMap((chain) => chainQuestions(rows, chain))
+  const entries = chains
+    .flatMap((chain, chainIndex) =>
+      chainQuestions(rows, chain).map((entry) => ({ ...entry, chainIndex })),
+    )
     .sort(
       (a, b) =>
-        b.answers - a.answers ||
-        (b.topBondWei > a.topBondWei
-          ? 1
-          : b.topBondWei < a.topBondWei
-            ? -1
-            : 0),
+        b.row.answers - a.row.answers ||
+        a.chainIndex - b.chainIndex ||
+        compareBigInt(b.topBondWei, a.topBondWei),
     );
+  const questions = entries.map((entry) => entry.row);
   const contested = questions[0];
   const count = (key) =>
     chains.reduce((sum, chain) => sum + rows[`${chain.key}-${key}`].length, 0);
@@ -127,20 +134,23 @@ export function shape(rows) {
     answered: String(questions.filter((q) => q.answers > 0).length),
     answers: String(count("answers")),
     mostRounds: String(contested.answers),
-    highestBond: questions.reduce((top, q) =>
-      q.topBondWei > top.topBondWei ? q : top,
-    ).topBond,
+    highestBonds: chains.map((chain, chainIndex) => {
+      const wei = entries
+        .filter((entry) => entry.chainIndex === chainIndex)
+        .reduce(
+          (top, entry) => (entry.topBondWei > top ? entry.topBondWei : top),
+          0n,
+        );
+      return {
+        chain: chain.name,
+        bond: wei ? formatBond(wei, chain.token) : "—",
+      };
+    }),
     contested: {
       title: contested.title,
       chain: contested.chain,
       ladder: contested.ladder,
     },
-    questions: questions.slice(0, topQuestions).map(displayable),
+    questions: questions.slice(0, topQuestions),
   };
-}
-
-function displayable(question) {
-  const display = { ...question };
-  delete display.topBondWei;
-  return display;
 }

@@ -83,25 +83,25 @@
       {
         "block": 26214490,
         "question_id": "0xdf1a90a861e3e7ab6afa0480acfdad773fb8da3b71e25e12f11b15f18fcefd90",
-        "template_id": "2",
-        "question_text": "Will ETH close above $4,000 on 2026-12-31?␟\"Team A\",\"Team B\",\"Team C\"␟sports␟en_US",
+        "template_id": "0",
+        "question_text": "Will ETH close above $4,000 on 2026-12-31?␟news␟en_US",
         "arbitrator": "0xcbc30d4dd89be81b81774c98e5f3fde7498a578b",
         "timeout": "86400",
         "opening_ts": "0",
         "title": "Will ETH close above $4,000 on 2026-12-31?",
-        "category": "sports",
+        "category": "news",
         "language": "en_US"
       },
       {
         "block": 26174915,
         "question_id": "0x9dde61636c8b364084cad53522e975d8928aa995de40723f7a7dd6e0852a465f",
-        "template_id": "0",
-        "question_text": "Which team wins the final?␟news␟en_US",
+        "template_id": "2",
+        "question_text": "Which team wins the final?␟\"Team A\",\"Team B\",\"Team C\"␟sports␟en_US",
         "arbitrator": "0x694e965a6d57d9c071851b8117e42bbdde83bb80",
         "timeout": "86400",
         "opening_ts": "0",
         "title": "Which team wins the final?",
-        "category": "news",
+        "category": "sports",
         "language": "en_US"
       },
       {
@@ -119,13 +119,13 @@
       {
         "block": 26148361,
         "question_id": "0xef42476ae46114a46db8fa49c0faf1fc9d4254354ed68ca88e727115a41478a9",
-        "template_id": "2",
-        "question_text": "Will the bridge upgrade ship this year?␟\"Team A\",\"Team B\",\"Team C\"␟sports␟en_US",
+        "template_id": "0",
+        "question_text": "Will the bridge upgrade ship this year?␟news␟en_US",
         "arbitrator": "0xb9ee5cdb82b70f27346b573e0cc129ec4c95d689",
         "timeout": "86400",
         "opening_ts": "0",
         "title": "Will the bridge upgrade ship this year?",
-        "category": "sports",
+        "category": "news",
         "language": "en_US"
       },
       {
@@ -143,25 +143,25 @@
       {
         "block": 26125948,
         "question_id": "0x9269546b7b888a5b7b968c0eb6a9f12f8903ffac8ef6bc15d801d60daaa93a65",
-        "template_id": "0",
-        "question_text": "Will the grant be awarded to Team Alpha?␟news␟en_US",
+        "template_id": "2",
+        "question_text": "Which team is awarded the grant?␟\"Team A\",\"Team B\",\"Team C\"␟grants␟en_US",
         "arbitrator": "0xb783abd9d5aa4fcfbb93ab01645d7e17fb9eb394",
         "timeout": "86400",
         "opening_ts": "0",
-        "title": "Will the grant be awarded to Team Alpha?",
-        "category": "news",
+        "title": "Which team is awarded the grant?",
+        "category": "grants",
         "language": "en_US"
       },
       {
         "block": 26195143,
         "question_id": "0x75a0d464b07d6978b63c0f38f503ccb442a07af8fb63054244b22fd795461e35",
-        "template_id": "2",
-        "question_text": "Does the paper replicate?␟\"Team A\",\"Team B\",\"Team C\"␟sports␟en_US",
+        "template_id": "0",
+        "question_text": "Does the paper replicate?␟news␟en_US",
         "arbitrator": "0x6d156f7cc51fec0e3b93d5264fa7ef45e292b46e",
         "timeout": "86400",
         "opening_ts": "0",
         "title": "Does the paper replicate?",
-        "category": "sports",
+        "category": "news",
         "language": "en_US"
       },
       {
@@ -191,13 +191,13 @@
       {
         "block": 26204383,
         "question_id": "0x2815ac939340baff0aae92f33dcedf47b2c7b8719dd0fe3e4a7ee1c2ab8e61a5",
-        "template_id": "2",
-        "question_text": "Will the court rule before the end of Q4?␟\"Team A\",\"Team B\",\"Team C\"␟sports␟en_US",
+        "template_id": "0",
+        "question_text": "Will the court rule before the end of Q4?␟news␟en_US",
         "arbitrator": "0xf39d22ea303b747b30527715388fc2baa687818c",
         "timeout": "86400",
         "opening_ts": "0",
         "title": "Will the court rule before the end of Q4?",
-        "category": "sports",
+        "category": "news",
         "language": "en_US"
       },
       {
@@ -233,8 +233,8 @@
         "question_id": "0x3d465913b7d815b71a36c9455b5a84a4647aab6620bbc5094d20930c5cecceba",
         "answer": "0x0000000000000000000000000000000000000000000000000000000000000000",
         "bond": "10000000000000000",
-        "ts": "1819212648",
-        "finalize_ts": "1819299048"
+        "ts": "1792240392",
+        "finalize_ts": "1792326792"
       },
       {
         "block": 26220437,
@@ -243,8 +243,8 @@
         "question_id": "0x3d465913b7d815b71a36c9455b5a84a4647aab6620bbc5094d20930c5cecceba",
         "answer": "0x0000000000000000000000000000000000000000000000000000000000000001",
         "bond": "40000000000000000",
-        "ts": "1819220437",
-        "finalize_ts": "1819306837"
+        "ts": "1792333860",
+        "finalize_ts": "1792420260"
       },
       {
         "block": 26221225,
@@ -253,8 +253,8 @@
         "question_id": "0x3d465913b7d815b71a36c9455b5a84a4647aab6620bbc5094d20930c5cecceba",
         "answer": "0x0000000000000000000000000000000000000000000000000000000000000000",
         "bond": "80000000000000000",
-        "ts": "1819221225",
-        "finalize_ts": "1819307625"
+        "ts": "1792343316",
+        "finalize_ts": "1792429716"
       },
       {
         "block": 26227126,
@@ -263,8 +263,8 @@
         "question_id": "0x3d465913b7d815b71a36c9455b5a84a4647aab6620bbc5094d20930c5cecceba",
         "answer": "0x0000000000000000000000000000000000000000000000000000000000000001",
         "bond": "160000000000000000",
-        "ts": "1819227126",
-        "finalize_ts": "1819313526"
+        "ts": "1792414128",
+        "finalize_ts": "1792500528"
       },
       {
         "block": 26228189,
@@ -273,8 +273,8 @@
         "question_id": "0x3d465913b7d815b71a36c9455b5a84a4647aab6620bbc5094d20930c5cecceba",
         "answer": "0x0000000000000000000000000000000000000000000000000000000000000000",
         "bond": "320000000000000000",
-        "ts": "1819228189",
-        "finalize_ts": "1819314589"
+        "ts": "1792426884",
+        "finalize_ts": "1792513284"
       },
       {
         "block": 26228370,
@@ -283,8 +283,8 @@
         "question_id": "0x3d465913b7d815b71a36c9455b5a84a4647aab6620bbc5094d20930c5cecceba",
         "answer": "0x0000000000000000000000000000000000000000000000000000000000000001",
         "bond": "650000000000000000",
-        "ts": "1819228370",
-        "finalize_ts": "1819314770"
+        "ts": "1792429056",
+        "finalize_ts": "1792515456"
       },
       {
         "block": 26232702,
@@ -293,8 +293,8 @@
         "question_id": "0x3d465913b7d815b71a36c9455b5a84a4647aab6620bbc5094d20930c5cecceba",
         "answer": "0x0000000000000000000000000000000000000000000000000000000000000000",
         "bond": "1310000000000000000",
-        "ts": "1819232702",
-        "finalize_ts": "1819319102"
+        "ts": "1792481040",
+        "finalize_ts": "1792567440"
       },
       {
         "block": 26161383,
@@ -303,8 +303,8 @@
         "question_id": "0xe6509425061e61a2d8e0e16d5a4ec34b3b0e305268bdb2d8a8f82f4e30b21800",
         "answer": "0x0000000000000000000000000000000000000000000000000000000000000000",
         "bond": "10000000000000000",
-        "ts": "1819161383",
-        "finalize_ts": "1819247783"
+        "ts": "1791625212",
+        "finalize_ts": "1791711612"
       },
       {
         "block": 26161473,
@@ -313,8 +313,8 @@
         "question_id": "0xe6509425061e61a2d8e0e16d5a4ec34b3b0e305268bdb2d8a8f82f4e30b21800",
         "answer": "0x0000000000000000000000000000000000000000000000000000000000000001",
         "bond": "30000000000000000",
-        "ts": "1819161473",
-        "finalize_ts": "1819247873"
+        "ts": "1791626292",
+        "finalize_ts": "1791712692"
       },
       {
         "block": 26164217,
@@ -323,8 +323,8 @@
         "question_id": "0xe6509425061e61a2d8e0e16d5a4ec34b3b0e305268bdb2d8a8f82f4e30b21800",
         "answer": "0x0000000000000000000000000000000000000000000000000000000000000000",
         "bond": "70000000000000000",
-        "ts": "1819164217",
-        "finalize_ts": "1819250617"
+        "ts": "1791659220",
+        "finalize_ts": "1791745620"
       },
       {
         "block": 26167681,
@@ -333,8 +333,8 @@
         "question_id": "0xe6509425061e61a2d8e0e16d5a4ec34b3b0e305268bdb2d8a8f82f4e30b21800",
         "answer": "0x0000000000000000000000000000000000000000000000000000000000000001",
         "bond": "160000000000000000",
-        "ts": "1819167681",
-        "finalize_ts": "1819254081"
+        "ts": "1791700788",
+        "finalize_ts": "1791787188"
       },
       {
         "block": 26175358,
@@ -343,8 +343,8 @@
         "question_id": "0xe6509425061e61a2d8e0e16d5a4ec34b3b0e305268bdb2d8a8f82f4e30b21800",
         "answer": "0x0000000000000000000000000000000000000000000000000000000000000000",
         "bond": "330000000000000000",
-        "ts": "1819175358",
-        "finalize_ts": "1819261758"
+        "ts": "1791792912",
+        "finalize_ts": "1791879312"
       },
       {
         "block": 26220871,
@@ -353,8 +353,8 @@
         "question_id": "0xdf1a90a861e3e7ab6afa0480acfdad773fb8da3b71e25e12f11b15f18fcefd90",
         "answer": "0x0000000000000000000000000000000000000000000000000000000000000000",
         "bond": "10000000000000000",
-        "ts": "1819220871",
-        "finalize_ts": "1819307271"
+        "ts": "1792339068",
+        "finalize_ts": "1792425468"
       },
       {
         "block": 26227289,
@@ -363,28 +363,28 @@
         "question_id": "0xdf1a90a861e3e7ab6afa0480acfdad773fb8da3b71e25e12f11b15f18fcefd90",
         "answer": "0x0000000000000000000000000000000000000000000000000000000000000001",
         "bond": "30000000000000000",
-        "ts": "1819227289",
-        "finalize_ts": "1819313689"
+        "ts": "1792416084",
+        "finalize_ts": "1792502484"
       },
       {
         "block": 26234341,
         "log_index": "106",
         "tx": "0x62d3884c187c109cd7d911bbdaab4e223013c2c76ae62f5baaf8e8586277eb2d",
         "question_id": "0xdf1a90a861e3e7ab6afa0480acfdad773fb8da3b71e25e12f11b15f18fcefd90",
-        "answer": "0x0000000000000000000000000000000000000000000000000000000000000002",
+        "answer": "0x0000000000000000000000000000000000000000000000000000000000000000",
         "bond": "70000000000000000",
-        "ts": "1819234341",
-        "finalize_ts": "1819320741"
+        "ts": "1792500708",
+        "finalize_ts": "1792587108"
       },
       {
         "block": 26239215,
         "log_index": "96",
         "tx": "0xe7c69dd213bdb59cd432ff505258c8a00621f984871e09aedd35a95f7ed762eb",
         "question_id": "0xdf1a90a861e3e7ab6afa0480acfdad773fb8da3b71e25e12f11b15f18fcefd90",
-        "answer": "0x0000000000000000000000000000000000000000000000000000000000000000",
+        "answer": "0x0000000000000000000000000000000000000000000000000000000000000001",
         "bond": "150000000000000000",
-        "ts": "1819239215",
-        "finalize_ts": "1819325615"
+        "ts": "1792559196",
+        "finalize_ts": "1792645596"
       },
       {
         "block": 26180024,
@@ -393,8 +393,8 @@
         "question_id": "0x9dde61636c8b364084cad53522e975d8928aa995de40723f7a7dd6e0852a465f",
         "answer": "0x0000000000000000000000000000000000000000000000000000000000000000",
         "bond": "10000000000000000",
-        "ts": "1819180024",
-        "finalize_ts": "1819266424"
+        "ts": "1791848904",
+        "finalize_ts": "1791935304"
       },
       {
         "block": 26181745,
@@ -403,18 +403,18 @@
         "question_id": "0x9dde61636c8b364084cad53522e975d8928aa995de40723f7a7dd6e0852a465f",
         "answer": "0x0000000000000000000000000000000000000000000000000000000000000001",
         "bond": "20000000000000000",
-        "ts": "1819181745",
-        "finalize_ts": "1819268145"
+        "ts": "1791869556",
+        "finalize_ts": "1791955956"
       },
       {
         "block": 26184852,
         "log_index": "44",
         "tx": "0x29a3b753f60d4e9d7f864e91a3dadbb00681236a9d3e2d08f4b74d2749116840",
         "question_id": "0x9dde61636c8b364084cad53522e975d8928aa995de40723f7a7dd6e0852a465f",
-        "answer": "0x0000000000000000000000000000000000000000000000000000000000000000",
+        "answer": "0x0000000000000000000000000000000000000000000000000000000000000002",
         "bond": "60000000000000000",
-        "ts": "1819184852",
-        "finalize_ts": "1819271252"
+        "ts": "1791906840",
+        "finalize_ts": "1791993240"
       },
       {
         "block": 26185530,
@@ -423,8 +423,8 @@
         "question_id": "0xe374455ce9005d73559d2ad2ab7149c57f55dfb293485d0b0f1ae7a9e483f5f7",
         "answer": "0x0000000000000000000000000000000000000000000000000000000000000000",
         "bond": "10000000000000000",
-        "ts": "1819185530",
-        "finalize_ts": "1819271930"
+        "ts": "1791914976",
+        "finalize_ts": "1792001376"
       },
       {
         "block": 26186913,
@@ -433,8 +433,8 @@
         "question_id": "0xe374455ce9005d73559d2ad2ab7149c57f55dfb293485d0b0f1ae7a9e483f5f7",
         "answer": "0x0000000000000000000000000000000000000000000000000000000000000001",
         "bond": "30000000000000000",
-        "ts": "1819186913",
-        "finalize_ts": "1819273313"
+        "ts": "1791931572",
+        "finalize_ts": "1792017972"
       },
       {
         "block": 26188035,
@@ -443,8 +443,8 @@
         "question_id": "0xe374455ce9005d73559d2ad2ab7149c57f55dfb293485d0b0f1ae7a9e483f5f7",
         "answer": "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
         "bond": "70000000000000000",
-        "ts": "1819188035",
-        "finalize_ts": "1819274435"
+        "ts": "1791945036",
+        "finalize_ts": "1792031436"
       },
       {
         "block": 26148982,
@@ -453,8 +453,8 @@
         "question_id": "0xef42476ae46114a46db8fa49c0faf1fc9d4254354ed68ca88e727115a41478a9",
         "answer": "0x0000000000000000000000000000000000000000000000000000000000000000",
         "bond": "10000000000000000",
-        "ts": "1819148982",
-        "finalize_ts": "1819235382"
+        "ts": "1791476400",
+        "finalize_ts": "1791562800"
       },
       {
         "block": 26158564,
@@ -463,8 +463,8 @@
         "question_id": "0xef42476ae46114a46db8fa49c0faf1fc9d4254354ed68ca88e727115a41478a9",
         "answer": "0x0000000000000000000000000000000000000000000000000000000000000001",
         "bond": "30000000000000000",
-        "ts": "1819158564",
-        "finalize_ts": "1819244964"
+        "ts": "1791591384",
+        "finalize_ts": "1791677784"
       },
       {
         "block": 26155652,
@@ -473,8 +473,8 @@
         "question_id": "0xa459416a7f0bd774c70bfa00e638b1ec8debf4b7648f7ca7027aac7dbd0f7f5c",
         "answer": "0x0000000000000000000000000000000000000000000000000000000000000000",
         "bond": "10000000000000000",
-        "ts": "1819155652",
-        "finalize_ts": "1819242052"
+        "ts": "1791556440",
+        "finalize_ts": "1791642840"
       },
       {
         "block": 26156763,
@@ -483,8 +483,8 @@
         "question_id": "0xa459416a7f0bd774c70bfa00e638b1ec8debf4b7648f7ca7027aac7dbd0f7f5c",
         "answer": "0x0000000000000000000000000000000000000000000000000000000000000001",
         "bond": "40000000000000000",
-        "ts": "1819156763",
-        "finalize_ts": "1819243163"
+        "ts": "1791569772",
+        "finalize_ts": "1791656172"
       },
       {
         "block": 26133305,
@@ -493,8 +493,8 @@
         "question_id": "0x9269546b7b888a5b7b968c0eb6a9f12f8903ffac8ef6bc15d801d60daaa93a65",
         "answer": "0x0000000000000000000000000000000000000000000000000000000000000000",
         "bond": "10000000000000000",
-        "ts": "1819133305",
-        "finalize_ts": "1819219705"
+        "ts": "1791288276",
+        "finalize_ts": "1791374676"
       },
       {
         "block": 26138152,
@@ -503,8 +503,8 @@
         "question_id": "0x9269546b7b888a5b7b968c0eb6a9f12f8903ffac8ef6bc15d801d60daaa93a65",
         "answer": "0x0000000000000000000000000000000000000000000000000000000000000001",
         "bond": "20000000000000000",
-        "ts": "1819138152",
-        "finalize_ts": "1819224552"
+        "ts": "1791346440",
+        "finalize_ts": "1791432840"
       },
       {
         "block": 26196180,
@@ -513,8 +513,8 @@
         "question_id": "0x75a0d464b07d6978b63c0f38f503ccb442a07af8fb63054244b22fd795461e35",
         "answer": "0x0000000000000000000000000000000000000000000000000000000000000000",
         "bond": "10000000000000000",
-        "ts": "1819196180",
-        "finalize_ts": "1819282580"
+        "ts": "1792042776",
+        "finalize_ts": "1792129176"
       },
       {
         "block": 26124039,
@@ -523,8 +523,8 @@
         "question_id": "0xe38ea70ba33dab313dc46655f9c41075f503c46b0a3dc7e249b199d8b8037cc0",
         "answer": "0x0000000000000000000000000000000000000000000000000000000000000000",
         "bond": "10000000000000000",
-        "ts": "1819124039",
-        "finalize_ts": "1819210439"
+        "ts": "1791177084",
+        "finalize_ts": "1791263484"
       },
       {
         "block": 26175444,
@@ -533,8 +533,8 @@
         "question_id": "0x6cc113474de8050bbe16f5d8488d992ad04772690c3e70c010939e4a0ca0f740",
         "answer": "0x0000000000000000000000000000000000000000000000000000000000000000",
         "bond": "10000000000000000",
-        "ts": "1819175444",
-        "finalize_ts": "1819261844"
+        "ts": "1791793944",
+        "finalize_ts": "1791880344"
       },
       {
         "block": 26209581,
@@ -543,80 +543,44 @@
         "question_id": "0x2815ac939340baff0aae92f33dcedf47b2c7b8719dd0fe3e4a7ee1c2ab8e61a5",
         "answer": "0x0000000000000000000000000000000000000000000000000000000000000000",
         "bond": "10000000000000000",
-        "ts": "1819209581",
-        "finalize_ts": "1819295981"
+        "ts": "1792203588",
+        "finalize_ts": "1792289988"
       }
     ],
     "ethereum-outcomes": [
       {
-        "block": 26214490,
-        "question_id": "0xdf1a90a861e3e7ab6afa0480acfdad773fb8da3b71e25e12f11b15f18fcefd90",
+        "block": 26174915,
+        "question_id": "0x9dde61636c8b364084cad53522e975d8928aa995de40723f7a7dd6e0852a465f",
         "outcome_index": "0",
         "outcome": "Team A"
       },
       {
-        "block": 26214490,
-        "question_id": "0xdf1a90a861e3e7ab6afa0480acfdad773fb8da3b71e25e12f11b15f18fcefd90",
+        "block": 26174915,
+        "question_id": "0x9dde61636c8b364084cad53522e975d8928aa995de40723f7a7dd6e0852a465f",
         "outcome_index": "1",
         "outcome": "Team B"
       },
       {
-        "block": 26214490,
-        "question_id": "0xdf1a90a861e3e7ab6afa0480acfdad773fb8da3b71e25e12f11b15f18fcefd90",
+        "block": 26174915,
+        "question_id": "0x9dde61636c8b364084cad53522e975d8928aa995de40723f7a7dd6e0852a465f",
         "outcome_index": "2",
         "outcome": "Team C"
       },
       {
-        "block": 26148361,
-        "question_id": "0xef42476ae46114a46db8fa49c0faf1fc9d4254354ed68ca88e727115a41478a9",
+        "block": 26125948,
+        "question_id": "0x9269546b7b888a5b7b968c0eb6a9f12f8903ffac8ef6bc15d801d60daaa93a65",
         "outcome_index": "0",
         "outcome": "Team A"
       },
       {
-        "block": 26148361,
-        "question_id": "0xef42476ae46114a46db8fa49c0faf1fc9d4254354ed68ca88e727115a41478a9",
+        "block": 26125948,
+        "question_id": "0x9269546b7b888a5b7b968c0eb6a9f12f8903ffac8ef6bc15d801d60daaa93a65",
         "outcome_index": "1",
         "outcome": "Team B"
       },
       {
-        "block": 26148361,
-        "question_id": "0xef42476ae46114a46db8fa49c0faf1fc9d4254354ed68ca88e727115a41478a9",
-        "outcome_index": "2",
-        "outcome": "Team C"
-      },
-      {
-        "block": 26195143,
-        "question_id": "0x75a0d464b07d6978b63c0f38f503ccb442a07af8fb63054244b22fd795461e35",
-        "outcome_index": "0",
-        "outcome": "Team A"
-      },
-      {
-        "block": 26195143,
-        "question_id": "0x75a0d464b07d6978b63c0f38f503ccb442a07af8fb63054244b22fd795461e35",
-        "outcome_index": "1",
-        "outcome": "Team B"
-      },
-      {
-        "block": 26195143,
-        "question_id": "0x75a0d464b07d6978b63c0f38f503ccb442a07af8fb63054244b22fd795461e35",
-        "outcome_index": "2",
-        "outcome": "Team C"
-      },
-      {
-        "block": 26204383,
-        "question_id": "0x2815ac939340baff0aae92f33dcedf47b2c7b8719dd0fe3e4a7ee1c2ab8e61a5",
-        "outcome_index": "0",
-        "outcome": "Team A"
-      },
-      {
-        "block": 26204383,
-        "question_id": "0x2815ac939340baff0aae92f33dcedf47b2c7b8719dd0fe3e4a7ee1c2ab8e61a5",
-        "outcome_index": "1",
-        "outcome": "Team B"
-      },
-      {
-        "block": 26204383,
-        "question_id": "0x2815ac939340baff0aae92f33dcedf47b2c7b8719dd0fe3e4a7ee1c2ab8e61a5",
+        "block": 26125948,
+        "question_id": "0x9269546b7b888a5b7b968c0eb6a9f12f8903ffac8ef6bc15d801d60daaa93a65",
         "outcome_index": "2",
         "outcome": "Team C"
       }
@@ -649,25 +613,25 @@
       {
         "block": 48681853,
         "question_id": "0xa5f4b14b5913f9f2bf3d46805a167df7ba448422d282253b35efed1f83f2ee93",
-        "template_id": "2",
-        "question_text": "Will ETH close above $4,000 on 2026-12-31?␟\"Team A\",\"Team B\",\"Team C\"␟sports␟en_US",
+        "template_id": "0",
+        "question_text": "Will ETH close above $4,000 on 2026-12-31?␟news␟en_US",
         "arbitrator": "0x898e7891d6bcfed8393826d158d43057d1c4c4a0",
         "timeout": "86400",
         "opening_ts": "0",
         "title": "Will ETH close above $4,000 on 2026-12-31?",
-        "category": "sports",
+        "category": "news",
         "language": "en_US"
       },
       {
         "block": 48746984,
         "question_id": "0x06a49bc71db0afddb878bcec38885d847f9fe8c36b3edf2731f0933f2c3cb0cf",
-        "template_id": "0",
-        "question_text": "Which team wins the final?␟news␟en_US",
+        "template_id": "2",
+        "question_text": "Which team wins the final?␟\"Team A\",\"Team B\",\"Team C\"␟sports␟en_US",
         "arbitrator": "0x5a6526431a55a7399796d530a05e5012fa20a3d7",
         "timeout": "86400",
         "opening_ts": "0",
         "title": "Which team wins the final?",
-        "category": "news",
+        "category": "sports",
         "language": "en_US"
       },
       {
@@ -685,13 +649,13 @@
       {
         "block": 48607117,
         "question_id": "0x280f2957e0baa29797eebf194b3e61fc501dab1d02851e907ff6e7f98f74b01e",
-        "template_id": "2",
-        "question_text": "Will the bridge upgrade ship this year?␟\"Team A\",\"Team B\",\"Team C\"␟sports␟en_US",
+        "template_id": "0",
+        "question_text": "Will the bridge upgrade ship this year?␟news␟en_US",
         "arbitrator": "0x6a86158199a9f4ed6c64eee7642d2e9272b3ef15",
         "timeout": "86400",
         "opening_ts": "0",
         "title": "Will the bridge upgrade ship this year?",
-        "category": "sports",
+        "category": "news",
         "language": "en_US"
       },
       {
@@ -709,25 +673,25 @@
       {
         "block": 48741467,
         "question_id": "0x2c1035cb0f2204a355fe4bb3fba22a3608051ddce407262e62f64ec915372c8f",
-        "template_id": "0",
-        "question_text": "Will the grant be awarded to Team Alpha?␟news␟en_US",
+        "template_id": "2",
+        "question_text": "Which team is awarded the grant?␟\"Team A\",\"Team B\",\"Team C\"␟grants␟en_US",
         "arbitrator": "0xcb713cd7c29aeeddd3519e5b9e2199246f7d6a6d",
         "timeout": "86400",
         "opening_ts": "0",
-        "title": "Will the grant be awarded to Team Alpha?",
-        "category": "news",
+        "title": "Which team is awarded the grant?",
+        "category": "grants",
         "language": "en_US"
       },
       {
         "block": 48602901,
         "question_id": "0xebfc50d58d478f61f705317556aaa0b824d9330799054fa5e7f15ecceb62dd18",
-        "template_id": "2",
-        "question_text": "Does the paper replicate?␟\"Team A\",\"Team B\",\"Team C\"␟sports␟en_US",
+        "template_id": "0",
+        "question_text": "Does the paper replicate?␟news␟en_US",
         "arbitrator": "0x990c785e6aff9bad011012a0a806944c28611c1f",
         "timeout": "86400",
         "opening_ts": "0",
         "title": "Does the paper replicate?",
-        "category": "sports",
+        "category": "news",
         "language": "en_US"
       },
       {
@@ -757,13 +721,13 @@
       {
         "block": 48769050,
         "question_id": "0xda8ae6345c19635a305ea6633494228f4f2383f9b6a2d7d47ba1442c97122c1f",
-        "template_id": "2",
-        "question_text": "Will the court rule before the end of Q4?␟\"Team A\",\"Team B\",\"Team C\"␟sports␟en_US",
+        "template_id": "0",
+        "question_text": "Will the court rule before the end of Q4?␟news␟en_US",
         "arbitrator": "0x59b5d63666f791bb675e9dc0def90a343ec46b70",
         "timeout": "86400",
         "opening_ts": "0",
         "title": "Will the court rule before the end of Q4?",
-        "category": "sports",
+        "category": "news",
         "language": "en_US"
       },
       {
@@ -799,8 +763,8 @@
         "question_id": "0xfc356a6d82e02de5f496d4742d61e0de09b26623d28cf214b29e5631be7a317e",
         "answer": "0x0000000000000000000000000000000000000000000000000000000000000000",
         "bond": "10000000000000000",
-        "ts": "1841739374",
-        "finalize_ts": "1841825774"
+        "ts": "1791891040",
+        "finalize_ts": "1791977440"
       },
       {
         "block": 48758594,
@@ -809,8 +773,8 @@
         "question_id": "0xfc356a6d82e02de5f496d4742d61e0de09b26623d28cf214b29e5631be7a317e",
         "answer": "0x0000000000000000000000000000000000000000000000000000000000000001",
         "bond": "30000000000000000",
-        "ts": "1841758594",
-        "finalize_ts": "1841844994"
+        "ts": "1791987140",
+        "finalize_ts": "1792073540"
       },
       {
         "block": 48777535,
@@ -819,8 +783,8 @@
         "question_id": "0xfc356a6d82e02de5f496d4742d61e0de09b26623d28cf214b29e5631be7a317e",
         "answer": "0x0000000000000000000000000000000000000000000000000000000000000000",
         "bond": "80000000000000000",
-        "ts": "1841777535",
-        "finalize_ts": "1841863935"
+        "ts": "1792081845",
+        "finalize_ts": "1792168245"
       },
       {
         "block": 48797041,
@@ -829,8 +793,8 @@
         "question_id": "0xfc356a6d82e02de5f496d4742d61e0de09b26623d28cf214b29e5631be7a317e",
         "answer": "0x0000000000000000000000000000000000000000000000000000000000000001",
         "bond": "180000000000000000",
-        "ts": "1841797041",
-        "finalize_ts": "1841883441"
+        "ts": "1792179375",
+        "finalize_ts": "1792265775"
       },
       {
         "block": 48810261,
@@ -839,8 +803,8 @@
         "question_id": "0xfc356a6d82e02de5f496d4742d61e0de09b26623d28cf214b29e5631be7a317e",
         "answer": "0x0000000000000000000000000000000000000000000000000000000000000000",
         "bond": "380000000000000000",
-        "ts": "1841810261",
-        "finalize_ts": "1841896661"
+        "ts": "1792245475",
+        "finalize_ts": "1792331875"
       },
       {
         "block": 48826065,
@@ -849,8 +813,8 @@
         "question_id": "0xfc356a6d82e02de5f496d4742d61e0de09b26623d28cf214b29e5631be7a317e",
         "answer": "0x0000000000000000000000000000000000000000000000000000000000000001",
         "bond": "780000000000000000",
-        "ts": "1841826065",
-        "finalize_ts": "1841912465"
+        "ts": "1792324495",
+        "finalize_ts": "1792410895"
       },
       {
         "block": 48674447,
@@ -859,8 +823,8 @@
         "question_id": "0x7c3386d54f8f64218aaeea0019455a9a861a5456dee99bb99de356059fff7308",
         "answer": "0x0000000000000000000000000000000000000000000000000000000000000000",
         "bond": "10000000000000000",
-        "ts": "1841674447",
-        "finalize_ts": "1841760847"
+        "ts": "1791566405",
+        "finalize_ts": "1791652805"
       },
       {
         "block": 48680348,
@@ -869,8 +833,8 @@
         "question_id": "0x7c3386d54f8f64218aaeea0019455a9a861a5456dee99bb99de356059fff7308",
         "answer": "0x0000000000000000000000000000000000000000000000000000000000000001",
         "bond": "30000000000000000",
-        "ts": "1841680348",
-        "finalize_ts": "1841766748"
+        "ts": "1791595910",
+        "finalize_ts": "1791682310"
       },
       {
         "block": 48682832,
@@ -879,8 +843,8 @@
         "question_id": "0x7c3386d54f8f64218aaeea0019455a9a861a5456dee99bb99de356059fff7308",
         "answer": "0x0000000000000000000000000000000000000000000000000000000000000000",
         "bond": "60000000000000000",
-        "ts": "1841682832",
-        "finalize_ts": "1841769232"
+        "ts": "1791608330",
+        "finalize_ts": "1791694730"
       },
       {
         "block": 48696528,
@@ -889,8 +853,8 @@
         "question_id": "0x7c3386d54f8f64218aaeea0019455a9a861a5456dee99bb99de356059fff7308",
         "answer": "0x0000000000000000000000000000000000000000000000000000000000000001",
         "bond": "120000000000000000",
-        "ts": "1841696528",
-        "finalize_ts": "1841782928"
+        "ts": "1791676810",
+        "finalize_ts": "1791763210"
       },
       {
         "block": 48700390,
@@ -899,8 +863,8 @@
         "question_id": "0x7c3386d54f8f64218aaeea0019455a9a861a5456dee99bb99de356059fff7308",
         "answer": "0x0000000000000000000000000000000000000000000000000000000000000000",
         "bond": "240000000000000000",
-        "ts": "1841700390",
-        "finalize_ts": "1841786790"
+        "ts": "1791696120",
+        "finalize_ts": "1791782520"
       },
       {
         "block": 48699562,
@@ -909,8 +873,8 @@
         "question_id": "0xa5f4b14b5913f9f2bf3d46805a167df7ba448422d282253b35efed1f83f2ee93",
         "answer": "0x0000000000000000000000000000000000000000000000000000000000000000",
         "bond": "10000000000000000",
-        "ts": "1841699562",
-        "finalize_ts": "1841785962"
+        "ts": "1791691980",
+        "finalize_ts": "1791778380"
       },
       {
         "block": 48711901,
@@ -919,28 +883,28 @@
         "question_id": "0xa5f4b14b5913f9f2bf3d46805a167df7ba448422d282253b35efed1f83f2ee93",
         "answer": "0x0000000000000000000000000000000000000000000000000000000000000001",
         "bond": "20000000000000000",
-        "ts": "1841711901",
-        "finalize_ts": "1841798301"
+        "ts": "1791753675",
+        "finalize_ts": "1791840075"
       },
       {
         "block": 48726483,
         "log_index": "93",
         "tx": "0x85fa8c92731af3022bee07e2c4cc9585952371f6b9479bd70d1711a9e126abbd",
         "question_id": "0xa5f4b14b5913f9f2bf3d46805a167df7ba448422d282253b35efed1f83f2ee93",
-        "answer": "0x0000000000000000000000000000000000000000000000000000000000000002",
+        "answer": "0x0000000000000000000000000000000000000000000000000000000000000000",
         "bond": "60000000000000000",
-        "ts": "1841726483",
-        "finalize_ts": "1841812883"
+        "ts": "1791826585",
+        "finalize_ts": "1791912985"
       },
       {
         "block": 48734083,
         "log_index": "107",
         "tx": "0x515797eda4849393003d92e3f44fd5805d84211ce4da5a95070cb9b3eee58f2b",
         "question_id": "0xa5f4b14b5913f9f2bf3d46805a167df7ba448422d282253b35efed1f83f2ee93",
-        "answer": "0x0000000000000000000000000000000000000000000000000000000000000000",
+        "answer": "0x0000000000000000000000000000000000000000000000000000000000000001",
         "bond": "140000000000000000",
-        "ts": "1841734083",
-        "finalize_ts": "1841820483"
+        "ts": "1791864585",
+        "finalize_ts": "1791950985"
       },
       {
         "block": 48769467,
@@ -949,8 +913,8 @@
         "question_id": "0x06a49bc71db0afddb878bcec38885d847f9fe8c36b3edf2731f0933f2c3cb0cf",
         "answer": "0x0000000000000000000000000000000000000000000000000000000000000000",
         "bond": "10000000000000000",
-        "ts": "1841769467",
-        "finalize_ts": "1841855867"
+        "ts": "1792041505",
+        "finalize_ts": "1792127905"
       },
       {
         "block": 48780243,
@@ -959,18 +923,18 @@
         "question_id": "0x06a49bc71db0afddb878bcec38885d847f9fe8c36b3edf2731f0933f2c3cb0cf",
         "answer": "0x0000000000000000000000000000000000000000000000000000000000000001",
         "bond": "20000000000000000",
-        "ts": "1841780243",
-        "finalize_ts": "1841866643"
+        "ts": "1792095385",
+        "finalize_ts": "1792181785"
       },
       {
         "block": 48788827,
         "log_index": "28",
         "tx": "0x3286e6fbd5d0f333a85efced3d8c8af4023dbdd9fef7ff501d75d1fac9000b19",
         "question_id": "0x06a49bc71db0afddb878bcec38885d847f9fe8c36b3edf2731f0933f2c3cb0cf",
-        "answer": "0x0000000000000000000000000000000000000000000000000000000000000000",
+        "answer": "0x0000000000000000000000000000000000000000000000000000000000000002",
         "bond": "60000000000000000",
-        "ts": "1841788827",
-        "finalize_ts": "1841875227"
+        "ts": "1792138305",
+        "finalize_ts": "1792224705"
       },
       {
         "block": 48654484,
@@ -979,8 +943,8 @@
         "question_id": "0x1106d76b317b1fe00a15378810018cfb53f76d64488d9ccba9c7f6b7ad3b9e19",
         "answer": "0x0000000000000000000000000000000000000000000000000000000000000000",
         "bond": "10000000000000000",
-        "ts": "1841654484",
-        "finalize_ts": "1841740884"
+        "ts": "1791466590",
+        "finalize_ts": "1791552990"
       },
       {
         "block": 48656270,
@@ -989,8 +953,8 @@
         "question_id": "0x1106d76b317b1fe00a15378810018cfb53f76d64488d9ccba9c7f6b7ad3b9e19",
         "answer": "0x0000000000000000000000000000000000000000000000000000000000000001",
         "bond": "30000000000000000",
-        "ts": "1841656270",
-        "finalize_ts": "1841742670"
+        "ts": "1791475520",
+        "finalize_ts": "1791561920"
       },
       {
         "block": 48660324,
@@ -999,8 +963,8 @@
         "question_id": "0x1106d76b317b1fe00a15378810018cfb53f76d64488d9ccba9c7f6b7ad3b9e19",
         "answer": "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
         "bond": "70000000000000000",
-        "ts": "1841660324",
-        "finalize_ts": "1841746724"
+        "ts": "1791495790",
+        "finalize_ts": "1791582190"
       },
       {
         "block": 48623756,
@@ -1009,8 +973,8 @@
         "question_id": "0x280f2957e0baa29797eebf194b3e61fc501dab1d02851e907ff6e7f98f74b01e",
         "answer": "0x0000000000000000000000000000000000000000000000000000000000000000",
         "bond": "10000000000000000",
-        "ts": "1841623756",
-        "finalize_ts": "1841710156"
+        "ts": "1791312950",
+        "finalize_ts": "1791399350"
       },
       {
         "block": 48645027,
@@ -1019,8 +983,8 @@
         "question_id": "0x280f2957e0baa29797eebf194b3e61fc501dab1d02851e907ff6e7f98f74b01e",
         "answer": "0x0000000000000000000000000000000000000000000000000000000000000001",
         "bond": "30000000000000000",
-        "ts": "1841645027",
-        "finalize_ts": "1841731427"
+        "ts": "1791419305",
+        "finalize_ts": "1791505705"
       },
       {
         "block": 48799708,
@@ -1029,8 +993,8 @@
         "question_id": "0x02d02420c39477bfe9216c1b0efcbf9196bf3555b1af0f99f8def3536ccbb5b7",
         "answer": "0x0000000000000000000000000000000000000000000000000000000000000000",
         "bond": "10000000000000000",
-        "ts": "1841799708",
-        "finalize_ts": "1841886108"
+        "ts": "1792192710",
+        "finalize_ts": "1792279110"
       },
       {
         "block": 48813393,
@@ -1039,8 +1003,8 @@
         "question_id": "0x02d02420c39477bfe9216c1b0efcbf9196bf3555b1af0f99f8def3536ccbb5b7",
         "answer": "0x0000000000000000000000000000000000000000000000000000000000000001",
         "bond": "40000000000000000",
-        "ts": "1841813393",
-        "finalize_ts": "1841899793"
+        "ts": "1792261135",
+        "finalize_ts": "1792347535"
       },
       {
         "block": 48752119,
@@ -1049,8 +1013,8 @@
         "question_id": "0x2c1035cb0f2204a355fe4bb3fba22a3608051ddce407262e62f64ec915372c8f",
         "answer": "0x0000000000000000000000000000000000000000000000000000000000000000",
         "bond": "10000000000000000",
-        "ts": "1841752119",
-        "finalize_ts": "1841838519"
+        "ts": "1791954765",
+        "finalize_ts": "1792041165"
       },
       {
         "block": 48777852,
@@ -1059,8 +1023,8 @@
         "question_id": "0x2c1035cb0f2204a355fe4bb3fba22a3608051ddce407262e62f64ec915372c8f",
         "answer": "0x0000000000000000000000000000000000000000000000000000000000000001",
         "bond": "20000000000000000",
-        "ts": "1841777852",
-        "finalize_ts": "1841864252"
+        "ts": "1792083430",
+        "finalize_ts": "1792169830"
       },
       {
         "block": 48625172,
@@ -1069,8 +1033,8 @@
         "question_id": "0xebfc50d58d478f61f705317556aaa0b824d9330799054fa5e7f15ecceb62dd18",
         "answer": "0x0000000000000000000000000000000000000000000000000000000000000000",
         "bond": "10000000000000000",
-        "ts": "1841625172",
-        "finalize_ts": "1841711572"
+        "ts": "1791320030",
+        "finalize_ts": "1791406430"
       },
       {
         "block": 48609292,
@@ -1079,8 +1043,8 @@
         "question_id": "0xe158533567294aeead1cd75f804ebaa6605b7aaa7af94d584b6c68f104a5866d",
         "answer": "0x0000000000000000000000000000000000000000000000000000000000000000",
         "bond": "10000000000000000",
-        "ts": "1841609292",
-        "finalize_ts": "1841695692"
+        "ts": "1791240630",
+        "finalize_ts": "1791327030"
       },
       {
         "block": 48747376,
@@ -1089,8 +1053,8 @@
         "question_id": "0x8b2ebb9800f586cf421ae55c8e89ade1f95f790afc54dd268df3ab814af07d10",
         "answer": "0x0000000000000000000000000000000000000000000000000000000000000000",
         "bond": "10000000000000000",
-        "ts": "1841747376",
-        "finalize_ts": "1841833776"
+        "ts": "1791931050",
+        "finalize_ts": "1792017450"
       },
       {
         "block": 48777467,
@@ -1099,80 +1063,44 @@
         "question_id": "0xda8ae6345c19635a305ea6633494228f4f2383f9b6a2d7d47ba1442c97122c1f",
         "answer": "0x0000000000000000000000000000000000000000000000000000000000000000",
         "bond": "10000000000000000",
-        "ts": "1841777467",
-        "finalize_ts": "1841863867"
+        "ts": "1792081505",
+        "finalize_ts": "1792167905"
       }
     ],
     "gnosis-outcomes": [
       {
-        "block": 48681853,
-        "question_id": "0xa5f4b14b5913f9f2bf3d46805a167df7ba448422d282253b35efed1f83f2ee93",
+        "block": 48746984,
+        "question_id": "0x06a49bc71db0afddb878bcec38885d847f9fe8c36b3edf2731f0933f2c3cb0cf",
         "outcome_index": "0",
         "outcome": "Team A"
       },
       {
-        "block": 48681853,
-        "question_id": "0xa5f4b14b5913f9f2bf3d46805a167df7ba448422d282253b35efed1f83f2ee93",
+        "block": 48746984,
+        "question_id": "0x06a49bc71db0afddb878bcec38885d847f9fe8c36b3edf2731f0933f2c3cb0cf",
         "outcome_index": "1",
         "outcome": "Team B"
       },
       {
-        "block": 48681853,
-        "question_id": "0xa5f4b14b5913f9f2bf3d46805a167df7ba448422d282253b35efed1f83f2ee93",
+        "block": 48746984,
+        "question_id": "0x06a49bc71db0afddb878bcec38885d847f9fe8c36b3edf2731f0933f2c3cb0cf",
         "outcome_index": "2",
         "outcome": "Team C"
       },
       {
-        "block": 48607117,
-        "question_id": "0x280f2957e0baa29797eebf194b3e61fc501dab1d02851e907ff6e7f98f74b01e",
+        "block": 48741467,
+        "question_id": "0x2c1035cb0f2204a355fe4bb3fba22a3608051ddce407262e62f64ec915372c8f",
         "outcome_index": "0",
         "outcome": "Team A"
       },
       {
-        "block": 48607117,
-        "question_id": "0x280f2957e0baa29797eebf194b3e61fc501dab1d02851e907ff6e7f98f74b01e",
+        "block": 48741467,
+        "question_id": "0x2c1035cb0f2204a355fe4bb3fba22a3608051ddce407262e62f64ec915372c8f",
         "outcome_index": "1",
         "outcome": "Team B"
       },
       {
-        "block": 48607117,
-        "question_id": "0x280f2957e0baa29797eebf194b3e61fc501dab1d02851e907ff6e7f98f74b01e",
-        "outcome_index": "2",
-        "outcome": "Team C"
-      },
-      {
-        "block": 48602901,
-        "question_id": "0xebfc50d58d478f61f705317556aaa0b824d9330799054fa5e7f15ecceb62dd18",
-        "outcome_index": "0",
-        "outcome": "Team A"
-      },
-      {
-        "block": 48602901,
-        "question_id": "0xebfc50d58d478f61f705317556aaa0b824d9330799054fa5e7f15ecceb62dd18",
-        "outcome_index": "1",
-        "outcome": "Team B"
-      },
-      {
-        "block": 48602901,
-        "question_id": "0xebfc50d58d478f61f705317556aaa0b824d9330799054fa5e7f15ecceb62dd18",
-        "outcome_index": "2",
-        "outcome": "Team C"
-      },
-      {
-        "block": 48769050,
-        "question_id": "0xda8ae6345c19635a305ea6633494228f4f2383f9b6a2d7d47ba1442c97122c1f",
-        "outcome_index": "0",
-        "outcome": "Team A"
-      },
-      {
-        "block": 48769050,
-        "question_id": "0xda8ae6345c19635a305ea6633494228f4f2383f9b6a2d7d47ba1442c97122c1f",
-        "outcome_index": "1",
-        "outcome": "Team B"
-      },
-      {
-        "block": 48769050,
-        "question_id": "0xda8ae6345c19635a305ea6633494228f4f2383f9b6a2d7d47ba1442c97122c1f",
+        "block": 48741467,
+        "question_id": "0x2c1035cb0f2204a355fe4bb3fba22a3608051ddce407262e62f64ec915372c8f",
         "outcome_index": "2",
         "outcome": "Team C"
       }
