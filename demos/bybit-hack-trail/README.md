@@ -55,7 +55,7 @@ Declared in `testril.json`, one trio per wallet.
 
 - A transfer is keyed by transaction and log index, so one read from both its sender's and recipient's wallet counts once; a repeat inside one wallet fails.
 - A transfer between two trail wallets must appear, identical, on both sides.
-- A wallet's hourly token balance changes between hours by exactly the transfers in the trail in that hour (inflows minus outflows, per token). An hour's blocks are `from_block + hour * 300`, since the window starts at hour 0 and Ethereum has 7,200 blocks a day. stETH rebases daily without a transfer, so it may drift by 0.05% of the balance. The first hour's balance is the starting point.
+- A wallet's hourly token balance changes between hours by exactly the transfers in the trail in that hour (inflows minus outflows, per token). The recording carries each hour's last block in `hourEndBlocks` (hour to block); a transfer belongs to the first hour whose last block is at or after it. stETH may differ by 2 wei per transfer for share rounding, plus up to 0.02% of the balance in the 12:00 and 13:00 UTC hours that hold Lido's daily rebase. The first hour's balance is the starting point.
 - Balance rows must lie inside the hour window, once per hour and token.
 
 Native ETH moves emit no ERC-20 transfer, so hourly ETH balances are only charted and window-checked, not reconciled. The roughly 401,000 ETH taken in the hack was native ETH and is not in the transfers; the headline counts stETH, mETH and cmETH separately.

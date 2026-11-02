@@ -1,34 +1,34 @@
 import spec from "../testril.json" with { type: "json" };
 
-const transferBinds = spec.binds.filter(
+export const transferBinds = spec.binds.filter(
   (bind) => bind.function_slug === "erc20.wallet_transfers",
 );
-const balanceBinds = spec.binds.filter(
+export const balanceBinds = spec.binds.filter(
   (bind) => bind.function_slug === "native.balance",
 );
-const tokenBalanceBinds = spec.binds.filter(
+export const tokenBalanceBinds = spec.binds.filter(
   (bind) => bind.function_slug === "erc20.token_balance",
 );
 export const transferWindow = transferBinds[0].window;
 export const hourWindow = balanceBinds[0].window;
 export const wallets = transferBinds.map((bind) => bind.params.wallet);
-const [source, exploiter] = wallets;
+const walletOf = (bindName) =>
+  transferBinds.find((bind) => bind.name === bindName).params.wallet;
+const source = walletOf("transfers-bybit-cold-wallet");
+const exploiter = walletOf("transfers-exploiter");
 export const maxNodes = 10;
 const minDrawnAmount = 1000n * 10n ** 18n;
 
 const titles = {
-  "bybit-cold-wallet": "Bybit cold wallet",
-  exploiter: "Exploiter",
-  "hop-a4b2": "Wallet 0xa4b2…449e",
-  "hop-bdd0": "Wallet 0xbdd0…9516",
-  "hop-0fa0": "Wallet 0x0fa0…6d2e",
-  "hop-1542": "Wallet 0x1542…0d04",
+  "transfers-bybit-cold-wallet": "Bybit cold wallet",
+  "transfers-exploiter": "Exploiter",
+  "transfers-hop-a4b2": "Wallet 0xa4b2…449e",
+  "transfers-hop-bdd0": "Wallet 0xbdd0…9516",
+  "transfers-hop-0fa0": "Wallet 0x0fa0…6d2e",
+  "transfers-hop-1542": "Wallet 0x1542…0d04",
 };
 const names = new Map(
-  transferBinds.map((bind) => [
-    bind.params.wallet,
-    titles[bind.name.replace("transfers-", "")],
-  ]),
+  transferBinds.map((bind) => [bind.params.wallet, titles[bind.name]]),
 );
 const symbols = new Map([
   ["0xae7ab96520de3a18e5e111b5eaab095312d7fe84", "stETH"],
@@ -38,13 +38,10 @@ const symbols = new Map([
 export const tokens = transferBinds[0].params.tokens;
 
 const unit = 10n ** 18n;
-export const blocksPerHour = 7200 / 24;
-const rebasingTokens = new Set(["0xae7ab96520de3a18e5e111b5eaab095312d7fe84"]);
-const rebaseToleranceDivisor = 2000n;
-const rebaseRoundingWei = 2n;
+export const symbolOf = (token) => symbols.get(token);
 const shortAddress = (address) => `${address.slice(0, 6)}…${address.slice(-4)}`;
-const label = (address) => names.get(address) ?? shortAddress(address);
-const transferKey = (row) => `${row.tx}:${row.log_index}`;
+export const label = (address) => names.get(address) ?? shortAddress(address);
+export const transferKey = (row) => `${row.tx}:${row.log_index}`;
 const edgeKey = (from, to) => `${from}>${to}`;
 
 export function hoursInWindow() {
@@ -66,9 +63,9 @@ export function formatAmount(raw, signed = false) {
   return `${negative ? "−" : signed && abs > 0n ? "+" : ""}${whole}`;
 }
 
-const asFloat = (raw) => Number(raw / 10n ** 15n) / 1000;
+const toChartEth = (raw) => Number(raw / 10n ** 15n) / 1000;
 
-function uniqueTransfers(rows) {
+export function uniqueTransfers(rows) {
   const unique = new Map();
   for (const bind of transferBinds)
     for (const row of rows[bind.name])
@@ -78,128 +75,6 @@ function uniqueTransfers(rows) {
     for (const row of rows[bind.name])
       unique.get(transferKey(row)).seenIn.add(bind.params.wallet);
   return unique;
-}
-
-function checkTransferRows(rows) {
-  for (const bind of transferBinds) {
-    const { wallet } = bind.params;
-    const seen = new Set();
-    for (const row of rows[bind.name]) {
-      const where = `${label(wallet)} transfer ${transferKey(row)}`;
-      if (row.from !== wallet && row.to !== wallet)
-        throw new Error(`${where} does not involve the wallet.`);
-      if (
-        row.block < transferWindow.from_block ||
-        row.block >= transferWindow.to_block
-      )
-        throw new Error(`${where} is outside the block window.`);
-      if (!tokens.includes(row.token))
-        throw new Error(`${where} is a token outside the trail.`);
-      if (seen.has(transferKey(row)))
-        throw new Error(`${where} is listed twice.`);
-      seen.add(transferKey(row));
-    }
-  }
-}
-
-function checkBothSidesAgree(rows) {
-  const first = new Map();
-  for (const bind of transferBinds)
-    for (const row of rows[bind.name]) {
-      const key = transferKey(row);
-      const other = first.get(key);
-      const fields = ["from", "to", "token", "value"];
-      if (other && fields.some((field) => other[field] !== row[field]))
-        throw new Error(`Wallets disagree about transfer ${key}.`);
-      first.set(key, row);
-    }
-  for (const [key, { row, seenIn }] of uniqueTransfers(rows))
-    for (const side of [row.from, row.to])
-      if (wallets.includes(side) && !seenIn.has(side))
-        throw new Error(`Transfer ${key} is missing from ${label(side)}.`);
-}
-
-function checkHourRows(rows, bind, owner) {
-  const hours = new Set(hoursInWindow());
-  const seen = new Set();
-  for (const row of rows[bind.name]) {
-    const key = `${row.hour}:${row.token ?? ""}`;
-    const tokenOutside = row.token !== undefined && !tokens.includes(row.token);
-    const wrongOwner = row.owner !== undefined && row.owner !== owner;
-    if (wrongOwner || tokenOutside || !hours.has(row.hour) || seen.has(key))
-      throw new Error(`${bind.name} has a stray or repeated ${row.hour} row.`);
-    seen.add(key);
-  }
-}
-
-function checkNativeBalances(rows) {
-  for (const bind of balanceBinds)
-    checkHourRows(rows, bind, bind.params.owners[0]);
-}
-
-function hourlyTransferChanges(rows) {
-  const changes = new Map();
-  for (const { row } of uniqueTransfers(rows).values()) {
-    const hour = Math.floor(
-      (row.block - transferWindow.from_block) / blocksPerHour,
-    );
-    for (const [wallet, sign] of [
-      [row.to, 1n],
-      [row.from, -1n],
-    ]) {
-      const key = `${wallet}:${row.token}:${hour}`;
-      changes.set(key, (changes.get(key) ?? 0n) + sign * BigInt(row.value));
-    }
-  }
-  return changes;
-}
-
-function allowedDrift(token, balance) {
-  return rebasingTokens.has(token)
-    ? balance / rebaseToleranceDivisor + rebaseRoundingWei
-    : 0n;
-}
-
-function checkBalancesFollowTransfers(rows) {
-  const changes = hourlyTransferChanges(rows);
-  const hours = hoursInWindow();
-  for (const bind of tokenBalanceBinds) {
-    const [wallet] = bind.params.reads.owners;
-    checkHourRows(rows, bind, wallet);
-    const balances = new Map(
-      rows[bind.name].map((row) => [
-        `${row.token}:${row.hour}`,
-        BigInt(row.balance),
-      ]),
-    );
-    for (const token of tokens)
-      for (let index = 1; index < hours.length; index++) {
-        const before = balances.get(`${token}:${hours[index - 1]}`) ?? 0n;
-        const after = balances.get(`${token}:${hours[index]}`) ?? 0n;
-        const expected = changes.get(`${wallet}:${token}:${index}`) ?? 0n;
-        const drift = after - before - expected;
-        const allowed = allowedDrift(token, before > after ? before : after);
-        if (drift > allowed || -drift > allowed)
-          throw new Error(
-            `${label(wallet)} ${symbols.get(token)} balance moved by ${formatAmount(after - before, true)} in ${hours[index]}, but its transfers moved ${formatAmount(expected, true)}.`,
-          );
-      }
-  }
-}
-
-export function check(rows) {
-  checkTransferRows(rows);
-  checkBothSidesAgree(rows);
-  checkBalancesFollowTransfers(rows);
-  checkNativeBalances(rows);
-  const entries = [...uniqueTransfers(rows).values()];
-  const readTwice = entries.filter((entry) => entry.seenIn.size > 1).length;
-  return [
-    `${entries.length} transfers counted once each, ${readTwice} of them read from both wallets`,
-    "Every transfer between two trail wallets appears, identical, on both sides",
-    "Every wallet's hourly token balance changes by exactly its transfers in that hour (stETH within 0.05% for rebases)",
-    `Balance rows sit only in the ${hoursInWindow().length} hours of the window`,
-  ];
 }
 
 function hopsFrom(start, edges) {
@@ -231,7 +106,7 @@ function sparkline(rows, bind) {
   );
   const series = hoursInWindow().map((hour) => ({
     hour,
-    eth: asFloat(balances.get(hour) ?? 0n),
+    eth: toChartEth(balances.get(hour) ?? 0n),
   }));
   const peak = Math.max(...series.map((point) => point.eth));
   return {
@@ -293,7 +168,9 @@ export function shape(rows) {
     tokens.map((token) => [
       token,
       Math.max(
-        ...drawn.filter((e) => e.token === token).map((e) => asFloat(e.amount)),
+        ...drawn
+          .filter((e) => e.token === token)
+          .map((e) => toChartEth(e.amount)),
       ),
     ]),
   );
@@ -325,7 +202,7 @@ export function shape(rows) {
       symbol: symbols.get(edge.token),
       tokenIndex: tokens.indexOf(edge.token),
       amount: formatAmount(edge.amount),
-      share: asFloat(edge.amount) / biggest.get(edge.token),
+      share: toChartEth(edge.amount) / biggest.get(edge.token),
     })),
     hiddenEdges: edges.length - drawn.length,
     wallets: transferBinds.map((bind, index) => {

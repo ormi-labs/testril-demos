@@ -1,20 +1,23 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { check, hoursInWindow, shape, wallets } from "../src/report.mjs";
-import { fixture } from "./fixture.mjs";
+import { check } from "../src/check.mjs";
+import { hoursInWindow, shape, wallets } from "../src/report.mjs";
+import { fixture, hourEndBlocks } from "./fixture.mjs";
 
-const rows = () => JSON.parse(JSON.stringify(fixture().rows));
+const recording = () => JSON.parse(JSON.stringify(fixture()));
+const rows = () => recording().rows;
+const checkRows = (corrupted) => check({ rows: corrupted, hourEndBlocks });
 const [, exploiter, walletA] = wallets;
 const exploiterBind = "transfers-exploiter";
 
 test("check passes on the fixture and says what it proved", () => {
-  assert.match(check(rows())[0], /counted once each/);
+  assert.match(check(recording())[0], /counted once each/);
 });
 
 test("check fails when a transfer is listed twice in one wallet", () => {
   const corrupted = rows();
   corrupted[exploiterBind].push(corrupted[exploiterBind][0]);
-  assert.throws(() => check(corrupted), /listed twice/);
+  assert.throws(() => checkRows(corrupted), /listed twice/);
 });
 
 test("check fails when two wallets disagree about one transfer", () => {
@@ -23,13 +26,13 @@ test("check fails when two wallets disagree about one transfer", () => {
     (transfer) => transfer.from === exploiter && transfer.to === walletA,
   );
   row.value = (BigInt(row.value) * 1000000n).toString();
-  assert.throws(() => check(corrupted), /disagree/);
+  assert.throws(() => checkRows(corrupted), /disagree/);
 });
 
 test("check fails when a transfer between trail wallets is missing on one side", () => {
   const corrupted = rows();
   corrupted["transfers-hop-a4b2"].shift();
-  assert.throws(() => check(corrupted), /is missing from/);
+  assert.throws(() => checkRows(corrupted), /is missing from/);
 });
 
 test("check fails when transfers are scaled but the balances are not", () => {
@@ -38,7 +41,7 @@ test("check fails when transfers are scaled but the balances are not", () => {
     for (const row of corrupted[name])
       if (row.from === exploiter && row.to === walletA)
         row.value = (BigInt(row.value) * 10n).toString();
-  assert.throws(() => check(corrupted), /balance moved/);
+  assert.throws(() => checkRows(corrupted), /balance moved/);
 });
 
 const balanceRow = (corrupted, bind, hourIndex, token) =>
@@ -46,12 +49,14 @@ const balanceRow = (corrupted, bind, hourIndex, token) =>
     (row) => row.hour === hoursInWindow()[hourIndex] && row.token === token,
   );
 const stEth = "0xae7ab96520de3a18e5e111b5eaab095312d7fe84";
+const hourOf = (block) =>
+  Object.values(hourEndBlocks).findIndex((end) => block <= end);
 
 test("check fails when one balance is off by a factor of 1e9", () => {
   const corrupted = rows();
   const row = balanceRow(corrupted, "token-balance-hop-a4b2", 30, stEth);
   row.balance = (BigInt(row.balance) * 10n ** 9n).toString();
-  assert.throws(() => check(corrupted), /balance moved/);
+  assert.throws(() => checkRows(corrupted), /balance moved/);
 });
 
 test("check fails when one hour's balance change has the wrong sign", () => {
@@ -62,13 +67,49 @@ test("check fails when one hour's balance change has the wrong sign", () => {
     2n * BigInt(before.balance) -
     BigInt(after.balance)
   ).toString();
-  assert.throws(() => check(corrupted), /balance moved/);
+  assert.throws(() => checkRows(corrupted), /balance moved/);
+});
+
+test("check fails when one small stETH transfer is dropped outside the rebase hours", () => {
+  const corrupted = rows();
+  const hours = hoursInWindow();
+  const small = corrupted["transfers-hop-a4b2"].find(
+    (row) =>
+      row.token === stEth &&
+      row.value.length <= 20 &&
+      !["12", "13"].includes(hours[hourOf(row.block)].slice(11)),
+  );
+  corrupted["transfers-hop-a4b2"] = corrupted["transfers-hop-a4b2"].filter(
+    (row) => row !== small,
+  );
+  assert.throws(() => checkRows(corrupted), /balance moved/);
+});
+
+test("check places a transfer by the recorded hour end, not by an even 300 blocks", () => {
+  const ends = Object.values(hourEndBlocks);
+  const lastOfHour29 = rows()["transfers-hop-a4b2"].find(
+    (row) => row.block === ends[29],
+  );
+  assert.ok(
+    lastOfHour29,
+    "fixture has a transfer on the last block of an hour",
+  );
+  const shifted = recording();
+  shifted.hourEndBlocks[hoursInWindow()[29]] = ends[29] - 1;
+  assert.throws(() => check(shifted), /balance moved/);
+});
+
+test("check fails when the recording lacks the hour end blocks", () => {
+  assert.throws(
+    () => check({ rows: rows() }),
+    /lacks an increasing last block per hour/,
+  );
 });
 
 test("check fails when a balance row falls outside the window", () => {
   const corrupted = rows();
   corrupted["balance-exploiter"][0].hour = "2025-03-02T00";
-  assert.throws(() => check(corrupted), /stray or repeated/);
+  assert.throws(() => checkRows(corrupted), /stray or repeated/);
 });
 
 test("shape keeps each token separate and counts a transfer once", () => {
@@ -85,7 +126,7 @@ test("shape keeps each token separate and counts a transfer once", () => {
   assert.deepEqual(walletC.tokens, [
     { symbol: "mETH", received: "8,000", sent: "8,000", net: "0" },
   ]);
-  assert.equal(view.headline.transfers, "53");
+  assert.equal(view.headline.transfers, "55");
   assert.equal(view.nodes.length, 10);
 });
 
