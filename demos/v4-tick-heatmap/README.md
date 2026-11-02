@@ -1,4 +1,4 @@
-# V4 tick heatmap
+# V4 tick liquidity histogram
 
 Liquidity by price for one ETH/USDC Uniswap v4 pool on Ethereum, rebuilt from
 every position edge tick since the pool began, with the current price marked.
@@ -47,14 +47,20 @@ that the server returns the shaped report. `npm run test:browser` writes
 
 ## Subjects and window
 
-| Subject                   | Value                                                                | Note                    |
-| ------------------------- | -------------------------------------------------------------------- | ----------------------- |
-| Uniswap v4 PoolManager    | `0x000000000004444c5dc75cb358380d2e3de08a90`                         |                         |
-| ETH/USDC 0.05% pool id    | `0xdce6394339af00981949f5f3baf27e3610c76326a700af57e4b3e3ae4977f78d` | verify before recording |
-| Tick window start (block) | 21688329                                                             | verify before recording |
+| Subject                   | Value                                                                | Note                       |
+| ------------------------- | -------------------------------------------------------------------- | -------------------------- |
+| Uniswap v4 PoolManager    | `0x000000000004444c5dc75cb358380d2e3de08a90`                         |                            |
+| ETH/USDC 0.05% pool id    | `0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27` | hash of the pool key below |
+| Tick window start (block) | 21688329                                                             | verify before recording    |
+| Tick window end (block)   | 26323365                                                             | first block of 2026-11-02  |
 
+- Pool key (hashed to the pool id as `keccak256(abi.encode(currency0, currency1, fee, tickSpacing, hooks))`):
+  currency0 native ETH (`0x0000000000000000000000000000000000000000`),
+  currency1 USDC (`0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48`), fee 500
+  (0.05%), tickSpacing 10, hooks `0x0000000000000000000000000000000000000000`.
 - Ticks: blocks `[21688329, 26323365)`, from the PoolManager's deployment (at
-  or before the pool's initialization) to the end of 2026-11-01. Blocks before
+  or before the pool's initialization) to the end of 2026-11-01; 26323365 is the first block with a timestamp on
+  2026-11-02 UTC (block 26323364 is 2026-11-01 23:59:59). Blocks before
   the pool's initialization have no rows.
 - Pool state: UTC day 2026-11-01, read at the day's last block (26323364).
   `to_day` is exclusive, so the window ends 2026-11-02.

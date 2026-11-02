@@ -7,7 +7,7 @@
       "chain_id": 1,
       "params": {
         "manager": "0x000000000004444c5dc75cb358380d2e3de08a90",
-        "pool": "0xdce6394339af00981949f5f3baf27e3610c76326a700af57e4b3e3ae4977f78d"
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27"
       },
       "window": {
         "from_block": 21688329,
@@ -23,7 +23,7 @@
       "chain_id": 1,
       "params": {
         "manager": "0x000000000004444c5dc75cb358380d2e3de08a90",
-        "pool": "0xdce6394339af00981949f5f3baf27e3610c76326a700af57e4b3e3ae4977f78d",
+        "pool": "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
         "by": "day"
       },
       "window": {
