@@ -38,7 +38,7 @@ function barChart(markets) {
   const labelWidth = 130;
   const valueWidth = 170;
   const height = markets.length * rowHeight + 10;
-  const largest = Math.max(...markets.map((market) => market.wxdai));
+  const largest = Math.max(...markets.map((market) => market.cents));
   const chart = svg("svg", {
     viewBox: `0 0 ${width} ${height}`,
     role: "img",
@@ -47,7 +47,7 @@ function barChart(markets) {
   markets.forEach((market, index) => {
     const y = 5 + index * rowHeight;
     const barWidth = Math.max(
-      (market.wxdai / largest) * (width - labelWidth - valueWidth),
+      (market.cents / largest) * (width - labelWidth - valueWidth),
       1,
     );
     chart.append(
@@ -95,8 +95,13 @@ function render(report) {
       metric("TRADES", view.tradeCount),
       metric("TRADE VOLUME", view.volume),
       metric(
-        "OTHER COLLATERAL",
-        `${view.otherCollateral.reduce((sum, token) => sum + Number(token.markets), 0)} markets`,
+        "MARKETS ON OTHER COLLATERAL",
+        String(
+          view.otherCollateral.reduce(
+            (sum, token) => sum + Number(token.markets),
+            0,
+          ),
+        ),
       ),
       metric("QUESTIONS ANSWERED", view.answeredCount),
     );

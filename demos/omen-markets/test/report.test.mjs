@@ -34,7 +34,7 @@ test("check fails when a pool's tokens do not follow its trades", () => {
   const state = corrupted.market_state.findLast(
     (row) => row.market === corrupted.trades.at(-1).market,
   );
-  state.amount = (BigInt(state.amount) + 10n ** 18n).toString();
+  state.amount = (BigInt(state.amount) - 10n ** 18n).toString();
   assert.throws(() => check(corrupted), /its trades leave/);
 });
 
@@ -50,12 +50,29 @@ test("check fails when an answer finalizes before it was given", () => {
   assert.throws(() => check(corrupted), /finalizes before/);
 });
 
+test("check fails when finalize_ts is read in milliseconds", () => {
+  const corrupted = rows();
+  corrupted.answers[0].finalize_ts = (
+    BigInt(corrupted.answers[0].finalize_ts) * 1000n
+  ).toString();
+  assert.throws(() => check(corrupted), /more than a year after/);
+});
+
+test("check passes when a stray transfer adds tokens to a pool", () => {
+  const stray = rows();
+  const state = stray.market_state.findLast(
+    (row) => row.market === stray.trades.at(-1).market,
+  );
+  state.amount = (BigInt(state.amount) + 10n ** 18n).toString();
+  assert.doesNotThrow(() => check(stray));
+});
+
 test("shape ranks wxDAI markets by volume and lists other collateral apart", () => {
   const view = shape(rows());
   assert.equal(view.markets[0].volume, "1,801.00 wxDAI");
   assert.equal(view.markets[0].trades, "3");
   assert.equal(view.otherCollateral[0].rawVolume, "350000000");
-  assert.ok(view.markets.every((market) => market.wxdai < 1e6));
+  assert.ok(view.markets.every((market) => market.cents < 1e8));
 });
 
 test("shape counts only markets created in the window", () => {
