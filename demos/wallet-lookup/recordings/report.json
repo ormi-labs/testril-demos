@@ -1,0 +1,435 @@
+{
+  "demo": "wallet-lookup",
+  "source": "synthetic",
+  "recordedAt": "2026-11-02T00:00:00.000Z",
+  "boundFunctions": {
+    "ens-vitalik": {
+      "function_slug": "ens.primary_name",
+      "chain_id": 1
+    },
+    "ens-nick": {
+      "function_slug": "ens.primary_name",
+      "chain_id": 1
+    },
+    "ens-brantly": {
+      "function_slug": "ens.primary_name",
+      "chain_id": 1
+    },
+    "balance": {
+      "function_slug": "native.balance",
+      "chain_id": 1
+    },
+    "transfers-vitalik": {
+      "function_slug": "erc20.wallet_transfers",
+      "chain_id": 1
+    },
+    "transfers-nick": {
+      "function_slug": "erc20.wallet_transfers",
+      "chain_id": 1
+    },
+    "transfers-brantly": {
+      "function_slug": "erc20.wallet_transfers",
+      "chain_id": 1
+    }
+  },
+  "window": {
+    "ens-vitalik": {
+      "from_block": 26323364,
+      "to_block": 26323365
+    },
+    "ens-nick": {
+      "from_block": 26323364,
+      "to_block": 26323365
+    },
+    "ens-brantly": {
+      "from_block": 26323364,
+      "to_block": 26323365
+    },
+    "balance": {
+      "from_block": 26323364,
+      "to_block": 26323365
+    },
+    "transfers-vitalik": {
+      "from_block": 26272965,
+      "to_block": 26323365
+    },
+    "transfers-nick": {
+      "from_block": 26272965,
+      "to_block": 26323365
+    },
+    "transfers-brantly": {
+      "from_block": 26272965,
+      "to_block": 26323365
+    }
+  },
+  "rows": {
+    "balance": [
+      {
+        "block": 26323364,
+        "owner": "0xd8da6bf26964af9d7eed9e03e53415d37aa96045",
+        "balance": "1234567890123456789012"
+      },
+      {
+        "block": 26323364,
+        "owner": "0xb8c2c29ee19d8307cb7255e1cd9cbde883a267d5",
+        "balance": "42000000000000000000"
+      },
+      {
+        "block": 26323364,
+        "owner": "0x983110309620d911731ac0932219af06091b6744",
+        "balance": "7500000000000000000"
+      }
+    ],
+    "ens-vitalik": [
+      {
+        "block": 26323364,
+        "address": "0xd8da6bf26964af9d7eed9e03e53415d37aa96045",
+        "name": "vitalik.eth"
+      }
+    ],
+    "transfers-vitalik": [
+      {
+        "block": 26279516,
+        "log_index": "115",
+        "tx": "0xb80d9e94148b6d8d8aaa6782e10540324507cfab83e9705cf4c268fd69499d5f",
+        "token": "0x6b175474e89094c44da98b954eedeac495271d0f",
+        "from": "0x9008d19f58aabd9ed0d60971565aa8510560ab41",
+        "to": "0xd8da6bf26964af9d7eed9e03e53415d37aa96045",
+        "value": "118000000000000000000"
+      },
+      {
+        "block": 26281065,
+        "log_index": "191",
+        "tx": "0xb5f0497849addb08269320fb424164ce745e057592da74c75db945001eae8ff9",
+        "token": "0xdac17f958d2ee523a2206206994597c13d831ec7",
+        "from": "0xd8da6bf26964af9d7eed9e03e53415d37aa96045",
+        "to": "0xa9d1e08c7793af67e9d92fe308d5697fb81d3e43",
+        "value": "560000000"
+      },
+      {
+        "block": 26283170,
+        "log_index": "31",
+        "tx": "0x2e89e983895d62ef6cc83bf0a9ae8fee604e91519d953b419154fa653875b1f8",
+        "token": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        "from": "0x9008d19f58aabd9ed0d60971565aa8510560ab41",
+        "to": "0xd8da6bf26964af9d7eed9e03e53415d37aa96045",
+        "value": "35000000"
+      },
+      {
+        "block": 26283495,
+        "log_index": "91",
+        "tx": "0xd8a8771a17a5be5d8b0236530c2e49d8011a2c1356a7d11f237a8600c56e3359",
+        "token": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+        "from": "0xd8da6bf26964af9d7eed9e03e53415d37aa96045",
+        "to": "0xa9d1e08c7793af67e9d92fe308d5697fb81d3e43",
+        "value": "1839000000000000000000"
+      },
+      {
+        "block": 26286159,
+        "log_index": "148",
+        "tx": "0x7aabcc41b984b1d2bfc1fd364f282ae91c00f82602823452aa725bfb3ad300a9",
+        "token": "0x6b175474e89094c44da98b954eedeac495271d0f",
+        "from": "0x88e6a0c2ddd26feeb64f039a2c41296fcb3f5640",
+        "to": "0xd8da6bf26964af9d7eed9e03e53415d37aa96045",
+        "value": "10681000000000000000000"
+      },
+      {
+        "block": 26286448,
+        "log_index": "243",
+        "tx": "0x1ec6a0efe7bae592016adee654c430356bbdaf243b10791f76dac0be6774484a",
+        "token": "0x6b175474e89094c44da98b954eedeac495271d0f",
+        "from": "0xd8da6bf26964af9d7eed9e03e53415d37aa96045",
+        "to": "0x1111111111111111111111111111111111111111",
+        "value": "5072000000000000000000"
+      },
+      {
+        "block": 26292367,
+        "log_index": "44",
+        "tx": "0x1bf045c55f8bd0a626e7f9e3971a538a79ea81cbb26510019e66e6ec62a75258",
+        "token": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        "from": "0xa9d1e08c7793af67e9d92fe308d5697fb81d3e43",
+        "to": "0xd8da6bf26964af9d7eed9e03e53415d37aa96045",
+        "value": "11839000000"
+      },
+      {
+        "block": 26293094,
+        "log_index": "298",
+        "tx": "0x626a8503968181245009a79dc5f3fb4ed43ac8c6a2cb7967b4694f97ec8faa00",
+        "token": "0xdac17f958d2ee523a2206206994597c13d831ec7",
+        "from": "0x2222222222222222222222222222222222222222",
+        "to": "0xd8da6bf26964af9d7eed9e03e53415d37aa96045",
+        "value": "313000000"
+      },
+      {
+        "block": 26294919,
+        "log_index": "95",
+        "tx": "0x358f1fff18de7139e9ae42f1d7344fd19a6eea6f08afa73bd37e51f11f8cf9fc",
+        "token": "0xdac17f958d2ee523a2206206994597c13d831ec7",
+        "from": "0xd8da6bf26964af9d7eed9e03e53415d37aa96045",
+        "to": "0x9008d19f58aabd9ed0d60971565aa8510560ab41",
+        "value": "14000000"
+      },
+      {
+        "block": 26301100,
+        "log_index": "264",
+        "tx": "0xcaa6083fe7ddc830231ff9179a6e14f6a54670d7c0f0e3be8efb687a07a7b075",
+        "token": "0xdac17f958d2ee523a2206206994597c13d831ec7",
+        "from": "0x88e6a0c2ddd26feeb64f039a2c41296fcb3f5640",
+        "to": "0xd8da6bf26964af9d7eed9e03e53415d37aa96045",
+        "value": "14343000000"
+      },
+      {
+        "block": 26301641,
+        "log_index": "109",
+        "tx": "0x7ad0f2614a0c1816d25e86d3098426f2f17023b4e42b38e5be446e61a6bf4cff",
+        "token": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+        "from": "0xd8da6bf26964af9d7eed9e03e53415d37aa96045",
+        "to": "0x9008d19f58aabd9ed0d60971565aa8510560ab41",
+        "value": "340000000000000000000"
+      },
+      {
+        "block": 26303570,
+        "log_index": "272",
+        "tx": "0x18749effe4858bd3cd3e4f8c4d76367386c544ad3bb2f2cac5f47b38d10ac0d7",
+        "token": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+        "from": "0xa9d1e08c7793af67e9d92fe308d5697fb81d3e43",
+        "to": "0xd8da6bf26964af9d7eed9e03e53415d37aa96045",
+        "value": "30122000000000000000000"
+      },
+      {
+        "block": 26304733,
+        "log_index": "115",
+        "tx": "0xacb18f13bed50afff6357a677b949a4f08d3c1fbf047f46898e17ff3e9dc6c90",
+        "token": "0x6b175474e89094c44da98b954eedeac495271d0f",
+        "from": "0xd8da6bf26964af9d7eed9e03e53415d37aa96045",
+        "to": "0x1111111111111111111111111111111111111111",
+        "value": "37928000000000000000000"
+      },
+      {
+        "block": 26306456,
+        "log_index": "289",
+        "tx": "0x91cecebb392d5e86d841719dd1bda4231cc6e25afe567e27a7ec9d1bb9d3f555",
+        "token": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        "from": "0xd8da6bf26964af9d7eed9e03e53415d37aa96045",
+        "to": "0x88e6a0c2ddd26feeb64f039a2c41296fcb3f5640",
+        "value": "23823000000"
+      },
+      {
+        "block": 26307290,
+        "log_index": "264",
+        "tx": "0x41c3e8feb4ce09c88f959b49dc9cc60297608d349aef56c5fde965f5580250b0",
+        "token": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        "from": "0x1111111111111111111111111111111111111111",
+        "to": "0xd8da6bf26964af9d7eed9e03e53415d37aa96045",
+        "value": "4344000000"
+      },
+      {
+        "block": 26309011,
+        "log_index": "253",
+        "tx": "0x1b13c4558a67a62bc042905ecbf05c03d24dcfb279964970c20b694f220845b8",
+        "token": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        "from": "0x9008d19f58aabd9ed0d60971565aa8510560ab41",
+        "to": "0xd8da6bf26964af9d7eed9e03e53415d37aa96045",
+        "value": "31000000"
+      },
+      {
+        "block": 26309011,
+        "log_index": "301",
+        "tx": "0x1b13c4558a67a62bc042905ecbf05c03d24dcfb279964970c20b694f220845b8",
+        "token": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        "from": "0xd8da6bf26964af9d7eed9e03e53415d37aa96045",
+        "to": "0xd8da6bf26964af9d7eed9e03e53415d37aa96045",
+        "value": "31000000"
+      },
+      {
+        "block": 26322024,
+        "log_index": "154",
+        "tx": "0x810ad3a57d6e79d6668348cd32e7d98a9d47377de82459649565dc78181e2bd8",
+        "token": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+        "from": "0xd8da6bf26964af9d7eed9e03e53415d37aa96045",
+        "to": "0x28c6c06298d514db089934071355e5743bf21d60",
+        "value": "124000000000000000000"
+      },
+      {
+        "block": 26323186,
+        "log_index": "242",
+        "tx": "0x482e836e6f25a2964da33f4551bf16de700b21c7c90a9ad00f1be452a67ca6b9",
+        "token": "0xdac17f958d2ee523a2206206994597c13d831ec7",
+        "from": "0xd8da6bf26964af9d7eed9e03e53415d37aa96045",
+        "to": "0x88e6a0c2ddd26feeb64f039a2c41296fcb3f5640",
+        "value": "10000000"
+      }
+    ],
+    "ens-nick": [
+      {
+        "block": 26323364,
+        "address": "0xb8c2c29ee19d8307cb7255e1cd9cbde883a267d5",
+        "name": "nick.eth"
+      }
+    ],
+    "transfers-nick": [
+      {
+        "block": 26282687,
+        "log_index": "82",
+        "tx": "0x504152bab136f951bf39c11c34f788147e748bd78d180d0a5faaacc0b5539d56",
+        "token": "0xdac17f958d2ee523a2206206994597c13d831ec7",
+        "from": "0x88e6a0c2ddd26feeb64f039a2c41296fcb3f5640",
+        "to": "0xb8c2c29ee19d8307cb7255e1cd9cbde883a267d5",
+        "value": "17955000000"
+      },
+      {
+        "block": 26290570,
+        "log_index": "173",
+        "tx": "0x4b163170ba7f813965678857980baf280fa8fb1d0d0aa362b8adda4cb9a06571",
+        "token": "0x6b175474e89094c44da98b954eedeac495271d0f",
+        "from": "0x28c6c06298d514db089934071355e5743bf21d60",
+        "to": "0xb8c2c29ee19d8307cb7255e1cd9cbde883a267d5",
+        "value": "27730000000000000000000"
+      },
+      {
+        "block": 26295473,
+        "log_index": "271",
+        "tx": "0x85f38ae55760576af2cc5cbec7e9650c143d1725af516b60edba548d4179e21b",
+        "token": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+        "from": "0xb8c2c29ee19d8307cb7255e1cd9cbde883a267d5",
+        "to": "0x1111111111111111111111111111111111111111",
+        "value": "9735000000000000000000"
+      },
+      {
+        "block": 26296157,
+        "log_index": "188",
+        "tx": "0xd6b767b303f0cb4a7ff6044b2d9413c6167c1e039d24ae4e9b61dd90d80283b1",
+        "token": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        "from": "0x88e6a0c2ddd26feeb64f039a2c41296fcb3f5640",
+        "to": "0xb8c2c29ee19d8307cb7255e1cd9cbde883a267d5",
+        "value": "10000000"
+      },
+      {
+        "block": 26307662,
+        "log_index": "80",
+        "tx": "0x4668ee9068bb4f865f046a9d3aef18c7ea9ff3509dc5cb7cde5bb6b806d4d1d9",
+        "token": "0x6b175474e89094c44da98b954eedeac495271d0f",
+        "from": "0xa9d1e08c7793af67e9d92fe308d5697fb81d3e43",
+        "to": "0xb8c2c29ee19d8307cb7255e1cd9cbde883a267d5",
+        "value": "6091000000000000000000"
+      },
+      {
+        "block": 26308023,
+        "log_index": "233",
+        "tx": "0xb79df347eca86aef92e3377357138cba88886ca381ae7cff78b4c47f3d041407",
+        "token": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        "from": "0xb8c2c29ee19d8307cb7255e1cd9cbde883a267d5",
+        "to": "0x2222222222222222222222222222222222222222",
+        "value": "1094000000"
+      },
+      {
+        "block": 26308926,
+        "log_index": "37",
+        "tx": "0x5f8e384772cbbabb7728320f4c01cb008d09f3668e2ef9d726ed0b62d8f1b953",
+        "token": "0x6b175474e89094c44da98b954eedeac495271d0f",
+        "from": "0xb8c2c29ee19d8307cb7255e1cd9cbde883a267d5",
+        "to": "0x28c6c06298d514db089934071355e5743bf21d60",
+        "value": "13305000000000000000000"
+      },
+      {
+        "block": 26308933,
+        "log_index": "3",
+        "tx": "0xb342db97950e8fed03ab316e67e8e4e87b19530fea29c51301d0acd33d5fa3ed",
+        "token": "0x6b175474e89094c44da98b954eedeac495271d0f",
+        "from": "0x28c6c06298d514db089934071355e5743bf21d60",
+        "to": "0xb8c2c29ee19d8307cb7255e1cd9cbde883a267d5",
+        "value": "3983000000000000000000"
+      },
+      {
+        "block": 26312674,
+        "log_index": "136",
+        "tx": "0xeccca853f812edaf06902f6874cdc4cf826c144e00b1fd4892d476037c19940a",
+        "token": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+        "from": "0xb8c2c29ee19d8307cb7255e1cd9cbde883a267d5",
+        "to": "0x9008d19f58aabd9ed0d60971565aa8510560ab41",
+        "value": "7114000000000000000000"
+      },
+      {
+        "block": 26318010,
+        "log_index": "19",
+        "tx": "0xc517ef90669b6eca6cf55ba2d0b9f6a4815a44cc016898615e9021a994bf0a9f",
+        "token": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+        "from": "0x88e6a0c2ddd26feeb64f039a2c41296fcb3f5640",
+        "to": "0xb8c2c29ee19d8307cb7255e1cd9cbde883a267d5",
+        "value": "297000000000000000000"
+      },
+      {
+        "block": 26319532,
+        "log_index": "256",
+        "tx": "0x3356b138ef8dff06e8a0a3a33c65fc17f0c603ce4b9db07c136bb9a6e7763d9b",
+        "token": "0x6b175474e89094c44da98b954eedeac495271d0f",
+        "from": "0xb8c2c29ee19d8307cb7255e1cd9cbde883a267d5",
+        "to": "0x1111111111111111111111111111111111111111",
+        "value": "27992000000000000000000"
+      }
+    ],
+    "ens-brantly": [
+      {
+        "block": 26323364,
+        "address": "0x983110309620d911731ac0932219af06091b6744",
+        "name": "brantly.eth"
+      }
+    ],
+    "transfers-brantly": [
+      {
+        "block": 26288509,
+        "log_index": "281",
+        "tx": "0x4334c5652eabfc5af8f9e3346e17fada7bbda04e30a41979db88aec998a8a1b0",
+        "token": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        "from": "0xa9d1e08c7793af67e9d92fe308d5697fb81d3e43",
+        "to": "0x983110309620d911731ac0932219af06091b6744",
+        "value": "1273000000"
+      },
+      {
+        "block": 26290452,
+        "log_index": "212",
+        "tx": "0x7518d80487f6f5b71038a650e44e2e0ffdfe26a0053483288539db917c48753a",
+        "token": "0x6b175474e89094c44da98b954eedeac495271d0f",
+        "from": "0x983110309620d911731ac0932219af06091b6744",
+        "to": "0x88e6a0c2ddd26feeb64f039a2c41296fcb3f5640",
+        "value": "36550000000000000000000"
+      },
+      {
+        "block": 26301920,
+        "log_index": "147",
+        "tx": "0x8879dbfd332d5d35dcca87e3e715f60e34336cb678020bd836a6c30665ac5cad",
+        "token": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        "from": "0x2222222222222222222222222222222222222222",
+        "to": "0x983110309620d911731ac0932219af06091b6744",
+        "value": "40617000000"
+      },
+      {
+        "block": 26306616,
+        "log_index": "60",
+        "tx": "0x61f936051622d7d1bb1738d48628ae014598155de9b9e509f705909feeacabf9",
+        "token": "0x6b175474e89094c44da98b954eedeac495271d0f",
+        "from": "0x9008d19f58aabd9ed0d60971565aa8510560ab41",
+        "to": "0x983110309620d911731ac0932219af06091b6744",
+        "value": "27390000000000000000000"
+      },
+      {
+        "block": 26307183,
+        "log_index": "213",
+        "tx": "0x25a651bfcebbeb24cf0852be216bfcec6ecea2852f6ecef0d60d11623d3f4643",
+        "token": "0x6b175474e89094c44da98b954eedeac495271d0f",
+        "from": "0x88e6a0c2ddd26feeb64f039a2c41296fcb3f5640",
+        "to": "0x983110309620d911731ac0932219af06091b6744",
+        "value": "16475000000000000000000"
+      },
+      {
+        "block": 26315911,
+        "log_index": "203",
+        "tx": "0xe22f07661c3c911fec4e67446cf4bdbaab20cafb451ffb348517fb482d8233ee",
+        "token": "0xdac17f958d2ee523a2206206994597c13d831ec7",
+        "from": "0x983110309620d911731ac0932219af06091b6744",
+        "to": "0xa9d1e08c7793af67e9d92fe308d5697fb81d3e43",
+        "value": "128000000"
+      }
+    ]
+  }
+}

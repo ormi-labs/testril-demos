@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Wallet Lookup · Testril demos</title>
+    <link rel="icon" href="assets/favicon.svg" />
+    <link rel="stylesheet" href="style.css" />
+    <script type="module" src="app.js"></script>
+  </head>
+  <body>
+    <header class="measure masthead">
+      <a href="https://testril.ai"
+        ><img
+          src="assets/wordmark.svg"
+          alt="Testril"
+          width="115"
+          height="38" /></a
+      ><span>Data demos / Wallet lookup</span>
+    </header>
+    <main class="measure">
+      <p id="source" class="banner">Loading…</p>
+      <div class="eyebrow">ETHEREUM · ONE WEEK</div>
+      <h1>Who is this wallet,<br />and what did it do.</h1>
+      <p class="intro">
+        Pick one of three recorded wallets: its ENS name, its ETH balance, and
+        its stablecoin and WETH transfers over the last seven days.
+      </p>
+      <section class="scope" aria-label="Report scope">
+        <div>
+          <span class="label">WALLET</span>
+          <select id="wallet" aria-label="Wallet"></select>
+        </div>
+        <div>
+          <span class="label">TRANSFERS · SEVEN DAYS</span
+          ><strong id="week-window"></strong>
+        </div>
+        <div>
+          <span class="label">FUNCTIONS</span
+          ><strong
+            >ens.primary_name · native.balance · erc20.wallet_transfers</strong
+          >
+        </div>
+        <div>
+          <span class="label">ADDRESS</span><strong id="address"></strong>
+        </div>
+      </section>
+      <section
+        id="headline"
+        class="metrics"
+        aria-label="Headline numbers"
+      ></section>
+      <section class="results">
+        <div class="section-heading">
+          <h2>Transfers per day</h2>
+          <span>green incoming, brown outgoing; days of 7,200 blocks</span>
+        </div>
+        <div id="daily-chart" class="flow"></div>
+      </section>
+      <section class="results">
+        <div class="section-heading">
+          <h2>Transfer list</h2>
+          <span id="list-note"></span>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Block</th>
+                <th>Direction</th>
+                <th>Counterparty</th>
+                <th>Token</th>
+                <th>Amount</th>
+              </tr>
+            </thead>
+            <tbody id="transfers"></tbody>
+          </table>
+        </div>
+      </section>
+      <section class="method">
+        <h2>Cross-check</h2>
+        <ul id="checks"></ul>
+      </section>
+    </main>
+    <footer class="measure">
+      Data shaped from the recording in <code>recordings/report.json</code>.
+      Looking up any pasted wallet live is not built yet.
+    </footer>
+  </body>
+</html>
