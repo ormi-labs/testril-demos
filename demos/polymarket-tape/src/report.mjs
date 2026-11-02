@@ -6,7 +6,7 @@ export const fillWindow = binds.fills.window;
 export const payoutWindow = binds.payouts.window;
 export const exchanges = binds.fills.params.exchanges;
 export const conditionalTokens = binds.payouts.params.conditional_tokens;
-export const day = spec.day;
+export const day = "2026-11-01";
 export const blocksPerHour = 2400;
 const tapeSize = 12;
 const leaderboardSize = 8;
@@ -54,10 +54,8 @@ function conditionsOf(payouts) {
 
 const feeIsInRequiredAsset = (fill) => {
   const feeInTokens = fill.exchange_version === "1" && fill.is_buy;
-  const [paid, unpaid] = feeInTokens
-    ? [fill.token_fee, fill.collateral_fee]
-    : [fill.collateral_fee, fill.token_fee];
-  return BigInt(unpaid) === 0n && BigInt(paid) >= 0n;
+  const unpaid = feeInTokens ? fill.collateral_fee : fill.token_fee;
+  return BigInt(unpaid) === 0n;
 };
 
 export function check(rows) {
@@ -93,17 +91,21 @@ export function check(rows) {
       `Version 1 fill ${shortHex(coded.tx)} carries a builder or metadata, but version 1 emits none.`,
     );
   const total = totalVolume(fills);
-  const uncodedVolume = builderVolumes(fills).get(zeroWord) ?? 0n;
-  if (uncodedVolume < totalVolume(versionOne))
+  const builderSum = [...builderVolumes(fills).values()].reduce(
+    (sum, volume) => sum + volume,
+    0n,
+  );
+  if (builderSum !== total)
     throw new Error(
-      `No-builder volume is ${uncodedVolume}, below the ${totalVolume(versionOne)} that version 1 fills moved.`,
+      `Builder volumes sum to ${builderSum}, not the total ${total}.`,
     );
+  assertLeaderboardAddsUp(leaderboardEntries(fills), total);
   const conditions = conditionsOf(payouts);
   for (const condition of conditions) {
-    const early = condition.rows.find((row) => !inWindow(row, payoutWindow));
-    if (early)
+    const outside = condition.rows.find((row) => !inWindow(row, payoutWindow));
+    if (outside)
       throw new Error(
-        `Condition ${shortHex(condition.id)} resolved at block ${early.block}, outside the window.`,
+        `Condition ${shortHex(condition.id)} resolved at block ${outside.block}, outside the window.`,
       );
     const sum = condition.numerators.reduce((s, n) => s + n, 0n);
     if (condition.rows.some((r) => BigInt(r.payout_denominator) !== sum))
@@ -114,7 +116,7 @@ export function check(rows) {
   return [
     `All ${fills.length} fills price within (0, 1]: collateral never exceeds outcome tokens`,
     `Every fee is booked in the asset its version and side require`,
-    `Version 1 fills carry no builder code, so the no-builder bucket (${formatUsd(uncodedVolume)}) holds at least their volume (${formatUsd(totalVolume(versionOne))}) of ${formatUsd(total)}`,
+    `Builder volumes and the leaderboard (top ${leaderboardSize} plus other builders) each add up to the ${formatUsd(total)} total`,
     `${conditions.length} resolved conditions each pay a denominator equal to the sum of their numerators`,
   ];
 }
@@ -195,22 +197,46 @@ function oddsLine(fills) {
   };
 }
 
-function leaderboard(fills) {
-  const total = totalVolume(fills);
+export function leaderboardEntries(fills) {
   const counts = new Map();
   for (const fill of fills)
     counts.set(fill.builder, (counts.get(fill.builder) ?? 0) + 1);
-  return [...builderVolumes(fills)]
-    .map(([builder, volume]) => ({ builder, volume }))
-    .sort(byVolumeDescending)
-    .slice(0, leaderboardSize)
-    .map(({ builder, volume }) => ({
+  const ranked = [...builderVolumes(fills)]
+    .map(([builder, volume]) => ({
       label: builderLabel(builder),
-      volume: formatUsd(volume),
-      fills: String(counts.get(builder)),
-      share: `${Number((volume * 1000n) / total) / 10}%`,
-      fraction: Number((volume * priceScale) / total) / Number(priceScale),
-    }));
+      volume,
+      fills: counts.get(builder),
+    }))
+    .sort(byVolumeDescending);
+  const rest = ranked.slice(leaderboardSize);
+  if (rest.length === 0) return ranked;
+  return [
+    ...ranked.slice(0, leaderboardSize),
+    {
+      label: "Other builders",
+      volume: rest.reduce((sum, e) => sum + e.volume, 0n),
+      fills: rest.reduce((sum, e) => sum + e.fills, 0),
+    },
+  ];
+}
+
+export function assertLeaderboardAddsUp(entries, total) {
+  const shown = entries.reduce((sum, entry) => sum + entry.volume, 0n);
+  if (shown !== total)
+    throw new Error(
+      `Leaderboard rows sum to ${shown}, not the total ${total}.`,
+    );
+}
+
+function leaderboard(fills) {
+  const total = totalVolume(fills);
+  return leaderboardEntries(fills).map(({ label, volume, fills: count }) => ({
+    label,
+    volume: formatUsd(volume),
+    fills: String(count),
+    share: `${Number((volume * 1000n) / total) / 10}%`,
+    fraction: Number((volume * priceScale) / total) / Number(priceScale),
+  }));
 }
 
 function resolved(payouts) {

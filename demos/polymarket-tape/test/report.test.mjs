@@ -1,6 +1,11 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { check, shape } from "../src/report.mjs";
+import {
+  assertLeaderboardAddsUp,
+  check,
+  leaderboardEntries,
+  shape,
+} from "../src/report.mjs";
 import { fixture } from "./fixture.mjs";
 
 const rows = () => structuredClone(fixture().rows);
@@ -101,4 +106,15 @@ test("shape's odds line follows the busiest market upward through the day", () =
   const { points } = shape(rows()).odds;
   assert.ok(points.length > 12);
   assert.ok(points.at(-1).price > points[0].price + 0.2);
+});
+
+test("a leaderboard that presents truncated volumes as the whole fails", () => {
+  const fills = rows().fills;
+  const total = fills.reduce((sum, f) => sum + BigInt(f.collateral_amount), 0n);
+  const truncated = leaderboardEntries(fills).slice(0, 1);
+  assert.throws(
+    () => assertLeaderboardAddsUp(truncated, total),
+    /Leaderboard rows sum/,
+  );
+  assertLeaderboardAddsUp(leaderboardEntries(fills), total);
 });
