@@ -7,7 +7,7 @@ export const dayWindow = binds.transfers.window;
 export const ownersWindow = binds.owners.window;
 export const metadataWindow = binds.metadata.window;
 export const day = "2026-11-01";
-export const hourBlocks = 300;
+const hoursPerDay = 24;
 const topHolders = 10;
 const basisPoints = 10000n;
 
@@ -36,9 +36,16 @@ export function holdings(owners) {
   return balances;
 }
 
+function ownersBeforeDay(owners) {
+  const before = owners.filter((o) => o.block < dayWindow.from_block);
+  return new Map([...latestOwners(before)].map(([id, row]) => [id, row.owner]));
+}
+
 function checkMints(transfers, owners) {
   const heldBefore = new Set(
-    owners.filter((o) => o.block < dayWindow.from_block).map((o) => o.token_id),
+    [...ownersBeforeDay(owners)]
+      .filter(([, owner]) => owner !== zeroAddress)
+      .map(([id]) => id),
   );
   const moved = new Set();
   for (const transfer of inLogOrder(transfers)) {
@@ -57,36 +64,55 @@ function checkMints(transfers, owners) {
 }
 
 function checkOwnersAtTransfers(transfers, owners) {
-  const receivers = new Map();
+  const lastTransfers = new Map();
   for (const transfer of inLogOrder(transfers))
-    receivers.set(`${transfer.token_id}@${transfer.block}`, transfer.to);
-  for (const [key, receiver] of receivers) {
-    const [id, block] = key.split("@");
-    const rows = owners.filter(
-      (o) => o.token_id === id && o.block === Number(block),
-    );
+    lastTransfers.set(`${transfer.token_id}@${transfer.block}`, transfer);
+  const rowsByTokenBlock = new Map();
+  for (const row of owners) {
+    const key = `${row.token_id}@${row.block}`;
+    rowsByTokenBlock.set(key, [...(rowsByTokenBlock.get(key) ?? []), row]);
+  }
+  for (const [key, { token_id, block, to }] of lastTransfers) {
+    const rows = rowsByTokenBlock.get(key) ?? [];
     if (rows.length !== 1)
       throw new Error(
-        `Token ${id} has ${rows.length} owner rows at block ${block}, expected one.`,
+        `Token ${token_id} has ${rows.length} owner rows at block ${block}, expected one.`,
       );
-    if (rows[0].owner !== receiver)
+    if (rows[0].owner !== to)
       throw new Error(
-        `Token ${id} at block ${block} is owned by ${rows[0].owner}, but its last transfer went to ${receiver}.`,
+        `Token ${token_id} at block ${block} is owned by ${rows[0].owner}, but its last transfer went to ${to}.`,
       );
   }
-  return receivers.size;
+  return lastTransfers.size;
 }
 
-function checkHolders(owners) {
+function replayHoldings(transfers, owners) {
+  const current = ownersBeforeDay(owners);
+  for (const transfer of inLogOrder(transfers)) {
+    const owner = current.get(transfer.token_id) ?? zeroAddress;
+    if (transfer.from !== owner)
+      throw new Error(
+        `Token ${transfer.token_id} moved from ${transfer.from} at block ${transfer.block}, but its owner was ${owner}.`,
+      );
+    current.set(transfer.token_id, transfer.to);
+  }
+  const balances = new Map();
+  for (const owner of current.values())
+    if (owner !== zeroAddress)
+      balances.set(owner, (balances.get(owner) ?? 0n) + 1n);
+  return balances;
+}
+
+function checkHolders(transfers, owners) {
+  const replayed = replayHoldings(transfers, owners);
   const balances = holdings(owners);
-  const live = [...latestOwners(owners).values()].filter(
-    (row) => row.owner !== zeroAddress,
-  );
-  const distinct = new Set(live.map((row) => row.owner));
   const held = [...balances.values()].reduce((sum, n) => sum + n, 0n);
-  if (balances.size !== distinct.size || held !== BigInt(live.length))
+  const differs =
+    replayed.size !== balances.size ||
+    [...replayed].some(([owner, n]) => balances.get(owner) !== n);
+  if (differs)
     throw new Error(
-      `Holder balances count ${balances.size} holders and ${held} tokens, but the owner rows have ${distinct.size} distinct owners and ${live.length} live tokens.`,
+      `Replaying the day's transfers gives ${replayed.size} holders, but the owner rows give ${balances.size} holders owning ${held} tokens.`,
     );
   return { holders: balances.size, held };
 }
@@ -100,30 +126,32 @@ export function check(rows) {
     throw new Error(`Transfer at block ${outside.block} is outside the day.`);
   const mints = checkMints(transfers, owners);
   const tokenBlocks = checkOwnersAtTransfers(transfers, owners);
-  const { holders, held } = checkHolders(owners);
+  const { holders, held } = checkHolders(transfers, owners);
   return [
     `All ${mints} mints on ${day} come from the zero address, and only for tokens with no earlier owner`,
     `${tokenBlocks} transferred token-blocks each have exactly one owner row naming the receiver of the block's last transfer`,
-    `${holders} holders own ${held} live tokens, matching the distinct owners in the owner rows`,
+    `${holders} holders own ${held} live tokens, matching a replay of the day's transfers from the owners before it`,
   ];
 }
 
 const shortAddress = (address) => `${address.slice(0, 6)}…${address.slice(-4)}`;
 
-function percent(part, whole) {
-  const hundredths = (part * basisPoints) / whole;
+const shareInBasisPoints = (part, whole) => (part * basisPoints) / whole;
+
+function percent(hundredths) {
   return `${hundredths / 100n}.${String(hundredths % 100n).padStart(2, "0")}%`;
 }
 
 function hourly(transfers) {
-  const hours = Array.from({ length: 24 }, (_, hour) => ({
+  const hours = Array.from({ length: hoursPerDay }, (_, hour) => ({
     hour,
     mints: 0,
     trades: 0,
   }));
   for (const transfer of transfers) {
     const hour = Math.floor(
-      (transfer.block - dayWindow.from_block) / hourBlocks,
+      ((transfer.block - dayWindow.from_block) * hoursPerDay) /
+        (dayWindow.to_block - dayWindow.from_block),
     );
     if (isMint(transfer)) hours[hour].mints += 1;
     else if (!isBurn(transfer)) hours[hour].trades += 1;
@@ -138,15 +166,16 @@ function concentration(balances) {
   );
   const top = sorted.slice(0, topHolders);
   const topTotal = top.reduce((sum, [, n]) => sum + n, 0n);
+  const topBp = shareInBasisPoints(topTotal, total);
   return {
     top: top.map(([address, tokens]) => ({
       address: shortAddress(address),
       tokens: tokens.toString(),
-      share: percent(tokens, total),
+      share: percent(shareInBasisPoints(tokens, total)),
       fraction: Number(tokens) / Number(total),
     })),
-    topShare: percent(topTotal, total),
-    restShare: percent(total - topTotal, total),
+    topShare: percent(topBp),
+    restShare: percent(basisPoints - topBp),
     restFraction: Number(total - topTotal) / Number(total),
   };
 }
