@@ -99,10 +99,12 @@ function render(report) {
       metric("QUESTIONS ASKED", view.asked, `${view.answered} got an answer`),
       metric("ANSWERS GIVEN", view.answers),
       metric("MOST ROUNDS ON ONE QUESTION", view.mostRounds),
-      metric("HIGHEST BOND", view.highestBond),
+      ...view.highestBonds.map(({ chain, bond }) =>
+        metric(`HIGHEST BOND ON ${chain.toUpperCase()}`, bond),
+      ),
     );
   document.querySelector("#ladder-note").textContent =
-    `${view.contested.title} (${view.contested.chain}); bar height doubles with each doubling of the bond`;
+    `${view.contested.title} (${view.contested.chain}); each step up is one doubling of the bond (log scale)`;
   document
     .querySelector("#ladder")
     .replaceChildren(ladderChart(view.contested.ladder));

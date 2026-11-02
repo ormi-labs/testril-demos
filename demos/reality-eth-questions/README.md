@@ -10,9 +10,14 @@ previous bond on the same question.
 
 **The shipped recording is synthetic.** `recordings/report.json` is generated
 by `test/fixture.mjs` and the page says so in its banner. Record real data with
-`tools/prepare` (below). A real recording can fail the cross-check when an
-answer in the window belongs to a question asked before it; the page then shows
-the failure instead of the passed checks.
+`tools/prepare` (below). A real recording can fail the cross-check, and the page
+then shows the failure instead of the passed checks, when:
+
+- an answer in the window belongs to a question asked before it;
+- an answer does not beat the previous bond, because `realitio.answer` keeps a
+  row for a bond that does not beat the question's bond;
+- an answer was revealed from a commitment: its row sits at the reveal block,
+  not where it was committed, so block order can misplace it.
 
 ![Desktop screenshot](docs/screenshot-desktop.png)
 
