@@ -28,9 +28,16 @@ const ensName = (rows, wallet) =>
   rows[`ens-${wallet.key}`]?.find((row) => row.address === wallet.address)
     ?.name;
 const balanceOf = (rows, wallet) =>
-  rows.balance.find((row) => row.owner === wallet.address)?.balance;
+  rows.balance.find((row) => row.owner === wallet.address)?.balance ?? "0";
+// Testril returns lowercase hex addresses, so plain equality is exact.
 const involves = (transfer, address) =>
   transfer.from === address || transfer.to === address;
+const directionOf = (transfer, address) =>
+  transfer.from === transfer.to
+    ? "self"
+    : transfer.from === address
+      ? "out"
+      : "in";
 
 export function check(rows) {
   const passed = [];
@@ -38,8 +45,6 @@ export function check(rows) {
     const label = ensName(rows, wallet) || wallet.address;
     if (!ensName(rows, wallet))
       throw new Error(`No ENS name recorded for ${wallet.address}.`);
-    if (BigInt(balanceOf(rows, wallet) ?? 0) <= 0n)
-      throw new Error(`No balance recorded for ${label}.`);
     const transfers = rows[`transfers-${wallet.key}`];
     const stranger = transfers.find((t) => !involves(t, wallet.address));
     if (stranger)
@@ -54,7 +59,7 @@ export function check(rows) {
         `${label} has a transfer at block ${outside.block} outside the window.`,
       );
     passed.push(
-      `${label}: ${transfers.length} transfers, each with the wallet as sender or recipient; ENS name and balance present`,
+      `${label}: ${transfers.length} transfers, each with the wallet as sender or recipient; ENS name present`,
     );
   }
   return passed;
@@ -65,23 +70,20 @@ export function formatUnits(raw, decimals, places) {
   const rounded = (BigInt(raw) + scale / 2n) / scale;
   const unit = 10n ** BigInt(places);
   const whole = (rounded / unit).toLocaleString("en-US");
-  return places
-    ? `${whole}.${String(rounded % unit).padStart(places, "0")}`
-    : whole;
+  return `${whole}.${String(rounded % unit).padStart(places, "0")}`;
 }
 
 const shortAddress = (address) => `${address.slice(0, 6)}…${address.slice(-4)}`;
 
 function transferView(transfer, wallet) {
-  const token = tokens[transfer.token] ?? {
-    symbol: shortAddress(transfer.token),
-    decimals: 18,
-  };
-  const outgoing = transfer.from === wallet.address;
+  const token = tokens[transfer.token];
+  const direction = directionOf(transfer, wallet.address);
   return {
     block: transfer.block,
-    direction: outgoing ? "out" : "in",
-    counterparty: shortAddress(outgoing ? transfer.to : transfer.from),
+    direction,
+    counterparty: shortAddress(
+      direction === "in" ? transfer.from : transfer.to,
+    ),
     token: token.symbol,
     amount: formatUnits(transfer.value, token.decimals, 2),
     tx: shortAddress(transfer.tx),
@@ -89,12 +91,16 @@ function transferView(transfer, wallet) {
 }
 
 function dailyCounts(transfers, wallet) {
-  const days = Array.from({ length: weekDays }, () => ({ in: 0, out: 0 }));
+  const days = Array.from({ length: weekDays }, () => ({
+    in: 0,
+    out: 0,
+    self: 0,
+  }));
   for (const transfer of transfers) {
     const day = Math.floor(
       (transfer.block - weekWindow.from_block) / blocksPerDay,
     );
-    days[day][transfer.from === wallet.address ? "out" : "in"] += 1;
+    days[day][directionOf(transfer, wallet.address)] += 1;
   }
   return days;
 }

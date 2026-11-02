@@ -49,8 +49,8 @@ outside the window, and that raw units display at their decimals.
 ## Subjects and window
 
 - Transfers: seven days of 7,200 blocks, `[26272965, 26323365)`, ending at the
-  first block of 2026-11-02.
-- Balance and ENS name: read at block 26323364, the last block of 2026-11-01.
+  first block of 2026-11-02 (estimate, verify before recording).
+- Balance and ENS name: read at block 26323364, the last block of 2026-11-01 (estimate, verify before recording).
 - ENS registry `0x00000000000c2e074ec69a0dfb2997ba6c7d2e1e`.
 - Tokens: USDC `0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48`, USDT
   `0xdac17f958d2ee523a2206206994597c13d831ec7`, DAI

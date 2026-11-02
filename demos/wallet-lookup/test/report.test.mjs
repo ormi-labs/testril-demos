@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { check, shape } from "../src/report.mjs";
+import { check, shape, weekWindow, wallets } from "../src/report.mjs";
 import { fixture } from "./fixture.mjs";
 
 const rows = () => structuredClone(fixture().rows);
@@ -24,10 +24,21 @@ test("check fails when a recorded ENS name is empty", () => {
   assert.throws(() => check(corrupted), /No ENS name recorded/);
 });
 
-test("check fails when a transfer is outside the week", () => {
+test("check treats the window as half-open at the end block", () => {
   const corrupted = rows();
-  corrupted["transfers-vitalik"][0].block = 1;
+  corrupted["transfers-vitalik"][0].block = weekWindow.to_block;
   assert.throws(() => check(corrupted), /outside the window/);
+  corrupted["transfers-vitalik"][0].block = weekWindow.to_block - 1;
+  assert.equal(check(corrupted).length, 3);
+});
+
+test("a wallet with no balance row shows 0 ETH and still passes", () => {
+  const input = rows();
+  input.balance = input.balance.filter(
+    (row) => row.owner !== wallets[0].address,
+  );
+  assert.equal(check(input).length, 3);
+  assert.equal(shape(input).wallets[0].balance, "0.0000 ETH");
 });
 
 test("shape shows wei as ETH and raw token units at their decimals", () => {
@@ -42,9 +53,13 @@ test("shape shows wei as ETH and raw token units at their decimals", () => {
   );
 });
 
-test("shape counts self transfers once and orders newest first", () => {
-  const [vitalik] = shape(rows()).wallets;
+test("shape shows a self transfer once, as self, and orders newest first", () => {
+  const input = rows();
+  const [vitalik] = shape(input).wallets;
   assert.equal(vitalik.transferCount, 19);
+  const self = vitalik.transfers.filter((t) => t.direction === "self");
+  assert.equal(self.length, 1);
+  assert.equal(self[0].counterparty, "0xd8da…6045");
   const blocks = vitalik.transfers.map((t) => t.block);
   assert.deepEqual(
     blocks,

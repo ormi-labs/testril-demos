@@ -35,7 +35,7 @@ function dailyChart(daily) {
   const width = 1000;
   const height = 260;
   const pad = { left: 40, right: 12, top: 16, bottom: 28 };
-  const peak = Math.max(1, ...daily.map((day) => day.in + day.out));
+  const peak = Math.max(1, ...daily.map((day) => day.in + day.out + day.self));
   const slot = (width - pad.left - pad.right) / daily.length;
   const unit = (height - pad.top - pad.bottom) / peak;
   const floor = height - pad.bottom;
@@ -67,9 +67,9 @@ function dailyChart(daily) {
       }),
       svg("rect", {
         x,
-        y: floor - (day.in + day.out) * unit,
+        y: floor - (day.in + day.out + day.self) * unit,
         width: barWidth,
-        height: day.out * unit,
+        height: (day.out + day.self) * unit,
         class: "bar out",
       }),
       svg(
