@@ -28,6 +28,7 @@ export const hourBlocks = (index) => ({
 });
 
 function hourIndexOf(block) {
+  if (block < hourFirstBlocks[0] || block >= hourFirstBlocks.at(-1)) return -1;
   let index = 0;
   while (hourFirstBlocks[index + 1] <= block) index++;
   return index;
@@ -47,6 +48,7 @@ export function mintsAndBurns(edges) {
   const net = hours.map(() => ({ minted: 0n, burned: 0n }));
   for (const edge of lowercased(edges)) {
     const hour = net[hourIndexOf(edge.block)];
+    if (!hour) continue;
     if (edge.from === zeroAddress) hour.minted += BigInt(edge.amount);
     if (edge.to === zeroAddress) hour.burned += BigInt(edge.amount);
   }

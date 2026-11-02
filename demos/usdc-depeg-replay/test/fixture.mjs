@@ -17,7 +17,7 @@ const minters = Array.from(
 );
 const holders = Array.from(
   { length: 16 },
-  (_, i) => `0x${(i + 10).toString(16).repeat(20)}`,
+  (_, i) => `0x${(i + 10).toString(16).padStart(2, "0").repeat(20)}`,
 );
 const recordedAt = "2023-03-16T00:00:00.000Z";
 const startingSupply = 43900000000n;

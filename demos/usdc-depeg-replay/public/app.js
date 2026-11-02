@@ -134,7 +134,13 @@ function render(report) {
       metric("LOWEST ANSWER", view.lowest.price, view.lowest.hour),
       metric("PEAK NET BURN", view.peakBurn.amount, view.peakBurn.hour),
       metric("USDC BURNED", view.burned),
-      metric("USDC MINTED", view.minted, `net burn ${view.net}`),
+      metric(
+        "USDC MINTED",
+        view.minted,
+        view.net.startsWith("−")
+          ? `net mint ${view.net.replace("−", "+")}`
+          : `net burn ${view.net}`,
+      ),
     );
   document
     .querySelector("#timeline")
