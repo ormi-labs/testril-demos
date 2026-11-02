@@ -2,7 +2,6 @@ import { writeFile } from "node:fs/promises";
 import { pathToFileURL } from "node:url";
 import spec from "../testril.json" with { type: "json" };
 import {
-  blocksPerHour,
   hoursInWindow,
   tokens,
   transferWindow,
@@ -13,6 +12,24 @@ const recordedAt = "2026-11-02T00:00:00.000Z";
 const unit = 10n ** 18n;
 const [stEth, mEth, cmEth] = tokens;
 const [cold, exploiter, walletA, walletB, walletC, walletD] = wallets;
+
+const hourCount = hoursInWindow().length;
+const blockSpan = transferWindow.to_block - transferWindow.from_block;
+export const hourEndBlocks = Object.fromEntries(
+  hoursInWindow().map((hour, index) => [
+    hour,
+    transferWindow.from_block +
+      Math.floor(((index + 1) * blockSpan) / hourCount) -
+      1,
+  ]),
+);
+const hourEnds = Object.values(hourEndBlocks);
+const hourStartBlock = (hour) =>
+  hour === 0 ? transferWindow.from_block : hourEnds[hour - 1] + 1;
+const hourOfBlock = (block) => hourEnds.findIndex((end) => block <= end);
+const rebaseHour = (index) => index % 24 === 12;
+const rebaseNumerator = 10001n;
+const rebaseDenominator = 10000n;
 
 function seeded(seed) {
   let state = seed;
@@ -51,6 +68,8 @@ function transferMoves(random) {
     [40, walletC, mixer, mEth, 8000],
     [60, walletD, otc, cmEth, 15000],
     [70, walletA, bridge, stEth, 15000],
+    [30, walletA, bridge, stEth, 7, -1],
+    [30, walletA, bridge, stEth, 9, 0],
   ];
   for (let i = 0; i < 40; i++)
     moves.push([
@@ -65,8 +84,8 @@ function transferMoves(random) {
 
 function transferEvents(random) {
   const moves = transferMoves(random).sort((a, b) => a[0] - b[0]);
-  return moves.map(([hour, from, to, token, whole], index) => ({
-    block: transferWindow.from_block + hour * blocksPerHour + (index % 250),
+  return moves.map(([hour, from, to, token, whole, offset], index) => ({
+    block: hourStartBlock(hour) + (offset ?? index % 250),
     from,
     to,
     token,
@@ -102,12 +121,12 @@ function tokenBalanceRows(events) {
     add(cold, token, BigInt(whole) * unit);
   const rows = Object.fromEntries(wallets.map((wallet) => [wallet, []]));
   hoursInWindow().forEach((hour, index) => {
+    if (rebaseHour(index))
+      for (const [key, balance] of held)
+        if (key.endsWith(stEth))
+          held.set(key, (balance * rebaseNumerator) / rebaseDenominator);
     for (const event of events)
-      if (
-        Math.floor(
-          (event.block - transferWindow.from_block) / blocksPerHour,
-        ) === index
-      ) {
+      if (hourOfBlock(event.block) === index) {
         add(event.from, event.token, -BigInt(event.value));
         add(event.to, event.token, BigInt(event.value));
       }
@@ -171,6 +190,7 @@ export function fixture() {
     demo: spec.demo,
     source: "synthetic",
     recordedAt,
+    hourEndBlocks,
     boundFunctions: Object.fromEntries(
       spec.binds.map((bind) => [
         bind.name,

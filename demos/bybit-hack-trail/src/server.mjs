@@ -2,7 +2,8 @@ import { createServer } from "node:http";
 import { readFile } from "node:fs/promises";
 import { extname, join, normalize } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
-import { check, shape } from "./report.mjs";
+import { check } from "./check.mjs";
+import { shape } from "./report.mjs";
 
 const root = fileURLToPath(new URL("..", import.meta.url));
 const publicDir = join(root, "public");
@@ -16,7 +17,7 @@ const types = {
 export function report(recording) {
   let checks;
   try {
-    checks = { ok: true, passed: check(recording.rows) };
+    checks = { ok: true, passed: check(recording) };
   } catch (error) {
     checks = { ok: false, error: error.message };
   }
