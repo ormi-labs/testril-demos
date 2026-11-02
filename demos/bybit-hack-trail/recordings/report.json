@@ -1,0 +1,3022 @@
+{
+  "demo": "bybit-hack-trail",
+  "source": "synthetic",
+  "recordedAt": "2026-11-02T00:00:00.000Z",
+  "boundFunctions": {
+    "transfers-bybit-cold-wallet": {
+      "function_slug": "erc20.wallet_transfers",
+      "chain_id": 1
+    },
+    "transfers-exploiter": {
+      "function_slug": "erc20.wallet_transfers",
+      "chain_id": 1
+    },
+    "transfers-hop-a4b2": {
+      "function_slug": "erc20.wallet_transfers",
+      "chain_id": 1
+    },
+    "transfers-hop-bdd0": {
+      "function_slug": "erc20.wallet_transfers",
+      "chain_id": 1
+    },
+    "transfers-hop-0fa0": {
+      "function_slug": "erc20.wallet_transfers",
+      "chain_id": 1
+    },
+    "transfers-hop-1542": {
+      "function_slug": "erc20.wallet_transfers",
+      "chain_id": 1
+    },
+    "balance-bybit-cold-wallet": {
+      "function_slug": "native.balance",
+      "chain_id": 1
+    },
+    "balance-exploiter": {
+      "function_slug": "native.balance",
+      "chain_id": 1
+    },
+    "balance-hop-a4b2": {
+      "function_slug": "native.balance",
+      "chain_id": 1
+    },
+    "balance-hop-bdd0": {
+      "function_slug": "native.balance",
+      "chain_id": 1
+    },
+    "balance-hop-0fa0": {
+      "function_slug": "native.balance",
+      "chain_id": 1
+    },
+    "balance-hop-1542": {
+      "function_slug": "native.balance",
+      "chain_id": 1
+    }
+  },
+  "window": {
+    "transfers-bybit-cold-wallet": {
+      "from_block": 21890994,
+      "to_block": 21948292
+    },
+    "transfers-exploiter": {
+      "from_block": 21890994,
+      "to_block": 21948292
+    },
+    "transfers-hop-a4b2": {
+      "from_block": 21890994,
+      "to_block": 21948292
+    },
+    "transfers-hop-bdd0": {
+      "from_block": 21890994,
+      "to_block": 21948292
+    },
+    "transfers-hop-0fa0": {
+      "from_block": 21890994,
+      "to_block": 21948292
+    },
+    "transfers-hop-1542": {
+      "from_block": 21890994,
+      "to_block": 21948292
+    },
+    "balance-bybit-cold-wallet": {
+      "from_hour": "2025-02-21T00",
+      "to_hour": "2025-03-01T00"
+    },
+    "balance-exploiter": {
+      "from_hour": "2025-02-21T00",
+      "to_hour": "2025-03-01T00"
+    },
+    "balance-hop-a4b2": {
+      "from_hour": "2025-02-21T00",
+      "to_hour": "2025-03-01T00"
+    },
+    "balance-hop-bdd0": {
+      "from_hour": "2025-02-21T00",
+      "to_hour": "2025-03-01T00"
+    },
+    "balance-hop-0fa0": {
+      "from_hour": "2025-02-21T00",
+      "to_hour": "2025-03-01T00"
+    },
+    "balance-hop-1542": {
+      "from_hour": "2025-02-21T00",
+      "to_hour": "2025-03-01T00"
+    }
+  },
+  "rows": {
+    "transfers-bybit-cold-wallet": [
+      {
+        "block": 21895194,
+        "from": "0x1db92e2eebc8e0c075a02bea49a2935bcd2dfcf4",
+        "to": "0x47666fab8bd0ac7003bce3f5c3585383f09486e2",
+        "token": "0xae7ab96520de3a18e5e111b5eaab095312d7fe84",
+        "tx": "0xbdaf243b10791f76dac0be6774484a36b7ae41c3e8feb4ce09c88f959b49dc9c",
+        "log_index": "231",
+        "value": "401000000000000000000000"
+      },
+      {
+        "block": 21895195,
+        "from": "0x1db92e2eebc8e0c075a02bea49a2935bcd2dfcf4",
+        "to": "0x47666fab8bd0ac7003bce3f5c3585383f09486e2",
+        "token": "0xd5f7838f5c461feff7fe49ea5ebaf7728bb0adfa",
+        "tx": "0x60297608d349aef56c5fde965f5580250b053d26f626a8503968181245009a79",
+        "log_index": "255",
+        "value": "8000000000000000000000"
+      },
+      {
+        "block": 21895196,
+        "from": "0x1db92e2eebc8e0c075a02bea49a2935bcd2dfcf4",
+        "to": "0x47666fab8bd0ac7003bce3f5c3585383f09486e2",
+        "token": "0xe6829d9a7ee3040e1276fa75293bde931859e8fa",
+        "tx": "0xc5f3fb4ed43ac8c6a2cb7967b4694f97ec8faa00797065358f1fff18de7139e9",
+        "log_index": "189",
+        "value": "15000000000000000000000"
+      }
+    ],
+    "transfers-exploiter": [
+      {
+        "block": 21895194,
+        "from": "0x1db92e2eebc8e0c075a02bea49a2935bcd2dfcf4",
+        "to": "0x47666fab8bd0ac7003bce3f5c3585383f09486e2",
+        "token": "0xae7ab96520de3a18e5e111b5eaab095312d7fe84",
+        "tx": "0xbdaf243b10791f76dac0be6774484a36b7ae41c3e8feb4ce09c88f959b49dc9c",
+        "log_index": "231",
+        "value": "401000000000000000000000"
+      },
+      {
+        "block": 21895195,
+        "from": "0x1db92e2eebc8e0c075a02bea49a2935bcd2dfcf4",
+        "to": "0x47666fab8bd0ac7003bce3f5c3585383f09486e2",
+        "token": "0xd5f7838f5c461feff7fe49ea5ebaf7728bb0adfa",
+        "tx": "0x60297608d349aef56c5fde965f5580250b053d26f626a8503968181245009a79",
+        "log_index": "255",
+        "value": "8000000000000000000000"
+      },
+      {
+        "block": 21895196,
+        "from": "0x1db92e2eebc8e0c075a02bea49a2935bcd2dfcf4",
+        "to": "0x47666fab8bd0ac7003bce3f5c3585383f09486e2",
+        "token": "0xe6829d9a7ee3040e1276fa75293bde931859e8fa",
+        "tx": "0xc5f3fb4ed43ac8c6a2cb7967b4694f97ec8faa00797065358f1fff18de7139e9",
+        "log_index": "189",
+        "value": "15000000000000000000000"
+      },
+      {
+        "block": 21895497,
+        "from": "0x47666fab8bd0ac7003bce3f5c3585383f09486e2",
+        "to": "0xa4b2fd68593b6f34e51cb9edb66e71c1b4ab449e",
+        "token": "0xae7ab96520de3a18e5e111b5eaab095312d7fe84",
+        "tx": "0xe42f1d7344fd19a6eea6f08afa73bd37e51f11f8cf9fcc04d9e18749effe4858",
+        "log_index": "210",
+        "value": "150000000000000000000000"
+      },
+      {
+        "block": 21895498,
+        "from": "0x47666fab8bd0ac7003bce3f5c3585383f09486e2",
+        "to": "0xbdd077f651ebe7f7b3ce16fe5f2b025be2969516",
+        "token": "0xae7ab96520de3a18e5e111b5eaab095312d7fe84",
+        "tx": "0xd3cd3e4f8c4d76367386c544ad3bb2f2cac5f47b38d10ac0d7389caf91cecebb",
+        "log_index": "57",
+        "value": "100000000000000000000000"
+      },
+      {
+        "block": 21895799,
+        "from": "0x47666fab8bd0ac7003bce3f5c3585383f09486e2",
+        "to": "0xbdd077f651ebe7f7b3ce16fe5f2b025be2969516",
+        "token": "0xd5f7838f5c461feff7fe49ea5ebaf7728bb0adfa",
+        "tx": "0x92d5e86d841719dd1bda4231cc6e25afe567e27a7ec9d1bb9d3f555ca02f8810",
+        "log_index": "204",
+        "value": "8000000000000000000000"
+      },
+      {
+        "block": 21895800,
+        "from": "0x47666fab8bd0ac7003bce3f5c3585383f09486e2",
+        "to": "0xa4b2fd68593b6f34e51cb9edb66e71c1b4ab449e",
+        "token": "0xe6829d9a7ee3040e1276fa75293bde931859e8fa",
+        "tx": "0xd3a57d6e79d6668348cd32e7d98a9d47377de82459649565dc78181e2bd8b862",
+        "log_index": "38",
+        "value": "15000000000000000000000"
+      },
+      {
+        "block": 21896101,
+        "from": "0x47666fab8bd0ac7003bce3f5c3585383f09486e2",
+        "to": "0x3451bd1b13c4558a67a62bc042905ecbf05c03d2",
+        "token": "0xae7ab96520de3a18e5e111b5eaab095312d7fe84",
+        "tx": "0x6b80d9e94148b6d8d8aaa6782e10540324507cfab83e9705cf4c268fd69499d5",
+        "log_index": "295",
+        "value": "100000000000000000000000"
+      },
+      {
+        "block": 21899709,
+        "from": "0x47666fab8bd0ac7003bce3f5c3585383f09486e2",
+        "to": "0x10019e66e6ec62a7525886a9477aabcc41b984b1",
+        "token": "0xae7ab96520de3a18e5e111b5eaab095312d7fe84",
+        "tx": "0x80fa8fb1d0d0aa362b8adda4cb9a06571f9b97e85f38ae55760576af2cc5cbec",
+        "log_index": "142",
+        "value": "17935002677000000000"
+      },
+      {
+        "block": 21903613,
+        "from": "0x47666fab8bd0ac7003bce3f5c3585383f09486e2",
+        "to": "0x3451bd1b13c4558a67a62bc042905ecbf05c03d2",
+        "token": "0xae7ab96520de3a18e5e111b5eaab095312d7fe84",
+        "tx": "0xdaf06902f6874cdc4cf826c144e00b1fd4892d476037c19940af482e1c517ef9",
+        "log_index": "4",
+        "value": "5376042508000000000"
+      },
+      {
+        "block": 21906015,
+        "from": "0x47666fab8bd0ac7003bce3f5c3585383f09486e2",
+        "to": "0x4dcfb279964970c20b694f220845b83839621bf0",
+        "token": "0xae7ab96520de3a18e5e111b5eaab095312d7fe84",
+        "tx": "0xf347eca86aef92e3377357138cba88886ca381ae7cff78b4c47f3d041407758b",
+        "log_index": "57",
+        "value": "23274099873000000000"
+      },
+      {
+        "block": 21907816,
+        "from": "0x47666fab8bd0ac7003bce3f5c3585383f09486e2",
+        "to": "0x4dcfb279964970c20b694f220845b83839621bf0",
+        "token": "0xae7ab96520de3a18e5e111b5eaab095312d7fe84",
+        "tx": "0x504152bab136f951bf39c11c34f788147e748bd78d180d0a5faaacc0b5539d56",
+        "log_index": "215",
+        "value": "30943002868000000000"
+      },
+      {
+        "block": 21912920,
+        "from": "0x47666fab8bd0ac7003bce3f5c3585383f09486e2",
+        "to": "0x45c55f8bd0a626e7f9e3971a538a79ea81cbb265",
+        "token": "0xae7ab96520de3a18e5e111b5eaab095312d7fe84",
+        "tx": "0xacd33d5fa3ed30544f4334c5652eabfc5af8f9e3346e17fada7bbda04e30a419",
+        "log_index": "141",
+        "value": "20605509433000000000"
+      },
+      {
+        "block": 21920125,
+        "from": "0x47666fab8bd0ac7003bce3f5c3585383f09486e2",
+        "to": "0x4dcfb279964970c20b694f220845b83839621bf0",
+        "token": "0xae7ab96520de3a18e5e111b5eaab095312d7fe84",
+        "tx": "0xab20cafb451ffb348517fb482d8233ee18fe978879dbfd332d5d35dcca87e3e7",
+        "log_index": "22",
+        "value": "21333949782000000000"
+      },
+      {
+        "block": 21923429,
+        "from": "0x47666fab8bd0ac7003bce3f5c3585383f09486e2",
+        "to": "0x3451bd1b13c4558a67a62bc042905ecbf05c03d2",
+        "token": "0xae7ab96520de3a18e5e111b5eaab095312d7fe84",
+        "tx": "0xae5ab3145fa09c73d1444577088ed86fb8d32ef368b2b2c0210abc68d5238efd",
+        "log_index": "244",
+        "value": "9950280690000000000"
+      },
+      {
+        "block": 21924630,
+        "from": "0x47666fab8bd0ac7003bce3f5c3585383f09486e2",
+        "to": "0x3451bd1b13c4558a67a62bc042905ecbf05c03d2",
+        "token": "0xae7ab96520de3a18e5e111b5eaab095312d7fe84",
+        "tx": "0x3a5fe388f03bdfff517dfc001910d6371e0138108f5f66489cacfba39143590c",
+        "log_index": "79",
+        "value": "4779481814000000000"
+      },
+      {
+        "block": 21933638,
+        "from": "0x47666fab8bd0ac7003bce3f5c3585383f09486e2",
+        "to": "0x3451bd1b13c4558a67a62bc042905ecbf05c03d2",
+        "token": "0xae7ab96520de3a18e5e111b5eaab095312d7fe84",
+        "tx": "0xe608f9c2d6a7d8b55cc4d20a5ef5d8486f0375aab2d30904aef5ce6d1290756f",
+        "log_index": "181",
+        "value": "2678130258000000000"
+      },
+      {
+        "block": 21935439,
+        "from": "0x47666fab8bd0ac7003bce3f5c3585383f09486e2",
+        "to": "0x10019e66e6ec62a7525886a9477aabcc41b984b1",
+        "token": "0xae7ab96520de3a18e5e111b5eaab095312d7fe84",
+        "tx": "0x011aa094261199d896147190cd2b156fcf7c2001fc6cbf0e553624ea1d584ba6",
+        "log_index": "107",
+        "value": "21479028209000000000"
+      },
+      {
+        "block": 21935440,
+        "from": "0x47666fab8bd0ac7003bce3f5c3585383f09486e2",
+        "to": "0x45c55f8bd0a626e7f9e3971a538a79ea81cbb265",
+        "token": "0xae7ab96520de3a18e5e111b5eaab095312d7fe84",
+        "tx": "0xa7f45466f0a8621a1cc3ffb4642c54fae7734254c1ab38f8f227f19a467572e3",
+        "log_index": "265",
+        "value": "2965989185000000000"
+      },
+      {
+        "block": 21935741,
+        "from": "0x47666fab8bd0ac7003bce3f5c3585383f09486e2",
+        "to": "0x10019e66e6ec62a7525886a9477aabcc41b984b1",
+        "token": "0xae7ab96520de3a18e5e111b5eaab095312d7fe84",
+        "tx": "0x63382b90f8c41e588aef570f5d28fa84f71b3108a28a0223842d566f70afdf11",
+        "log_index": "241",
+        "value": "26204620644000000000"
+      },
+      {
+        "block": 21936642,
+        "from": "0x47666fab8bd0ac7003bce3f5c3585383f09486e2",
+        "to": "0x3451bd1b13c4558a67a62bc042905ecbf05c03d2",
+        "token": "0xae7ab96520de3a18e5e111b5eaab095312d7fe84",
+        "tx": "0x676d92d5fe677a69f975f0df2d8e3516535a63928428fbadd7a429121d5bd36f",
+        "log_index": "170",
+        "value": "1733152202000000000"
+      },
+      {
+        "block": 21937543,
+        "from": "0x47666fab8bd0ac7003bce3f5c3585383f09486e2",
+        "to": "0x45c55f8bd0a626e7f9e3971a538a79ea81cbb265",
+        "token": "0xae7ab96520de3a18e5e111b5eaab095312d7fe84",
+        "tx": "0x659cdf033c675207243df9e7a631bc579e29ab1e0302086e394b3703180c9774",
+        "log_index": "184",
+        "value": "29355841160000000000"
+      },
+      {
+        "block": 21939344,
+        "from": "0x47666fab8bd0ac7003bce3f5c3585383f09486e2",
+        "to": "0x4dcfb279964970c20b694f220845b83839621bf0",
+        "token": "0xae7ab96520de3a18e5e111b5eaab095312d7fe84",
+        "tx": "0xb6da8af947ae4aba2e782d8713ea68fef6544eb314909210a03ccdffb90d24cf",
+        "log_index": "63",
+        "value": "10873527094000000000"
+      },
+      {
+        "block": 21942048,
+        "from": "0x47666fab8bd0ac7003bce3f5c3585383f09486e2",
+        "to": "0x3451bd1b13c4558a67a62bc042905ecbf05c03d2",
+        "token": "0xae7ab96520de3a18e5e111b5eaab095312d7fe84",
+        "tx": "0x418b7b7c7ffef8b1dd7dfec014e48309c9648f5e99cad4c76fb47c0f44dcfb93",
+        "log_index": "29",
+        "value": "10219863014000000000"
+      },
+      {
+        "block": 21942349,
+        "from": "0x47666fab8bd0ac7003bce3f5c3585383f09486e2",
+        "to": "0x4dcfb279964970c20b694f220845b83839621bf0",
+        "token": "0xae7ab96520de3a18e5e111b5eaab095312d7fe84",
+        "tx": "0xbcceb73e5fe75493a3b9ce631dc008696fd02742bb7f7de94f851b0e06aa3d16",
+        "log_index": "264",
+        "value": "14357578236000000000"
+      },
+      {
+        "block": 21944451,
+        "from": "0x47666fab8bd0ac7003bce3f5c3585383f09486e2",
+        "to": "0x4dcfb279964970c20b694f220845b83839621bf0",
+        "token": "0xae7ab96520de3a18e5e111b5eaab095312d7fe84",
+        "tx": "0x2c1289408a00f81d208e613b710bb206beecae3970ef75a8cbdb6a4fef6b43d4",
+        "log_index": "232",
+        "value": "17297586654000000000"
+      }
+    ],
+    "transfers-hop-a4b2": [
+      {
+        "block": 21895497,
+        "from": "0x47666fab8bd0ac7003bce3f5c3585383f09486e2",
+        "to": "0xa4b2fd68593b6f34e51cb9edb66e71c1b4ab449e",
+        "token": "0xae7ab96520de3a18e5e111b5eaab095312d7fe84",
+        "tx": "0xe42f1d7344fd19a6eea6f08afa73bd37e51f11f8cf9fcc04d9e18749effe4858",
+        "log_index": "210",
+        "value": "150000000000000000000000"
+      },
+      {
+        "block": 21895800,
+        "from": "0x47666fab8bd0ac7003bce3f5c3585383f09486e2",
+        "to": "0xa4b2fd68593b6f34e51cb9edb66e71c1b4ab449e",
+        "token": "0xe6829d9a7ee3040e1276fa75293bde931859e8fa",
+        "tx": "0xd3a57d6e79d6668348cd32e7d98a9d47377de82459649565dc78181e2bd8b862",
+        "log_index": "38",
+        "value": "15000000000000000000000"
+      },
+      {
+        "block": 21896402,
+        "from": "0xa4b2fd68593b6f34e51cb9edb66e71c1b4ab449e",
+        "to": "0x1542368a03ad1f03d96d51b414f4a2d6d2fe0d04",
+        "token": "0xe6829d9a7ee3040e1276fa75293bde931859e8fa",
+        "tx": "0x5d432ab5f0497849addb08269320fb424164ce745e057592da74c75db945001e",
+        "log_index": "198",
+        "value": "15000000000000000000000"
+      },
+      {
+        "block": 21897004,
+        "from": "0xa4b2fd68593b6f34e51cb9edb66e71c1b4ab449e",
+        "to": "0x1542368a03ad1f03d96d51b414f4a2d6d2fe0d04",
+        "token": "0xae7ab96520de3a18e5e111b5eaab095312d7fe84",
+        "tx": "0x653875b1f8ff53957ad0f2614a0c1816d25e86d3098426f2f17023b4e42b38e5",
+        "log_index": "220",
+        "value": "50000000000000000000000"
+      },
+      {
+        "block": 21897605,
+        "from": "0xa4b2fd68593b6f34e51cb9edb66e71c1b4ab449e",
+        "to": "0x4dcfb279964970c20b694f220845b83839621bf0",
+        "token": "0xae7ab96520de3a18e5e111b5eaab095312d7fe84",
+        "tx": "0xe446e61a6bf4cfff94534d8a8771a17a5be5d8b0236530c2e49d8011a2c1356a",
+        "log_index": "146",
+        "value": "80000000000000000000000"
+      },
+      {
+        "block": 21897906,
+        "from": "0xa4b2fd68593b6f34e51cb9edb66e71c1b4ab449e",
+        "to": "0x10019e66e6ec62a7525886a9477aabcc41b984b1",
+        "token": "0xae7ab96520de3a18e5e111b5eaab095312d7fe84",
+        "tx": "0xd11f237a8600c56e3359558a8ecaa6083fe7ddc830231ff9179a6e14f6a54670",
+        "log_index": "252",
+        "value": "29456013903000000000"
+      },
+      {
+        "block": 21898208,
+        "from": "0xa4b2fd68593b6f34e51cb9edb66e71c1b4ab449e",
+        "to": "0x10019e66e6ec62a7525886a9477aabcc41b984b1",
+        "token": "0xae7ab96520de3a18e5e111b5eaab095312d7fe84",
+        "tx": "0xb21c7c90a9ad00f1be452a67ca6b9b82d594b163170ba7f813965678857980ba",
+        "log_index": "283",
+        "value": "8185803338000000000"
+      },
+      {
+        "block": 21903312,
+        "from": "0xa4b2fd68593b6f34e51cb9edb66e71c1b4ab449e",
+        "to": "0x3451bd1b13c4558a67a62bc042905ecbf05c03d2",
+        "token": "0xae7ab96520de3a18e5e111b5eaab095312d7fe84",
+        "tx": "0x8a0a3a33c65fc17f0c603ce4b9db07c136bb9a6e7763d9bef68c7eccca853f81",
+        "log_index": "48",
+        "value": "20884959151000000000"
+      },
+      {
+        "block": 21909618,
+        "from": "0xa4b2fd68593b6f34e51cb9edb66e71c1b4ab449e",
+        "to": "0x3451bd1b13c4558a67a62bc042905ecbf05c03d2",
+        "token": "0xae7ab96520de3a18e5e111b5eaab095312d7fe84",
+        "tx": "0x953b737b44668ee9068bb4f865f046a9d3aef18c7ea9ff3509dc5cb7cde5bb6b",
+        "log_index": "154",
+        "value": "28030442419000000000"
+      },
+      {
+        "block": 21915021,
+        "from": "0xa4b2fd68593b6f34e51cb9edb66e71c1b4ab449e",
+        "to": "0x10019e66e6ec62a7525886a9477aabcc41b984b1",
+        "token": "0xae7ab96520de3a18e5e111b5eaab095312d7fe84",
+        "tx": "0xdb88aec998a8a1b0b67da361f936051622d7d1bb1738d48628ae014598155de9",
+        "log_index": "217",
+        "value": "27613395205000000000"
+      },
+      {
+        "block": 21916822,
+        "from": "0xa4b2fd68593b6f34e51cb9edb66e71c1b4ab449e",
+        "to": "0x45c55f8bd0a626e7f9e3971a538a79ea81cbb265",
+        "token": "0xae7ab96520de3a18e5e111b5eaab095312d7fe84",
+        "tx": "0xe509f705909feeacabf9949bab25a651bfcebbeb24cf0852be216bfcec6ecea2",
+        "log_index": "157",
+        "value": "2352520924000000000"
+      },
+      {
+        "block": 21918923,
+        "from": "0xa4b2fd68593b6f34e51cb9edb66e71c1b4ab449e",
+        "to": "0x45c55f8bd0a626e7f9e3971a538a79ea81cbb265",
+        "token": "0xae7ab96520de3a18e5e111b5eaab095312d7fe84",
+        "tx": "0x2f6ecef0d60d11623d3f4643ae8e5b7518d80487f6f5b71038a650e44e2e0ffd",
+        "log_index": "287",
+        "value": "9904532469000000000"
+      },
+      {
+        "block": 21919224,
+        "from": "0xa4b2fd68593b6f34e51cb9edb66e71c1b4ab449e",
+        "to": "0x10019e66e6ec62a7525886a9477aabcc41b984b1",
+        "token": "0xae7ab96520de3a18e5e111b5eaab095312d7fe84",
+        "tx": "0x26a0053483288539db917c48753a4d42dae22f07661c3c911fec4e67446cf4bd",
+        "log_index": "221",
+        "value": "8635217493000000000"
+      },
+      {
+        "block": 21920126,
+        "from": "0xa4b2fd68593b6f34e51cb9edb66e71c1b4ab449e",
+        "to": "0x4dcfb279964970c20b694f220845b83839621bf0",
+        "token": "0xae7ab96520de3a18e5e111b5eaab095312d7fe84",
+        "tx": "0xf60e34336cb678020bd836a6c30665ac5cadfd38df4fa5d1b988893d063f9f77",
+        "log_index": "157",
+        "value": "15979491634000000000"
+      },
+      {
+        "block": 21921327,
+        "from": "0xa4b2fd68593b6f34e51cb9edb66e71c1b4ab449e",
+        "to": "0x3451bd1b13c4558a67a62bc042905ecbf05c03d2",
+        "token": "0xae7ab96520de3a18e5e111b5eaab095312d7fe84",
+        "tx": "0x8971f02e0ecc98927fb49d011ae2abc48559ea899039ef4d85821ed5900bbee8",
+        "log_index": "51",
+        "value": "7536084943000000000"
+      },
+      {
+        "block": 21922528,
+        "from": "0xa4b2fd68593b6f34e51cb9edb66e71c1b4ab449e",
+        "to": "0x10019e66e6ec62a7525886a9477aabcc41b984b1",
+        "token": "0xae7ab96520de3a18e5e111b5eaab095312d7fe84",
+        "tx": "0x0a9c1badb7be385879ec63d23f9323bcb562415a399d3a551f2add4cb4bc830d",
+        "log_index": "173",
+        "value": "14575363196000000000"
+      },
+      {
+        "block": 21926131,
+        "from": "0xa4b2fd68593b6f34e51cb9edb66e71c1b4ab449e",
+        "to": "0x10019e66e6ec62a7525886a9477aabcc41b984b1",
+        "token": "0xae7ab96520de3a18e5e111b5eaab095312d7fe84",
+        "tx": "0x3988ac41d704fe6da96297828ec1606409ce898c4f17f8280eb2e32b1a257955",
+        "log_index": "296",
+        "value": "3696822296000000000"
+      },
+      {
+        "block": 21926732,
+        "from": "0xa4b2fd68593b6f34e51cb9edb66e71c1b4ab449e",
+        "to": "0x4dcfb279964970c20b694f220845b83839621bf0",
+        "token": "0xae7ab96520de3a18e5e111b5eaab095312d7fe84",
+        "tx": "0x595021f5c8f7ae8d914c85c348351e93ee1bb8eb2dce751509b52025eba99eb1",
+        "log_index": "88",
+        "value": "30243605920000000000"
+      },
+      {
+        "block": 21928233,
+        "from": "0xa4b2fd68593b6f34e51cb9edb66e71c1b4ab449e",
+        "to": "0x45c55f8bd0a626e7f9e3971a538a79ea81cbb265",
+        "token": "0xae7ab96520de3a18e5e111b5eaab095312d7fe84",
+        "tx": "0x6f51a108197fef87b1368189afe66ee62297be17a9804dcd3057d88b3746cf55",
+        "log_index": "279",
+        "value": "19493014227000000000"
+      },
+      {
+        "block": 21929734,
+        "from": "0xa4b2fd68593b6f34e51cb9edb66e71c1b4ab449e",
+        "to": "0x45c55f8bd0a626e7f9e3971a538a79ea81cbb265",
+        "token": "0xae7ab96520de3a18e5e111b5eaab095312d7fe84",
+        "tx": "0xb919e3f69ddab3cfdcc00419dc4f8780a18bc5bfaa50d22c97be2610fb99b35b",
+        "log_index": "205",
+        "value": "4059683310000000000"
+      },
+      {
+        "block": 21930035,
+        "from": "0xa4b2fd68593b6f34e51cb9edb66e71c1b4ab449e",
+        "to": "0x10019e66e6ec62a7525886a9477aabcc41b984b1",
+        "token": "0xae7ab96520de3a18e5e111b5eaab095312d7fe84",
+        "tx": "0x9fdf56cbbebaa0f1cc9e02147ea726d2743f5846206d261dc3259796ea133f96",
+        "log_index": "288",
+        "value": "11624920872000000000"
+      },
+      {
+        "block": 21930036,
+        "from": "0xa4b2fd68593b6f34e51cb9edb66e71c1b4ab449e",
+        "to": "0x10019e66e6ec62a7525886a9477aabcc41b984b1",
+        "token": "0xae7ab96520de3a18e5e111b5eaab095312d7fe84",
+        "tx": "0xa2234f1c44c47513315f03456f3f39b2ce213c020a5f4bfa23001de0226f4c13",
+        "log_index": "52",
+        "value": "10562158267000000000"
+      },
+      {
+        "block": 21933637,
+        "from": "0xa4b2fd68593b6f34e51cb9edb66e71c1b4ab449e",
+        "to": "0x45c55f8bd0a626e7f9e3971a538a79ea81cbb265",
+        "token": "0xae7ab96520de3a18e5e111b5eaab095312d7fe84",
+        "tx": "0xbc73dc9edd5959292676664d462bf2111a7a6e66fed4c61e35f0bcf0f8b72aa3",
+        "log_index": "167",
+        "value": "12240396319000000000"
+      },
+      {
+        "block": 21939645,
+        "from": "0xa4b2fd68593b6f34e51cb9edb66e71c1b4ab449e",
+        "to": "0x3451bd1b13c4558a67a62bc042905ecbf05c03d2",
+        "token": "0xae7ab96520de3a18e5e111b5eaab095312d7fe84",
+        "tx": "0xec303f8abaf5a6532cdca978e63cf0b957648820637a68899506094bb9e1fb84",
+        "log_index": "103",
+        "value": "24180656763000000000"
+      },
+      {
+        "block": 21939646,
+        "from": "0xa4b2fd68593b6f34e51cb9edb66e71c1b4ab449e",
+        "to": "0x10019e66e6ec62a7525886a9477aabcc41b984b1",
+        "token": "0xae7ab96520de3a18e5e111b5eaab095312d7fe84",
+        "tx": "0xe2f1c064c1d67e2b55bb5439ca1d849100f99ae230824a18a39647b747546ebc",
+        "log_index": "288",
+        "value": "15315327220000000000"
+      },
+      {
+        "block": 21941447,
+        "from": "0xa4b2fd68593b6f34e51cb9edb66e71c1b4ab449e",
+        "to": "0x10019e66e6ec62a7525886a9477aabcc41b984b1",
+        "token": "0xae7ab96520de3a18e5e111b5eaab095312d7fe84",
+        "tx": "0x4700929850c4dc1cacfdc03052cf4307cfd9955126acbfca38a4741579e4ddbf",
+        "log_index": "184",
+        "value": "24870184022000000000"
+      },
+      {
+        "block": 21944150,
+        "from": "0xa4b2fd68593b6f34e51cb9edb66e71c1b4ab449e",
+        "to": "0x3451bd1b13c4558a67a62bc042905ecbf05c03d2",
+        "token": "0xae7ab96520de3a18e5e111b5eaab095312d7fe84",
+        "tx": "0x28e0b205285242ed5ae4bfdb6132fcf78e052b598f7ac66009dad9e9ee72100a",
+        "log_index": "139",
+        "value": "20321935052000000000"
+      }
+    ],
+    "transfers-hop-bdd0": [
+      {
+        "block": 21895498,
+        "from": "0x47666fab8bd0ac7003bce3f5c3585383f09486e2",
+        "to": "0xbdd077f651ebe7f7b3ce16fe5f2b025be2969516",
+        "token": "0xae7ab96520de3a18e5e111b5eaab095312d7fe84",
+        "tx": "0xd3cd3e4f8c4d76367386c544ad3bb2f2cac5f47b38d10ac0d7389caf91cecebb",
+        "log_index": "57",
+        "value": "100000000000000000000000"
+      },
+      {
+        "block": 21895799,
+        "from": "0x47666fab8bd0ac7003bce3f5c3585383f09486e2",
+        "to": "0xbdd077f651ebe7f7b3ce16fe5f2b025be2969516",
+        "token": "0xd5f7838f5c461feff7fe49ea5ebaf7728bb0adfa",
+        "tx": "0x92d5e86d841719dd1bda4231cc6e25afe567e27a7ec9d1bb9d3f555ca02f8810",
+        "log_index": "204",
+        "value": "8000000000000000000000"
+      },
+      {
+        "block": 21896703,
+        "from": "0xbdd077f651ebe7f7b3ce16fe5f2b025be2969516",
+        "to": "0x0fa09c3a328792253f8dee7116848723b72a6d2e",
+        "token": "0xd5f7838f5c461feff7fe49ea5ebaf7728bb0adfa",
+        "tx": "0xe8ff92161312e89e983895d62ef6cc83bf0a9ae8fee604e91519d953b419154f",
+        "log_index": "204",
+        "value": "8000000000000000000000"
+      },
+      {
+        "block": 21898207,
+        "from": "0xbdd077f651ebe7f7b3ce16fe5f2b025be2969516",
+        "to": "0x3451bd1b13c4558a67a62bc042905ecbf05c03d2",
+        "token": "0xae7ab96520de3a18e5e111b5eaab095312d7fe84",
+        "tx": "0xc0f0e3be8efb687a07a7b0756a80fc482e836e6f25a2964da33f4551bf16de70",
+        "log_index": "10",
+        "value": "60000000000000000000000"
+      },
+      {
+        "block": 21900010,
+        "from": "0xbdd077f651ebe7f7b3ce16fe5f2b025be2969516",
+        "to": "0x0fa09c3a328792253f8dee7116848723b72a6d2e",
+        "token": "0xae7ab96520de3a18e5e111b5eaab095312d7fe84",
+        "tx": "0x9650c143d1725af516b60edba548d4179e21b33807ad6b767b303f0cb4a7ff60",
+        "log_index": "77",
+        "value": "40000000000000000000000"
+      }
+    ],
+    "transfers-hop-0fa0": [
+      {
+        "block": 21896703,
+        "from": "0xbdd077f651ebe7f7b3ce16fe5f2b025be2969516",
+        "to": "0x0fa09c3a328792253f8dee7116848723b72a6d2e",
+        "token": "0xd5f7838f5c461feff7fe49ea5ebaf7728bb0adfa",
+        "tx": "0xe8ff92161312e89e983895d62ef6cc83bf0a9ae8fee604e91519d953b419154f",
+        "log_index": "204",
+        "value": "8000000000000000000000"
+      },
+      {
+        "block": 21900010,
+        "from": "0xbdd077f651ebe7f7b3ce16fe5f2b025be2969516",
+        "to": "0x0fa09c3a328792253f8dee7116848723b72a6d2e",
+        "token": "0xae7ab96520de3a18e5e111b5eaab095312d7fe84",
+        "tx": "0x9650c143d1725af516b60edba548d4179e21b33807ad6b767b303f0cb4a7ff60",
+        "log_index": "77",
+        "value": "40000000000000000000000"
+      },
+      {
+        "block": 21903011,
+        "from": "0x0fa09c3a328792253f8dee7116848723b72a6d2e",
+        "to": "0x45c55f8bd0a626e7f9e3971a538a79ea81cbb265",
+        "token": "0xd5f7838f5c461feff7fe49ea5ebaf7728bb0adfa",
+        "tx": "0x4b2d9413c6167c1e039d24ae4e9b61dd90d80283b18ccded3356b138ef8dff06",
+        "log_index": "266",
+        "value": "8000000000000000000000"
+      },
+      {
+        "block": 21906014,
+        "from": "0x0fa09c3a328792253f8dee7116848723b72a6d2e",
+        "to": "0x4dcfb279964970c20b694f220845b83839621bf0",
+        "token": "0xae7ab96520de3a18e5e111b5eaab095312d7fe84",
+        "tx": "0x69b6eca6cf55ba2d0b9f6a4815a44cc016898615e9021a994bf0a9f3cd4bcb79",
+        "log_index": "244",
+        "value": "40000000000000000000000"
+      }
+    ],
+    "transfers-hop-1542": [
+      {
+        "block": 21896402,
+        "from": "0xa4b2fd68593b6f34e51cb9edb66e71c1b4ab449e",
+        "to": "0x1542368a03ad1f03d96d51b414f4a2d6d2fe0d04",
+        "token": "0xe6829d9a7ee3040e1276fa75293bde931859e8fa",
+        "tx": "0x5d432ab5f0497849addb08269320fb424164ce745e057592da74c75db945001e",
+        "log_index": "198",
+        "value": "15000000000000000000000"
+      },
+      {
+        "block": 21897004,
+        "from": "0xa4b2fd68593b6f34e51cb9edb66e71c1b4ab449e",
+        "to": "0x1542368a03ad1f03d96d51b414f4a2d6d2fe0d04",
+        "token": "0xae7ab96520de3a18e5e111b5eaab095312d7fe84",
+        "tx": "0x653875b1f8ff53957ad0f2614a0c1816d25e86d3098426f2f17023b4e42b38e5",
+        "log_index": "220",
+        "value": "50000000000000000000000"
+      },
+      {
+        "block": 21909017,
+        "from": "0x1542368a03ad1f03d96d51b414f4a2d6d2fe0d04",
+        "to": "0x10019e66e6ec62a7525886a9477aabcc41b984b1",
+        "token": "0xe6829d9a7ee3040e1276fa75293bde931859e8fa",
+        "tx": "0x1ab15f8e384772cbbabb7728320f4c01cb008d09f3668e2ef9d726ed0b62d8f1",
+        "log_index": "208",
+        "value": "15000000000000000000000"
+      },
+      {
+        "block": 21912019,
+        "from": "0x1542368a03ad1f03d96d51b414f4a2d6d2fe0d04",
+        "to": "0x4dcfb279964970c20b694f220845b83839621bf0",
+        "token": "0xae7ab96520de3a18e5e111b5eaab095312d7fe84",
+        "tx": "0x6d4d1d9a306b0b342db97950e8fed03ab316e67e8e4e87b19530fea29c51301d",
+        "log_index": "8",
+        "value": "50000000000000000000000"
+      }
+    ],
+    "balance-bybit-cold-wallet": [
+      {
+        "hour": "2025-02-21T00",
+        "owner": "0x1db92e2eebc8e0c075a02bea49a2935bcd2dfcf4",
+        "balance": "420000000000000000000000"
+      },
+      {
+        "hour": "2025-02-21T01",
+        "owner": "0x1db92e2eebc8e0c075a02bea49a2935bcd2dfcf4",
+        "balance": "420000000000000000000000"
+      },
+      {
+        "hour": "2025-02-21T02",
+        "owner": "0x1db92e2eebc8e0c075a02bea49a2935bcd2dfcf4",
+        "balance": "420000000000000000000000"
+      },
+      {
+        "hour": "2025-02-21T03",
+        "owner": "0x1db92e2eebc8e0c075a02bea49a2935bcd2dfcf4",
+        "balance": "420000000000000000000000"
+      },
+      {
+        "hour": "2025-02-21T04",
+        "owner": "0x1db92e2eebc8e0c075a02bea49a2935bcd2dfcf4",
+        "balance": "420000000000000000000000"
+      },
+      {
+        "hour": "2025-02-21T05",
+        "owner": "0x1db92e2eebc8e0c075a02bea49a2935bcd2dfcf4",
+        "balance": "420000000000000000000000"
+      },
+      {
+        "hour": "2025-02-21T06",
+        "owner": "0x1db92e2eebc8e0c075a02bea49a2935bcd2dfcf4",
+        "balance": "420000000000000000000000"
+      },
+      {
+        "hour": "2025-02-21T07",
+        "owner": "0x1db92e2eebc8e0c075a02bea49a2935bcd2dfcf4",
+        "balance": "420000000000000000000000"
+      },
+      {
+        "hour": "2025-02-21T08",
+        "owner": "0x1db92e2eebc8e0c075a02bea49a2935bcd2dfcf4",
+        "balance": "420000000000000000000000"
+      },
+      {
+        "hour": "2025-02-21T09",
+        "owner": "0x1db92e2eebc8e0c075a02bea49a2935bcd2dfcf4",
+        "balance": "420000000000000000000000"
+      },
+      {
+        "hour": "2025-02-21T10",
+        "owner": "0x1db92e2eebc8e0c075a02bea49a2935bcd2dfcf4",
+        "balance": "420000000000000000000000"
+      },
+      {
+        "hour": "2025-02-21T11",
+        "owner": "0x1db92e2eebc8e0c075a02bea49a2935bcd2dfcf4",
+        "balance": "420000000000000000000000"
+      },
+      {
+        "hour": "2025-02-21T12",
+        "owner": "0x1db92e2eebc8e0c075a02bea49a2935bcd2dfcf4",
+        "balance": "420000000000000000000000"
+      },
+      {
+        "hour": "2025-02-21T13",
+        "owner": "0x1db92e2eebc8e0c075a02bea49a2935bcd2dfcf4",
+        "balance": "420000000000000000000000"
+      },
+      {
+        "hour": "2025-02-21T14",
+        "owner": "0x1db92e2eebc8e0c075a02bea49a2935bcd2dfcf4",
+        "balance": "19000000000000000000000"
+      },
+      {
+        "hour": "2025-02-21T15",
+        "owner": "0x1db92e2eebc8e0c075a02bea49a2935bcd2dfcf4",
+        "balance": "19000000000000000000000"
+      },
+      {
+        "hour": "2025-02-21T16",
+        "owner": "0x1db92e2eebc8e0c075a02bea49a2935bcd2dfcf4",
+        "balance": "19000000000000000000000"
+      },
+      {
+        "hour": "2025-02-21T17",
+        "owner": "0x1db92e2eebc8e0c075a02bea49a2935bcd2dfcf4",
+        "balance": "19000000000000000000000"
+      },
+      {
+        "hour": "2025-02-21T18",
+        "owner": "0x1db92e2eebc8e0c075a02bea49a2935bcd2dfcf4",
+        "balance": "19000000000000000000000"
+      },
+      {
+        "hour": "2025-02-21T19",
+        "owner": "0x1db92e2eebc8e0c075a02bea49a2935bcd2dfcf4",
+        "balance": "19000000000000000000000"
+      },
+      {
+        "hour": "2025-02-21T20",
+        "owner": "0x1db92e2eebc8e0c075a02bea49a2935bcd2dfcf4",
+        "balance": "19000000000000000000000"
+      },
+      {
+        "hour": "2025-02-21T21",
+        "owner": "0x1db92e2eebc8e0c075a02bea49a2935bcd2dfcf4",
+        "balance": "19000000000000000000000"
+      },
+      {
+        "hour": "2025-02-21T22",
+        "owner": "0x1db92e2eebc8e0c075a02bea49a2935bcd2dfcf4",
+        "balance": "19000000000000000000000"
+      },
+      {
+        "hour": "2025-02-21T23",
+        "owner": "0x1db92e2eebc8e0c075a02bea49a2935bcd2dfcf4",
+        "balance": "19000000000000000000000"
+      },
+      {
+        "hour": "2025-02-22T00",
+        "owner": "0x1db92e2eebc8e0c075a02bea49a2935bcd2dfcf4",
+        "balance": "19000000000000000000000"
+      },
+      {
+        "hour": "2025-02-22T01",
+        "owner": "0x1db92e2eebc8e0c075a02bea49a2935bcd2dfcf4",
+        "balance": "19000000000000000000000"
+      },
+      {
+        "hour": "2025-02-22T02",
+        "owner": "0x1db92e2eebc8e0c075a02bea49a2935bcd2dfcf4",
+        "balance": "19000000000000000000000"
+      },
+      {
+        "hour": "2025-02-22T03",
+        "owner": "0x1db92e2eebc8e0c075a02bea49a2935bcd2dfcf4",
+        "balance": "19000000000000000000000"
+      },
+      {
+        "hour": "2025-02-22T04",
+        "owner": "0x1db92e2eebc8e0c075a02bea49a2935bcd2dfcf4",
+        "balance": "19000000000000000000000"
+      },
+      {
+        "hour": "2025-02-22T05",
+        "owner": "0x1db92e2eebc8e0c075a02bea49a2935bcd2dfcf4",
+        "balance": "19000000000000000000000"
+      },
+      {
+        "hour": "2025-02-22T06",
+        "owner": "0x1db92e2eebc8e0c075a02bea49a2935bcd2dfcf4",
+        "balance": "19000000000000000000000"
+      },
+      {
+        "hour": "2025-02-22T07",
+        "owner": "0x1db92e2eebc8e0c075a02bea49a2935bcd2dfcf4",
+        "balance": "19000000000000000000000"
+      },
+      {
+        "hour": "2025-02-22T08",
+        "owner": "0x1db92e2eebc8e0c075a02bea49a2935bcd2dfcf4",
+        "balance": "19000000000000000000000"
+      },
+      {
+        "hour": "2025-02-22T09",
+        "owner": "0x1db92e2eebc8e0c075a02bea49a2935bcd2dfcf4",
+        "balance": "19000000000000000000000"
+      },
+      {
+        "hour": "2025-02-22T10",
+        "owner": "0x1db92e2eebc8e0c075a02bea49a2935bcd2dfcf4",
+        "balance": "19000000000000000000000"
+      },
+      {
+        "hour": "2025-02-22T11",
+        "owner": "0x1db92e2eebc8e0c075a02bea49a2935bcd2dfcf4",
+        "balance": "19000000000000000000000"
+      },
+      {
+        "hour": "2025-02-22T12",
+        "owner": "0x1db92e2eebc8e0c075a02bea49a2935bcd2dfcf4",
+        "balance": "19000000000000000000000"
+      },
+      {
+        "hour": "2025-02-22T13",
+        "owner": "0x1db92e2eebc8e0c075a02bea49a2935bcd2dfcf4",
+        "balance": "19000000000000000000000"
+      },
+      {
+        "hour": "2025-02-22T14",
+        "owner": "0x1db92e2eebc8e0c075a02bea49a2935bcd2dfcf4",
+        "balance": "19000000000000000000000"
+      },
+      {
+        "hour": "2025-02-22T15",
+        "owner": "0x1db92e2eebc8e0c075a02bea49a2935bcd2dfcf4",
+        "balance": "19000000000000000000000"
+      },
+      {
+        "hour": "2025-02-22T16",
+        "owner": "0x1db92e2eebc8e0c075a02bea49a2935bcd2dfcf4",
+        "balance": "19000000000000000000000"
+      },
+      {
+        "hour": "2025-02-22T17",
+        "owner": "0x1db92e2eebc8e0c075a02bea49a2935bcd2dfcf4",
+        "balance": "19000000000000000000000"
+      },
+      {
+        "hour": "2025-02-22T18",
+        "owner": "0x1db92e2eebc8e0c075a02bea49a2935bcd2dfcf4",
+        "balance": "19000000000000000000000"
+      },
+      {
+        "hour": "2025-02-22T19",
+        "owner": "0x1db92e2eebc8e0c075a02bea49a2935bcd2dfcf4",
+        "balance": "19000000000000000000000"
+      },
+      {
+        "hour": "2025-02-22T20",
+        "owner": "0x1db92e2eebc8e0c075a02bea49a2935bcd2dfcf4",
+        "balance": "19000000000000000000000"
+      },
+      {
+        "hour": "2025-02-22T21",
+        "owner": "0x1db92e2eebc8e0c075a02bea49a2935bcd2dfcf4",
+        "balance": "19000000000000000000000"
+      },
+      {
+        "hour": "2025-02-22T22",
+        "owner": "0x1db92e2eebc8e0c075a02bea49a2935bcd2dfcf4",
+        "balance": "19000000000000000000000"
+      },
+      {
+        "hour": "2025-02-22T23",
+        "owner": "0x1db92e2eebc8e0c075a02bea49a2935bcd2dfcf4",
+        "balance": "19000000000000000000000"
+      },
+      {
+        "hour": "2025-02-23T00",
+        "owner": "0x1db92e2eebc8e0c075a02bea49a2935bcd2dfcf4",
+        "balance": "19000000000000000000000"
+      },
+      {
+        "hour": "2025-02-23T01",
+        "owner": "0x1db92e2eebc8e0c075a02bea49a2935bcd2dfcf4",
+        "balance": "19000000000000000000000"
+      },
+      {
+        "hour": "2025-02-23T02",
+        "owner": "0x1db92e2eebc8e0c075a02bea49a2935bcd2dfcf4",
+        "balance": "19000000000000000000000"
+      },
+      {
+        "hour": "2025-02-23T03",
+        "owner": "0x1db92e2eebc8e0c075a02bea49a2935bcd2dfcf4",
+        "balance": "19000000000000000000000"
+      },
+      {
+        "hour": "2025-02-23T04",
+        "owner": "0x1db92e2eebc8e0c075a02bea49a2935bcd2dfcf4",
+        "balance": "19000000000000000000000"
+      },
+      {
+        "hour": "2025-02-23T05",
+        "owner": "0x1db92e2eebc8e0c075a02bea49a2935bcd2dfcf4",
+        "balance": "19000000000000000000000"
+      },
+      {
+        "hour": "2025-02-23T06",
+        "owner": "0x1db92e2eebc8e0c075a02bea49a2935bcd2dfcf4",
+        "balance": "19000000000000000000000"
+      },
+      {
+        "hour": "2025-02-23T07",
+        "owner": "0x1db92e2eebc8e0c075a02bea49a2935bcd2dfcf4",
+        "balance": "19000000000000000000000"
+      },
+      {
+        "hour": "2025-02-23T08",
+        "owner": "0x1db92e2eebc8e0c075a02bea49a2935bcd2dfcf4",
+        "balance": "19000000000000000000000"
+      },
+      {
+        "hour": "2025-02-23T09",
+        "owner": "0x1db92e2eebc8e0c075a02bea49a2935bcd2dfcf4",
+        "balance": "19000000000000000000000"
+      },
+      {
+        "hour": "2025-02-23T10",
+        "owner": "0x1db92e2eebc8e0c075a02bea49a2935bcd2dfcf4",
+        "balance": "19000000000000000000000"
+      },
+      {
+        "hour": "2025-02-23T11",
+        "owner": "0x1db92e2eebc8e0c075a02bea49a2935bcd2dfcf4",
+        "balance": "19000000000000000000000"
+      },
+      {
+        "hour": "2025-02-23T12",
+        "owner": "0x1db92e2eebc8e0c075a02bea49a2935bcd2dfcf4",
+        "balance": "19000000000000000000000"
+      },
+      {
+        "hour": "2025-02-23T13",
+        "owner": "0x1db92e2eebc8e0c075a02bea49a2935bcd2dfcf4",
+        "balance": "19000000000000000000000"
+      },
+      {
+        "hour": "2025-02-23T14",
+        "owner": "0x1db92e2eebc8e0c075a02bea49a2935bcd2dfcf4",
+        "balance": "19000000000000000000000"
+      },
+      {
+        "hour": "2025-02-23T15",
+        "owner": "0x1db92e2eebc8e0c075a02bea49a2935bcd2dfcf4",
+        "balance": "19000000000000000000000"
+      },
+      {
+        "hour": "2025-02-23T16",
+        "owner": "0x1db92e2eebc8e0c075a02bea49a2935bcd2dfcf4",
+        "balance": "19000000000000000000000"
+      },
+      {
+        "hour": "2025-02-23T17",
+        "owner": "0x1db92e2eebc8e0c075a02bea49a2935bcd2dfcf4",
+        "balance": "19000000000000000000000"
+      },
+      {
+        "hour": "2025-02-23T18",
+        "owner": "0x1db92e2eebc8e0c075a02bea49a2935bcd2dfcf4",
+        "balance": "19000000000000000000000"
+      },
+      {
+        "hour": "2025-02-23T19",
+        "owner": "0x1db92e2eebc8e0c075a02bea49a2935bcd2dfcf4",
+        "balance": "19000000000000000000000"
+      },
+      {
+        "hour": "2025-02-23T20",
+        "owner": "0x1db92e2eebc8e0c075a02bea49a2935bcd2dfcf4",
+        "balance": "19000000000000000000000"
+      },
+      {
+        "hour": "2025-02-23T21",
+        "owner": "0x1db92e2eebc8e0c075a02bea49a2935bcd2dfcf4",
+        "balance": "19000000000000000000000"
+      },
+      {
+        "hour": "2025-02-23T22",
+        "owner": "0x1db92e2eebc8e0c075a02bea49a2935bcd2dfcf4",
+        "balance": "19000000000000000000000"
+      },
+      {
+        "hour": "2025-02-23T23",
+        "owner": "0x1db92e2eebc8e0c075a02bea49a2935bcd2dfcf4",
+        "balance": "19000000000000000000000"
+      },
+      {
+        "hour": "2025-02-24T00",
+        "owner": "0x1db92e2eebc8e0c075a02bea49a2935bcd2dfcf4",
+        "balance": "19000000000000000000000"
+      },
+      {
+        "hour": "2025-02-24T01",
+        "owner": "0x1db92e2eebc8e0c075a02bea49a2935bcd2dfcf4",
+        "balance": "19000000000000000000000"
+      },
+      {
+        "hour": "2025-02-24T02",
+        "owner": "0x1db92e2eebc8e0c075a02bea49a2935bcd2dfcf4",
+        "balance": "19000000000000000000000"
+      },
+      {
+        "hour": "2025-02-24T03",
+        "owner": "0x1db92e2eebc8e0c075a02bea49a2935bcd2dfcf4",
+        "balance": "19000000000000000000000"
+      },
+      {
+        "hour": "2025-02-24T04",
+        "owner": "0x1db92e2eebc8e0c075a02bea49a2935bcd2dfcf4",
+        "balance": "19000000000000000000000"
+      },
+      {
+        "hour": "2025-02-24T05",
+        "owner": "0x1db92e2eebc8e0c075a02bea49a2935bcd2dfcf4",
+        "balance": "19000000000000000000000"
+      },
+      {
+        "hour": "2025-02-24T06",
+        "owner": "0x1db92e2eebc8e0c075a02bea49a2935bcd2dfcf4",
+        "balance": "19000000000000000000000"
+      },
+      {
+        "hour": "2025-02-24T07",
+        "owner": "0x1db92e2eebc8e0c075a02bea49a2935bcd2dfcf4",
+        "balance": "19000000000000000000000"
+      },
+      {
+        "hour": "2025-02-24T08",
+        "owner": "0x1db92e2eebc8e0c075a02bea49a2935bcd2dfcf4",
+        "balance": "19000000000000000000000"
+      },
+      {
+        "hour": "2025-02-24T09",
+        "owner": "0x1db92e2eebc8e0c075a02bea49a2935bcd2dfcf4",
+        "balance": "19000000000000000000000"
+      },
+      {
+        "hour": "2025-02-24T10",
+        "owner": "0x1db92e2eebc8e0c075a02bea49a2935bcd2dfcf4",
+        "balance": "19000000000000000000000"
+      },
+      {
+        "hour": "2025-02-24T11",
+        "owner": "0x1db92e2eebc8e0c075a02bea49a2935bcd2dfcf4",
+        "balance": "19000000000000000000000"
+      },
+      {
+        "hour": "2025-02-24T12",
+        "owner": "0x1db92e2eebc8e0c075a02bea49a2935bcd2dfcf4",
+        "balance": "19000000000000000000000"
+      },
+      {
+        "hour": "2025-02-24T13",
+        "owner": "0x1db92e2eebc8e0c075a02bea49a2935bcd2dfcf4",
+        "balance": "19000000000000000000000"
+      },
+      {
+        "hour": "2025-02-24T14",
+        "owner": "0x1db92e2eebc8e0c075a02bea49a2935bcd2dfcf4",
+        "balance": "19000000000000000000000"
+      },
+      {
+        "hour": "2025-02-24T15",
+        "owner": "0x1db92e2eebc8e0c075a02bea49a2935bcd2dfcf4",
+        "balance": "19000000000000000000000"
+      },
+      {
+        "hour": "2025-02-24T16",
+        "owner": "0x1db92e2eebc8e0c075a02bea49a2935bcd2dfcf4",
+        "balance": "19000000000000000000000"
+      },
+      {
+        "hour": "2025-02-24T17",
+        "owner": "0x1db92e2eebc8e0c075a02bea49a2935bcd2dfcf4",
+        "balance": "19000000000000000000000"
+      },
+      {
+        "hour": "2025-02-24T18",
+        "owner": "0x1db92e2eebc8e0c075a02bea49a2935bcd2dfcf4",
+        "balance": "19000000000000000000000"
+      },
+      {
+        "hour": "2025-02-24T19",
+        "owner": "0x1db92e2eebc8e0c075a02bea49a2935bcd2dfcf4",
+        "balance": "19000000000000000000000"
+      },
+      {
+        "hour": "2025-02-24T20",
+        "owner": "0x1db92e2eebc8e0c075a02bea49a2935bcd2dfcf4",
+        "balance": "19000000000000000000000"
+      },
+      {
+        "hour": "2025-02-24T21",
+        "owner": "0x1db92e2eebc8e0c075a02bea49a2935bcd2dfcf4",
+        "balance": "19000000000000000000000"
+      },
+      {
+        "hour": "2025-02-24T22",
+        "owner": "0x1db92e2eebc8e0c075a02bea49a2935bcd2dfcf4",
+        "balance": "19000000000000000000000"
+      },
+      {
+        "hour": "2025-02-24T23",
+        "owner": "0x1db92e2eebc8e0c075a02bea49a2935bcd2dfcf4",
+        "balance": "19000000000000000000000"
+      },
+      {
+        "hour": "2025-02-25T00",
+        "owner": "0x1db92e2eebc8e0c075a02bea49a2935bcd2dfcf4",
+        "balance": "19000000000000000000000"
+      },
+      {
+        "hour": "2025-02-25T01",
+        "owner": "0x1db92e2eebc8e0c075a02bea49a2935bcd2dfcf4",
+        "balance": "19000000000000000000000"
+      },
+      {
+        "hour": "2025-02-25T02",
+        "owner": "0x1db92e2eebc8e0c075a02bea49a2935bcd2dfcf4",
+        "balance": "19000000000000000000000"
+      },
+      {
+        "hour": "2025-02-25T03",
+        "owner": "0x1db92e2eebc8e0c075a02bea49a2935bcd2dfcf4",
+        "balance": "19000000000000000000000"
+      },
+      {
+        "hour": "2025-02-25T04",
+        "owner": "0x1db92e2eebc8e0c075a02bea49a2935bcd2dfcf4",
+        "balance": "19000000000000000000000"
+      },
+      {
+        "hour": "2025-02-25T05",
+        "owner": "0x1db92e2eebc8e0c075a02bea49a2935bcd2dfcf4",
+        "balance": "19000000000000000000000"
+      },
+      {
+        "hour": "2025-02-25T06",
+        "owner": "0x1db92e2eebc8e0c075a02bea49a2935bcd2dfcf4",
+        "balance": "19000000000000000000000"
+      },
+      {
+        "hour": "2025-02-25T07",
+        "owner": "0x1db92e2eebc8e0c075a02bea49a2935bcd2dfcf4",
+        "balance": "19000000000000000000000"
+      },
+      {
+        "hour": "2025-02-25T08",
+        "owner": "0x1db92e2eebc8e0c075a02bea49a2935bcd2dfcf4",
+        "balance": "19000000000000000000000"
+      },
+      {
+        "hour": "2025-02-25T09",
+        "owner": "0x1db92e2eebc8e0c075a02bea49a2935bcd2dfcf4",
+        "balance": "19000000000000000000000"
+      },
+      {
+        "hour": "2025-02-25T10",
+        "owner": "0x1db92e2eebc8e0c075a02bea49a2935bcd2dfcf4",
+        "balance": "19000000000000000000000"
+      },
+      {
+        "hour": "2025-02-25T11",
+        "owner": "0x1db92e2eebc8e0c075a02bea49a2935bcd2dfcf4",
+        "balance": "19000000000000000000000"
+      },
+      {
+        "hour": "2025-02-25T12",
+        "owner": "0x1db92e2eebc8e0c075a02bea49a2935bcd2dfcf4",
+        "balance": "19000000000000000000000"
+      },
+      {
+        "hour": "2025-02-25T13",
+        "owner": "0x1db92e2eebc8e0c075a02bea49a2935bcd2dfcf4",
+        "balance": "19000000000000000000000"
+      },
+      {
+        "hour": "2025-02-25T14",
+        "owner": "0x1db92e2eebc8e0c075a02bea49a2935bcd2dfcf4",
+        "balance": "19000000000000000000000"
+      },
+      {
+        "hour": "2025-02-25T15",
+        "owner": "0x1db92e2eebc8e0c075a02bea49a2935bcd2dfcf4",
+        "balance": "19000000000000000000000"
+      },
+      {
+        "hour": "2025-02-25T16",
+        "owner": "0x1db92e2eebc8e0c075a02bea49a2935bcd2dfcf4",
+        "balance": "19000000000000000000000"
+      },
+      {
+        "hour": "2025-02-25T17",
+        "owner": "0x1db92e2eebc8e0c075a02bea49a2935bcd2dfcf4",
+        "balance": "19000000000000000000000"
+      },
+      {
+        "hour": "2025-02-25T18",
+        "owner": "0x1db92e2eebc8e0c075a02bea49a2935bcd2dfcf4",
+        "balance": "19000000000000000000000"
+      },
+      {
+        "hour": "2025-02-25T19",
+        "owner": "0x1db92e2eebc8e0c075a02bea49a2935bcd2dfcf4",
+        "balance": "19000000000000000000000"
+      },
+      {
+        "hour": "2025-02-25T20",
+        "owner": "0x1db92e2eebc8e0c075a02bea49a2935bcd2dfcf4",
+        "balance": "19000000000000000000000"
+      },
+      {
+        "hour": "2025-02-25T21",
+        "owner": "0x1db92e2eebc8e0c075a02bea49a2935bcd2dfcf4",
+        "balance": "19000000000000000000000"
+      },
+      {
+        "hour": "2025-02-25T22",
+        "owner": "0x1db92e2eebc8e0c075a02bea49a2935bcd2dfcf4",
+        "balance": "19000000000000000000000"
+      },
+      {
+        "hour": "2025-02-25T23",
+        "owner": "0x1db92e2eebc8e0c075a02bea49a2935bcd2dfcf4",
+        "balance": "19000000000000000000000"
+      },
+      {
+        "hour": "2025-02-26T00",
+        "owner": "0x1db92e2eebc8e0c075a02bea49a2935bcd2dfcf4",
+        "balance": "19000000000000000000000"
+      },
+      {
+        "hour": "2025-02-26T01",
+        "owner": "0x1db92e2eebc8e0c075a02bea49a2935bcd2dfcf4",
+        "balance": "19000000000000000000000"
+      },
+      {
+        "hour": "2025-02-26T02",
+        "owner": "0x1db92e2eebc8e0c075a02bea49a2935bcd2dfcf4",
+        "balance": "19000000000000000000000"
+      },
+      {
+        "hour": "2025-02-26T03",
+        "owner": "0x1db92e2eebc8e0c075a02bea49a2935bcd2dfcf4",
+        "balance": "19000000000000000000000"
+      },
+      {
+        "hour": "2025-02-26T04",
+        "owner": "0x1db92e2eebc8e0c075a02bea49a2935bcd2dfcf4",
+        "balance": "19000000000000000000000"
+      },
+      {
+        "hour": "2025-02-26T05",
+        "owner": "0x1db92e2eebc8e0c075a02bea49a2935bcd2dfcf4",
+        "balance": "19000000000000000000000"
+      },
+      {
+        "hour": "2025-02-26T06",
+        "owner": "0x1db92e2eebc8e0c075a02bea49a2935bcd2dfcf4",
+        "balance": "19000000000000000000000"
+      },
+      {
+        "hour": "2025-02-26T07",
+        "owner": "0x1db92e2eebc8e0c075a02bea49a2935bcd2dfcf4",
+        "balance": "19000000000000000000000"
+      },
+      {
+        "hour": "2025-02-26T08",
+        "owner": "0x1db92e2eebc8e0c075a02bea49a2935bcd2dfcf4",
+        "balance": "19000000000000000000000"
+      },
+      {
+        "hour": "2025-02-26T09",
+        "owner": "0x1db92e2eebc8e0c075a02bea49a2935bcd2dfcf4",
+        "balance": "19000000000000000000000"
+      },
+      {
+        "hour": "2025-02-26T10",
+        "owner": "0x1db92e2eebc8e0c075a02bea49a2935bcd2dfcf4",
+        "balance": "19000000000000000000000"
+      },
+      {
+        "hour": "2025-02-26T11",
+        "owner": "0x1db92e2eebc8e0c075a02bea49a2935bcd2dfcf4",
+        "balance": "19000000000000000000000"
+      },
+      {
+        "hour": "2025-02-26T12",
+        "owner": "0x1db92e2eebc8e0c075a02bea49a2935bcd2dfcf4",
+        "balance": "19000000000000000000000"
+      },
+      {
+        "hour": "2025-02-26T13",
+        "owner": "0x1db92e2eebc8e0c075a02bea49a2935bcd2dfcf4",
+        "balance": "19000000000000000000000"
+      },
+      {
+        "hour": "2025-02-26T14",
+        "owner": "0x1db92e2eebc8e0c075a02bea49a2935bcd2dfcf4",
+        "balance": "19000000000000000000000"
+      },
+      {
+        "hour": "2025-02-26T15",
+        "owner": "0x1db92e2eebc8e0c075a02bea49a2935bcd2dfcf4",
+        "balance": "19000000000000000000000"
+      },
+      {
+        "hour": "2025-02-26T16",
+        "owner": "0x1db92e2eebc8e0c075a02bea49a2935bcd2dfcf4",
+        "balance": "19000000000000000000000"
+      },
+      {
+        "hour": "2025-02-26T17",
+        "owner": "0x1db92e2eebc8e0c075a02bea49a2935bcd2dfcf4",
+        "balance": "19000000000000000000000"
+      },
+      {
+        "hour": "2025-02-26T18",
+        "owner": "0x1db92e2eebc8e0c075a02bea49a2935bcd2dfcf4",
+        "balance": "19000000000000000000000"
+      },
+      {
+        "hour": "2025-02-26T19",
+        "owner": "0x1db92e2eebc8e0c075a02bea49a2935bcd2dfcf4",
+        "balance": "19000000000000000000000"
+      },
+      {
+        "hour": "2025-02-26T20",
+        "owner": "0x1db92e2eebc8e0c075a02bea49a2935bcd2dfcf4",
+        "balance": "19000000000000000000000"
+      },
+      {
+        "hour": "2025-02-26T21",
+        "owner": "0x1db92e2eebc8e0c075a02bea49a2935bcd2dfcf4",
+        "balance": "19000000000000000000000"
+      },
+      {
+        "hour": "2025-02-26T22",
+        "owner": "0x1db92e2eebc8e0c075a02bea49a2935bcd2dfcf4",
+        "balance": "19000000000000000000000"
+      },
+      {
+        "hour": "2025-02-26T23",
+        "owner": "0x1db92e2eebc8e0c075a02bea49a2935bcd2dfcf4",
+        "balance": "19000000000000000000000"
+      },
+      {
+        "hour": "2025-02-27T00",
+        "owner": "0x1db92e2eebc8e0c075a02bea49a2935bcd2dfcf4",
+        "balance": "19000000000000000000000"
+      },
+      {
+        "hour": "2025-02-27T01",
+        "owner": "0x1db92e2eebc8e0c075a02bea49a2935bcd2dfcf4",
+        "balance": "19000000000000000000000"
+      },
+      {
+        "hour": "2025-02-27T02",
+        "owner": "0x1db92e2eebc8e0c075a02bea49a2935bcd2dfcf4",
+        "balance": "19000000000000000000000"
+      },
+      {
+        "hour": "2025-02-27T03",
+        "owner": "0x1db92e2eebc8e0c075a02bea49a2935bcd2dfcf4",
+        "balance": "19000000000000000000000"
+      },
+      {
+        "hour": "2025-02-27T04",
+        "owner": "0x1db92e2eebc8e0c075a02bea49a2935bcd2dfcf4",
+        "balance": "19000000000000000000000"
+      },
+      {
+        "hour": "2025-02-27T05",
+        "owner": "0x1db92e2eebc8e0c075a02bea49a2935bcd2dfcf4",
+        "balance": "19000000000000000000000"
+      },
+      {
+        "hour": "2025-02-27T06",
+        "owner": "0x1db92e2eebc8e0c075a02bea49a2935bcd2dfcf4",
+        "balance": "19000000000000000000000"
+      },
+      {
+        "hour": "2025-02-27T07",
+        "owner": "0x1db92e2eebc8e0c075a02bea49a2935bcd2dfcf4",
+        "balance": "19000000000000000000000"
+      },
+      {
+        "hour": "2025-02-27T08",
+        "owner": "0x1db92e2eebc8e0c075a02bea49a2935bcd2dfcf4",
+        "balance": "19000000000000000000000"
+      },
+      {
+        "hour": "2025-02-27T09",
+        "owner": "0x1db92e2eebc8e0c075a02bea49a2935bcd2dfcf4",
+        "balance": "19000000000000000000000"
+      },
+      {
+        "hour": "2025-02-27T10",
+        "owner": "0x1db92e2eebc8e0c075a02bea49a2935bcd2dfcf4",
+        "balance": "19000000000000000000000"
+      },
+      {
+        "hour": "2025-02-27T11",
+        "owner": "0x1db92e2eebc8e0c075a02bea49a2935bcd2dfcf4",
+        "balance": "19000000000000000000000"
+      },
+      {
+        "hour": "2025-02-27T12",
+        "owner": "0x1db92e2eebc8e0c075a02bea49a2935bcd2dfcf4",
+        "balance": "19000000000000000000000"
+      },
+      {
+        "hour": "2025-02-27T13",
+        "owner": "0x1db92e2eebc8e0c075a02bea49a2935bcd2dfcf4",
+        "balance": "19000000000000000000000"
+      },
+      {
+        "hour": "2025-02-27T14",
+        "owner": "0x1db92e2eebc8e0c075a02bea49a2935bcd2dfcf4",
+        "balance": "19000000000000000000000"
+      },
+      {
+        "hour": "2025-02-27T15",
+        "owner": "0x1db92e2eebc8e0c075a02bea49a2935bcd2dfcf4",
+        "balance": "19000000000000000000000"
+      },
+      {
+        "hour": "2025-02-27T16",
+        "owner": "0x1db92e2eebc8e0c075a02bea49a2935bcd2dfcf4",
+        "balance": "19000000000000000000000"
+      },
+      {
+        "hour": "2025-02-27T17",
+        "owner": "0x1db92e2eebc8e0c075a02bea49a2935bcd2dfcf4",
+        "balance": "19000000000000000000000"
+      },
+      {
+        "hour": "2025-02-27T18",
+        "owner": "0x1db92e2eebc8e0c075a02bea49a2935bcd2dfcf4",
+        "balance": "19000000000000000000000"
+      },
+      {
+        "hour": "2025-02-27T19",
+        "owner": "0x1db92e2eebc8e0c075a02bea49a2935bcd2dfcf4",
+        "balance": "19000000000000000000000"
+      },
+      {
+        "hour": "2025-02-27T20",
+        "owner": "0x1db92e2eebc8e0c075a02bea49a2935bcd2dfcf4",
+        "balance": "19000000000000000000000"
+      },
+      {
+        "hour": "2025-02-27T21",
+        "owner": "0x1db92e2eebc8e0c075a02bea49a2935bcd2dfcf4",
+        "balance": "19000000000000000000000"
+      },
+      {
+        "hour": "2025-02-27T22",
+        "owner": "0x1db92e2eebc8e0c075a02bea49a2935bcd2dfcf4",
+        "balance": "19000000000000000000000"
+      },
+      {
+        "hour": "2025-02-27T23",
+        "owner": "0x1db92e2eebc8e0c075a02bea49a2935bcd2dfcf4",
+        "balance": "19000000000000000000000"
+      },
+      {
+        "hour": "2025-02-28T00",
+        "owner": "0x1db92e2eebc8e0c075a02bea49a2935bcd2dfcf4",
+        "balance": "19000000000000000000000"
+      },
+      {
+        "hour": "2025-02-28T01",
+        "owner": "0x1db92e2eebc8e0c075a02bea49a2935bcd2dfcf4",
+        "balance": "19000000000000000000000"
+      },
+      {
+        "hour": "2025-02-28T02",
+        "owner": "0x1db92e2eebc8e0c075a02bea49a2935bcd2dfcf4",
+        "balance": "19000000000000000000000"
+      },
+      {
+        "hour": "2025-02-28T03",
+        "owner": "0x1db92e2eebc8e0c075a02bea49a2935bcd2dfcf4",
+        "balance": "19000000000000000000000"
+      },
+      {
+        "hour": "2025-02-28T04",
+        "owner": "0x1db92e2eebc8e0c075a02bea49a2935bcd2dfcf4",
+        "balance": "19000000000000000000000"
+      },
+      {
+        "hour": "2025-02-28T05",
+        "owner": "0x1db92e2eebc8e0c075a02bea49a2935bcd2dfcf4",
+        "balance": "19000000000000000000000"
+      },
+      {
+        "hour": "2025-02-28T06",
+        "owner": "0x1db92e2eebc8e0c075a02bea49a2935bcd2dfcf4",
+        "balance": "19000000000000000000000"
+      },
+      {
+        "hour": "2025-02-28T07",
+        "owner": "0x1db92e2eebc8e0c075a02bea49a2935bcd2dfcf4",
+        "balance": "19000000000000000000000"
+      },
+      {
+        "hour": "2025-02-28T08",
+        "owner": "0x1db92e2eebc8e0c075a02bea49a2935bcd2dfcf4",
+        "balance": "19000000000000000000000"
+      },
+      {
+        "hour": "2025-02-28T09",
+        "owner": "0x1db92e2eebc8e0c075a02bea49a2935bcd2dfcf4",
+        "balance": "19000000000000000000000"
+      },
+      {
+        "hour": "2025-02-28T10",
+        "owner": "0x1db92e2eebc8e0c075a02bea49a2935bcd2dfcf4",
+        "balance": "19000000000000000000000"
+      },
+      {
+        "hour": "2025-02-28T11",
+        "owner": "0x1db92e2eebc8e0c075a02bea49a2935bcd2dfcf4",
+        "balance": "19000000000000000000000"
+      },
+      {
+        "hour": "2025-02-28T12",
+        "owner": "0x1db92e2eebc8e0c075a02bea49a2935bcd2dfcf4",
+        "balance": "19000000000000000000000"
+      },
+      {
+        "hour": "2025-02-28T13",
+        "owner": "0x1db92e2eebc8e0c075a02bea49a2935bcd2dfcf4",
+        "balance": "19000000000000000000000"
+      },
+      {
+        "hour": "2025-02-28T14",
+        "owner": "0x1db92e2eebc8e0c075a02bea49a2935bcd2dfcf4",
+        "balance": "19000000000000000000000"
+      },
+      {
+        "hour": "2025-02-28T15",
+        "owner": "0x1db92e2eebc8e0c075a02bea49a2935bcd2dfcf4",
+        "balance": "19000000000000000000000"
+      },
+      {
+        "hour": "2025-02-28T16",
+        "owner": "0x1db92e2eebc8e0c075a02bea49a2935bcd2dfcf4",
+        "balance": "19000000000000000000000"
+      },
+      {
+        "hour": "2025-02-28T17",
+        "owner": "0x1db92e2eebc8e0c075a02bea49a2935bcd2dfcf4",
+        "balance": "19000000000000000000000"
+      },
+      {
+        "hour": "2025-02-28T18",
+        "owner": "0x1db92e2eebc8e0c075a02bea49a2935bcd2dfcf4",
+        "balance": "19000000000000000000000"
+      },
+      {
+        "hour": "2025-02-28T19",
+        "owner": "0x1db92e2eebc8e0c075a02bea49a2935bcd2dfcf4",
+        "balance": "19000000000000000000000"
+      },
+      {
+        "hour": "2025-02-28T20",
+        "owner": "0x1db92e2eebc8e0c075a02bea49a2935bcd2dfcf4",
+        "balance": "19000000000000000000000"
+      },
+      {
+        "hour": "2025-02-28T21",
+        "owner": "0x1db92e2eebc8e0c075a02bea49a2935bcd2dfcf4",
+        "balance": "19000000000000000000000"
+      },
+      {
+        "hour": "2025-02-28T22",
+        "owner": "0x1db92e2eebc8e0c075a02bea49a2935bcd2dfcf4",
+        "balance": "19000000000000000000000"
+      },
+      {
+        "hour": "2025-02-28T23",
+        "owner": "0x1db92e2eebc8e0c075a02bea49a2935bcd2dfcf4",
+        "balance": "19000000000000000000000"
+      }
+    ],
+    "balance-exploiter": [
+      {
+        "hour": "2025-02-21T14",
+        "owner": "0x47666fab8bd0ac7003bce3f5c3585383f09486e2",
+        "balance": "401000000000000000000000"
+      },
+      {
+        "hour": "2025-02-21T15",
+        "owner": "0x47666fab8bd0ac7003bce3f5c3585383f09486e2",
+        "balance": "151000000000000000000000"
+      },
+      {
+        "hour": "2025-02-21T16",
+        "owner": "0x47666fab8bd0ac7003bce3f5c3585383f09486e2",
+        "balance": "51000000000000000000000"
+      },
+      {
+        "hour": "2025-02-21T17",
+        "owner": "0x47666fab8bd0ac7003bce3f5c3585383f09486e2",
+        "balance": "1000000000000000000000"
+      },
+      {
+        "hour": "2025-02-21T18",
+        "owner": "0x47666fab8bd0ac7003bce3f5c3585383f09486e2",
+        "balance": "1000000000000000000000"
+      },
+      {
+        "hour": "2025-02-21T19",
+        "owner": "0x47666fab8bd0ac7003bce3f5c3585383f09486e2",
+        "balance": "1000000000000000000000"
+      },
+      {
+        "hour": "2025-02-21T20",
+        "owner": "0x47666fab8bd0ac7003bce3f5c3585383f09486e2",
+        "balance": "1000000000000000000000"
+      },
+      {
+        "hour": "2025-02-21T21",
+        "owner": "0x47666fab8bd0ac7003bce3f5c3585383f09486e2",
+        "balance": "1000000000000000000000"
+      },
+      {
+        "hour": "2025-02-21T22",
+        "owner": "0x47666fab8bd0ac7003bce3f5c3585383f09486e2",
+        "balance": "1000000000000000000000"
+      },
+      {
+        "hour": "2025-02-21T23",
+        "owner": "0x47666fab8bd0ac7003bce3f5c3585383f09486e2",
+        "balance": "1000000000000000000000"
+      },
+      {
+        "hour": "2025-02-22T00",
+        "owner": "0x47666fab8bd0ac7003bce3f5c3585383f09486e2",
+        "balance": "1000000000000000000000"
+      },
+      {
+        "hour": "2025-02-22T01",
+        "owner": "0x47666fab8bd0ac7003bce3f5c3585383f09486e2",
+        "balance": "1000000000000000000000"
+      },
+      {
+        "hour": "2025-02-22T02",
+        "owner": "0x47666fab8bd0ac7003bce3f5c3585383f09486e2",
+        "balance": "1000000000000000000000"
+      },
+      {
+        "hour": "2025-02-22T03",
+        "owner": "0x47666fab8bd0ac7003bce3f5c3585383f09486e2",
+        "balance": "1000000000000000000000"
+      },
+      {
+        "hour": "2025-02-22T04",
+        "owner": "0x47666fab8bd0ac7003bce3f5c3585383f09486e2",
+        "balance": "1000000000000000000000"
+      },
+      {
+        "hour": "2025-02-22T05",
+        "owner": "0x47666fab8bd0ac7003bce3f5c3585383f09486e2",
+        "balance": "1000000000000000000000"
+      },
+      {
+        "hour": "2025-02-22T06",
+        "owner": "0x47666fab8bd0ac7003bce3f5c3585383f09486e2",
+        "balance": "1000000000000000000000"
+      },
+      {
+        "hour": "2025-02-22T07",
+        "owner": "0x47666fab8bd0ac7003bce3f5c3585383f09486e2",
+        "balance": "1000000000000000000000"
+      },
+      {
+        "hour": "2025-02-22T08",
+        "owner": "0x47666fab8bd0ac7003bce3f5c3585383f09486e2",
+        "balance": "1000000000000000000000"
+      },
+      {
+        "hour": "2025-02-22T09",
+        "owner": "0x47666fab8bd0ac7003bce3f5c3585383f09486e2",
+        "balance": "1000000000000000000000"
+      },
+      {
+        "hour": "2025-02-22T10",
+        "owner": "0x47666fab8bd0ac7003bce3f5c3585383f09486e2",
+        "balance": "1000000000000000000000"
+      },
+      {
+        "hour": "2025-02-22T11",
+        "owner": "0x47666fab8bd0ac7003bce3f5c3585383f09486e2",
+        "balance": "1000000000000000000000"
+      },
+      {
+        "hour": "2025-02-22T12",
+        "owner": "0x47666fab8bd0ac7003bce3f5c3585383f09486e2",
+        "balance": "1000000000000000000000"
+      },
+      {
+        "hour": "2025-02-22T13",
+        "owner": "0x47666fab8bd0ac7003bce3f5c3585383f09486e2",
+        "balance": "1000000000000000000000"
+      },
+      {
+        "hour": "2025-02-22T14",
+        "owner": "0x47666fab8bd0ac7003bce3f5c3585383f09486e2",
+        "balance": "1000000000000000000000"
+      },
+      {
+        "hour": "2025-02-22T15",
+        "owner": "0x47666fab8bd0ac7003bce3f5c3585383f09486e2",
+        "balance": "1000000000000000000000"
+      },
+      {
+        "hour": "2025-02-22T16",
+        "owner": "0x47666fab8bd0ac7003bce3f5c3585383f09486e2",
+        "balance": "1000000000000000000000"
+      },
+      {
+        "hour": "2025-02-22T17",
+        "owner": "0x47666fab8bd0ac7003bce3f5c3585383f09486e2",
+        "balance": "1000000000000000000000"
+      },
+      {
+        "hour": "2025-02-22T18",
+        "owner": "0x47666fab8bd0ac7003bce3f5c3585383f09486e2",
+        "balance": "1000000000000000000000"
+      },
+      {
+        "hour": "2025-02-22T19",
+        "owner": "0x47666fab8bd0ac7003bce3f5c3585383f09486e2",
+        "balance": "1000000000000000000000"
+      },
+      {
+        "hour": "2025-02-22T20",
+        "owner": "0x47666fab8bd0ac7003bce3f5c3585383f09486e2",
+        "balance": "1000000000000000000000"
+      },
+      {
+        "hour": "2025-02-22T21",
+        "owner": "0x47666fab8bd0ac7003bce3f5c3585383f09486e2",
+        "balance": "1000000000000000000000"
+      },
+      {
+        "hour": "2025-02-22T22",
+        "owner": "0x47666fab8bd0ac7003bce3f5c3585383f09486e2",
+        "balance": "1000000000000000000000"
+      },
+      {
+        "hour": "2025-02-22T23",
+        "owner": "0x47666fab8bd0ac7003bce3f5c3585383f09486e2",
+        "balance": "1000000000000000000000"
+      },
+      {
+        "hour": "2025-02-23T00",
+        "owner": "0x47666fab8bd0ac7003bce3f5c3585383f09486e2",
+        "balance": "1000000000000000000000"
+      },
+      {
+        "hour": "2025-02-23T01",
+        "owner": "0x47666fab8bd0ac7003bce3f5c3585383f09486e2",
+        "balance": "1000000000000000000000"
+      },
+      {
+        "hour": "2025-02-23T02",
+        "owner": "0x47666fab8bd0ac7003bce3f5c3585383f09486e2",
+        "balance": "1000000000000000000000"
+      },
+      {
+        "hour": "2025-02-23T03",
+        "owner": "0x47666fab8bd0ac7003bce3f5c3585383f09486e2",
+        "balance": "1000000000000000000000"
+      },
+      {
+        "hour": "2025-02-23T04",
+        "owner": "0x47666fab8bd0ac7003bce3f5c3585383f09486e2",
+        "balance": "1000000000000000000000"
+      },
+      {
+        "hour": "2025-02-23T05",
+        "owner": "0x47666fab8bd0ac7003bce3f5c3585383f09486e2",
+        "balance": "1000000000000000000000"
+      },
+      {
+        "hour": "2025-02-23T06",
+        "owner": "0x47666fab8bd0ac7003bce3f5c3585383f09486e2",
+        "balance": "1000000000000000000000"
+      },
+      {
+        "hour": "2025-02-23T07",
+        "owner": "0x47666fab8bd0ac7003bce3f5c3585383f09486e2",
+        "balance": "1000000000000000000000"
+      },
+      {
+        "hour": "2025-02-23T08",
+        "owner": "0x47666fab8bd0ac7003bce3f5c3585383f09486e2",
+        "balance": "1000000000000000000000"
+      },
+      {
+        "hour": "2025-02-23T09",
+        "owner": "0x47666fab8bd0ac7003bce3f5c3585383f09486e2",
+        "balance": "1000000000000000000000"
+      },
+      {
+        "hour": "2025-02-23T10",
+        "owner": "0x47666fab8bd0ac7003bce3f5c3585383f09486e2",
+        "balance": "1000000000000000000000"
+      },
+      {
+        "hour": "2025-02-23T11",
+        "owner": "0x47666fab8bd0ac7003bce3f5c3585383f09486e2",
+        "balance": "1000000000000000000000"
+      },
+      {
+        "hour": "2025-02-23T12",
+        "owner": "0x47666fab8bd0ac7003bce3f5c3585383f09486e2",
+        "balance": "1000000000000000000000"
+      },
+      {
+        "hour": "2025-02-23T13",
+        "owner": "0x47666fab8bd0ac7003bce3f5c3585383f09486e2",
+        "balance": "1000000000000000000000"
+      },
+      {
+        "hour": "2025-02-23T14",
+        "owner": "0x47666fab8bd0ac7003bce3f5c3585383f09486e2",
+        "balance": "1000000000000000000000"
+      },
+      {
+        "hour": "2025-02-23T15",
+        "owner": "0x47666fab8bd0ac7003bce3f5c3585383f09486e2",
+        "balance": "1000000000000000000000"
+      },
+      {
+        "hour": "2025-02-23T16",
+        "owner": "0x47666fab8bd0ac7003bce3f5c3585383f09486e2",
+        "balance": "1000000000000000000000"
+      },
+      {
+        "hour": "2025-02-23T17",
+        "owner": "0x47666fab8bd0ac7003bce3f5c3585383f09486e2",
+        "balance": "1000000000000000000000"
+      },
+      {
+        "hour": "2025-02-23T18",
+        "owner": "0x47666fab8bd0ac7003bce3f5c3585383f09486e2",
+        "balance": "1000000000000000000000"
+      },
+      {
+        "hour": "2025-02-23T19",
+        "owner": "0x47666fab8bd0ac7003bce3f5c3585383f09486e2",
+        "balance": "1000000000000000000000"
+      },
+      {
+        "hour": "2025-02-23T20",
+        "owner": "0x47666fab8bd0ac7003bce3f5c3585383f09486e2",
+        "balance": "1000000000000000000000"
+      },
+      {
+        "hour": "2025-02-23T21",
+        "owner": "0x47666fab8bd0ac7003bce3f5c3585383f09486e2",
+        "balance": "1000000000000000000000"
+      },
+      {
+        "hour": "2025-02-23T22",
+        "owner": "0x47666fab8bd0ac7003bce3f5c3585383f09486e2",
+        "balance": "1000000000000000000000"
+      },
+      {
+        "hour": "2025-02-23T23",
+        "owner": "0x47666fab8bd0ac7003bce3f5c3585383f09486e2",
+        "balance": "1000000000000000000000"
+      },
+      {
+        "hour": "2025-02-24T00",
+        "owner": "0x47666fab8bd0ac7003bce3f5c3585383f09486e2",
+        "balance": "1000000000000000000000"
+      },
+      {
+        "hour": "2025-02-24T01",
+        "owner": "0x47666fab8bd0ac7003bce3f5c3585383f09486e2",
+        "balance": "1000000000000000000000"
+      },
+      {
+        "hour": "2025-02-24T02",
+        "owner": "0x47666fab8bd0ac7003bce3f5c3585383f09486e2",
+        "balance": "1000000000000000000000"
+      },
+      {
+        "hour": "2025-02-24T03",
+        "owner": "0x47666fab8bd0ac7003bce3f5c3585383f09486e2",
+        "balance": "1000000000000000000000"
+      },
+      {
+        "hour": "2025-02-24T04",
+        "owner": "0x47666fab8bd0ac7003bce3f5c3585383f09486e2",
+        "balance": "1000000000000000000000"
+      },
+      {
+        "hour": "2025-02-24T05",
+        "owner": "0x47666fab8bd0ac7003bce3f5c3585383f09486e2",
+        "balance": "1000000000000000000000"
+      },
+      {
+        "hour": "2025-02-24T06",
+        "owner": "0x47666fab8bd0ac7003bce3f5c3585383f09486e2",
+        "balance": "1000000000000000000000"
+      },
+      {
+        "hour": "2025-02-24T07",
+        "owner": "0x47666fab8bd0ac7003bce3f5c3585383f09486e2",
+        "balance": "1000000000000000000000"
+      },
+      {
+        "hour": "2025-02-24T08",
+        "owner": "0x47666fab8bd0ac7003bce3f5c3585383f09486e2",
+        "balance": "1000000000000000000000"
+      },
+      {
+        "hour": "2025-02-24T09",
+        "owner": "0x47666fab8bd0ac7003bce3f5c3585383f09486e2",
+        "balance": "1000000000000000000000"
+      },
+      {
+        "hour": "2025-02-24T10",
+        "owner": "0x47666fab8bd0ac7003bce3f5c3585383f09486e2",
+        "balance": "1000000000000000000000"
+      },
+      {
+        "hour": "2025-02-24T11",
+        "owner": "0x47666fab8bd0ac7003bce3f5c3585383f09486e2",
+        "balance": "1000000000000000000000"
+      },
+      {
+        "hour": "2025-02-24T12",
+        "owner": "0x47666fab8bd0ac7003bce3f5c3585383f09486e2",
+        "balance": "1000000000000000000000"
+      },
+      {
+        "hour": "2025-02-24T13",
+        "owner": "0x47666fab8bd0ac7003bce3f5c3585383f09486e2",
+        "balance": "1000000000000000000000"
+      },
+      {
+        "hour": "2025-02-24T14",
+        "owner": "0x47666fab8bd0ac7003bce3f5c3585383f09486e2",
+        "balance": "1000000000000000000000"
+      },
+      {
+        "hour": "2025-02-24T15",
+        "owner": "0x47666fab8bd0ac7003bce3f5c3585383f09486e2",
+        "balance": "1000000000000000000000"
+      },
+      {
+        "hour": "2025-02-24T16",
+        "owner": "0x47666fab8bd0ac7003bce3f5c3585383f09486e2",
+        "balance": "1000000000000000000000"
+      },
+      {
+        "hour": "2025-02-24T17",
+        "owner": "0x47666fab8bd0ac7003bce3f5c3585383f09486e2",
+        "balance": "1000000000000000000000"
+      },
+      {
+        "hour": "2025-02-24T18",
+        "owner": "0x47666fab8bd0ac7003bce3f5c3585383f09486e2",
+        "balance": "1000000000000000000000"
+      },
+      {
+        "hour": "2025-02-24T19",
+        "owner": "0x47666fab8bd0ac7003bce3f5c3585383f09486e2",
+        "balance": "1000000000000000000000"
+      },
+      {
+        "hour": "2025-02-24T20",
+        "owner": "0x47666fab8bd0ac7003bce3f5c3585383f09486e2",
+        "balance": "1000000000000000000000"
+      },
+      {
+        "hour": "2025-02-24T21",
+        "owner": "0x47666fab8bd0ac7003bce3f5c3585383f09486e2",
+        "balance": "1000000000000000000000"
+      },
+      {
+        "hour": "2025-02-24T22",
+        "owner": "0x47666fab8bd0ac7003bce3f5c3585383f09486e2",
+        "balance": "1000000000000000000000"
+      },
+      {
+        "hour": "2025-02-24T23",
+        "owner": "0x47666fab8bd0ac7003bce3f5c3585383f09486e2",
+        "balance": "1000000000000000000000"
+      },
+      {
+        "hour": "2025-02-25T00",
+        "owner": "0x47666fab8bd0ac7003bce3f5c3585383f09486e2",
+        "balance": "1000000000000000000000"
+      },
+      {
+        "hour": "2025-02-25T01",
+        "owner": "0x47666fab8bd0ac7003bce3f5c3585383f09486e2",
+        "balance": "1000000000000000000000"
+      },
+      {
+        "hour": "2025-02-25T02",
+        "owner": "0x47666fab8bd0ac7003bce3f5c3585383f09486e2",
+        "balance": "1000000000000000000000"
+      },
+      {
+        "hour": "2025-02-25T03",
+        "owner": "0x47666fab8bd0ac7003bce3f5c3585383f09486e2",
+        "balance": "1000000000000000000000"
+      },
+      {
+        "hour": "2025-02-25T04",
+        "owner": "0x47666fab8bd0ac7003bce3f5c3585383f09486e2",
+        "balance": "1000000000000000000000"
+      },
+      {
+        "hour": "2025-02-25T05",
+        "owner": "0x47666fab8bd0ac7003bce3f5c3585383f09486e2",
+        "balance": "1000000000000000000000"
+      },
+      {
+        "hour": "2025-02-25T06",
+        "owner": "0x47666fab8bd0ac7003bce3f5c3585383f09486e2",
+        "balance": "1000000000000000000000"
+      },
+      {
+        "hour": "2025-02-25T07",
+        "owner": "0x47666fab8bd0ac7003bce3f5c3585383f09486e2",
+        "balance": "1000000000000000000000"
+      },
+      {
+        "hour": "2025-02-25T08",
+        "owner": "0x47666fab8bd0ac7003bce3f5c3585383f09486e2",
+        "balance": "1000000000000000000000"
+      },
+      {
+        "hour": "2025-02-25T09",
+        "owner": "0x47666fab8bd0ac7003bce3f5c3585383f09486e2",
+        "balance": "1000000000000000000000"
+      },
+      {
+        "hour": "2025-02-25T10",
+        "owner": "0x47666fab8bd0ac7003bce3f5c3585383f09486e2",
+        "balance": "1000000000000000000000"
+      },
+      {
+        "hour": "2025-02-25T11",
+        "owner": "0x47666fab8bd0ac7003bce3f5c3585383f09486e2",
+        "balance": "1000000000000000000000"
+      },
+      {
+        "hour": "2025-02-25T12",
+        "owner": "0x47666fab8bd0ac7003bce3f5c3585383f09486e2",
+        "balance": "1000000000000000000000"
+      },
+      {
+        "hour": "2025-02-25T13",
+        "owner": "0x47666fab8bd0ac7003bce3f5c3585383f09486e2",
+        "balance": "1000000000000000000000"
+      },
+      {
+        "hour": "2025-02-25T14",
+        "owner": "0x47666fab8bd0ac7003bce3f5c3585383f09486e2",
+        "balance": "1000000000000000000000"
+      },
+      {
+        "hour": "2025-02-25T15",
+        "owner": "0x47666fab8bd0ac7003bce3f5c3585383f09486e2",
+        "balance": "1000000000000000000000"
+      },
+      {
+        "hour": "2025-02-25T16",
+        "owner": "0x47666fab8bd0ac7003bce3f5c3585383f09486e2",
+        "balance": "1000000000000000000000"
+      },
+      {
+        "hour": "2025-02-25T17",
+        "owner": "0x47666fab8bd0ac7003bce3f5c3585383f09486e2",
+        "balance": "1000000000000000000000"
+      },
+      {
+        "hour": "2025-02-25T18",
+        "owner": "0x47666fab8bd0ac7003bce3f5c3585383f09486e2",
+        "balance": "1000000000000000000000"
+      },
+      {
+        "hour": "2025-02-25T19",
+        "owner": "0x47666fab8bd0ac7003bce3f5c3585383f09486e2",
+        "balance": "1000000000000000000000"
+      },
+      {
+        "hour": "2025-02-25T20",
+        "owner": "0x47666fab8bd0ac7003bce3f5c3585383f09486e2",
+        "balance": "1000000000000000000000"
+      },
+      {
+        "hour": "2025-02-25T21",
+        "owner": "0x47666fab8bd0ac7003bce3f5c3585383f09486e2",
+        "balance": "1000000000000000000000"
+      },
+      {
+        "hour": "2025-02-25T22",
+        "owner": "0x47666fab8bd0ac7003bce3f5c3585383f09486e2",
+        "balance": "1000000000000000000000"
+      },
+      {
+        "hour": "2025-02-25T23",
+        "owner": "0x47666fab8bd0ac7003bce3f5c3585383f09486e2",
+        "balance": "1000000000000000000000"
+      },
+      {
+        "hour": "2025-02-26T00",
+        "owner": "0x47666fab8bd0ac7003bce3f5c3585383f09486e2",
+        "balance": "1000000000000000000000"
+      },
+      {
+        "hour": "2025-02-26T01",
+        "owner": "0x47666fab8bd0ac7003bce3f5c3585383f09486e2",
+        "balance": "1000000000000000000000"
+      },
+      {
+        "hour": "2025-02-26T02",
+        "owner": "0x47666fab8bd0ac7003bce3f5c3585383f09486e2",
+        "balance": "1000000000000000000000"
+      },
+      {
+        "hour": "2025-02-26T03",
+        "owner": "0x47666fab8bd0ac7003bce3f5c3585383f09486e2",
+        "balance": "1000000000000000000000"
+      },
+      {
+        "hour": "2025-02-26T04",
+        "owner": "0x47666fab8bd0ac7003bce3f5c3585383f09486e2",
+        "balance": "1000000000000000000000"
+      },
+      {
+        "hour": "2025-02-26T05",
+        "owner": "0x47666fab8bd0ac7003bce3f5c3585383f09486e2",
+        "balance": "1000000000000000000000"
+      },
+      {
+        "hour": "2025-02-26T06",
+        "owner": "0x47666fab8bd0ac7003bce3f5c3585383f09486e2",
+        "balance": "1000000000000000000000"
+      },
+      {
+        "hour": "2025-02-26T07",
+        "owner": "0x47666fab8bd0ac7003bce3f5c3585383f09486e2",
+        "balance": "1000000000000000000000"
+      },
+      {
+        "hour": "2025-02-26T08",
+        "owner": "0x47666fab8bd0ac7003bce3f5c3585383f09486e2",
+        "balance": "1000000000000000000000"
+      },
+      {
+        "hour": "2025-02-26T09",
+        "owner": "0x47666fab8bd0ac7003bce3f5c3585383f09486e2",
+        "balance": "1000000000000000000000"
+      },
+      {
+        "hour": "2025-02-26T10",
+        "owner": "0x47666fab8bd0ac7003bce3f5c3585383f09486e2",
+        "balance": "1000000000000000000000"
+      },
+      {
+        "hour": "2025-02-26T11",
+        "owner": "0x47666fab8bd0ac7003bce3f5c3585383f09486e2",
+        "balance": "1000000000000000000000"
+      },
+      {
+        "hour": "2025-02-26T12",
+        "owner": "0x47666fab8bd0ac7003bce3f5c3585383f09486e2",
+        "balance": "1000000000000000000000"
+      },
+      {
+        "hour": "2025-02-26T13",
+        "owner": "0x47666fab8bd0ac7003bce3f5c3585383f09486e2",
+        "balance": "1000000000000000000000"
+      },
+      {
+        "hour": "2025-02-26T14",
+        "owner": "0x47666fab8bd0ac7003bce3f5c3585383f09486e2",
+        "balance": "1000000000000000000000"
+      },
+      {
+        "hour": "2025-02-26T15",
+        "owner": "0x47666fab8bd0ac7003bce3f5c3585383f09486e2",
+        "balance": "1000000000000000000000"
+      },
+      {
+        "hour": "2025-02-26T16",
+        "owner": "0x47666fab8bd0ac7003bce3f5c3585383f09486e2",
+        "balance": "1000000000000000000000"
+      },
+      {
+        "hour": "2025-02-26T17",
+        "owner": "0x47666fab8bd0ac7003bce3f5c3585383f09486e2",
+        "balance": "1000000000000000000000"
+      },
+      {
+        "hour": "2025-02-26T18",
+        "owner": "0x47666fab8bd0ac7003bce3f5c3585383f09486e2",
+        "balance": "1000000000000000000000"
+      },
+      {
+        "hour": "2025-02-26T19",
+        "owner": "0x47666fab8bd0ac7003bce3f5c3585383f09486e2",
+        "balance": "1000000000000000000000"
+      },
+      {
+        "hour": "2025-02-26T20",
+        "owner": "0x47666fab8bd0ac7003bce3f5c3585383f09486e2",
+        "balance": "1000000000000000000000"
+      },
+      {
+        "hour": "2025-02-26T21",
+        "owner": "0x47666fab8bd0ac7003bce3f5c3585383f09486e2",
+        "balance": "1000000000000000000000"
+      },
+      {
+        "hour": "2025-02-26T22",
+        "owner": "0x47666fab8bd0ac7003bce3f5c3585383f09486e2",
+        "balance": "1000000000000000000000"
+      },
+      {
+        "hour": "2025-02-26T23",
+        "owner": "0x47666fab8bd0ac7003bce3f5c3585383f09486e2",
+        "balance": "1000000000000000000000"
+      },
+      {
+        "hour": "2025-02-27T00",
+        "owner": "0x47666fab8bd0ac7003bce3f5c3585383f09486e2",
+        "balance": "1000000000000000000000"
+      },
+      {
+        "hour": "2025-02-27T01",
+        "owner": "0x47666fab8bd0ac7003bce3f5c3585383f09486e2",
+        "balance": "1000000000000000000000"
+      },
+      {
+        "hour": "2025-02-27T02",
+        "owner": "0x47666fab8bd0ac7003bce3f5c3585383f09486e2",
+        "balance": "1000000000000000000000"
+      },
+      {
+        "hour": "2025-02-27T03",
+        "owner": "0x47666fab8bd0ac7003bce3f5c3585383f09486e2",
+        "balance": "1000000000000000000000"
+      },
+      {
+        "hour": "2025-02-27T04",
+        "owner": "0x47666fab8bd0ac7003bce3f5c3585383f09486e2",
+        "balance": "1000000000000000000000"
+      },
+      {
+        "hour": "2025-02-27T05",
+        "owner": "0x47666fab8bd0ac7003bce3f5c3585383f09486e2",
+        "balance": "1000000000000000000000"
+      },
+      {
+        "hour": "2025-02-27T06",
+        "owner": "0x47666fab8bd0ac7003bce3f5c3585383f09486e2",
+        "balance": "1000000000000000000000"
+      },
+      {
+        "hour": "2025-02-27T07",
+        "owner": "0x47666fab8bd0ac7003bce3f5c3585383f09486e2",
+        "balance": "1000000000000000000000"
+      },
+      {
+        "hour": "2025-02-27T08",
+        "owner": "0x47666fab8bd0ac7003bce3f5c3585383f09486e2",
+        "balance": "1000000000000000000000"
+      },
+      {
+        "hour": "2025-02-27T09",
+        "owner": "0x47666fab8bd0ac7003bce3f5c3585383f09486e2",
+        "balance": "1000000000000000000000"
+      },
+      {
+        "hour": "2025-02-27T10",
+        "owner": "0x47666fab8bd0ac7003bce3f5c3585383f09486e2",
+        "balance": "1000000000000000000000"
+      },
+      {
+        "hour": "2025-02-27T11",
+        "owner": "0x47666fab8bd0ac7003bce3f5c3585383f09486e2",
+        "balance": "1000000000000000000000"
+      },
+      {
+        "hour": "2025-02-27T12",
+        "owner": "0x47666fab8bd0ac7003bce3f5c3585383f09486e2",
+        "balance": "1000000000000000000000"
+      },
+      {
+        "hour": "2025-02-27T13",
+        "owner": "0x47666fab8bd0ac7003bce3f5c3585383f09486e2",
+        "balance": "1000000000000000000000"
+      },
+      {
+        "hour": "2025-02-27T14",
+        "owner": "0x47666fab8bd0ac7003bce3f5c3585383f09486e2",
+        "balance": "1000000000000000000000"
+      },
+      {
+        "hour": "2025-02-27T15",
+        "owner": "0x47666fab8bd0ac7003bce3f5c3585383f09486e2",
+        "balance": "1000000000000000000000"
+      },
+      {
+        "hour": "2025-02-27T16",
+        "owner": "0x47666fab8bd0ac7003bce3f5c3585383f09486e2",
+        "balance": "1000000000000000000000"
+      },
+      {
+        "hour": "2025-02-27T17",
+        "owner": "0x47666fab8bd0ac7003bce3f5c3585383f09486e2",
+        "balance": "1000000000000000000000"
+      },
+      {
+        "hour": "2025-02-27T18",
+        "owner": "0x47666fab8bd0ac7003bce3f5c3585383f09486e2",
+        "balance": "1000000000000000000000"
+      },
+      {
+        "hour": "2025-02-27T19",
+        "owner": "0x47666fab8bd0ac7003bce3f5c3585383f09486e2",
+        "balance": "1000000000000000000000"
+      },
+      {
+        "hour": "2025-02-27T20",
+        "owner": "0x47666fab8bd0ac7003bce3f5c3585383f09486e2",
+        "balance": "1000000000000000000000"
+      },
+      {
+        "hour": "2025-02-27T21",
+        "owner": "0x47666fab8bd0ac7003bce3f5c3585383f09486e2",
+        "balance": "1000000000000000000000"
+      },
+      {
+        "hour": "2025-02-27T22",
+        "owner": "0x47666fab8bd0ac7003bce3f5c3585383f09486e2",
+        "balance": "1000000000000000000000"
+      },
+      {
+        "hour": "2025-02-27T23",
+        "owner": "0x47666fab8bd0ac7003bce3f5c3585383f09486e2",
+        "balance": "1000000000000000000000"
+      },
+      {
+        "hour": "2025-02-28T00",
+        "owner": "0x47666fab8bd0ac7003bce3f5c3585383f09486e2",
+        "balance": "1000000000000000000000"
+      },
+      {
+        "hour": "2025-02-28T01",
+        "owner": "0x47666fab8bd0ac7003bce3f5c3585383f09486e2",
+        "balance": "1000000000000000000000"
+      },
+      {
+        "hour": "2025-02-28T02",
+        "owner": "0x47666fab8bd0ac7003bce3f5c3585383f09486e2",
+        "balance": "1000000000000000000000"
+      },
+      {
+        "hour": "2025-02-28T03",
+        "owner": "0x47666fab8bd0ac7003bce3f5c3585383f09486e2",
+        "balance": "1000000000000000000000"
+      },
+      {
+        "hour": "2025-02-28T04",
+        "owner": "0x47666fab8bd0ac7003bce3f5c3585383f09486e2",
+        "balance": "1000000000000000000000"
+      },
+      {
+        "hour": "2025-02-28T05",
+        "owner": "0x47666fab8bd0ac7003bce3f5c3585383f09486e2",
+        "balance": "1000000000000000000000"
+      },
+      {
+        "hour": "2025-02-28T06",
+        "owner": "0x47666fab8bd0ac7003bce3f5c3585383f09486e2",
+        "balance": "1000000000000000000000"
+      },
+      {
+        "hour": "2025-02-28T07",
+        "owner": "0x47666fab8bd0ac7003bce3f5c3585383f09486e2",
+        "balance": "1000000000000000000000"
+      },
+      {
+        "hour": "2025-02-28T08",
+        "owner": "0x47666fab8bd0ac7003bce3f5c3585383f09486e2",
+        "balance": "1000000000000000000000"
+      },
+      {
+        "hour": "2025-02-28T09",
+        "owner": "0x47666fab8bd0ac7003bce3f5c3585383f09486e2",
+        "balance": "1000000000000000000000"
+      },
+      {
+        "hour": "2025-02-28T10",
+        "owner": "0x47666fab8bd0ac7003bce3f5c3585383f09486e2",
+        "balance": "1000000000000000000000"
+      },
+      {
+        "hour": "2025-02-28T11",
+        "owner": "0x47666fab8bd0ac7003bce3f5c3585383f09486e2",
+        "balance": "1000000000000000000000"
+      },
+      {
+        "hour": "2025-02-28T12",
+        "owner": "0x47666fab8bd0ac7003bce3f5c3585383f09486e2",
+        "balance": "1000000000000000000000"
+      },
+      {
+        "hour": "2025-02-28T13",
+        "owner": "0x47666fab8bd0ac7003bce3f5c3585383f09486e2",
+        "balance": "1000000000000000000000"
+      },
+      {
+        "hour": "2025-02-28T14",
+        "owner": "0x47666fab8bd0ac7003bce3f5c3585383f09486e2",
+        "balance": "1000000000000000000000"
+      },
+      {
+        "hour": "2025-02-28T15",
+        "owner": "0x47666fab8bd0ac7003bce3f5c3585383f09486e2",
+        "balance": "1000000000000000000000"
+      },
+      {
+        "hour": "2025-02-28T16",
+        "owner": "0x47666fab8bd0ac7003bce3f5c3585383f09486e2",
+        "balance": "1000000000000000000000"
+      },
+      {
+        "hour": "2025-02-28T17",
+        "owner": "0x47666fab8bd0ac7003bce3f5c3585383f09486e2",
+        "balance": "1000000000000000000000"
+      },
+      {
+        "hour": "2025-02-28T18",
+        "owner": "0x47666fab8bd0ac7003bce3f5c3585383f09486e2",
+        "balance": "1000000000000000000000"
+      },
+      {
+        "hour": "2025-02-28T19",
+        "owner": "0x47666fab8bd0ac7003bce3f5c3585383f09486e2",
+        "balance": "1000000000000000000000"
+      },
+      {
+        "hour": "2025-02-28T20",
+        "owner": "0x47666fab8bd0ac7003bce3f5c3585383f09486e2",
+        "balance": "1000000000000000000000"
+      },
+      {
+        "hour": "2025-02-28T21",
+        "owner": "0x47666fab8bd0ac7003bce3f5c3585383f09486e2",
+        "balance": "1000000000000000000000"
+      },
+      {
+        "hour": "2025-02-28T22",
+        "owner": "0x47666fab8bd0ac7003bce3f5c3585383f09486e2",
+        "balance": "1000000000000000000000"
+      },
+      {
+        "hour": "2025-02-28T23",
+        "owner": "0x47666fab8bd0ac7003bce3f5c3585383f09486e2",
+        "balance": "1000000000000000000000"
+      }
+    ],
+    "balance-hop-a4b2": [
+      {
+        "hour": "2025-02-21T15",
+        "owner": "0xa4b2fd68593b6f34e51cb9edb66e71c1b4ab449e",
+        "balance": "150000000000000000000000"
+      },
+      {
+        "hour": "2025-02-21T16",
+        "owner": "0xa4b2fd68593b6f34e51cb9edb66e71c1b4ab449e",
+        "balance": "150000000000000000000000"
+      },
+      {
+        "hour": "2025-02-21T17",
+        "owner": "0xa4b2fd68593b6f34e51cb9edb66e71c1b4ab449e",
+        "balance": "150000000000000000000000"
+      },
+      {
+        "hour": "2025-02-21T18",
+        "owner": "0xa4b2fd68593b6f34e51cb9edb66e71c1b4ab449e",
+        "balance": "150000000000000000000000"
+      },
+      {
+        "hour": "2025-02-21T19",
+        "owner": "0xa4b2fd68593b6f34e51cb9edb66e71c1b4ab449e",
+        "balance": "150000000000000000000000"
+      },
+      {
+        "hour": "2025-02-21T20",
+        "owner": "0xa4b2fd68593b6f34e51cb9edb66e71c1b4ab449e",
+        "balance": "150000000000000000000000"
+      },
+      {
+        "hour": "2025-02-21T21",
+        "owner": "0xa4b2fd68593b6f34e51cb9edb66e71c1b4ab449e",
+        "balance": "150000000000000000000000"
+      }
+    ],
+    "balance-hop-bdd0": [
+      {
+        "hour": "2025-02-21T15",
+        "owner": "0xbdd077f651ebe7f7b3ce16fe5f2b025be2969516",
+        "balance": "100000000000000000000000"
+      },
+      {
+        "hour": "2025-02-21T16",
+        "owner": "0xbdd077f651ebe7f7b3ce16fe5f2b025be2969516",
+        "balance": "100000000000000000000000"
+      },
+      {
+        "hour": "2025-02-21T17",
+        "owner": "0xbdd077f651ebe7f7b3ce16fe5f2b025be2969516",
+        "balance": "100000000000000000000000"
+      },
+      {
+        "hour": "2025-02-21T18",
+        "owner": "0xbdd077f651ebe7f7b3ce16fe5f2b025be2969516",
+        "balance": "100000000000000000000000"
+      },
+      {
+        "hour": "2025-02-21T19",
+        "owner": "0xbdd077f651ebe7f7b3ce16fe5f2b025be2969516",
+        "balance": "100000000000000000000000"
+      },
+      {
+        "hour": "2025-02-21T20",
+        "owner": "0xbdd077f651ebe7f7b3ce16fe5f2b025be2969516",
+        "balance": "100000000000000000000000"
+      },
+      {
+        "hour": "2025-02-21T21",
+        "owner": "0xbdd077f651ebe7f7b3ce16fe5f2b025be2969516",
+        "balance": "100000000000000000000000"
+      },
+      {
+        "hour": "2025-02-21T22",
+        "owner": "0xbdd077f651ebe7f7b3ce16fe5f2b025be2969516",
+        "balance": "100000000000000000000000"
+      },
+      {
+        "hour": "2025-02-21T23",
+        "owner": "0xbdd077f651ebe7f7b3ce16fe5f2b025be2969516",
+        "balance": "100000000000000000000000"
+      }
+    ],
+    "balance-hop-0fa0": [
+      {
+        "hour": "2025-02-21T16",
+        "owner": "0x0fa09c3a328792253f8dee7116848723b72a6d2e",
+        "balance": "50000000000000000000000"
+      },
+      {
+        "hour": "2025-02-21T17",
+        "owner": "0x0fa09c3a328792253f8dee7116848723b72a6d2e",
+        "balance": "50000000000000000000000"
+      },
+      {
+        "hour": "2025-02-21T18",
+        "owner": "0x0fa09c3a328792253f8dee7116848723b72a6d2e",
+        "balance": "50000000000000000000000"
+      },
+      {
+        "hour": "2025-02-21T19",
+        "owner": "0x0fa09c3a328792253f8dee7116848723b72a6d2e",
+        "balance": "50000000000000000000000"
+      },
+      {
+        "hour": "2025-02-21T20",
+        "owner": "0x0fa09c3a328792253f8dee7116848723b72a6d2e",
+        "balance": "50000000000000000000000"
+      },
+      {
+        "hour": "2025-02-21T21",
+        "owner": "0x0fa09c3a328792253f8dee7116848723b72a6d2e",
+        "balance": "50000000000000000000000"
+      },
+      {
+        "hour": "2025-02-21T22",
+        "owner": "0x0fa09c3a328792253f8dee7116848723b72a6d2e",
+        "balance": "50000000000000000000000"
+      },
+      {
+        "hour": "2025-02-21T23",
+        "owner": "0x0fa09c3a328792253f8dee7116848723b72a6d2e",
+        "balance": "50000000000000000000000"
+      },
+      {
+        "hour": "2025-02-22T00",
+        "owner": "0x0fa09c3a328792253f8dee7116848723b72a6d2e",
+        "balance": "50000000000000000000000"
+      },
+      {
+        "hour": "2025-02-22T01",
+        "owner": "0x0fa09c3a328792253f8dee7116848723b72a6d2e",
+        "balance": "50000000000000000000000"
+      },
+      {
+        "hour": "2025-02-22T02",
+        "owner": "0x0fa09c3a328792253f8dee7116848723b72a6d2e",
+        "balance": "50000000000000000000000"
+      },
+      {
+        "hour": "2025-02-22T03",
+        "owner": "0x0fa09c3a328792253f8dee7116848723b72a6d2e",
+        "balance": "50000000000000000000000"
+      },
+      {
+        "hour": "2025-02-22T04",
+        "owner": "0x0fa09c3a328792253f8dee7116848723b72a6d2e",
+        "balance": "50000000000000000000000"
+      },
+      {
+        "hour": "2025-02-22T05",
+        "owner": "0x0fa09c3a328792253f8dee7116848723b72a6d2e",
+        "balance": "50000000000000000000000"
+      },
+      {
+        "hour": "2025-02-22T06",
+        "owner": "0x0fa09c3a328792253f8dee7116848723b72a6d2e",
+        "balance": "50000000000000000000000"
+      },
+      {
+        "hour": "2025-02-22T07",
+        "owner": "0x0fa09c3a328792253f8dee7116848723b72a6d2e",
+        "balance": "50000000000000000000000"
+      },
+      {
+        "hour": "2025-02-22T08",
+        "owner": "0x0fa09c3a328792253f8dee7116848723b72a6d2e",
+        "balance": "50000000000000000000000"
+      },
+      {
+        "hour": "2025-02-22T09",
+        "owner": "0x0fa09c3a328792253f8dee7116848723b72a6d2e",
+        "balance": "50000000000000000000000"
+      },
+      {
+        "hour": "2025-02-22T10",
+        "owner": "0x0fa09c3a328792253f8dee7116848723b72a6d2e",
+        "balance": "50000000000000000000000"
+      },
+      {
+        "hour": "2025-02-22T11",
+        "owner": "0x0fa09c3a328792253f8dee7116848723b72a6d2e",
+        "balance": "50000000000000000000000"
+      },
+      {
+        "hour": "2025-02-22T12",
+        "owner": "0x0fa09c3a328792253f8dee7116848723b72a6d2e",
+        "balance": "50000000000000000000000"
+      },
+      {
+        "hour": "2025-02-22T13",
+        "owner": "0x0fa09c3a328792253f8dee7116848723b72a6d2e",
+        "balance": "50000000000000000000000"
+      },
+      {
+        "hour": "2025-02-22T14",
+        "owner": "0x0fa09c3a328792253f8dee7116848723b72a6d2e",
+        "balance": "50000000000000000000000"
+      },
+      {
+        "hour": "2025-02-22T15",
+        "owner": "0x0fa09c3a328792253f8dee7116848723b72a6d2e",
+        "balance": "50000000000000000000000"
+      }
+    ],
+    "balance-hop-1542": [
+      {
+        "hour": "2025-02-21T16",
+        "owner": "0x1542368a03ad1f03d96d51b414f4a2d6d2fe0d04",
+        "balance": "50000000000000000000000"
+      },
+      {
+        "hour": "2025-02-21T17",
+        "owner": "0x1542368a03ad1f03d96d51b414f4a2d6d2fe0d04",
+        "balance": "50000000000000000000000"
+      },
+      {
+        "hour": "2025-02-21T18",
+        "owner": "0x1542368a03ad1f03d96d51b414f4a2d6d2fe0d04",
+        "balance": "50000000000000000000000"
+      },
+      {
+        "hour": "2025-02-21T19",
+        "owner": "0x1542368a03ad1f03d96d51b414f4a2d6d2fe0d04",
+        "balance": "50000000000000000000000"
+      },
+      {
+        "hour": "2025-02-21T20",
+        "owner": "0x1542368a03ad1f03d96d51b414f4a2d6d2fe0d04",
+        "balance": "50000000000000000000000"
+      },
+      {
+        "hour": "2025-02-21T21",
+        "owner": "0x1542368a03ad1f03d96d51b414f4a2d6d2fe0d04",
+        "balance": "50000000000000000000000"
+      },
+      {
+        "hour": "2025-02-21T22",
+        "owner": "0x1542368a03ad1f03d96d51b414f4a2d6d2fe0d04",
+        "balance": "50000000000000000000000"
+      },
+      {
+        "hour": "2025-02-21T23",
+        "owner": "0x1542368a03ad1f03d96d51b414f4a2d6d2fe0d04",
+        "balance": "50000000000000000000000"
+      },
+      {
+        "hour": "2025-02-22T00",
+        "owner": "0x1542368a03ad1f03d96d51b414f4a2d6d2fe0d04",
+        "balance": "50000000000000000000000"
+      },
+      {
+        "hour": "2025-02-22T01",
+        "owner": "0x1542368a03ad1f03d96d51b414f4a2d6d2fe0d04",
+        "balance": "50000000000000000000000"
+      },
+      {
+        "hour": "2025-02-22T02",
+        "owner": "0x1542368a03ad1f03d96d51b414f4a2d6d2fe0d04",
+        "balance": "50000000000000000000000"
+      },
+      {
+        "hour": "2025-02-22T03",
+        "owner": "0x1542368a03ad1f03d96d51b414f4a2d6d2fe0d04",
+        "balance": "50000000000000000000000"
+      },
+      {
+        "hour": "2025-02-22T04",
+        "owner": "0x1542368a03ad1f03d96d51b414f4a2d6d2fe0d04",
+        "balance": "50000000000000000000000"
+      },
+      {
+        "hour": "2025-02-22T05",
+        "owner": "0x1542368a03ad1f03d96d51b414f4a2d6d2fe0d04",
+        "balance": "50000000000000000000000"
+      },
+      {
+        "hour": "2025-02-22T06",
+        "owner": "0x1542368a03ad1f03d96d51b414f4a2d6d2fe0d04",
+        "balance": "50000000000000000000000"
+      },
+      {
+        "hour": "2025-02-22T07",
+        "owner": "0x1542368a03ad1f03d96d51b414f4a2d6d2fe0d04",
+        "balance": "50000000000000000000000"
+      },
+      {
+        "hour": "2025-02-22T08",
+        "owner": "0x1542368a03ad1f03d96d51b414f4a2d6d2fe0d04",
+        "balance": "50000000000000000000000"
+      },
+      {
+        "hour": "2025-02-22T09",
+        "owner": "0x1542368a03ad1f03d96d51b414f4a2d6d2fe0d04",
+        "balance": "50000000000000000000000"
+      },
+      {
+        "hour": "2025-02-22T10",
+        "owner": "0x1542368a03ad1f03d96d51b414f4a2d6d2fe0d04",
+        "balance": "50000000000000000000000"
+      },
+      {
+        "hour": "2025-02-22T11",
+        "owner": "0x1542368a03ad1f03d96d51b414f4a2d6d2fe0d04",
+        "balance": "50000000000000000000000"
+      },
+      {
+        "hour": "2025-02-22T12",
+        "owner": "0x1542368a03ad1f03d96d51b414f4a2d6d2fe0d04",
+        "balance": "50000000000000000000000"
+      },
+      {
+        "hour": "2025-02-22T13",
+        "owner": "0x1542368a03ad1f03d96d51b414f4a2d6d2fe0d04",
+        "balance": "50000000000000000000000"
+      },
+      {
+        "hour": "2025-02-22T14",
+        "owner": "0x1542368a03ad1f03d96d51b414f4a2d6d2fe0d04",
+        "balance": "50000000000000000000000"
+      },
+      {
+        "hour": "2025-02-22T15",
+        "owner": "0x1542368a03ad1f03d96d51b414f4a2d6d2fe0d04",
+        "balance": "50000000000000000000000"
+      },
+      {
+        "hour": "2025-02-22T16",
+        "owner": "0x1542368a03ad1f03d96d51b414f4a2d6d2fe0d04",
+        "balance": "50000000000000000000000"
+      },
+      {
+        "hour": "2025-02-22T17",
+        "owner": "0x1542368a03ad1f03d96d51b414f4a2d6d2fe0d04",
+        "balance": "50000000000000000000000"
+      },
+      {
+        "hour": "2025-02-22T18",
+        "owner": "0x1542368a03ad1f03d96d51b414f4a2d6d2fe0d04",
+        "balance": "50000000000000000000000"
+      },
+      {
+        "hour": "2025-02-22T19",
+        "owner": "0x1542368a03ad1f03d96d51b414f4a2d6d2fe0d04",
+        "balance": "50000000000000000000000"
+      },
+      {
+        "hour": "2025-02-22T20",
+        "owner": "0x1542368a03ad1f03d96d51b414f4a2d6d2fe0d04",
+        "balance": "50000000000000000000000"
+      },
+      {
+        "hour": "2025-02-22T21",
+        "owner": "0x1542368a03ad1f03d96d51b414f4a2d6d2fe0d04",
+        "balance": "50000000000000000000000"
+      },
+      {
+        "hour": "2025-02-22T22",
+        "owner": "0x1542368a03ad1f03d96d51b414f4a2d6d2fe0d04",
+        "balance": "50000000000000000000000"
+      },
+      {
+        "hour": "2025-02-22T23",
+        "owner": "0x1542368a03ad1f03d96d51b414f4a2d6d2fe0d04",
+        "balance": "50000000000000000000000"
+      },
+      {
+        "hour": "2025-02-23T00",
+        "owner": "0x1542368a03ad1f03d96d51b414f4a2d6d2fe0d04",
+        "balance": "50000000000000000000000"
+      },
+      {
+        "hour": "2025-02-23T01",
+        "owner": "0x1542368a03ad1f03d96d51b414f4a2d6d2fe0d04",
+        "balance": "50000000000000000000000"
+      },
+      {
+        "hour": "2025-02-23T02",
+        "owner": "0x1542368a03ad1f03d96d51b414f4a2d6d2fe0d04",
+        "balance": "50000000000000000000000"
+      },
+      {
+        "hour": "2025-02-23T03",
+        "owner": "0x1542368a03ad1f03d96d51b414f4a2d6d2fe0d04",
+        "balance": "50000000000000000000000"
+      },
+      {
+        "hour": "2025-02-23T04",
+        "owner": "0x1542368a03ad1f03d96d51b414f4a2d6d2fe0d04",
+        "balance": "50000000000000000000000"
+      },
+      {
+        "hour": "2025-02-23T05",
+        "owner": "0x1542368a03ad1f03d96d51b414f4a2d6d2fe0d04",
+        "balance": "50000000000000000000000"
+      },
+      {
+        "hour": "2025-02-23T06",
+        "owner": "0x1542368a03ad1f03d96d51b414f4a2d6d2fe0d04",
+        "balance": "50000000000000000000000"
+      },
+      {
+        "hour": "2025-02-23T07",
+        "owner": "0x1542368a03ad1f03d96d51b414f4a2d6d2fe0d04",
+        "balance": "50000000000000000000000"
+      },
+      {
+        "hour": "2025-02-23T08",
+        "owner": "0x1542368a03ad1f03d96d51b414f4a2d6d2fe0d04",
+        "balance": "50000000000000000000000"
+      },
+      {
+        "hour": "2025-02-23T09",
+        "owner": "0x1542368a03ad1f03d96d51b414f4a2d6d2fe0d04",
+        "balance": "50000000000000000000000"
+      },
+      {
+        "hour": "2025-02-23T10",
+        "owner": "0x1542368a03ad1f03d96d51b414f4a2d6d2fe0d04",
+        "balance": "50000000000000000000000"
+      },
+      {
+        "hour": "2025-02-23T11",
+        "owner": "0x1542368a03ad1f03d96d51b414f4a2d6d2fe0d04",
+        "balance": "50000000000000000000000"
+      }
+    ]
+  }
+}
