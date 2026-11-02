@@ -1,0 +1,66 @@
+{
+  "demo": "pons-graduations",
+  "binds": [
+    {
+      "name": "launches",
+      "function_slug": "pons.curve_list",
+      "chain_id": 46630,
+      "params": {
+        "factory": "0x7ed598bcef8bd9edd8c97a195c6d13f40801ec7e"
+      },
+      "window": {
+        "from_block": 0,
+        "to_block": 10000000
+      }
+    },
+    {
+      "name": "graduations",
+      "function_slug": "pons.graduated_pool_list",
+      "chain_id": 46630,
+      "params": {
+        "factory": "0x7ed598bcef8bd9edd8c97a195c6d13f40801ec7e",
+        "pool_manager": "0x1b0c5a0e2f1d4c3b8a7f6e5d4c3b2a1908f7e6d5"
+      },
+      "window": {
+        "from_block": 0,
+        "to_block": 10000000
+      }
+    },
+    {
+      "name": "curve-volume",
+      "function_slug": "pons.curve_volume",
+      "chain_id": 46630,
+      "params": {
+        "swap": {
+          "curve_list": {
+            "factory": "0x7ed598bcef8bd9edd8c97a195c6d13f40801ec7e"
+          }
+        },
+        "by": "day"
+      },
+      "window": {
+        "from_day": "2026-10-02",
+        "to_day": "2026-11-02"
+      }
+    },
+    {
+      "name": "pool-fees",
+      "function_slug": "pons.pool_fees",
+      "chain_id": 46630,
+      "params": {
+        "swap": {
+          "hook": "0x5c2e9a4b7d1f3e6a8c0b2d4f6e8a1c3b5d7f09a8",
+          "graduated_pool_list": {
+            "factory": "0x7ed598bcef8bd9edd8c97a195c6d13f40801ec7e",
+            "pool_manager": "0x1b0c5a0e2f1d4c3b8a7f6e5d4c3b2a1908f7e6d5"
+          }
+        },
+        "by": "day"
+      },
+      "window": {
+        "from_day": "2026-10-02",
+        "to_day": "2026-11-02"
+      }
+    }
+  ]
+}
