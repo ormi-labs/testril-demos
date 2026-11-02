@@ -57,13 +57,15 @@ recording.
 - Volume: UTC days `[2026-10-25, 2026-11-02)`, one row per pool per day.
 - Volume in dollars is the USDC or USDT side of a pool (6 decimals); pools with
   neither show swaps only.
-- Arrakis hooks: the private hooks created by the Arrakis hook factory over the
-  same blocks.
+- Arrakis hooks: the private hooks created by the Arrakis hook factory, from
+  the factory's creation block to the same end block (the factory address and
+  its creation block are placeholders, verify both before recording).
 
 | Subject                | Address                                      | Note                                                                           |
 | ---------------------- | -------------------------------------------- | ------------------------------------------------------------------------------ |
 | Uniswap v4 PoolManager | `0x000000000004444c5dc75cb358380d2e3de08a90` |                                                                                |
-| Arrakis hook factory   | not set                                      | set `arrakis-hooks.params.factory` before recording                            |
+| Arrakis hook factory   | `0xef129a430032c8183aba158c1a70799e3b840df9` | verify before recording: known on Base, not confirmed on Ethereum              |
+| Factory creation       | block 21688329                               | verify before recording: placeholder (PoolManager creation), use the factory's |
 | PoolManager creation   | block 21688329                               | verify before recording                                                        |
 | Pool window end        | block 26323365                               | verify before recording: must be the first block at or after 2026-11-02T00:00Z |
 | USDC                   | `0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48` |                                                                                |
@@ -83,9 +85,9 @@ Windows are half-open: the end is the first block or day not included.
 
 ## Record real data
 
-`npm run record` must not be run until the Arrakis hook factory address in
-`testril.json` replaces its `VERIFY_…` placeholder and the end block is read
-from the chain.
+`npm run record` must not be run until the Arrakis hook factory address and
+creation block and the pool window end block in `testril.json` are verified
+on the chain.
 
 Recording needs `tools/prepare` from this repository and a Testril operator
 key with a funded channel; neither is part of an extracted demo. From the

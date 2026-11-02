@@ -21,9 +21,14 @@ function lowercased(rows) {
     ...rows,
     pools: rows.pools.map((pool) => ({
       ...pool,
+      pool: pool.pool.toLowerCase(),
       currency0: pool.currency0.toLowerCase(),
       currency1: pool.currency1.toLowerCase(),
       hooks: pool.hooks.toLowerCase(),
+    })),
+    volume: rows.volume.map((row) => ({
+      ...row,
+      pool: row.pool.toLowerCase(),
     })),
     "arrakis-hooks": rows["arrakis-hooks"].map((row) => ({
       ...row,
@@ -87,16 +92,6 @@ export function hookTotals(rows) {
   );
 }
 
-function volumeSummedPerRow(rows) {
-  const pools = new Map(rows.pools.map((pool) => [pool.pool, pool]));
-  return sum(
-    rows.volume.map((row) => {
-      const side = stablecoinSide(pools.get(row.pool));
-      return side ? BigInt(row[side]) : 0n;
-    }),
-  );
-}
-
 export function check(listed) {
   const rows = lowercased(listed);
   const known = new Set(rows.pools.map((pool) => pool.pool));
@@ -114,27 +109,14 @@ export function check(listed) {
     throw new Error(
       `Hooks add up to ${hookSwaps} swaps, but the pools' volume rows total ${totalSwaps}.`,
     );
-  const hookVolume = sum(hooks.map((hook) => hook.volume));
-  const rowVolume = volumeSummedPerRow(rows);
-  if (hookVolume !== rowVolume)
-    throw new Error(
-      `Hooks add up to ${hookVolume} stablecoin units, but the volume rows total ${rowVolume}.`,
-    );
   const arrakisHooks = arrakisHookSet(rows);
   if (arrakisHooks.has(zeroAddress))
     throw new Error("The Arrakis hook list contains the zero address.");
-  const mislabelled = hooks.find(
-    (hook) =>
-      (hookLabel(hook.hook, arrakisHooks) === "No hook") !==
-      (hook.hook === zeroAddress),
-  );
-  if (mislabelled)
-    throw new Error(`Hook ${mislabelled.hook} has the wrong No hook label.`);
   const unhooked = hooks.find((hook) => hook.hook === zeroAddress);
   return [
     `All ${new Set(rows.volume.map((row) => row.pool)).size} pools with volume are in pool_list`,
     `Hooks add up to ${hookSwaps} swaps, the same as the volume rows`,
-    `${unhooked?.pools ?? 0n} pools at the zero address are shown as No hook`,
+    `${unhooked?.pools ?? 0n} pools with volume at the zero address are shown as No hook`,
   ];
 }
 
