@@ -27,6 +27,15 @@ test("check fails on a day outside the window", () => {
   assert.throws(() => check(corrupted), /outside the window/);
 });
 
+test("check fails on a row where nothing moved", () => {
+  const corrupted = rows();
+  corrupted["aqua-base"][0].pushes = "0";
+  assert.throws(() => check(corrupted), /zero count or amount/);
+  const zeroAmount = rows();
+  zeroAmount["aqua-base"][0].amount = "0";
+  assert.throws(() => check(zeroAmount), /zero count or amount/);
+});
+
 test("check fails when an amount is in decimal units instead of raw", () => {
   const corrupted = rows();
   corrupted["tessera-base"][0].amount_in = "0.04";

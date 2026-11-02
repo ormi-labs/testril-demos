@@ -2,10 +2,11 @@
 
 Daily volume per token for two newer venues over eight days: the 1inch Aqua
 registry on Ethereum and Base, and a Tessera swap contract on Base. Each venue
-gets one bar chart per token, with a table of window totals. The page proves
+gets one bar chart per token (small multiples, because token amounts have
+different scales and cannot share an axis), with a table of window totals. The page proves
 its numbers: counts and amounts are non-negative integers, no token-day is
-counted twice, every day lies in the window, and the per-token totals add up to
-the total of all rows.
+counted twice, every day lies in the window, and every row has a positive count
+and amount (a row exists only when something moved).
 
 **The shipped recording is synthetic.** `recordings/report.json` is generated
 by `test/fixture.mjs` and the page says so in its banner. Record real data with
@@ -41,7 +42,7 @@ npm run format:check
 ```
 
 `npm test` checks the cross-check passes on the fixture and fails on a
-negative amount, a token-day counted twice, a day outside the window, and an
+negative amount, a zero count or amount, a token-day counted twice, a day outside the window, and an
 amount in decimal instead of raw units, and that amounts of 6- and 18-decimal
 tokens are scaled apart. `npm run test:browser` writes
 `docs/screenshot-desktop.png`. `npm run fixture` regenerates the synthetic
@@ -55,10 +56,10 @@ recording.
   Tokens missing from the table in `src/report.mjs` show as a shortened address
   in raw units.
 
-| Subject                                   | Address                                      | Note                                                         |
-| ----------------------------------------- | -------------------------------------------- | ------------------------------------------------------------ |
-| 1inch Aqua registry (same on both chains) | `0x499943e74fb0ce105688beee8ef2abec5d936d31` | verify before recording                                      |
-| Tessera swap contract on Base             | `0x0000000000000000000000000000000000000001` | placeholder: replace with the real contract before recording |
+| Subject                                   | Address                                      | Note                                                                                      |
+| ----------------------------------------- | -------------------------------------------- | ----------------------------------------------------------------------------------------- |
+| 1inch Aqua registry (same on both chains) | `0x499943e74fb0ce105688beee8ef2abec5d936d31` | verify before recording                                                                   |
+| Tessera swap contract on Base             | `0x55555522005bcae1c2424d474bfd5ed477749e3e` | same address on Base, BNB and Robinhood; not on Ethereum, so Tessera has no Ethereum bind |
 
 ## Binds (`testril.json`)
 
