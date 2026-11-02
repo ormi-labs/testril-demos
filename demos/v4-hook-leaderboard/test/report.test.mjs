@@ -5,6 +5,7 @@ import {
   formatCompact,
   hookTotals,
   shape,
+  usdc,
   zeroAddress,
 } from "../src/report.mjs";
 import { fixture } from "./fixture.mjs";
@@ -14,7 +15,10 @@ const rows = () => structuredClone(fixture().rows);
 test("check passes and names the hook sum and the unhooked pools", () => {
   const passed = check(rows());
   assert.match(passed[1], /Hooks add up to \d+ swaps/);
-  assert.match(passed[2], /pools at the zero address are shown as No hook/);
+  assert.match(
+    passed[2],
+    /pools with volume at the zero address are shown as No hook/,
+  );
 });
 
 test("check fails when a volume pool is not in pool_list", () => {
@@ -63,6 +67,23 @@ test("stablecoin volume reads the stablecoin side of each pool", () => {
   assert.notEqual(row.volume0, row.volume1);
   const totals = hookTotals({ ...data, pools: [pool], volume: [row] });
   assert.equal(totals[0].volume, BigInt(row.volume1));
+});
+
+test("stablecoin volume reads volume0 when the stablecoin is currency0", () => {
+  const data = rows();
+  const pool = {
+    ...data.pools[0],
+    currency0: usdc,
+    currency1: "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+  };
+  const row = {
+    ...data.volume[0],
+    pool: pool.pool,
+    volume0: "7000000",
+    volume1: "3",
+  };
+  const totals = hookTotals({ ...data, pools: [pool], volume: [row] });
+  assert.equal(totals[0].volume, 7_000_000n);
 });
 
 test("check fails when the Arrakis hook list contains the zero address", () => {
