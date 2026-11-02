@@ -52,6 +52,10 @@ recording.
 - Volume: UTC days `[2026-10-25, 2026-11-02)`, per token and quote asset.
 - Trades: 2026-11-01, blocks `[130949246, 131141195)`, found by binary search
   over the public BSC RPC. They match the volume rows for 2026-11-01.
+  Verify before recording: block 130949246 must have timestamp
+  2026-11-01 00:00:00 UTC or later with block 130949245 earlier, and block
+  131141195 must be the first at or after 2026-11-02 00:00:00 UTC. The
+  window covers 191,949 blocks against BSC's roughly 192,000 per day.
 - Amounts are raw wei of the quote asset. The page ranks tokens quoted in BNB
   (the zero address) only.
 
