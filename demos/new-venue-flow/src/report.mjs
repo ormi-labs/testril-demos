@@ -64,8 +64,6 @@ function cells(venue, rows) {
 function checkVenue(venue, rows) {
   const days = windowDays(venue.window);
   const seen = new Set();
-  const totals = new Map();
-  let grand = 0n;
   for (const cell of cells(venue, rows)) {
     const where = `${venue.title}, ${cell.token} on ${cell.day}`;
     if (!days.includes(cell.day))
@@ -74,21 +72,15 @@ function checkVenue(venue, rows) {
       throw new Error(
         `${where} has a negative or non-integer count or amount.`,
       );
+    if (BigInt(cell.count) < 1n || BigInt(cell.amount) < 1n)
+      throw new Error(
+        `${where} has a zero count or amount; no row should exist.`,
+      );
     const key = `${cell.token}/${cell.day}`;
     if (seen.has(key)) throw new Error(`${where} appears twice.`);
     seen.add(key);
-    totals.set(
-      cell.token,
-      (totals.get(cell.token) ?? 0n) + BigInt(cell.amount),
-    );
-    grand += BigInt(cell.amount);
   }
-  const summed = [...totals.values()].reduce((sum, total) => sum + total, 0n);
-  if (summed !== grand)
-    throw new Error(
-      `${venue.title}: per-token totals add to ${summed}, rows add to ${grand}.`,
-    );
-  return `${venue.title}: ${seen.size} token-days in ${days.length} days, all counts and amounts non-negative, no day counted twice, per-token totals add to the window total`;
+  return `${venue.title}: ${seen.size} token-days in ${days.length} days, every row has a positive count and amount, no day counted twice`;
 }
 
 export function check(rows) {
