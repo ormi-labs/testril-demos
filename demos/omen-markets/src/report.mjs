@@ -9,6 +9,7 @@ const one = 10n ** 18n;
 const invalidAnswer = `0x${"f".repeat(64)}`;
 const topMarkets = 20;
 const feeRoundingTolerance = 1n;
+const maxAnswerTimeoutSeconds = 365n * 24n * 3600n;
 
 const shortAddress = (address) => `${address.slice(0, 6)}…${address.slice(-4)}`;
 const day = (unixSeconds) =>
@@ -83,9 +84,9 @@ function checkPoolReconciles(market, states, trades, funding) {
           (change.outcome === outcome ? change.ownOutcome : 0n),
         before.get(outcome) ?? 0n,
       );
-      if (amount !== expected)
+      if (amount < expected)
         throw new Error(
-          `Market ${market} holds ${amount} tokens of outcome ${outcome} at block ${block}, its trades leave ${expected}.`,
+          `Market ${market} holds ${amount} tokens of outcome ${outcome} at block ${block}, its trades leave at least ${expected}.`,
         );
     }
   }
@@ -126,17 +127,21 @@ export function check(rows) {
       fundingByMarket.get(market) ?? [],
     );
 
-  const early = rows.answers.find(
-    (answer) =>
-      BigInt(answer.ts) > 0n && BigInt(answer.finalize_ts) < BigInt(answer.ts),
-  );
-  if (early)
-    throw new Error(`Answer ${early.tx} finalizes before it was given.`);
+  const misdated = rows.answers.find((answer) => {
+    const wait = BigInt(answer.finalize_ts) - BigInt(answer.ts);
+    return (
+      BigInt(answer.ts) > 0n && (wait < 0n || wait > maxAnswerTimeoutSeconds)
+    );
+  });
+  if (misdated)
+    throw new Error(
+      `Answer ${misdated.tx} finalizes before it was given or more than a year after.`,
+    );
 
   return [
     `All ${rows.trades.length} trades, ${rows.liquidity.length} funding events and ${rows.market_state.length} pool balances are on a market in market_list`,
-    "Every trade's fee is the market's fee on its collateral, and no pool holds fewer outcome tokens than its trades leave",
-    `All ${rows.answers.length} answers finalize after they were given`,
+    "Every trade's fee is the market's fee on its collateral, and no pool holds fewer outcome tokens than its trades leave (tokens sent straight to a market may add more)",
+    `All ${rows.answers.length} answers finalize within a year after they were given`,
   ];
 }
 
@@ -230,7 +235,7 @@ export function shape(rows) {
       creator: shortAddress(market.creator),
       trades: market.trades.toString(),
       volume: formatAmount(market.volume, "wxDAI"),
-      wxdai: Number(market.volume / one),
+      cents: Number(market.volume / 10n ** 16n),
     })),
     answers,
   };

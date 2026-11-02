@@ -16,7 +16,7 @@ collateral plus fee paid out (sell) on every outcome, and by the tokens traded
 on the traded outcome. The scope is the market's pool, not a trader's
 holdings: a trader may sell tokens bought before the window or obtained by
 splitting a position, so sells are not matched against buys. A balance read
-after tokens sent straight to a market can differ from its trades.
+after tokens sent straight to a market can exceed what its trades leave.
 
 Reality.eth answers are keyed by question id, and none of the five functions
 links a market to its question, so answers are listed beside the markets, not
@@ -58,7 +58,7 @@ npm run format:check
 
 `npm test` checks the cross-check passes on the fixture and fails on a trade
 for an unlisted market, buys read as sells, a fee off by 10^2, a pool balance
-that does not follow its trades or is negative, and an answer that finalizes
+that holds fewer tokens than its trades leave or is negative, and an answer that finalizes
 before it was given; that the report counts only window markets, keeps
 non-wxDAI collateral out of the wxDAI total and survives an unlisted market;
 and that the server returns the shaped report. `npm run test:browser` writes `docs/screenshot-desktop.png`.
@@ -78,7 +78,8 @@ gnosis-rpc.publicnode.com.
 | Reality.eth (Realitio) on Gnosis     | `0x79e32ae03fb27b07c89c0c568f80287c01ca2e57` | verify before recording |
 | wxDAI (collateral counted in volume) | `0xe91d153e0b41518a2ce8dd3d7944fa863463a97d` |                         |
 
-All three contracts have code on Gnosis; only the Reality.eth address is
+The factory, Conditional Tokens and wxDAI addresses are the well-known Omen
+on Gnosis deployments; only the Reality.eth address is
 unconfirmed as the instance Omen uses.
 
 ## Binds (`testril.json`)
@@ -93,6 +94,8 @@ Windows are half-open: the end is the first block not included.
 | `market_state` | `omen.market_state` | 100   | `market_list`                   | 48558286 → 49062480 |
 | `answers`      | `realitio.answer`   | 100   | `realitio`                      | 48558286 → 49062480 |
 
+`market_state` is a bind the first plan did not list; the check that no pool
+holds negative or too few outcome tokens needs it, at the cost of its credits.
 `markets` starts at block 0 so it lists every market that can trade in the
 window, not only those created in it. `trades`, `liquidity`, `market_state` and
 `answers` are read in chunks of 20,000 blocks.
