@@ -29,7 +29,7 @@ const walletNames = {
   "0x3d30b1ab88d487b0f3061f40de76845bec3f1e94": "Uniswap Foundation",
   "0xfe89cc7abb2c4183683ab71653c4cdc9b02d44b7": "DAO Wallet",
   "0x4f2083f5fbede34c2714affb3105539775f7fe64": "Endowment",
-  "0xf3fc178157fb3c87548baa86f9d24ba38e649b58": "Treasury Timelock",
+  "0xf3fc178157fb3c87548baa86f9d24ba38e649b58": "DAO Treasury",
   "0x34d45e99f7d8c45ed05b5ca72d54bbd1fb3f98f0": "Core Timelock",
 };
 
@@ -107,6 +107,14 @@ export function check(rows) {
           );
       }
     }
+    const owners = new Set(dao.wallets.map((wallet) => wallet.address));
+    const stray = rows[dao.nativeBind].find(
+      (row) => !owners.has(row.owner) || !dao.days.includes(row.day),
+    );
+    if (stray)
+      throw new Error(
+        `${dao.name} native balance row is outside its wallets or window: ${stray.owner} on ${stray.day}.`,
+      );
     const balances = daoRows(rows, dao).flat();
     const negative = balances.find((row) => BigInt(row.balance) < 0n);
     if (negative)

@@ -36,6 +36,15 @@ test("check fails on a negative native balance", () => {
   assert.throws(() => check(corrupted), /ENS DAO has a negative balance: -5/);
 });
 
+test("check fails on a native row from a foreign owner or outside the window", () => {
+  const foreign = rows();
+  foreign["ens-native"][0].owner = "0x0000000000000000000000000000000000000001";
+  assert.throws(() => check(foreign), /ENS DAO native balance row is outside/);
+  const late = rows();
+  late["ens-native"][0].day = "2027-01-01";
+  assert.throws(() => check(late), /ENS DAO native balance row is outside/);
+});
+
 test("check fails when the governance token vanishes for a day", () => {
   const corrupted = rows();
   const arbitrum = daos.find((dao) => dao.id === "arbitrum");
@@ -70,4 +79,6 @@ test("shape lists holdings with the wallet split and the governance line", () =>
   );
   assert.equal(card.holdings[0].wallets.length, 2);
   assert.equal(view.cards[2].line.points.length, 8);
+  assert.match(view.cards[2].holdings[0].change, /^−2[4-6]\.\d\dM ARB$/);
+  assert.match(card.holdings[1].change, /^−1\.\d\dM USDC$/);
 });

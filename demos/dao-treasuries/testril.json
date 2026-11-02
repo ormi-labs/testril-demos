@@ -183,7 +183,7 @@
       }
     },
     {
-      "name": "arbitrum-tokens-treasury-timelock",
+      "name": "arbitrum-tokens-treasury",
       "function_slug": "erc20.token_balance",
       "chain_id": 42161,
       "params": {

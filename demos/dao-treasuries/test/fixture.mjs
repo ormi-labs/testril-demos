@@ -4,35 +4,34 @@ import spec from "../testril.json" with { type: "json" };
 import { daos } from "../src/report.mjs";
 
 const recordedAt = "2026-11-02T00:00:00.000Z";
-const nativeIndex = 3;
-const decimalsByAsset = [18, 6, 18, 18];
+const decimals = { governance: 18, usdc: 6, weth: 18, eth: 18 };
+const tokenOrder = ["governance", "usdc", "weth"];
 
-// Per wallet: starting whole units of [governance token, USDC, WETH, ETH].
 // A zero start is never held, so it yields no rows, as the daemon does.
 const holdings = {
   uniswap: {
-    start: [
-      [4.1e8, 2.6e6, 480, 1900],
-      [1.5e7, 4.2e6, 90, 310],
+    wallets: [
+      { governance: 410_000_000, usdc: 2_600_000, weth: 480, eth: 1900 },
+      { governance: 15_000_000, usdc: 4_200_000, weth: 90, eth: 310 },
     ],
-    step: [2e5, 8e4, 12, 40],
-    grant: { dayIndex: 40, asset: 1, amount: 1.5e6 },
+    step: { governance: 200_000, usdc: 80_000, weth: 12, eth: 40 },
+    grant: { dayIndex: 40, asset: "usdc", amount: 1_500_000 },
   },
   ens: {
-    start: [
-      [4.2e6, 9.8e6, 3100, 250],
-      [0, 4.5e7, 12000, 0],
+    wallets: [
+      { governance: 4_200_000, usdc: 9_800_000, weth: 3100, eth: 250 },
+      { governance: 0, usdc: 45_000_000, weth: 12000, eth: 0 },
     ],
-    step: [3e4, 1e5, 40, 8],
-    grant: { dayIndex: 50, asset: 1, amount: 2.4e6 },
+    step: { governance: 30_000, usdc: 100_000, weth: 40, eth: 8 },
+    grant: { dayIndex: 50, asset: "usdc", amount: 2_400_000 },
   },
   arbitrum: {
-    start: [
-      [7.1e8, 3.4e6, 210, 640],
-      [1.2e8, 0, 0, 55],
+    wallets: [
+      { governance: 710_000_000, usdc: 3_400_000, weth: 210, eth: 640 },
+      { governance: 120_000_000, usdc: 0, weth: 0, eth: 55 },
     ],
-    step: [4e5, 5e4, 6, 12],
-    grant: { dayIndex: 4, asset: 0, amount: 2.5e7 },
+    step: { governance: 400_000, usdc: 50_000, weth: 6, eth: 12 },
+    grant: { dayIndex: 4, asset: "governance", amount: 25_000_000 },
   },
 };
 
@@ -44,35 +43,38 @@ function seeded(seed) {
   };
 }
 
-const rawUnits = (units, decimals) =>
-  BigInt(Math.round(units * 100)) * 10n ** BigInt(decimals - 2);
+const rawUnits = (wholeUnits, asset) =>
+  BigInt(wholeUnits) * 10n ** BigInt(decimals[asset]);
 
 function walletUnits(dao, random) {
-  const { start, step } = holdings[dao.id];
-  return start.map((assets) => {
-    const days = assets.map(() => []);
-    assets.forEach((first, asset) => {
-      let units = first;
-      for (let index = 0; index < dao.days.length; index++) {
-        if (first > 0 && index > 0)
-          units = Math.max(0, units + (random() - 0.5) * 2 * step[asset]);
-        days[asset].push(units);
-      }
-    });
-    return days;
-  });
+  const { wallets, step, grant } = holdings[dao.id];
+  return wallets.map((start, wallet) =>
+    Object.fromEntries(
+      Object.entries(start).map(([asset, first]) => {
+        let units = first;
+        const days = dao.days.map((_, index) => {
+          if (first > 0 && index > 0)
+            units = Math.max(
+              0,
+              units + Math.round((random() - 0.5) * 2 * step[asset]),
+            );
+          const granted =
+            wallet === 0 && asset === grant.asset && index >= grant.dayIndex;
+          return granted ? Math.max(0, units - grant.amount) : units;
+        });
+        return [asset, days];
+      }),
+    ),
+  );
 }
 
 function dayRows(dao, wallets) {
-  const { grant } = holdings[dao.id];
-  const grantee = wallets[0][grant.asset];
-  for (let index = grant.dayIndex; index < dao.days.length; index++)
-    grantee[index] = Math.max(0, grantee[index] - grant.amount);
   const rawAt = (wallet, asset, index) =>
-    rawUnits(wallets[wallet][asset][index], decimalsByAsset[asset]);
+    rawUnits(wallets[wallet][asset][index], asset);
   const tokenRows = (members) =>
     dao.days.flatMap((day, index) =>
-      dao.tokens.flatMap((token, asset) => {
+      dao.tokens.flatMap((token, position) => {
+        const asset = tokenOrder[position];
         const balance = members.reduce(
           (sum, wallet) => sum + rawAt(wallet, asset, index),
           0n,
@@ -84,7 +86,7 @@ function dayRows(dao, wallets) {
     );
   const nativeRows = dao.days.flatMap((day, index) =>
     dao.wallets.flatMap(({ address: owner }, wallet) => {
-      const balance = rawAt(wallet, nativeIndex, index);
+      const balance = rawAt(wallet, "eth", index);
       return balance > 0n ? [{ day, owner, balance: balance.toString() }] : [];
     }),
   );
