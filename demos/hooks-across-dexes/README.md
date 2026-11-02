@@ -5,7 +5,8 @@ PancakeSwap Infinity CL, PancakeSwap Infinity Bin and Uniswap v4. Each pool is
 read from its manager's pool list, called hooked when its `hooks` address is
 not the zero address, and its volume is split into hooked and hookless. The page
 proves its numbers: every traded pool must be in its pool list, have at most
-one row per day, and hooked plus hookless must equal the total on each day.
+one row per day, and on each day hooked plus hookless must equal the total,
+with every pool counted in exactly one class.
 
 **The shipped recording is synthetic.** `recordings/report.json` is generated
 by `test/fixture.mjs` and the page says so in its banner. Record real data with
@@ -44,10 +45,18 @@ npm run format:check
 `npm test` checks the cross-check passes on the fixture and fails when a traded
 pool is missing from the pool list, a pool is listed twice, a pool has two rows
 for one day, a row is outside the window, the legs of a stablecoin pair differ
-by more than 1%, or a pool's hooks contradict its hooks_registration, and that the report splits hooked
+by more than 1%, a hookless pool has a non-zero hooks_registration, a pool counts
+as both or neither of hooked and hookless, and that a failed cross-check still
+renders on the page, and that the report splits hooked
 from hookless volume on the stablecoin side of each pool. `npm run test:browser`
 writes `docs/screenshot-desktop.png`. `npm run fixture` regenerates the
 synthetic recording.
+
+Assumptions to verify on the first real recording: the 1% leg check applies
+only to hookless stablecoin pairs (a hooked pool's swap delta or dynamic fee
+can legitimately widen the gap), and for hooked pools `hooks_registration` is
+not checked because a hook may register a zero bitmap. Uniswap v4's pool list
+has no `hooks_registration`, so that check runs only on PancakeSwap Infinity.
 
 ## How dollars are counted
 

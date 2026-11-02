@@ -1,7 +1,8 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import {
-  check,
+  check as checkWith,
+  poolMaps,
   shape,
   stablecoins,
   venues,
@@ -11,11 +12,14 @@ import { fixture } from "./fixture.mjs";
 
 const rows = () => structuredClone(fixture().rows);
 const [cl] = venues;
+const check = (data) => checkWith(data, poolMaps(data));
 
 test("check proves every venue's days from its pool list", () => {
   const passed = check(rows());
   assert.equal(passed.length, 3);
-  assert.match(passed[2], /Uniswap v4: .* hooks agree with hooks_registration/);
+  assert.match(passed[0], /on each day hooked plus hookless/);
+  assert.match(passed[0], /zero hooks_registration/);
+  assert.doesNotMatch(passed[2], /hooks_registration/);
 });
 
 test("check fails when a traded pool is missing from the pool list", () => {
@@ -57,13 +61,26 @@ test("check fails when a stablecoin pair's legs are swapped by 6 decimals", () =
   assert.throws(() => check(corrupted), /stablecoin legs differ/);
 });
 
-test("check fails when a hooked pool's registration is zero", () => {
+test("check fails when a hookless pool has a non-zero registration", () => {
   const corrupted = rows();
   const pool = corrupted[cl.poolsBind].find(
     (p) => p.hooks !== zeroAddress && p.hooks_registration === "1",
   );
   pool.hooks = zeroAddress;
   assert.throws(() => check(corrupted), /contradict hooks_registration/);
+});
+
+test("check fails when a pool's hooks fall in neither class", () => {
+  const corrupted = rows();
+  corrupted[cl.poolsBind][0].hooks = `0X${"0".repeat(40)}`;
+  assert.throws(() => check(corrupted), /neither hooked nor hookless/);
+});
+
+test("check passes a hooked pool whose registration is zero", () => {
+  const data = rows();
+  const pool = data[cl.poolsBind].find((p) => p.hooks !== zeroAddress);
+  pool.hooks_registration = "0";
+  assert.equal(check(data).length, 3);
 });
 
 test("shape reads the stablecoin leg and splits hooked from hookless", () => {
@@ -106,10 +123,8 @@ test("shape reads the stablecoin leg and splits hooked from hookless", () => {
       day(nonStablePool, "7", "999", "999"),
     ],
   };
-  const v4 = shape(small).venues[2];
-  assert.equal(v4.hookedStable, "$3.00M");
-  assert.equal(v4.hooklessStable, "$1.00M");
+  const v4 = shape(small, poolMaps(small)).venues[2];
+  assert.equal(v4.hookedMillions, 3);
+  assert.equal(v4.hooklessMillions, 1);
   assert.equal(v4.hookedShare, "75.0%");
-  assert.equal(v4.swaps, "22");
-  assert.equal(v4.hookedSwaps, "17");
 });

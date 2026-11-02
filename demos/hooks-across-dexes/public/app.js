@@ -100,9 +100,21 @@ function legend() {
   return node;
 }
 
+function renderChecks(checks) {
+  document
+    .querySelector("#checks")
+    .replaceChildren(
+      ...(checks.ok
+        ? checks.passed.map((text) => element("li", `✓ ${text}`))
+        : [element("li", `✗ ${checks.error}`, "failed")]),
+    );
+}
+
 function render(report) {
   const view = report.view;
   banner(report);
+  renderChecks(report.checks);
+  if (!view) return;
   document.querySelector("#day-window").textContent =
     `${view.dayWindow.from_day} to ${view.dayWindow.to_day} (exclusive)`;
   document
@@ -110,14 +122,14 @@ function render(report) {
     .replaceChildren(
       ...view.dexes.map((dex) =>
         metric(
-          `${dex.dex.toUpperCase()} HOOKED`,
+          `${dex.dex} hooked`,
           dex.hookedShare,
           `${dex.hooked} of ${dex.total}`,
         ),
       ),
       ...view.dexes.map((dex) =>
         metric(
-          `${dex.dex.toUpperCase()} HOOK POOLS`,
+          `${dex.dex} hook pools`,
           String(dex.activeHookedPools),
           `of ${dex.activePools} pools that traded`,
         ),
@@ -140,13 +152,6 @@ function render(report) {
       return row;
     }),
   );
-  document
-    .querySelector("#checks")
-    .replaceChildren(
-      ...(report.checks.ok
-        ? report.checks.passed.map((text) => element("li", `✓ ${text}`))
-        : [element("li", `✗ ${report.checks.error}`, "failed")]),
-    );
 }
 
 const response = await fetch("/api/report");
