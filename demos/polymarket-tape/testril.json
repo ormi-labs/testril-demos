@@ -1,5 +1,6 @@
 {
   "demo": "polymarket-tape",
+  "day": "2026-11-01",
   "binds": [
     {
       "name": "fills",

@@ -5,7 +5,7 @@ import {
   exchanges,
   fillWindow,
   payoutWindow,
-  zeroBuilder,
+  zeroWord,
 } from "../src/report.mjs";
 
 const recordedAt = "2026-11-02T00:00:00.000Z";
@@ -43,8 +43,8 @@ const basePrice = [0.4, 0.12, 0.91, 0.05, 0.5, 0.67];
 const busiestMarket = 0;
 
 function priceBasisPoints(market, block) {
-  const hour = (block - fillWindow.from_block) / blocksInDay;
-  const drift = market === busiestMarket ? 0.38 * hour : 0;
+  const dayFraction = (block - fillWindow.from_block) / blocksInDay;
+  const drift = market === busiestMarket ? 0.38 * dayFraction : 0;
   const noise = (random() - 0.5) * 0.04;
   return Math.round(
     Math.min(0.98, Math.max(0.02, basePrice[market] + drift + noise)) * 1e4,
@@ -74,8 +74,8 @@ function fillRow({ block, market, dollars, exchange, builder, basisPoints }) {
     token_amount: tokens.toString(),
     collateral_fee: version2 || !isBuy ? fee(collateral) : "0",
     token_fee: !version2 && isBuy ? fee(tokens) : "0",
-    builder: version2 ? builder : zeroBuilder,
-    metadata: zeroBuilder,
+    builder: version2 ? builder : zeroWord,
+    metadata: zeroWord,
   };
 }
 

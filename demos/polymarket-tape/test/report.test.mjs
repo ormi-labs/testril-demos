@@ -11,7 +11,7 @@ test("the fixture is the same on every call", () => {
 
 test("check passes on the fixture, including a fill priced at exactly 1", () => {
   const data = rows();
-  assert.equal(check(data).length, 3);
+  assert.equal(check(data).length, 5);
   assert.ok(data.fills.some((f) => f.collateral_amount === f.token_amount));
 });
 
@@ -54,7 +54,38 @@ test("check fails when a fill is read twice", () => {
 test("check fails when a payout denominator is not the numerators' sum", () => {
   const corrupted = rows();
   corrupted.payouts[0].payout_numerator = "5";
-  assert.throws(() => check(corrupted), /denominator of 1/);
+  assert.throws(() => check(corrupted), /not its denominator/);
+});
+
+test("check fails when a version 1 fill carries a builder code", () => {
+  const corrupted = rows();
+  const fill = corrupted.fills.find((f) => f.exchange_version === "1");
+  fill.builder = `0x${"a".repeat(64)}`;
+  assert.throws(() => check(corrupted), /Version 1 fill .* emits none/);
+});
+
+test("check fails when a version 1 buy books its fee as collateral", () => {
+  const corrupted = rows();
+  const fill = corrupted.fills.find(
+    (f) => f.exchange_version === "1" && f.is_buy,
+  );
+  [fill.collateral_fee, fill.token_fee] = [fill.token_fee, fill.collateral_fee];
+  assert.throws(() => check(corrupted), /wrong asset/);
+});
+
+test("check fails when a version 2 sell books its fee as tokens", () => {
+  const corrupted = rows();
+  const fill = corrupted.fills.find(
+    (f) => f.exchange_version === "2" && !f.is_buy,
+  );
+  [fill.collateral_fee, fill.token_fee] = [fill.token_fee, fill.collateral_fee];
+  assert.throws(() => check(corrupted), /wrong asset/);
+});
+
+test("check fails when a condition resolves outside the payout window", () => {
+  const corrupted = rows();
+  for (const row of corrupted.payouts.slice(0, 2)) row.block = 1;
+  assert.throws(() => check(corrupted), /outside the window/);
 });
 
 test("shape ranks the largest fill first and builders by volume", () => {
@@ -62,7 +93,7 @@ test("shape ranks the largest fill first and builders by volume", () => {
   assert.equal(view.fills, "280");
   assert.match(view.tape[0].volume, /^\$640,/);
   assert.equal(view.tape[0].price.split(".")[0], "0");
-  assert.equal(view.builders[0].label !== "No builder code", true);
+  assert.notEqual(view.builders[0].label, "No builder code");
   assert.equal(view.builderCount, "4");
 });
 
