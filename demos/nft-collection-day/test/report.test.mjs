@@ -49,6 +49,32 @@ test("check fails when the owner row names the first receiver of a double hop", 
   assert.throws(() => check(corrupted), /last transfer went to/);
 });
 
+test("check fails when a trade's sender was not the token's owner", () => {
+  const corrupted = rows();
+  const trade = corrupted.transfers.find(
+    (t, i, all) =>
+      t.from !== zeroAddress &&
+      t.to !== zeroAddress &&
+      all.every((o, j) => j === i || o.token_id !== t.token_id),
+  );
+  [trade.from, trade.to] = [trade.to, trade.from];
+  corrupted.owners.find(
+    (o) => o.token_id === trade.token_id && o.block === trade.block,
+  ).owner = trade.to;
+  assert.throws(() => check(corrupted), /but its owner was/);
+});
+
+test("check accepts a mint of a token burned before the day", () => {
+  const remint = rows();
+  const mint = remint.transfers.find((t) => t.from === zeroAddress);
+  remint.owners.push({
+    block: 1,
+    token_id: mint.token_id,
+    owner: zeroAddress,
+  });
+  assert.ok(check(remint));
+});
+
 test("shape splits the day into mints, trades and a burn", () => {
   const view = shape(rows());
   assert.equal(view.mints, 12);

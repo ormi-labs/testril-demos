@@ -42,7 +42,7 @@ function hoursChart(hours) {
   const chart = svg("svg", {
     viewBox: `0 0 ${width} ${height}`,
     role: "img",
-    "aria-label": "Mints and trades per UTC hour",
+    "aria-label": "Mints and trades per approximate UTC hour",
   });
   chart.append(
     svg("line", {

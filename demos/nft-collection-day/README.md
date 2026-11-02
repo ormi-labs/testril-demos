@@ -29,7 +29,7 @@ npm start
 ```
 
 Open http://127.0.0.1:4180 (set `PORT` to change it). Expected result: the
-synthetic banner, four headline numbers, a mints-vs-trades bar per UTC hour, a
+synthetic banner, four headline numbers, a mints-vs-trades bar per approximate UTC hour (the day's blocks split into 24 equal parts), a
 top-10 holder concentration bar with a table, and three passed cross-checks.
 
 ## Test
@@ -44,8 +44,8 @@ npm run format:check
 
 `npm test` checks the cross-checks pass on the fixture and fail when a mint
 comes from a holder, when a token with an earlier owner is called a mint, when
-an owner row is missing or duplicated, and when a double transfer in one block
-names the wrong owner, and that the server returns the shaped report.
+an owner row is missing or duplicated, when a double transfer in one block
+names the wrong owner, and when a transfer's sender is not the token's owner, and that the server returns the shaped report.
 `npm run test:browser` writes `docs/screenshot-desktop.png`.
 `npm run fixture` regenerates the synthetic recording.
 
@@ -57,7 +57,9 @@ names the wrong owner, and that the server returns the shaped report.
 | Collection born | block 12876179                               | verify before recording (start of owners read) |
 
 - Day: 2026-11-01, blocks `[26316189, 26323365)`, found by binary search over a
-  public RPC.
+  public RPC; verify before recording.
+- Pudgy Penguins finished minting in 2021, so a real recording shows 0 mints and
+  the mint cross-check has nothing to test; the synthetic fixture has 12.
 - Owners: from the collection's creation to the end of that day, so the last
   row per token is who holds it afterwards.
 - Names: `erc721.collection_metadata` read at block 26323364.
