@@ -25,7 +25,7 @@ const startingBalances = {
   gemini: [[0.15e9, 0.2e9, 6000]],
 };
 
-// The one exchange-hour where nothing but the event moves, so the hour's change is exact.
+// Each event's exchange has no stablecoin noise in that hour, so the hour's change equals the event exactly.
 const events = [
   { exchange: "binance", hour: 100, owner: 0, token: usdt, dollars: 300e6 },
   { exchange: "coinbase", hour: 60, owner: 0, token: usdc, dollars: -250e6 },
