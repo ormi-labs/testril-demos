@@ -46,7 +46,8 @@ export function windowDays() {
   return days;
 }
 
-const isHooked = (pool) => pool.hooks !== zeroAddress;
+const isHooked = (pool) => BigInt(pool.hooks) !== 0n;
+const isHookless = (pool) => pool.hooks === zeroAddress;
 
 function stableLegVolume(pool, row) {
   if (stablecoins.has(pool.currency0)) return BigInt(row.volume0);
@@ -61,9 +62,10 @@ const legsDisagree = (row) => {
   const gap = volume0 > volume1 ? volume0 - volume1 : volume1 - volume0;
   return gap * 100n > volume0;
 };
-const registrationDisagrees = (pool) =>
+const hooklessWithRegistration = (pool) =>
   pool.hooks_registration !== undefined &&
-  isHooked(pool) === (BigInt(pool.hooks_registration) === 0n);
+  isHookless(pool) &&
+  BigInt(pool.hooks_registration) !== 0n;
 
 function poolsById(rows, venue) {
   const pools = new Map();
@@ -80,6 +82,9 @@ function poolsById(rows, venue) {
   return pools;
 }
 
+export const poolMaps = (rows) =>
+  new Map(venues.map((venue) => [venue.key, poolsById(rows, venue)]));
+
 function sumRows(volumeRows, pools, include = () => true) {
   const total = { swaps: 0n, stable: 0n };
   for (const row of volumeRows) {
@@ -91,8 +96,28 @@ function sumRows(volumeRows, pools, include = () => true) {
   return total;
 }
 
-function checkVenue(rows, venue, days) {
-  const pools = poolsById(rows, venue);
+function checkPartition(volumeRows, pools, venue, days) {
+  for (const pool of pools.values())
+    if (isHooked(pool) === isHookless(pool))
+      throw new Error(
+        `${venue.name} pool ${pool.pool}: hooks ${pool.hooks} count as ${isHooked(pool) ? "both hooked and hookless" : "neither hooked nor hookless"}.`,
+      );
+  for (const day of days) {
+    const dayRows = volumeRows.filter((row) => row.day === day);
+    const total = sumRows(dayRows, pools);
+    const hooked = sumRows(dayRows, pools, isHooked);
+    const hookless = sumRows(dayRows, pools, isHookless);
+    if (
+      hooked.stable + hookless.stable !== total.stable ||
+      hooked.swaps + hookless.swaps !== total.swaps
+    )
+      throw new Error(
+        `${venue.name} on ${day}: hooked plus hookless volume does not equal the total.`,
+      );
+  }
+}
+
+function checkVenue(rows, pools, venue, days) {
   const seen = new Set();
   for (const row of rows[venue.volumeBind]) {
     if (!days.includes(row.day))
@@ -105,24 +130,30 @@ function checkVenue(rows, venue, days) {
         `${venue.name} has two rows for pool ${row.pool} on ${row.day}.`,
       );
     seen.add(key);
-    if (isStablePair(pools.get(row.pool)) && legsDisagree(row))
+    const pool = pools.get(row.pool);
+    if (isStablePair(pool) && isHookless(pool) && legsDisagree(row))
       throw new Error(
         `${venue.name} pool ${row.pool} on ${row.day}: the two stablecoin legs differ by more than 1%.`,
       );
   }
   for (const pool of pools.values())
-    if (registrationDisagrees(pool))
+    if (hooklessWithRegistration(pool))
       throw new Error(
-        `${venue.name} pool ${pool.pool}: hooks ${pool.hooks} contradict hooks_registration ${pool.hooks_registration}.`,
+        `${venue.name} pool ${pool.pool}: zero hooks contradict hooks_registration ${pool.hooks_registration}.`,
       );
-  return { pools: pools.size, rows: seen.size };
+  checkPartition(rows[venue.volumeBind], pools, venue, days);
+  return seen.size;
 }
 
-export function check(rows) {
+export function check(rows, pools) {
   const days = windowDays();
   return venues.map((venue) => {
-    const { pools, rows: count } = checkVenue(rows, venue, days);
-    return `${venue.name}: ${count} pool-day rows over ${days.length} days all belong to the ${pools} listed pools, stablecoin pairs trade equal legs, and hooks agree with hooks_registration`;
+    const venuePools = pools.get(venue.key);
+    const count = checkVenue(rows, venuePools, venue, days);
+    const registered = [...venuePools.values()].some(
+      (pool) => pool.hooks_registration !== undefined,
+    );
+    return `${venue.name}: ${count} pool-day rows over ${days.length} days all belong to the ${venuePools.size} listed pools, on each day hooked plus hookless volume equals the total, hookless stablecoin pairs trade equal legs${registered ? ", and hookless pools have zero hooks_registration" : ""}`;
   });
 }
 
@@ -138,31 +169,21 @@ const percent = (part, whole) =>
   whole === 0n
     ? "0.0%"
     : `${(Number((part * 1000n) / whole) / 10).toFixed(1)}%`;
-const share = (part, whole) =>
-  whole === 0n ? 0 : Number((part * 1000n) / whole) / 1000;
 
 const shortHex = (hex) => `${hex.slice(0, 6)}…${hex.slice(-4)}`;
 const symbol = (address) => symbols.get(address) ?? shortHex(address);
 
-function venueSummary(rows, venue) {
-  const pools = poolsById(rows, venue);
+function venueSummary(rows, venue, pools) {
   const all = sumRows(rows[venue.volumeBind], pools);
   const hooked = sumRows(rows[venue.volumeBind], pools, isHooked);
   const active = new Set(rows[venue.volumeBind].map((row) => row.pool));
   const view = {
     name: venue.name,
     dex: venue.dex,
-    pools: pools.size,
     activePools: active.size,
     activeHookedPools: [...active].filter((id) => isHooked(pools.get(id)))
       .length,
-    swaps: all.swaps.toString(),
-    hookedSwaps: hooked.swaps.toString(),
-    stable: formatCompact(all.stable),
-    hookedStable: formatCompact(hooked.stable),
-    hooklessStable: formatCompact(all.stable - hooked.stable),
     hookedShare: percent(hooked.stable, all.stable),
-    hookedFraction: share(hooked.stable, all.stable),
     hookedMillions: Number(hooked.stable / 10n ** decimals) / 1e6,
     hooklessMillions:
       Number((all.stable - hooked.stable) / 10n ** decimals) / 1e6,
@@ -187,9 +208,9 @@ function dexSummaries(summaries) {
   });
 }
 
-function topHooked(rows) {
+function topHooked(rows, poolMaps) {
   const ranked = venues.flatMap((venue) => {
-    const pools = poolsById(rows, venue);
+    const pools = poolMaps.get(venue.key);
     const totals = new Map();
     for (const row of rows[venue.volumeBind]) {
       const pool = pools.get(row.pool);
@@ -219,12 +240,14 @@ function topHooked(rows) {
     }));
 }
 
-export function shape(rows) {
-  const summaries = venues.map((venue) => venueSummary(rows, venue));
+export function shape(rows, pools) {
+  const summaries = venues.map((venue) =>
+    venueSummary(rows, venue, pools.get(venue.key)),
+  );
   return {
     dayWindow,
     venues: summaries.map((s) => s.view),
     dexes: dexSummaries(summaries),
-    hookedPools: topHooked(rows),
+    hookedPools: topHooked(rows, pools),
   };
 }

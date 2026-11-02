@@ -2,7 +2,7 @@ import { createServer } from "node:http";
 import { readFile } from "node:fs/promises";
 import { extname, join, normalize } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
-import { check, shape } from "./report.mjs";
+import { check, poolMaps, shape } from "./report.mjs";
 
 const root = fileURLToPath(new URL("..", import.meta.url));
 const publicDir = join(root, "public");
@@ -13,19 +13,23 @@ const types = {
   ".svg": "image/svg+xml",
 };
 
-export function report(recording) {
-  let checks;
+export function report({ source, recordedAt, rows }) {
   try {
-    checks = { ok: true, passed: check(recording.rows) };
+    const pools = poolMaps(rows);
+    return {
+      source,
+      recordedAt,
+      checks: { ok: true, passed: check(rows, pools) },
+      view: shape(rows, pools),
+    };
   } catch (error) {
-    checks = { ok: false, error: error.message };
+    return {
+      source,
+      recordedAt,
+      checks: { ok: false, error: error.message },
+      view: null,
+    };
   }
-  return {
-    source: recording.source,
-    recordedAt: recording.recordedAt,
-    view: shape(recording.rows),
-    checks,
-  };
 }
 
 export function createApp(
