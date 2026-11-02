@@ -31,6 +31,12 @@ function metric(label, value, note) {
   return node;
 }
 
+function tableRow(...cells) {
+  const row = element("tr");
+  row.append(...cells.map((text) => element("td", text)));
+  return row;
+}
+
 function lineChart({ symbol, series }) {
   const width = 520;
   const height = 220;
@@ -102,19 +108,18 @@ function render(report) {
   document
     .querySelector("#chart")
     .replaceChildren(...view.charts.map(lineChart));
-  document.querySelector("#pools").replaceChildren(
-    ...view.pools.map((pool) => {
-      const row = element("tr");
-      row.append(
-        element("td", pool.rank),
-        element("td", pool.pool),
-        element("td", pool.pair),
-        element("td", pool.swaps),
-        element("td", pool.volume),
-      );
-      return row;
-    }),
-  );
+  document
+    .querySelector("#pools")
+    .replaceChildren(
+      ...view.rankedPools.map((pool) =>
+        tableRow(pool.rank, pool.pool, pool.pair, pool.swaps, pool.volume),
+      ),
+    );
+  document
+    .querySelector("#unranked")
+    .replaceChildren(
+      ...view.unrankedPools.map((pool) => tableRow(pool.pool, pool.swaps)),
+    );
   const checks = document.querySelector("#checks");
   checks.replaceChildren(
     ...(report.checks.ok

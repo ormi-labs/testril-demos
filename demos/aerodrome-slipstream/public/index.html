@@ -52,8 +52,10 @@
       </section>
       <section class="results">
         <div class="section-heading">
-          <h2>Pools ranked by volume</h2>
-          <span>volume counts dollars paid in plus paid out</span>
+          <h2>Pools ranked by dollar volume</h2>
+          <span
+            >known pools only; volume counts dollars paid in plus paid out</span
+          >
         </div>
         <div class="table-wrap">
           <table>
@@ -67,6 +69,23 @@
               </tr>
             </thead>
             <tbody id="pools"></tbody>
+          </table>
+        </div>
+      </section>
+      <section class="results">
+        <div class="section-heading">
+          <h2>By swaps, dollar side unknown</h2>
+          <span>not ranked: these pools' dollar token is not known</span>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Pool</th>
+                <th>Swaps</th>
+              </tr>
+            </thead>
+            <tbody id="unranked"></tbody>
           </table>
         </div>
       </section>

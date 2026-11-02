@@ -42,7 +42,7 @@ export function fixture() {
     ...poolRows(
       random,
       wethUsdc,
-      90e6,
+      60e6,
       (d, r) => ({
         volume0: units(d / 3500, 18, r).toString(),
         volume1: units(d, 6, r).toString(),
@@ -52,7 +52,7 @@ export function fixture() {
     ...poolRows(
       random,
       usdcCbbtc,
-      60e6,
+      90e6,
       (d, r) => ({
         volume0: units(d, 6, r).toString(),
         volume1: units(d / 95000, 8, r).toString(),
