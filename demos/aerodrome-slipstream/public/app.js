@@ -103,7 +103,9 @@ function render(report) {
       metric("POOLS TRADED", String(view.poolCount)),
       metric("SWAPS", view.totalSwaps),
       metric("RANKED DOLLAR VOLUME", view.totalDollars),
-      metric("TOP POOL", view.leader.volume, view.leader.pair),
+      view.leader
+        ? metric("TOP POOL", view.leader.volume, view.leader.pair)
+        : metric("TOP POOL", "—"),
     );
   document
     .querySelector("#chart")
