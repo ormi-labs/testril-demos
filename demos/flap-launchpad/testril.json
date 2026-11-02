@@ -1,0 +1,35 @@
+{
+  "demo": "flap-launchpad",
+  "binds": [
+    {
+      "name": "volume",
+      "function_slug": "flap.token_volume",
+      "chain_id": 56,
+      "params": {
+        "swap": {
+          "portal": "0xe2ce6ab80874fa9fa2aae65d277dd6b8e65c9de0"
+        },
+        "by": "day"
+      },
+      "window": {
+        "from_day": "2026-10-25",
+        "to_day": "2026-11-02"
+      }
+    },
+    {
+      "name": "trades",
+      "function_slug": "flap.trade",
+      "chain_id": 56,
+      "params": {
+        "portal": "0xe2ce6ab80874fa9fa2aae65d277dd6b8e65c9de0"
+      },
+      "window": {
+        "from_block": 130949246,
+        "to_block": 131141195
+      },
+      "read": {
+        "chunk_blocks": 20000
+      }
+    }
+  ]
+}
