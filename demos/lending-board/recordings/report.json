@@ -1,0 +1,1878 @@
+{
+  "demo": "lending-board",
+  "source": "synthetic",
+  "recordedAt": "2026-11-02T00:00:00.000Z",
+  "boundFunctions": {
+    "reserves": {
+      "function_slug": "aave_v3.reserve_list",
+      "chain_id": 1
+    },
+    "reserve-state": {
+      "function_slug": "aave_v3.reserve_state",
+      "chain_id": 1
+    },
+    "reserve-totals": {
+      "function_slug": "aave_v3.reserve_totals",
+      "chain_id": 1
+    },
+    "morpho-holdings": {
+      "function_slug": "morpho_blue.token_holdings",
+      "chain_id": 1
+    }
+  },
+  "window": {
+    "reserves": {
+      "from_block": 16291000,
+      "to_block": 26323365
+    },
+    "reserve-state": {
+      "from_hour": "2026-10-25T00",
+      "to_hour": "2026-11-01T00"
+    },
+    "reserve-totals": {
+      "from_block": 26316189,
+      "to_block": 26323365
+    },
+    "morpho-holdings": {
+      "from_day": "2026-10-25",
+      "to_day": "2026-11-01"
+    }
+  },
+  "rows": {
+    "reserves": [
+      {
+        "block": 16291127,
+        "asset": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        "a_token": "0x000000000000000000000000000000000000a000",
+        "variable_debt_token": "0x000000000000000000000000000000000000d000",
+        "stable_debt_token": "0x0000000000000000000000000000000000000000",
+        "interest_rate_strategy": "0x0000000000000000000000000000000000005000",
+        "pool": "0x87870bca3f3fd6335c3f4ce8392d69350b4fa4e2"
+      },
+      {
+        "block": 16331127,
+        "asset": "0xdac17f958d2ee523a2206206994597c13d831ec7",
+        "a_token": "0x000000000000000000000000000000000000a001",
+        "variable_debt_token": "0x000000000000000000000000000000000000d001",
+        "stable_debt_token": "0x0000000000000000000000000000000000000000",
+        "interest_rate_strategy": "0x0000000000000000000000000000000000005001",
+        "pool": "0x87870bca3f3fd6335c3f4ce8392d69350b4fa4e2"
+      },
+      {
+        "block": 16371127,
+        "asset": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+        "a_token": "0x000000000000000000000000000000000000a002",
+        "variable_debt_token": "0x000000000000000000000000000000000000d002",
+        "stable_debt_token": "0x0000000000000000000000000000000000000000",
+        "interest_rate_strategy": "0x0000000000000000000000000000000000005002",
+        "pool": "0x87870bca3f3fd6335c3f4ce8392d69350b4fa4e2"
+      },
+      {
+        "block": 16411127,
+        "asset": "0x2260fac5e5542a773aa44fbcfedf7c193bc2c599",
+        "a_token": "0x000000000000000000000000000000000000a003",
+        "variable_debt_token": "0x000000000000000000000000000000000000d003",
+        "stable_debt_token": "0x0000000000000000000000000000000000000000",
+        "interest_rate_strategy": "0x0000000000000000000000000000000000005003",
+        "pool": "0x87870bca3f3fd6335c3f4ce8392d69350b4fa4e2"
+      },
+      {
+        "block": 16451127,
+        "asset": "0x6b175474e89094c44da98b954eedeac495271d0f",
+        "a_token": "0x000000000000000000000000000000000000a004",
+        "variable_debt_token": "0x000000000000000000000000000000000000d004",
+        "stable_debt_token": "0x0000000000000000000000000000000000000000",
+        "interest_rate_strategy": "0x0000000000000000000000000000000000005004",
+        "pool": "0x87870bca3f3fd6335c3f4ce8392d69350b4fa4e2"
+      },
+      {
+        "block": 25491127,
+        "asset": "0x7f39c581f595b53c5cb19bd0b3f8da6c935e2ca0",
+        "a_token": "0x000000000000000000000000000000000000a005",
+        "variable_debt_token": "0x000000000000000000000000000000000000d005",
+        "stable_debt_token": "0x0000000000000000000000000000000000000000",
+        "interest_rate_strategy": "0x0000000000000000000000000000000000005005",
+        "pool": "0x87870bca3f3fd6335c3f4ce8392d69350b4fa4e2"
+      },
+      {
+        "block": 25531127,
+        "asset": "0x514910771af9ca656af840dff83e8264ecf986ca",
+        "a_token": "0x000000000000000000000000000000000000a006",
+        "variable_debt_token": "0x000000000000000000000000000000000000d006",
+        "stable_debt_token": "0x0000000000000000000000000000000000000000",
+        "interest_rate_strategy": "0x0000000000000000000000000000000000005006",
+        "pool": "0x87870bca3f3fd6335c3f4ce8392d69350b4fa4e2"
+      }
+    ],
+    "reserve-state": [
+      {
+        "hour": "2026-10-25T00",
+        "asset": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        "liquidity_rate": "39986299079999987917488971",
+        "stable_borrow_rate": "0",
+        "variable_borrow_rate": "58123000000000000000000000",
+        "liquidity_index": "1074234577000000000000000000",
+        "variable_borrow_index": "1124365765000000000000000000",
+        "a_token_supply": "2597673606584000",
+        "variable_debt": "1985661704872809",
+        "scaled_accrued_to_treasury": "26000000000"
+      },
+      {
+        "hour": "2026-10-25T12",
+        "asset": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        "liquidity_rate": "41452607250000000000000000",
+        "stable_borrow_rate": "0",
+        "variable_borrow_rate": "61045000000000000000000000",
+        "liquidity_index": "1074234577001000000000000000",
+        "variable_borrow_index": "1124365765001000000000000000",
+        "a_token_supply": "2604838144546000",
+        "variable_debt": "1965350380059957",
+        "scaled_accrued_to_treasury": "26000000000"
+      },
+      {
+        "hour": "2026-10-26T00",
+        "asset": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        "liquidity_rate": "38506928580000000000000000",
+        "stable_borrow_rate": "0",
+        "variable_borrow_rate": "56662000000000000000000000",
+        "liquidity_index": "1074234577002000000000000000",
+        "variable_borrow_index": "1124365765002000000000000000",
+        "a_token_supply": "2607464269160000",
+        "variable_debt": "1968896269642716",
+        "scaled_accrued_to_treasury": "26000000000"
+      },
+      {
+        "hour": "2026-10-26T12",
+        "asset": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        "liquidity_rate": "39575131920000000000000000",
+        "stable_borrow_rate": "0",
+        "variable_borrow_rate": "57646000000000000000000000",
+        "liquidity_index": "1074234577003000000000000000",
+        "variable_borrow_index": "1124365765003000000000000000",
+        "a_token_supply": "2610792159300000",
+        "variable_debt": "1991512259114040",
+        "scaled_accrued_to_treasury": "26000000000"
+      },
+      {
+        "hour": "2026-10-27T00",
+        "asset": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        "liquidity_rate": "41046959520000000000000000",
+        "stable_borrow_rate": "0",
+        "variable_borrow_rate": "59108000000000000000000000",
+        "liquidity_index": "1074234577004000000000000000",
+        "variable_borrow_index": "1124365765004000000000000000",
+        "a_token_supply": "2608893142810000",
+        "variable_debt": "2013021948992196",
+        "scaled_accrued_to_treasury": "26000000000"
+      },
+      {
+        "hour": "2026-10-27T12",
+        "asset": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        "liquidity_rate": "41780643749999989856449308",
+        "stable_borrow_rate": "0",
+        "variable_borrow_rate": "58875000000000000000000000",
+        "liquidity_index": "1074234577005000000000000000",
+        "variable_borrow_index": "1124365765005000000000000000",
+        "a_token_supply": "2611881263859000",
+        "variable_debt": "2059468376552821",
+        "scaled_accrued_to_treasury": "26000000000"
+      },
+      {
+        "hour": "2026-10-28T00",
+        "asset": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        "liquidity_rate": "40388489819999992179433760",
+        "stable_borrow_rate": "0",
+        "variable_borrow_rate": "56798000000000000000000000",
+        "liquidity_index": "1074234577006000000000000000",
+        "variable_borrow_index": "1124365765006000000000000000",
+        "a_token_supply": "2614552370474000",
+        "variable_debt": "2065757827911507",
+        "scaled_accrued_to_treasury": "26000000000"
+      },
+      {
+        "hour": "2026-10-28T12",
+        "asset": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        "liquidity_rate": "40204825200000000000000000",
+        "stable_borrow_rate": "0",
+        "variable_borrow_rate": "56262000000000000000000000",
+        "liquidity_index": "1074234577007000000000000000",
+        "variable_borrow_index": "1124365765007000000000000000",
+        "a_token_supply": "2621037869013000",
+        "variable_debt": "2081104067996322",
+        "scaled_accrued_to_treasury": "26000000000"
+      },
+      {
+        "hour": "2026-10-29T00",
+        "asset": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        "liquidity_rate": "41101849619999991821770181",
+        "stable_borrow_rate": "0",
+        "variable_borrow_rate": "59449000000000000000000000",
+        "liquidity_index": "1074234577008000000000000000",
+        "variable_borrow_index": "1124365765008000000000000000",
+        "a_token_supply": "2616903715797000",
+        "variable_debt": "2010305434475255",
+        "scaled_accrued_to_treasury": "26000000000"
+      },
+      {
+        "hour": "2026-10-29T12",
+        "asset": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        "liquidity_rate": "41679905400000000000000000",
+        "stable_borrow_rate": "0",
+        "variable_borrow_rate": "61502000000000000000000000",
+        "liquidity_index": "1074234577009000000000000000",
+        "variable_borrow_index": "1124365765009000000000000000",
+        "a_token_supply": "2621959374449000",
+        "variable_debt": "1974335408960097",
+        "scaled_accrued_to_treasury": "26000000000"
+      },
+      {
+        "hour": "2026-10-30T00",
+        "asset": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        "liquidity_rate": "44376109919999987312022594",
+        "stable_borrow_rate": "0",
+        "variable_borrow_rate": "61757000000000000000000000",
+        "liquidity_index": "1074234577010000000000000000",
+        "variable_borrow_index": "1124365765010000000000000000",
+        "a_token_supply": "2628376370439000",
+        "variable_debt": "2098495694158497",
+        "scaled_accrued_to_treasury": "26000000000"
+      },
+      {
+        "hour": "2026-10-30T12",
+        "asset": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        "liquidity_rate": "41075327519999995846219478",
+        "stable_borrow_rate": "0",
+        "variable_borrow_rate": "60626000000000000000000000",
+        "liquidity_index": "1074234577011000000000000000",
+        "variable_borrow_index": "1124365765011000000000000000",
+        "a_token_supply": "2627168176994000",
+        "variable_debt": "1977732203641083",
+        "scaled_accrued_to_treasury": "26000000000"
+      },
+      {
+        "hour": "2026-10-31T00",
+        "asset": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        "liquidity_rate": "41361191909999997906997669",
+        "stable_borrow_rate": "0",
+        "variable_borrow_rate": "61121000000000000000000000",
+        "liquidity_index": "1074234577012000000000000000",
+        "variable_borrow_index": "1124365765012000000000000000",
+        "a_token_supply": "2628229275549000",
+        "variable_debt": "1976165592285293",
+        "scaled_accrued_to_treasury": "26000000000"
+      },
+      {
+        "hour": "2026-10-31T12",
+        "asset": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        "liquidity_rate": "41887687139999987443423533",
+        "stable_borrow_rate": "0",
+        "variable_borrow_rate": "61191000000000000000000000",
+        "liquidity_index": "1074234577013000000000000000",
+        "variable_borrow_index": "1124365765013000000000000000",
+        "a_token_supply": "2631540538716000",
+        "variable_debt": "2001549733747389",
+        "scaled_accrued_to_treasury": "26000000000"
+      },
+      {
+        "hour": "2026-10-31T23",
+        "asset": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        "liquidity_rate": "43166115000000000000000000",
+        "stable_borrow_rate": "0",
+        "variable_borrow_rate": "60330000000000000000000000",
+        "liquidity_index": "1074234577014000000000000000",
+        "variable_borrow_index": "1124365765014000000000000000",
+        "a_token_supply": "2640954812868000",
+        "variable_debt": "2099559076230060",
+        "scaled_accrued_to_treasury": "26000000000"
+      },
+      {
+        "hour": "2026-10-25T00",
+        "asset": "0xdac17f958d2ee523a2206206994597c13d831ec7",
+        "liquidity_rate": "49256749619999976810426780",
+        "stable_borrow_rate": "0",
+        "variable_borrow_rate": "67626000000000000000000000",
+        "liquidity_index": "1074234577000000000000000000",
+        "variable_borrow_index": "1124365765000000000000000000",
+        "a_token_supply": "2099681591326000",
+        "variable_debt": "1699272311860131",
+        "scaled_accrued_to_treasury": "21000000000"
+      },
+      {
+        "hour": "2026-10-25T12",
+        "asset": "0xdac17f958d2ee523a2206206994597c13d831ec7",
+        "liquidity_rate": "49064223779999988804257820",
+        "stable_borrow_rate": "0",
+        "variable_borrow_rate": "65351000000000000000000000",
+        "liquidity_index": "1074234577001000000000000000",
+        "variable_borrow_index": "1124365765001000000000000000",
+        "a_token_supply": "2101366718102000",
+        "variable_debt": "1752960116240688",
+        "scaled_accrued_to_treasury": "21000000000"
+      },
+      {
+        "hour": "2026-10-26T00",
+        "asset": "0xdac17f958d2ee523a2206206994597c13d831ec7",
+        "liquidity_rate": "48185587800000000000000000",
+        "stable_borrow_rate": "0",
+        "variable_borrow_rate": "63966000000000000000000000",
+        "liquidity_index": "1074234577002000000000000000",
+        "variable_borrow_index": "1124365765002000000000000000",
+        "a_token_supply": "2103825870332000",
+        "variable_debt": "1760902253467884",
+        "scaled_accrued_to_treasury": "21000000000"
+      },
+      {
+        "hour": "2026-10-26T12",
+        "asset": "0xdac17f958d2ee523a2206206994597c13d831ec7",
+        "liquidity_rate": "48615573600000000000000000",
+        "stable_borrow_rate": "0",
+        "variable_borrow_rate": "63888000000000000000000000",
+        "liquidity_index": "1074234577003000000000000000",
+        "variable_borrow_index": "1124365765003000000000000000",
+        "a_token_supply": "2103253786886000",
+        "variable_debt": "1778301076812113",
+        "scaled_accrued_to_treasury": "21000000000"
+      },
+      {
+        "hour": "2026-10-27T00",
+        "asset": "0xdac17f958d2ee523a2206206994597c13d831ec7",
+        "liquidity_rate": "51162021900000000000000000",
+        "stable_borrow_rate": "0",
+        "variable_borrow_rate": "67554000000000000000000000",
+        "liquidity_index": "1074234577004000000000000000",
+        "variable_borrow_index": "1124365765004000000000000000",
+        "a_token_supply": "2107564967490000",
+        "variable_debt": "1773515920142835",
+        "scaled_accrued_to_treasury": "21000000000"
+      },
+      {
+        "hour": "2026-10-27T12",
+        "asset": "0xdac17f958d2ee523a2206206994597c13d831ec7",
+        "liquidity_rate": "47494632959999989001107029",
+        "stable_borrow_rate": "0",
+        "variable_borrow_rate": "64608000000000000000000000",
+        "liquidity_index": "1074234577005000000000000000",
+        "variable_borrow_index": "1124365765005000000000000000",
+        "a_token_supply": "2114656453413000",
+        "variable_debt": "1727251391147738",
+        "scaled_accrued_to_treasury": "21000000000"
+      },
+      {
+        "hour": "2026-10-28T00",
+        "asset": "0xdac17f958d2ee523a2206206994597c13d831ec7",
+        "liquidity_rate": "48914234459999974223518357",
+        "stable_borrow_rate": "0",
+        "variable_borrow_rate": "67106000000000000000000000",
+        "liquidity_index": "1074234577006000000000000000",
+        "variable_borrow_index": "1124365765006000000000000000",
+        "a_token_supply": "2108738529701000",
+        "variable_debt": "1707867335204839",
+        "scaled_accrued_to_treasury": "21000000000"
+      },
+      {
+        "hour": "2026-10-28T12",
+        "asset": "0xdac17f958d2ee523a2206206994597c13d831ec7",
+        "liquidity_rate": "50390716679999997080267706",
+        "stable_borrow_rate": "0",
+        "variable_borrow_rate": "68556000000000000000000000",
+        "liquidity_index": "1074234577007000000000000000",
+        "variable_borrow_index": "1124365765007000000000000000",
+        "a_token_supply": "2113221137723000",
+        "variable_debt": "1725867703178374",
+        "scaled_accrued_to_treasury": "21000000000"
+      },
+      {
+        "hour": "2026-10-29T00",
+        "asset": "0xdac17f958d2ee523a2206206994597c13d831ec7",
+        "liquidity_rate": "50302041659999982815935985",
+        "stable_borrow_rate": "0",
+        "variable_borrow_rate": "67282000000000000000000000",
+        "liquidity_index": "1074234577008000000000000000",
+        "variable_borrow_index": "1124365765008000000000000000",
+        "a_token_supply": "2114300782968000",
+        "variable_debt": "1756349660411517",
+        "scaled_accrued_to_treasury": "21000000000"
+      },
+      {
+        "hour": "2026-10-29T12",
+        "asset": "0xdac17f958d2ee523a2206206994597c13d831ec7",
+        "liquidity_rate": "48382271369999991564757963",
+        "stable_borrow_rate": "0",
+        "variable_borrow_rate": "66229000000000000000000000",
+        "liquidity_index": "1074234577009000000000000000",
+        "variable_borrow_index": "1124365765009000000000000000",
+        "a_token_supply": "2119895306319000",
+        "variable_debt": "1720719020139132",
+        "scaled_accrued_to_treasury": "21000000000"
+      },
+      {
+        "hour": "2026-10-30T00",
+        "asset": "0xdac17f958d2ee523a2206206994597c13d831ec7",
+        "liquidity_rate": "49749616800000000000000000",
+        "stable_borrow_rate": "0",
+        "variable_borrow_rate": "68328000000000000000000000",
+        "liquidity_index": "1074234577010000000000000000",
+        "variable_borrow_index": "1124365765010000000000000000",
+        "a_token_supply": "2117372081934000",
+        "variable_debt": "1712954014284606",
+        "scaled_accrued_to_treasury": "21000000000"
+      },
+      {
+        "hour": "2026-10-30T12",
+        "asset": "0xdac17f958d2ee523a2206206994597c13d831ec7",
+        "liquidity_rate": "50533982729999980565097809",
+        "stable_borrow_rate": "0",
+        "variable_borrow_rate": "65373000000000000000000000",
+        "liquidity_index": "1074234577011000000000000000",
+        "variable_borrow_index": "1124365765011000000000000000",
+        "a_token_supply": "2119125149023000",
+        "variable_debt": "1820116590495854",
+        "scaled_accrued_to_treasury": "21000000000"
+      },
+      {
+        "hour": "2026-10-31T00",
+        "asset": "0xdac17f958d2ee523a2206206994597c13d831ec7",
+        "liquidity_rate": "48788346599999988843140356",
+        "stable_borrow_rate": "0",
+        "variable_borrow_rate": "65940000000000000000000000",
+        "liquidity_index": "1074234577012000000000000000",
+        "variable_borrow_index": "1124365765012000000000000000",
+        "a_token_supply": "2127695494804000",
+        "variable_debt": "1749178466278368",
+        "scaled_accrued_to_treasury": "21000000000"
+      },
+      {
+        "hour": "2026-10-31T12",
+        "asset": "0xdac17f958d2ee523a2206206994597c13d831ec7",
+        "liquidity_rate": "49644586169999977249991571",
+        "stable_borrow_rate": "0",
+        "variable_borrow_rate": "67343000000000000000000000",
+        "liquidity_index": "1074234577013000000000000000",
+        "variable_borrow_index": "1124365765013000000000000000",
+        "a_token_supply": "2131294155478000",
+        "variable_debt": "1745743042752029",
+        "scaled_accrued_to_treasury": "21000000000"
+      },
+      {
+        "hour": "2026-10-31T23",
+        "asset": "0xdac17f958d2ee523a2206206994597c13d831ec7",
+        "liquidity_rate": "48415972499999989215822455",
+        "stable_borrow_rate": "0",
+        "variable_borrow_rate": "63875000000000000000000000",
+        "liquidity_index": "1074234577014000000000000000",
+        "variable_borrow_index": "1124365765014000000000000000",
+        "a_token_supply": "2132290562352000",
+        "variable_debt": "1795815111612854",
+        "scaled_accrued_to_treasury": "21000000000"
+      },
+      {
+        "hour": "2026-10-25T00",
+        "asset": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+        "liquidity_rate": "15003368640000000000000000",
+        "stable_borrow_rate": "0",
+        "variable_borrow_rate": "23192000000000000000000000",
+        "liquidity_index": "1074234577000000000000000000",
+        "variable_borrow_index": "1124365765000000000000000000",
+        "a_token_supply": "2198958932000000000000000",
+        "variable_debt": "1580611680321600000000000",
+        "scaled_accrued_to_treasury": "22000000000000000000"
+      },
+      {
+        "hour": "2026-10-25T12",
+        "asset": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+        "liquidity_rate": "15166969200000000000000000",
+        "stable_borrow_rate": "0",
+        "variable_borrow_rate": "23965000000000000000000000",
+        "liquidity_index": "1074234577001000000000000000",
+        "variable_borrow_index": "1124365765001000000000000000",
+        "a_token_supply": "2205683213000000000000000",
+        "variable_debt": "1551036435381600000000000",
+        "scaled_accrued_to_treasury": "22000000000000000000"
+      },
+      {
+        "hour": "2026-10-26T00",
+        "asset": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+        "liquidity_rate": "16585785000000000000000000",
+        "stable_borrow_rate": "0",
+        "variable_borrow_rate": "24988000000000000000000000",
+        "liquidity_index": "1074234577002000000000000000",
+        "variable_borrow_index": "1124365765002000000000000000",
+        "a_token_supply": "2205411999000000000000000",
+        "variable_debt": "1626491349262500000000000",
+        "scaled_accrued_to_treasury": "22000000000000000000"
+      },
+      {
+        "hour": "2026-10-26T12",
+        "asset": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+        "liquidity_rate": "14916492360000000000000000",
+        "stable_borrow_rate": "0",
+        "variable_borrow_rate": "23892000000000000000000000",
+        "liquidity_index": "1074234577003000000000000000",
+        "variable_borrow_index": "1124365765003000000000000000",
+        "a_token_supply": "2207542422000000000000000",
+        "variable_debt": "1531372178141400000000000",
+        "scaled_accrued_to_treasury": "22000000000000000000"
+      },
+      {
+        "hour": "2026-10-27T00",
+        "asset": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+        "liquidity_rate": "14573845800000000000000000",
+        "stable_borrow_rate": "0",
+        "variable_borrow_rate": "23588000000000000000000000",
+        "liquidity_index": "1074234577004000000000000000",
+        "variable_borrow_index": "1124365765004000000000000000",
+        "a_token_supply": "2210414918000000000000000",
+        "variable_debt": "1517449841207000000000000",
+        "scaled_accrued_to_treasury": "22000000000000000000"
+      },
+      {
+        "hour": "2026-10-27T12",
+        "asset": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+        "liquidity_rate": "15241186620000000000000000",
+        "stable_borrow_rate": "0",
+        "variable_borrow_rate": "24398000000000000000000000",
+        "liquidity_index": "1074234577005000000000000000",
+        "variable_borrow_index": "1124365765005000000000000000",
+        "a_token_supply": "2211201088000000000000000",
+        "variable_debt": "1534794675180800000000000",
+        "scaled_accrued_to_treasury": "22000000000000000000"
+      },
+      {
+        "hour": "2026-10-28T00",
+        "asset": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+        "liquidity_rate": "15924701610000000000000000",
+        "stable_borrow_rate": "0",
+        "variable_borrow_rate": "24967000000000000000000000",
+        "liquidity_index": "1074234577006000000000000000",
+        "variable_borrow_index": "1124365765006000000000000000",
+        "a_token_supply": "2214183117000000000000000",
+        "variable_debt": "1569191575017900000000000",
+        "scaled_accrued_to_treasury": "22000000000000000000"
+      },
+      {
+        "hour": "2026-10-28T12",
+        "asset": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+        "liquidity_rate": "14879643480000000000000000",
+        "stable_borrow_rate": "0",
+        "variable_borrow_rate": "23036000000000000000000000",
+        "liquidity_index": "1074234577007000000000000000",
+        "variable_borrow_index": "1124365765007000000000000000",
+        "a_token_supply": "2215863786000000000000000",
+        "variable_debt": "1590325439212200000000000",
+        "scaled_accrued_to_treasury": "22000000000000000000"
+      },
+      {
+        "hour": "2026-10-29T00",
+        "asset": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+        "liquidity_rate": "16060517550000000000000000",
+        "stable_borrow_rate": "0",
+        "variable_borrow_rate": "24563000000000000000000000",
+        "liquidity_index": "1074234577008000000000000000",
+        "variable_borrow_index": "1124365765008000000000000000",
+        "a_token_supply": "2219475342000000000000000",
+        "variable_debt": "1612448835963000000000000",
+        "scaled_accrued_to_treasury": "22000000000000000000"
+      },
+      {
+        "hour": "2026-10-29T12",
+        "asset": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+        "liquidity_rate": "14710252320000000000000000",
+        "stable_borrow_rate": "0",
+        "variable_borrow_rate": "23664000000000000000000000",
+        "liquidity_index": "1074234577009000000000000000",
+        "variable_borrow_index": "1124365765009000000000000000",
+        "a_token_supply": "2219214813000000000000000",
+        "variable_debt": "1532811671339100000000000",
+        "scaled_accrued_to_treasury": "22000000000000000000"
+      },
+      {
+        "hour": "2026-10-30T00",
+        "asset": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+        "liquidity_rate": "14127007050000000000000000",
+        "stable_borrow_rate": "0",
+        "variable_borrow_rate": "22945000000000000000000000",
+        "liquidity_index": "1074234577010000000000000000",
+        "variable_borrow_index": "1124365765010000000000000000",
+        "a_token_supply": "2217605830000000000000000",
+        "variable_debt": "1517064148303000000000000",
+        "scaled_accrued_to_treasury": "22000000000000000000"
+      },
+      {
+        "hour": "2026-10-30T12",
+        "asset": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+        "liquidity_rate": "15428685600000000000000000",
+        "stable_borrow_rate": "0",
+        "variable_borrow_rate": "25008000000000000000000000",
+        "liquidity_index": "1074234577011000000000000000",
+        "variable_borrow_index": "1124365765011000000000000000",
+        "a_token_supply": "2224908500000000000000000",
+        "variable_debt": "1525174776750000000000000",
+        "scaled_accrued_to_treasury": "22000000000000000000"
+      },
+      {
+        "hour": "2026-10-31T00",
+        "asset": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+        "liquidity_rate": "15897362130000000000000000",
+        "stable_borrow_rate": "0",
+        "variable_borrow_rate": "25023000000000000000000000",
+        "liquidity_index": "1074234577012000000000000000",
+        "variable_borrow_index": "1124365765012000000000000000",
+        "a_token_supply": "2225391783000000000000000",
+        "variable_debt": "1570904059619700000000000",
+        "scaled_accrued_to_treasury": "22000000000000000000"
+      },
+      {
+        "hour": "2026-10-31T12",
+        "asset": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+        "liquidity_rate": "15628682520000000000000000",
+        "stable_borrow_rate": "0",
+        "variable_borrow_rate": "24628000000000000000000000",
+        "liquidity_index": "1074234577013000000000000000",
+        "variable_borrow_index": "1124365765013000000000000000",
+        "a_token_supply": "2232161554000000000000000",
+        "variable_debt": "1573897111725400000000000",
+        "scaled_accrued_to_treasury": "22000000000000000000"
+      },
+      {
+        "hour": "2026-10-31T23",
+        "asset": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+        "liquidity_rate": "15436396800000000000000000",
+        "stable_borrow_rate": "0",
+        "variable_borrow_rate": "24363000000000000000000000",
+        "liquidity_index": "1074234577014000000000000000",
+        "variable_borrow_index": "1124365765014000000000000000",
+        "a_token_supply": "2227723329000000000000000",
+        "variable_debt": "1568317223616000000000000",
+        "scaled_accrued_to_treasury": "22000000000000000000"
+      },
+      {
+        "hour": "2026-10-25T00",
+        "asset": "0x2260fac5e5542a773aa44fbcfedf7c193bc2c599",
+        "liquidity_rate": "1246867020000000000000000",
+        "stable_borrow_rate": "0",
+        "variable_borrow_rate": "3858000000000000000000000",
+        "liquidity_index": "1074234577000000000000000000",
+        "variable_borrow_index": "1124365765000000000000000000",
+        "a_token_supply": "3098437700000",
+        "variable_debt": "1112648978070",
+        "scaled_accrued_to_treasury": "31000000"
+      },
+      {
+        "hour": "2026-10-25T12",
+        "asset": "0x2260fac5e5542a773aa44fbcfedf7c193bc2c599",
+        "liquidity_rate": "1258514550000000000000000",
+        "stable_borrow_rate": "0",
+        "variable_borrow_rate": "4001000000000000000000000",
+        "liquidity_index": "1074234577001000000000000000",
+        "variable_borrow_index": "1124365765001000000000000000",
+        "a_token_supply": "3103296300000",
+        "variable_debt": "1084602056850",
+        "scaled_accrued_to_treasury": "31000000"
+      },
+      {
+        "hour": "2026-10-26T00",
+        "asset": "0x2260fac5e5542a773aa44fbcfedf7c193bc2c599",
+        "liquidity_rate": "1289369970000000000000000",
+        "stable_borrow_rate": "0",
+        "variable_borrow_rate": "4039000000000000000000000",
+        "liquidity_index": "1074234577002000000000000000",
+        "variable_borrow_index": "1124365765002000000000000000",
+        "a_token_supply": "3107836800000",
+        "variable_debt": "1102349712960",
+        "scaled_accrued_to_treasury": "31000000"
+      },
+      {
+        "hour": "2026-10-26T12",
+        "asset": "0x2260fac5e5542a773aa44fbcfedf7c193bc2c599",
+        "liquidity_rate": "1243897740000000000000000",
+        "stable_borrow_rate": "0",
+        "variable_borrow_rate": "3998000000000000000000000",
+        "liquidity_index": "1074234577003000000000000000",
+        "variable_borrow_index": "1124365765003000000000000000",
+        "a_token_supply": "3109256900000",
+        "variable_debt": "1074870110330",
+        "scaled_accrued_to_treasury": "31000000"
+      },
+      {
+        "hour": "2026-10-27T00",
+        "asset": "0x2260fac5e5542a773aa44fbcfedf7c193bc2c599",
+        "liquidity_rate": "1353723480000000000000000",
+        "stable_borrow_rate": "0",
+        "variable_borrow_rate": "4084000000000000000000000",
+        "liquidity_index": "1074234577004000000000000000",
+        "variable_borrow_index": "1124365765004000000000000000",
+        "a_token_supply": "3114545400000",
+        "variable_debt": "1147087070820",
+        "scaled_accrued_to_treasury": "31000000"
+      },
+      {
+        "hour": "2026-10-27T12",
+        "asset": "0x2260fac5e5542a773aa44fbcfedf7c193bc2c599",
+        "liquidity_rate": "1320449490000000000000000",
+        "stable_borrow_rate": "0",
+        "variable_borrow_rate": "3901000000000000000000000",
+        "liquidity_index": "1074234577005000000000000000",
+        "variable_borrow_index": "1124365765005000000000000000",
+        "a_token_supply": "3118617100000",
+        "variable_debt": "1172911891310",
+        "scaled_accrued_to_treasury": "31000000"
+      },
+      {
+        "hour": "2026-10-28T00",
+        "asset": "0x2260fac5e5542a773aa44fbcfedf7c193bc2c599",
+        "liquidity_rate": "1221137910000000000000000",
+        "stable_borrow_rate": "0",
+        "variable_borrow_rate": "4049000000000000000000000",
+        "liquidity_index": "1074234577006000000000000000",
+        "variable_borrow_index": "1124365765006000000000000000",
+        "a_token_supply": "3121292000000",
+        "variable_debt": "1045944949200",
+        "scaled_accrued_to_treasury": "31000000"
+      },
+      {
+        "hour": "2026-10-28T12",
+        "asset": "0x2260fac5e5542a773aa44fbcfedf7c193bc2c599",
+        "liquidity_rate": "1332322830000000000000000",
+        "stable_borrow_rate": "0",
+        "variable_borrow_rate": "4077000000000000000000000",
+        "liquidity_index": "1074234577007000000000000000",
+        "variable_borrow_index": "1124365765007000000000000000",
+        "a_token_supply": "3119315100000",
+        "variable_debt": "1132623312810",
+        "scaled_accrued_to_treasury": "31000000"
+      },
+      {
+        "hour": "2026-10-29T00",
+        "asset": "0x2260fac5e5542a773aa44fbcfedf7c193bc2c599",
+        "liquidity_rate": "1160501760000000000000000",
+        "stable_borrow_rate": "0",
+        "variable_borrow_rate": "3856000000000000000000000",
+        "liquidity_index": "1074234577008000000000000000",
+        "variable_borrow_index": "1124365765008000000000000000",
+        "a_token_supply": "3129113100000",
+        "variable_debt": "1046375420640",
+        "scaled_accrued_to_treasury": "31000000"
+      },
+      {
+        "hour": "2026-10-29T12",
+        "asset": "0x2260fac5e5542a773aa44fbcfedf7c193bc2c599",
+        "liquidity_rate": "1386317520000000000000000",
+        "stable_borrow_rate": "0",
+        "variable_borrow_rate": "4123000000000000000000000",
+        "liquidity_index": "1074234577009000000000000000",
+        "variable_borrow_index": "1124365765009000000000000000",
+        "a_token_supply": "3133655300000",
+        "variable_debt": "1170733620080",
+        "scaled_accrued_to_treasury": "31000000"
+      },
+      {
+        "hour": "2026-10-30T00",
+        "asset": "0x2260fac5e5542a773aa44fbcfedf7c193bc2c599",
+        "liquidity_rate": "1250818200000000000000000",
+        "stable_borrow_rate": "0",
+        "variable_borrow_rate": "4140000000000000000000000",
+        "liquidity_index": "1074234577010000000000000000",
+        "variable_borrow_index": "1124365765010000000000000000",
+        "a_token_supply": "3136963800000",
+        "variable_debt": "1053078747660",
+        "scaled_accrued_to_treasury": "31000000"
+      },
+      {
+        "hour": "2026-10-30T12",
+        "asset": "0x2260fac5e5542a773aa44fbcfedf7c193bc2c599",
+        "liquidity_rate": "1209746880000000000000000",
+        "stable_borrow_rate": "0",
+        "variable_borrow_rate": "3912000000000000000000000",
+        "liquidity_index": "1074234577011000000000000000",
+        "variable_borrow_index": "1124365765011000000000000000",
+        "a_token_supply": "3132924800000",
+        "variable_debt": "1076472961280",
+        "scaled_accrued_to_treasury": "31000000"
+      },
+      {
+        "hour": "2026-10-31T00",
+        "asset": "0x2260fac5e5542a773aa44fbcfedf7c193bc2c599",
+        "liquidity_rate": "1403251650000000000000000",
+        "stable_borrow_rate": "0",
+        "variable_borrow_rate": "4003000000000000000000000",
+        "liquidity_index": "1074234577012000000000000000",
+        "variable_borrow_index": "1124365765012000000000000000",
+        "a_token_supply": "3132668100000",
+        "variable_debt": "1220174224950",
+        "scaled_accrued_to_treasury": "31000000"
+      },
+      {
+        "hour": "2026-10-31T12",
+        "asset": "0x2260fac5e5542a773aa44fbcfedf7c193bc2c599",
+        "liquidity_rate": "1268674830000000000000000",
+        "stable_borrow_rate": "0",
+        "variable_borrow_rate": "4157000000000000000000000",
+        "liquidity_index": "1074234577013000000000000000",
+        "variable_borrow_index": "1124365765013000000000000000",
+        "a_token_supply": "3142199400000",
+        "variable_debt": "1065519816540",
+        "scaled_accrued_to_treasury": "31000000"
+      },
+      {
+        "hour": "2026-10-31T23",
+        "asset": "0x2260fac5e5542a773aa44fbcfedf7c193bc2c599",
+        "liquidity_rate": "1354740300000000000000000",
+        "stable_borrow_rate": "0",
+        "variable_borrow_rate": "4115000000000000000000000",
+        "liquidity_index": "1074234577014000000000000000",
+        "variable_borrow_index": "1124365765014000000000000000",
+        "a_token_supply": "3138269200000",
+        "variable_debt": "1147978873360",
+        "scaled_accrued_to_treasury": "31000000"
+      },
+      {
+        "hour": "2026-10-25T00",
+        "asset": "0x6b175474e89094c44da98b954eedeac495271d0f",
+        "liquidity_rate": "29545699140000000000000000",
+        "stable_borrow_rate": "0",
+        "variable_borrow_rate": "53519000000000000000000000",
+        "liquidity_index": "1074234577000000000000000000",
+        "variable_borrow_index": "1124365765000000000000000000",
+        "a_token_supply": "598822352695000000000000000",
+        "variable_debt": "367317631143113000000000000",
+        "scaled_accrued_to_treasury": "6000000000000000000000"
+      },
+      {
+        "hour": "2026-10-25T12",
+        "asset": "0x6b175474e89094c44da98b954eedeac495271d0f",
+        "liquidity_rate": "29228520420000000000000000",
+        "stable_borrow_rate": "0",
+        "variable_borrow_rate": "50578000000000000000000000",
+        "liquidity_index": "1074234577001000000000000000",
+        "variable_borrow_index": "1124365765001000000000000000",
+        "a_token_supply": "599737749949000000000000000",
+        "variable_debt": "385091609242252900000000000",
+        "scaled_accrued_to_treasury": "6000000000000000000000"
+      },
+      {
+        "hour": "2026-10-26T00",
+        "asset": "0x6b175474e89094c44da98b954eedeac495271d0f",
+        "liquidity_rate": "28202601600000000000000000",
+        "stable_borrow_rate": "0",
+        "variable_borrow_rate": "51270000000000000000000000",
+        "liquidity_index": "1074234577002000000000000000",
+        "variable_borrow_index": "1124365765002000000000000000",
+        "a_token_supply": "600365502928000000000000000",
+        "variable_debt": "366943395389593600000000000",
+        "scaled_accrued_to_treasury": "6000000000000000000000"
+      },
+      {
+        "hour": "2026-10-26T12",
+        "asset": "0x6b175474e89094c44da98b954eedeac495271d0f",
+        "liquidity_rate": "27773135550000000000000000",
+        "stable_borrow_rate": "0",
+        "variable_borrow_rate": "49845000000000000000000000",
+        "liquidity_index": "1074234577003000000000000000",
+        "variable_borrow_index": "1124365765003000000000000000",
+        "a_token_supply": "601088884751000000000000000",
+        "variable_debt": "372134128549344100000000000",
+        "scaled_accrued_to_treasury": "6000000000000000000000"
+      },
+      {
+        "hour": "2026-10-27T00",
+        "asset": "0x6b175474e89094c44da98b954eedeac495271d0f",
+        "liquidity_rate": "29418795000000000000000000",
+        "stable_borrow_rate": "0",
+        "variable_borrow_rate": "51885000000000000000000000",
+        "liquidity_index": "1074234577004000000000000000",
+        "variable_borrow_index": "1124365765004000000000000000",
+        "a_token_supply": "601518024331000000000000000",
+        "variable_debt": "378956355328530000000000000",
+        "scaled_accrued_to_treasury": "6000000000000000000000"
+      },
+      {
+        "hour": "2026-10-27T12",
+        "asset": "0x6b175474e89094c44da98b954eedeac495271d0f",
+        "liquidity_rate": "28801020240000000000000000",
+        "stable_borrow_rate": "0",
+        "variable_borrow_rate": "49354000000000000000000000",
+        "liquidity_index": "1074234577005000000000000000",
+        "variable_borrow_index": "1124365765005000000000000000",
+        "a_token_supply": "602955231107000000000000000",
+        "variable_debt": "390956171849778800000000000",
+        "scaled_accrued_to_treasury": "6000000000000000000000"
+      },
+      {
+        "hour": "2026-10-28T00",
+        "asset": "0x6b175474e89094c44da98b954eedeac495271d0f",
+        "liquidity_rate": "30289741200000000000000000",
+        "stable_borrow_rate": "0",
+        "variable_borrow_rate": "53455000000000000000000000",
+        "liquidity_index": "1074234577006000000000000000",
+        "variable_borrow_index": "1124365765006000000000000000",
+        "a_token_supply": "604056578897000000000000000",
+        "variable_debt": "380314022073551200000000000",
+        "scaled_accrued_to_treasury": "6000000000000000000000"
+      },
+      {
+        "hour": "2026-10-28T12",
+        "asset": "0x6b175474e89094c44da98b954eedeac495271d0f",
+        "liquidity_rate": "30444498630000000000000000",
+        "stable_borrow_rate": "0",
+        "variable_borrow_rate": "51779000000000000000000000",
+        "liquidity_index": "1074234577007000000000000000",
+        "variable_borrow_index": "1124365765007000000000000000",
+        "a_token_supply": "603496938045000000000000000",
+        "variable_debt": "394264549624798500000000000",
+        "scaled_accrued_to_treasury": "6000000000000000000000"
+      },
+      {
+        "hour": "2026-10-29T00",
+        "asset": "0x6b175474e89094c44da98b954eedeac495271d0f",
+        "liquidity_rate": "28832716260000000000000000",
+        "stable_borrow_rate": "0",
+        "variable_borrow_rate": "48562000000000000000000000",
+        "liquidity_index": "1074234577008000000000000000",
+        "variable_borrow_index": "1124365765008000000000000000",
+        "a_token_supply": "604063940335000000000000000",
+        "variable_debt": "398500981438999500000000000",
+        "scaled_accrued_to_treasury": "6000000000000000000000"
+      },
+      {
+        "hour": "2026-10-29T12",
+        "asset": "0x6b175474e89094c44da98b954eedeac495271d0f",
+        "liquidity_rate": "28286010720000000000000000",
+        "stable_borrow_rate": "0",
+        "variable_borrow_rate": "51388000000000000000000000",
+        "liquidity_index": "1074234577009000000000000000",
+        "variable_borrow_index": "1124365765009000000000000000",
+        "a_token_supply": "605768296551000000000000000",
+        "variable_debt": "370487890170591600000000000",
+        "scaled_accrued_to_treasury": "6000000000000000000000"
+      },
+      {
+        "hour": "2026-10-30T00",
+        "asset": "0x6b175474e89094c44da98b954eedeac495271d0f",
+        "liquidity_rate": "30188985120000000000000000",
+        "stable_borrow_rate": "0",
+        "variable_borrow_rate": "52346000000000000000000000",
+        "liquidity_index": "1074234577010000000000000000",
+        "variable_borrow_index": "1124365765010000000000000000",
+        "a_token_supply": "606240952384000000000000000",
+        "variable_debt": "388479202287667200000000000",
+        "scaled_accrued_to_treasury": "6000000000000000000000"
+      },
+      {
+        "hour": "2026-10-30T12",
+        "asset": "0x6b175474e89094c44da98b954eedeac495271d0f",
+        "liquidity_rate": "30159167220000000000000000",
+        "stable_borrow_rate": "0",
+        "variable_borrow_rate": "50414000000000000000000000",
+        "liquidity_index": "1074234577011000000000000000",
+        "variable_borrow_index": "1124365765011000000000000000",
+        "a_token_supply": "606912809455000000000000000",
+        "variable_debt": "403414944444738500000000000",
+        "scaled_accrued_to_treasury": "6000000000000000000000"
+      },
+      {
+        "hour": "2026-10-31T00",
+        "asset": "0x6b175474e89094c44da98b954eedeac495271d0f",
+        "liquidity_rate": "30472078770000000000000000",
+        "stable_borrow_rate": "0",
+        "variable_borrow_rate": "52017000000000000000000000",
+        "liquidity_index": "1074234577012000000000000000",
+        "variable_borrow_index": "1124365765012000000000000000",
+        "a_token_supply": "607850847967000000000000000",
+        "variable_debt": "395650116941720300000000000",
+        "scaled_accrued_to_treasury": "6000000000000000000000"
+      },
+      {
+        "hour": "2026-10-31T12",
+        "asset": "0x6b175474e89094c44da98b954eedeac495271d0f",
+        "liquidity_rate": "29595418920000000000000000",
+        "stable_borrow_rate": "0",
+        "variable_borrow_rate": "53279000000000000000000000",
+        "liquidity_index": "1074234577013000000000000000",
+        "variable_borrow_index": "1124365765013000000000000000",
+        "a_token_supply": "607823776456000000000000000",
+        "variable_debt": "375148834828643200000000000",
+        "scaled_accrued_to_treasury": "6000000000000000000000"
+      },
+      {
+        "hour": "2026-10-31T23",
+        "asset": "0x6b175474e89094c44da98b954eedeac495271d0f",
+        "liquidity_rate": "28717553700000000000000000",
+        "stable_borrow_rate": "0",
+        "variable_borrow_rate": "51985000000000000000000000",
+        "liquidity_index": "1074234577014000000000000000",
+        "variable_borrow_index": "1124365765014000000000000000",
+        "a_token_supply": "607744073713000000000000000",
+        "variable_debt": "373033312445039400000000000",
+        "scaled_accrued_to_treasury": "6000000000000000000000"
+      },
+      {
+        "hour": "2026-10-25T00",
+        "asset": "0x7f39c581f595b53c5cb19bd0b3f8da6c935e2ca0",
+        "liquidity_rate": "130625280000000000000000",
+        "stable_borrow_rate": "0",
+        "variable_borrow_rate": "1972000000000000000000000",
+        "liquidity_index": "1074234577000000000000000000",
+        "variable_borrow_index": "1124365765000000000000000000",
+        "a_token_supply": "1902830777000000000000000",
+        "variable_debt": "140048345187200000000000",
+        "scaled_accrued_to_treasury": "19000000000000000000"
+      },
+      {
+        "hour": "2026-10-25T12",
+        "asset": "0x7f39c581f595b53c5cb19bd0b3f8da6c935e2ca0",
+        "liquidity_rate": "40426740000000000000000",
+        "stable_borrow_rate": "0",
+        "variable_borrow_rate": "2099000000000000000000000",
+        "liquidity_index": "1074234577001000000000000000",
+        "variable_borrow_index": "1124365765001000000000000000",
+        "a_token_supply": "1903231134000000000000000",
+        "variable_debt": "40729146267600000000000",
+        "scaled_accrued_to_treasury": "19000000000000000000"
+      },
+      {
+        "hour": "2026-10-26T00",
+        "asset": "0x7f39c581f595b53c5cb19bd0b3f8da6c935e2ca0",
+        "liquidity_rate": "136626120000000000000000",
+        "stable_borrow_rate": "0",
+        "variable_borrow_rate": "1987000000000000000000000",
+        "liquidity_index": "1074234577002000000000000000",
+        "variable_borrow_index": "1124365765002000000000000000",
+        "a_token_supply": "1907150720000000000000000",
+        "variable_debt": "145706315008000000000000",
+        "scaled_accrued_to_treasury": "19000000000000000000"
+      },
+      {
+        "hour": "2026-10-26T12",
+        "asset": "0x7f39c581f595b53c5cb19bd0b3f8da6c935e2ca0",
+        "liquidity_rate": "62725770000000000000000",
+        "stable_borrow_rate": "0",
+        "variable_borrow_rate": "1997000000000000000000000",
+        "liquidity_index": "1074234577003000000000000000",
+        "variable_borrow_index": "1124365765003000000000000000",
+        "a_token_supply": "1904352917000000000000000",
+        "variable_debt": "66461916803300000000000",
+        "scaled_accrued_to_treasury": "19000000000000000000"
+      },
+      {
+        "hour": "2026-10-27T00",
+        "asset": "0x7f39c581f595b53c5cb19bd0b3f8da6c935e2ca0",
+        "liquidity_rate": "106904520000000000000000",
+        "stable_borrow_rate": "0",
+        "variable_borrow_rate": "1993000000000000000000000",
+        "liquidity_index": "1074234577004000000000000000",
+        "variable_borrow_index": "1124365765004000000000000000",
+        "a_token_supply": "1906712686000000000000000",
+        "variable_debt": "113640076085600000000000",
+        "scaled_accrued_to_treasury": "19000000000000000000"
+      },
+      {
+        "hour": "2026-10-27T12",
+        "asset": "0x7f39c581f595b53c5cb19bd0b3f8da6c935e2ca0",
+        "liquidity_rate": "86236920000000000000000",
+        "stable_borrow_rate": "0",
+        "variable_borrow_rate": "2013000000000000000000000",
+        "liquidity_index": "1074234577005000000000000000",
+        "variable_borrow_index": "1124365765005000000000000000",
+        "a_token_supply": "1911381922000000000000000",
+        "variable_debt": "90981779487200000000000",
+        "scaled_accrued_to_treasury": "19000000000000000000"
+      },
+      {
+        "hour": "2026-10-28T00",
+        "asset": "0x7f39c581f595b53c5cb19bd0b3f8da6c935e2ca0",
+        "liquidity_rate": "67167360000000000000000",
+        "stable_borrow_rate": "0",
+        "variable_borrow_rate": "2028000000000000000000000",
+        "liquidity_index": "1074234577006000000000000000",
+        "variable_borrow_index": "1124365765006000000000000000",
+        "a_token_supply": "1912333897000000000000000",
+        "variable_debt": "70373887409600000000000",
+        "scaled_accrued_to_treasury": "19000000000000000000"
+      },
+      {
+        "hour": "2026-10-28T12",
+        "asset": "0x7f39c581f595b53c5cb19bd0b3f8da6c935e2ca0",
+        "liquidity_rate": "62440560000000000000000",
+        "stable_borrow_rate": "0",
+        "variable_borrow_rate": "1906000000000000000000000",
+        "liquidity_index": "1074234577007000000000000000",
+        "variable_borrow_index": "1124365765007000000000000000",
+        "a_token_supply": "1917031529000000000000000",
+        "variable_debt": "69779947655600000000000",
+        "scaled_accrued_to_treasury": "19000000000000000000"
+      },
+      {
+        "hour": "2026-10-29T00",
+        "asset": "0x7f39c581f595b53c5cb19bd0b3f8da6c935e2ca0",
+        "liquidity_rate": "93923280000000000000000",
+        "stable_borrow_rate": "0",
+        "variable_borrow_rate": "1947000000000000000000000",
+        "liquidity_index": "1074234577008000000000000000",
+        "variable_borrow_index": "1124365765008000000000000000",
+        "a_token_supply": "1917594886000000000000000",
+        "variable_debt": "102783085889600000000000",
+        "scaled_accrued_to_treasury": "19000000000000000000"
+      },
+      {
+        "hour": "2026-10-29T12",
+        "asset": "0x7f39c581f595b53c5cb19bd0b3f8da6c935e2ca0",
+        "liquidity_rate": "128284200000000000000000",
+        "stable_borrow_rate": "0",
+        "variable_borrow_rate": "2090000000000000000000000",
+        "liquidity_index": "1074234577009000000000000000",
+        "variable_borrow_index": "1124365765009000000000000000",
+        "a_token_supply": "1913874325000000000000000",
+        "variable_debt": "130526228965000000000000",
+        "scaled_accrued_to_treasury": "19000000000000000000"
+      },
+      {
+        "hour": "2026-10-30T00",
+        "asset": "0x7f39c581f595b53c5cb19bd0b3f8da6c935e2ca0",
+        "liquidity_rate": "105485040000000000000000",
+        "stable_borrow_rate": "0",
+        "variable_borrow_rate": "1912000000000000000000000",
+        "liquidity_index": "1074234577010000000000000000",
+        "variable_borrow_index": "1124365765010000000000000000",
+        "a_token_supply": "1922377556000000000000000",
+        "variable_debt": "117841744182800000000000",
+        "scaled_accrued_to_treasury": "19000000000000000000"
+      },
+      {
+        "hour": "2026-10-30T12",
+        "asset": "0x7f39c581f595b53c5cb19bd0b3f8da6c935e2ca0",
+        "liquidity_rate": "69108120000000000000000",
+        "stable_borrow_rate": "0",
+        "variable_borrow_rate": "2098000000000000000000000",
+        "liquidity_index": "1074234577011000000000000000",
+        "variable_borrow_index": "1124365765011000000000000000",
+        "a_token_supply": "1920586299000000000000000",
+        "variable_debt": "70293458543400000000000",
+        "scaled_accrued_to_treasury": "19000000000000000000"
+      },
+      {
+        "hour": "2026-10-31T00",
+        "asset": "0x7f39c581f595b53c5cb19bd0b3f8da6c935e2ca0",
+        "liquidity_rate": "64187550000000000000000",
+        "stable_borrow_rate": "0",
+        "variable_borrow_rate": "2009000000000000000000000",
+        "liquidity_index": "1074234577012000000000000000",
+        "variable_borrow_index": "1124365765012000000000000000",
+        "a_token_supply": "1921851276000000000000000",
+        "variable_debt": "68225720298000000000000",
+        "scaled_accrued_to_treasury": "19000000000000000000"
+      },
+      {
+        "hour": "2026-10-31T12",
+        "asset": "0x7f39c581f595b53c5cb19bd0b3f8da6c935e2ca0",
+        "liquidity_rate": "105564600000000000000000",
+        "stable_borrow_rate": "0",
+        "variable_borrow_rate": "2076000000000000000000000",
+        "liquidity_index": "1074234577013000000000000000",
+        "variable_borrow_index": "1124365765013000000000000000",
+        "a_token_supply": "1924933490000000000000000",
+        "variable_debt": "108758742185000000000000",
+        "scaled_accrued_to_treasury": "19000000000000000000"
+      },
+      {
+        "hour": "2026-10-31T23",
+        "asset": "0x7f39c581f595b53c5cb19bd0b3f8da6c935e2ca0",
+        "liquidity_rate": "48149100000000000000000",
+        "stable_borrow_rate": "0",
+        "variable_borrow_rate": "2098000000000000000000000",
+        "liquidity_index": "1074234577014000000000000000",
+        "variable_borrow_index": "1124365765014000000000000000",
+        "a_token_supply": "1926355896000000000000000",
+        "variable_debt": "49122075348000000000000",
+        "scaled_accrued_to_treasury": "19000000000000000000"
+      },
+      {
+        "hour": "2026-10-25T00",
+        "asset": "0x514910771af9ca656af840dff83e8264ecf986ca",
+        "liquidity_rate": "11299461120000000000000000",
+        "stable_borrow_rate": "0",
+        "variable_borrow_rate": "22944000000000000000000000",
+        "liquidity_index": "1074234577000000000000000000",
+        "variable_borrow_index": "1124365765000000000000000000",
+        "a_token_supply": "10988471755000000000000000",
+        "variable_debt": "6012891744336000000000000",
+        "scaled_accrued_to_treasury": "110000000000000000000"
+      },
+      {
+        "hour": "2026-10-25T12",
+        "asset": "0x514910771af9ca656af840dff83e8264ecf986ca",
+        "liquidity_rate": "10681420050000000000000000",
+        "stable_borrow_rate": "0",
+        "variable_borrow_rate": "22645000000000000000000000",
+        "liquidity_index": "1074234577001000000000000000",
+        "variable_borrow_index": "1124365765001000000000000000",
+        "a_token_supply": "11026914783000000000000000",
+        "variable_debt": "5779206037770300000000000",
+        "scaled_accrued_to_treasury": "110000000000000000000"
+      },
+      {
+        "hour": "2026-10-26T00",
+        "asset": "0x514910771af9ca656af840dff83e8264ecf986ca",
+        "liquidity_rate": "10296189000000000000000000",
+        "stable_borrow_rate": "0",
+        "variable_borrow_rate": "22214000000000000000000000",
+        "liquidity_index": "1074234577002000000000000000",
+        "variable_borrow_index": "1124365765002000000000000000",
+        "a_token_supply": "11035673997000000000000000",
+        "variable_debt": "5683372108455000000000000",
+        "scaled_accrued_to_treasury": "110000000000000000000"
+      },
+      {
+        "hour": "2026-10-26T12",
+        "asset": "0x514910771af9ca656af840dff83e8264ecf986ca",
+        "liquidity_rate": "10100415150000000000000000",
+        "stable_borrow_rate": "0",
+        "variable_borrow_rate": "22741000000000000000000000",
+        "liquidity_index": "1074234577003000000000000000",
+        "variable_borrow_index": "1124365765003000000000000000",
+        "a_token_supply": "11034624132000000000000000",
+        "variable_debt": "5445587009142000000000000",
+        "scaled_accrued_to_treasury": "110000000000000000000"
+      },
+      {
+        "hour": "2026-10-27T00",
+        "asset": "0x514910771af9ca656af840dff83e8264ecf986ca",
+        "liquidity_rate": "10352755530000000000000000",
+        "stable_borrow_rate": "0",
+        "variable_borrow_rate": "21489000000000000000000000",
+        "liquidity_index": "1074234577004000000000000000",
+        "variable_borrow_index": "1124365765004000000000000000",
+        "a_token_supply": "11042508187000000000000000",
+        "variable_debt": "5911054632501100000000000",
+        "scaled_accrued_to_treasury": "110000000000000000000"
+      },
+      {
+        "hour": "2026-10-27T12",
+        "asset": "0x514910771af9ca656af840dff83e8264ecf986ca",
+        "liquidity_rate": "11128429080000000000000000",
+        "stable_borrow_rate": "0",
+        "variable_borrow_rate": "22949000000000000000000000",
+        "liquidity_index": "1074234577005000000000000000",
+        "variable_borrow_index": "1124365765005000000000000000",
+        "a_token_supply": "11038267700000000000000000",
+        "variable_debt": "5947418636760000000000000",
+        "scaled_accrued_to_treasury": "110000000000000000000"
+      },
+      {
+        "hour": "2026-10-28T00",
+        "asset": "0x514910771af9ca656af840dff83e8264ecf986ca",
+        "liquidity_rate": "10837593900000000000000000",
+        "stable_borrow_rate": "0",
+        "variable_borrow_rate": "22370000000000000000000000",
+        "liquidity_index": "1074234577006000000000000000",
+        "variable_borrow_index": "1124365765006000000000000000",
+        "a_token_supply": "11061750659000000000000000",
+        "variable_debt": "5954540379739700000000000",
+        "scaled_accrued_to_treasury": "110000000000000000000"
+      },
+      {
+        "hour": "2026-10-28T12",
+        "asset": "0x514910771af9ca656af840dff83e8264ecf986ca",
+        "liquidity_rate": "10222371720000000000000000",
+        "stable_borrow_rate": "0",
+        "variable_borrow_rate": "23067000000000000000000000",
+        "liquidity_index": "1074234577007000000000000000",
+        "variable_borrow_index": "1124365765007000000000000000",
+        "a_token_supply": "11094099453000000000000000",
+        "variable_debt": "5462734570657200000000000",
+        "scaled_accrued_to_treasury": "110000000000000000000"
+      },
+      {
+        "hour": "2026-10-29T00",
+        "asset": "0x514910771af9ca656af840dff83e8264ecf986ca",
+        "liquidity_rate": "11007152640000000000000000",
+        "stable_borrow_rate": "0",
+        "variable_borrow_rate": "22416000000000000000000000",
+        "liquidity_index": "1074234577008000000000000000",
+        "variable_borrow_index": "1124365765008000000000000000",
+        "a_token_supply": "11086839257000000000000000",
+        "variable_debt": "6048979498619200000000000",
+        "scaled_accrued_to_treasury": "110000000000000000000"
+      },
+      {
+        "hour": "2026-10-29T12",
+        "asset": "0x514910771af9ca656af840dff83e8264ecf986ca",
+        "liquidity_rate": "10260000450000000000000000",
+        "stable_borrow_rate": "0",
+        "variable_borrow_rate": "21595000000000000000000000",
+        "liquidity_index": "1074234577009000000000000000",
+        "variable_borrow_index": "1124365765009000000000000000",
+        "a_token_supply": "11116590129000000000000000",
+        "variable_debt": "5868447929099100000000000",
+        "scaled_accrued_to_treasury": "110000000000000000000"
+      },
+      {
+        "hour": "2026-10-30T00",
+        "asset": "0x514910771af9ca656af840dff83e8264ecf986ca",
+        "liquidity_rate": "9898410240000000000000000",
+        "stable_borrow_rate": "0",
+        "variable_borrow_rate": "20957000000000000000000000",
+        "liquidity_index": "1074234577010000000000000000",
+        "variable_borrow_index": "1124365765010000000000000000",
+        "a_token_supply": "11094387472000000000000000",
+        "variable_debt": "5822334545305600000000000",
+        "scaled_accrued_to_treasury": "110000000000000000000"
+      },
+      {
+        "hour": "2026-10-30T12",
+        "asset": "0x514910771af9ca656af840dff83e8264ecf986ca",
+        "liquidity_rate": "9975902220000000000000000",
+        "stable_borrow_rate": "0",
+        "variable_borrow_rate": "22298000000000000000000000",
+        "liquidity_index": "1074234577011000000000000000",
+        "variable_borrow_index": "1124365765011000000000000000",
+        "a_token_supply": "11115725099000000000000000",
+        "variable_debt": "5525626946712900000000000",
+        "scaled_accrued_to_treasury": "110000000000000000000"
+      },
+      {
+        "hour": "2026-10-31T00",
+        "asset": "0x514910771af9ca656af840dff83e8264ecf986ca",
+        "liquidity_rate": "11114629200000000000000000",
+        "stable_borrow_rate": "0",
+        "variable_borrow_rate": "22840000000000000000000000",
+        "liquidity_index": "1074234577012000000000000000",
+        "variable_borrow_index": "1124365765012000000000000000",
+        "a_token_supply": "11148584992000000000000000",
+        "variable_debt": "6028039905174400000000000",
+        "scaled_accrued_to_treasury": "110000000000000000000"
+      },
+      {
+        "hour": "2026-10-31T12",
+        "asset": "0x514910771af9ca656af840dff83e8264ecf986ca",
+        "liquidity_rate": "10012127040000000000000000",
+        "stable_borrow_rate": "0",
+        "variable_borrow_rate": "21576000000000000000000000",
+        "liquidity_index": "1074234577013000000000000000",
+        "variable_borrow_index": "1124365765013000000000000000",
+        "a_token_supply": "11136596598000000000000000",
+        "variable_debt": "5742029205928800000000000",
+        "scaled_accrued_to_treasury": "110000000000000000000"
+      },
+      {
+        "hour": "2026-10-31T23",
+        "asset": "0x514910771af9ca656af840dff83e8264ecf986ca",
+        "liquidity_rate": "10325294640000000000000000",
+        "stable_borrow_rate": "0",
+        "variable_borrow_rate": "21412000000000000000000000",
+        "liquidity_index": "1074234577014000000000000000",
+        "variable_borrow_index": "1124365765014000000000000000",
+        "a_token_supply": "11145053516000000000000000",
+        "variable_debt": "5971519673872800000000000",
+        "scaled_accrued_to_treasury": "110000000000000000000"
+      }
+    ],
+    "reserve-totals": [
+      {
+        "block": 26226189,
+        "asset": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        "supplied": "23400651612048000",
+        "withdrawn": "21322010531542000",
+        "borrowed": "24339938857842000",
+        "repaid": "23326758874089000",
+        "flash_loaned": "7802893502226000",
+        "flash_premium": "3901356723000",
+        "liquidated_collateral": "52021983836000",
+        "minted_to_treasury": "10403416659000"
+      },
+      {
+        "block": 26317989,
+        "asset": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        "supplied": "23458144316548000",
+        "withdrawn": "21364611683376000",
+        "borrowed": "24388402837388000",
+        "repaid": "23370874930253000",
+        "flash_loaned": "7818323248283000",
+        "flash_premium": "3907984410000",
+        "liquidated_collateral": "52104078010000",
+        "minted_to_treasury": "10423088567000"
+      },
+      {
+        "block": 26322965,
+        "asset": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        "supplied": "23500806458104000",
+        "withdrawn": "21406226044021000",
+        "borrowed": "24445421647764000",
+        "repaid": "23420843976141000",
+        "flash_loaned": "7832772824704000",
+        "flash_premium": "3917230406000",
+        "liquidated_collateral": "52225833445000",
+        "minted_to_treasury": "10445720562000"
+      },
+      {
+        "block": 26225489,
+        "asset": "0xdac17f958d2ee523a2206206994597c13d831ec7",
+        "supplied": "18900284792841000",
+        "withdrawn": "17226089594962000",
+        "borrowed": "20925238765298000",
+        "repaid": "20048268629956000",
+        "flash_loaned": "6301495371644000",
+        "flash_premium": "3150739498000",
+        "liquidated_collateral": "42005764550000",
+        "minted_to_treasury": "8401231325000"
+      },
+      {
+        "block": 26318079,
+        "asset": "0xdac17f958d2ee523a2206206994597c13d831ec7",
+        "supplied": "18942586266933000",
+        "withdrawn": "17257080147030000",
+        "borrowed": "20964777358468000",
+        "repaid": "20086868386004000",
+        "flash_loaned": "6313932276712000",
+        "flash_premium": "3157468709000",
+        "liquidated_collateral": "42093294318000",
+        "minted_to_treasury": "8419660483000"
+      },
+      {
+        "block": 26322915,
+        "asset": "0xdac17f958d2ee523a2206206994597c13d831ec7",
+        "supplied": "18983928399538000",
+        "withdrawn": "17291406159481000",
+        "borrowed": "21000335014371000",
+        "repaid": "20132598270307000",
+        "flash_loaned": "6325878604651000",
+        "flash_premium": "3164075488000",
+        "liquidated_collateral": "42179550731000",
+        "minted_to_treasury": "8437622709000"
+      },
+      {
+        "block": 26224789,
+        "asset": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+        "supplied": "19808699287000000000000000",
+        "withdrawn": "18046392339000000000000000",
+        "borrowed": "18746636798000000000000000",
+        "repaid": "17969790666000000000000000",
+        "flash_loaned": "6602982183000000000000000",
+        "flash_premium": "3300039000000000000000",
+        "liquidated_collateral": "44013154000000000000000",
+        "minted_to_treasury": "8803538000000000000000"
+      },
+      {
+        "block": 26318169,
+        "asset": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+        "supplied": "19844735589000000000000000",
+        "withdrawn": "18080904372000000000000000",
+        "borrowed": "18790561302000000000000000",
+        "repaid": "18004050785000000000000000",
+        "flash_loaned": "6614232058000000000000000",
+        "flash_premium": "3307624000000000000000",
+        "liquidated_collateral": "44104412000000000000000",
+        "minted_to_treasury": "8818955000000000000000"
+      },
+      {
+        "block": 26322865,
+        "asset": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+        "supplied": "19885022371000000000000000",
+        "withdrawn": "18119507873000000000000000",
+        "borrowed": "18826290235000000000000000",
+        "repaid": "18039958501000000000000000",
+        "flash_loaned": "6629017079000000000000000",
+        "flash_premium": "3314473000000000000000",
+        "liquidated_collateral": "44184645000000000000000",
+        "minted_to_treasury": "8835229000000000000000"
+      },
+      {
+        "block": 26224089,
+        "asset": "0x2260fac5e5542a773aa44fbcfedf7c193bc2c599",
+        "supplied": "27902419100000",
+        "withdrawn": "25427406300000",
+        "borrowed": "13395274400000",
+        "repaid": "12836701100000",
+        "flash_loaned": "9300162700000",
+        "flash_premium": "4651200000",
+        "liquidated_collateral": "62025400000",
+        "minted_to_treasury": "12401500000"
+      },
+      {
+        "block": 26318259,
+        "asset": "0x2260fac5e5542a773aa44fbcfedf7c193bc2c599",
+        "supplied": "27959382000000",
+        "withdrawn": "25478593000000",
+        "borrowed": "13423157900000",
+        "repaid": "12865409300000",
+        "flash_loaned": "9322997900000",
+        "flash_premium": "4660200000",
+        "liquidated_collateral": "62136100000",
+        "minted_to_treasury": "12429800000"
+      },
+      {
+        "block": 26322815,
+        "asset": "0x2260fac5e5542a773aa44fbcfedf7c193bc2c599",
+        "supplied": "28016819100000",
+        "withdrawn": "25533883100000",
+        "borrowed": "13451309200000",
+        "repaid": "12891272400000",
+        "flash_loaned": "9339938700000",
+        "flash_premium": "4669500000",
+        "liquidated_collateral": "62258200000",
+        "minted_to_treasury": "12455700000"
+      },
+      {
+        "block": 26223389,
+        "asset": "0x6b175474e89094c44da98b954eedeac495271d0f",
+        "supplied": "5400906867023000000000000000",
+        "withdrawn": "4920882332769000000000000000",
+        "borrowed": "4609174324400000000000000000",
+        "repaid": "4416000986853000000000000000",
+        "flash_loaned": "1800167721945000000000000000",
+        "flash_premium": "900141579000000000000000",
+        "liquidated_collateral": "12000213699000000000000000",
+        "minted_to_treasury": "2400873677000000000000000"
+      },
+      {
+        "block": 26318349,
+        "asset": "0x6b175474e89094c44da98b954eedeac495271d0f",
+        "supplied": "5410827225289000000000000000",
+        "withdrawn": "4930762000606000000000000000",
+        "borrowed": "4617684476133000000000000000",
+        "repaid": "4426729364397000000000000000",
+        "flash_loaned": "1803764217748000000000000000",
+        "flash_premium": "901979729000000000000000",
+        "liquidated_collateral": "12029975983000000000000000",
+        "minted_to_treasury": "2405275648000000000000000"
+      },
+      {
+        "block": 26322765,
+        "asset": "0x6b175474e89094c44da98b954eedeac495271d0f",
+        "supplied": "5422054162830000000000000000",
+        "withdrawn": "4940701759442000000000000000",
+        "borrowed": "4627907764601000000000000000",
+        "repaid": "4434768827255000000000000000",
+        "flash_loaned": "1807534333638000000000000000",
+        "flash_premium": "903605459000000000000000",
+        "liquidated_collateral": "12049331311000000000000000",
+        "minted_to_treasury": "2410285560000000000000000"
+      },
+      {
+        "block": 26222689,
+        "asset": "0x7f39c581f595b53c5cb19bd0b3f8da6c935e2ca0",
+        "supplied": "17103362646000000000000000",
+        "withdrawn": "15584140632000000000000000",
+        "borrowed": "1140067679000000000000000",
+        "repaid": "1092775656000000000000000",
+        "flash_loaned": "5700247168000000000000000",
+        "flash_premium": "2850184000000000000000",
+        "liquidated_collateral": "38005242000000000000000",
+        "minted_to_treasury": "7601246000000000000000"
+      },
+      {
+        "block": 26318439,
+        "asset": "0x7f39c581f595b53c5cb19bd0b3f8da6c935e2ca0",
+        "supplied": "17134633158000000000000000",
+        "withdrawn": "15611456298000000000000000",
+        "borrowed": "1142610340000000000000000",
+        "repaid": "1095051094000000000000000",
+        "flash_loaned": "5712689873000000000000000",
+        "flash_premium": "2856563000000000000000",
+        "liquidated_collateral": "38092154000000000000000",
+        "minted_to_treasury": "7618118000000000000000"
+      },
+      {
+        "block": 26322715,
+        "asset": "0x7f39c581f595b53c5cb19bd0b3f8da6c935e2ca0",
+        "supplied": "17171145717000000000000000",
+        "withdrawn": "15649679074000000000000000",
+        "borrowed": "1144685376000000000000000",
+        "repaid": "1097394145000000000000000",
+        "flash_loaned": "5724792114000000000000000",
+        "flash_premium": "2861772000000000000000",
+        "liquidated_collateral": "38169268000000000000000",
+        "minted_to_treasury": "7633718000000000000000"
+      },
+      {
+        "block": 26221989,
+        "asset": "0x514910771af9ca656af840dff83e8264ecf986ca",
+        "supplied": "99014688060000000000000000",
+        "withdrawn": "90209045345000000000000000",
+        "borrowed": "68662865550000000000000000",
+        "repaid": "65804971786000000000000000",
+        "flash_loaned": "33008882463000000000000000",
+        "flash_premium": "16506449000000000000000",
+        "liquidated_collateral": "220043241000000000000000",
+        "minted_to_treasury": "44014782000000000000000"
+      },
+      {
+        "block": 26318529,
+        "asset": "0x514910771af9ca656af840dff83e8264ecf986ca",
+        "supplied": "99204872933000000000000000",
+        "withdrawn": "90414255528000000000000000",
+        "borrowed": "68801656241000000000000000",
+        "repaid": "65926438058000000000000000",
+        "flash_loaned": "33075981812000000000000000",
+        "flash_premium": "16536566000000000000000",
+        "liquidated_collateral": "220493778000000000000000",
+        "minted_to_treasury": "44103772000000000000000"
+      },
+      {
+        "block": 26322665,
+        "asset": "0x514910771af9ca656af840dff83e8264ecf986ca",
+        "supplied": "99410800595000000000000000",
+        "withdrawn": "90579069097000000000000000",
+        "borrowed": "68935436330000000000000000",
+        "repaid": "66053086374000000000000000",
+        "flash_loaned": "33147792125000000000000000",
+        "flash_premium": "16570802000000000000000",
+        "liquidated_collateral": "220930262000000000000000",
+        "minted_to_treasury": "44195287000000000000000"
+      }
+    ],
+    "morpho-holdings": [
+      {
+        "day": "2026-10-25",
+        "token": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        "in_markets": "5416308299581000",
+        "in_vaults": "61125143244000"
+      },
+      {
+        "day": "2026-10-25",
+        "token": "0xdac17f958d2ee523a2206206994597c13d831ec7",
+        "in_markets": "903980946072000",
+        "in_vaults": "12184609715000"
+      },
+      {
+        "day": "2026-10-25",
+        "token": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+        "in_markets": "901271910000000000000000",
+        "in_vaults": "29582719000000000000000"
+      },
+      {
+        "day": "2026-10-25",
+        "token": "0x2260fac5e5542a773aa44fbcfedf7c193bc2c599",
+        "in_markets": "1393353400000",
+        "in_vaults": "0"
+      },
+      {
+        "day": "2026-10-25",
+        "token": "0x6b175474e89094c44da98b954eedeac495271d0f",
+        "in_markets": "400366708240000000000000000",
+        "in_vaults": "7995648636000000000000000"
+      },
+      {
+        "day": "2026-10-25",
+        "token": "0x7f39c581f595b53c5cb19bd0b3f8da6c935e2ca0",
+        "in_markets": "1094983802000000000000000",
+        "in_vaults": "3974246000000000000000"
+      },
+      {
+        "day": "2026-10-26",
+        "token": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        "in_markets": "5401053007945000",
+        "in_vaults": "59282686538000"
+      },
+      {
+        "day": "2026-10-26",
+        "token": "0xdac17f958d2ee523a2206206994597c13d831ec7",
+        "in_markets": "900398842385000",
+        "in_vaults": "12032835460000"
+      },
+      {
+        "day": "2026-10-26",
+        "token": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+        "in_markets": "905751405000000000000000",
+        "in_vaults": "29674027000000000000000"
+      },
+      {
+        "day": "2026-10-26",
+        "token": "0x2260fac5e5542a773aa44fbcfedf7c193bc2c599",
+        "in_markets": "1409530400000",
+        "in_vaults": "0"
+      },
+      {
+        "day": "2026-10-26",
+        "token": "0x6b175474e89094c44da98b954eedeac495271d0f",
+        "in_markets": "402632977775000000000000000",
+        "in_vaults": "7654891945000000000000000"
+      },
+      {
+        "day": "2026-10-26",
+        "token": "0x7f39c581f595b53c5cb19bd0b3f8da6c935e2ca0",
+        "in_markets": "1102250701000000000000000",
+        "in_vaults": "4131267000000000000000"
+      },
+      {
+        "day": "2026-10-27",
+        "token": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        "in_markets": "5443904721995000",
+        "in_vaults": "60788313092000"
+      },
+      {
+        "day": "2026-10-27",
+        "token": "0xdac17f958d2ee523a2206206994597c13d831ec7",
+        "in_markets": "900043404092000",
+        "in_vaults": "11642725350000"
+      },
+      {
+        "day": "2026-10-27",
+        "token": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+        "in_markets": "904327863000000000000000",
+        "in_vaults": "32189371000000000000000"
+      },
+      {
+        "day": "2026-10-27",
+        "token": "0x2260fac5e5542a773aa44fbcfedf7c193bc2c599",
+        "in_markets": "1407233500000",
+        "in_vaults": "0"
+      },
+      {
+        "day": "2026-10-27",
+        "token": "0x6b175474e89094c44da98b954eedeac495271d0f",
+        "in_markets": "403255000790000000000000000",
+        "in_vaults": "7826856757000000000000000"
+      },
+      {
+        "day": "2026-10-27",
+        "token": "0x7f39c581f595b53c5cb19bd0b3f8da6c935e2ca0",
+        "in_markets": "1100709575000000000000000",
+        "in_vaults": "4181047000000000000000"
+      },
+      {
+        "day": "2026-10-28",
+        "token": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        "in_markets": "5409820427680000",
+        "in_vaults": "63274229512000"
+      },
+      {
+        "day": "2026-10-28",
+        "token": "0xdac17f958d2ee523a2206206994597c13d831ec7",
+        "in_markets": "904983586374000",
+        "in_vaults": "11631083605000"
+      },
+      {
+        "day": "2026-10-28",
+        "token": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+        "in_markets": "903312180000000000000000",
+        "in_vaults": "30316145000000000000000"
+      },
+      {
+        "day": "2026-10-28",
+        "token": "0x2260fac5e5542a773aa44fbcfedf7c193bc2c599",
+        "in_markets": "1415091400000",
+        "in_vaults": "0"
+      },
+      {
+        "day": "2026-10-28",
+        "token": "0x6b175474e89094c44da98b954eedeac495271d0f",
+        "in_markets": "400815131832000000000000000",
+        "in_vaults": "8051543796000000000000000"
+      },
+      {
+        "day": "2026-10-28",
+        "token": "0x7f39c581f595b53c5cb19bd0b3f8da6c935e2ca0",
+        "in_markets": "1108323909000000000000000",
+        "in_vaults": "3952182000000000000000"
+      },
+      {
+        "day": "2026-10-29",
+        "token": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        "in_markets": "5464138908743000",
+        "in_vaults": "63465242273000"
+      },
+      {
+        "day": "2026-10-29",
+        "token": "0xdac17f958d2ee523a2206206994597c13d831ec7",
+        "in_markets": "908725909264000",
+        "in_vaults": "11898941433000"
+      },
+      {
+        "day": "2026-10-29",
+        "token": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+        "in_markets": "911491058000000000000000",
+        "in_vaults": "29508504000000000000000"
+      },
+      {
+        "day": "2026-10-29",
+        "token": "0x2260fac5e5542a773aa44fbcfedf7c193bc2c599",
+        "in_markets": "1411226600000",
+        "in_vaults": "0"
+      },
+      {
+        "day": "2026-10-29",
+        "token": "0x6b175474e89094c44da98b954eedeac495271d0f",
+        "in_markets": "405162342269000000000000000",
+        "in_vaults": "8141845023000000000000000"
+      },
+      {
+        "day": "2026-10-29",
+        "token": "0x7f39c581f595b53c5cb19bd0b3f8da6c935e2ca0",
+        "in_markets": "1108455635000000000000000",
+        "in_vaults": "3899766000000000000000"
+      },
+      {
+        "day": "2026-10-30",
+        "token": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        "in_markets": "5465908017222000",
+        "in_vaults": "63159244781000"
+      },
+      {
+        "day": "2026-10-30",
+        "token": "0xdac17f958d2ee523a2206206994597c13d831ec7",
+        "in_markets": "906578410282000",
+        "in_vaults": "11933241601000"
+      },
+      {
+        "day": "2026-10-30",
+        "token": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+        "in_markets": "912447495000000000000000",
+        "in_vaults": "30591570000000000000000"
+      },
+      {
+        "day": "2026-10-30",
+        "token": "0x2260fac5e5542a773aa44fbcfedf7c193bc2c599",
+        "in_markets": "1407996600000",
+        "in_vaults": "0"
+      },
+      {
+        "day": "2026-10-30",
+        "token": "0x6b175474e89094c44da98b954eedeac495271d0f",
+        "in_markets": "402434437084000000000000000",
+        "in_vaults": "7666307304000000000000000"
+      },
+      {
+        "day": "2026-10-30",
+        "token": "0x7f39c581f595b53c5cb19bd0b3f8da6c935e2ca0",
+        "in_markets": "1115877892000000000000000",
+        "in_vaults": "4023918000000000000000"
+      },
+      {
+        "day": "2026-10-31",
+        "token": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        "in_markets": "5481342803338000",
+        "in_vaults": "63990614586000"
+      },
+      {
+        "day": "2026-10-31",
+        "token": "0xdac17f958d2ee523a2206206994597c13d831ec7",
+        "in_markets": "911367136133000",
+        "in_vaults": "12586257384000"
+      },
+      {
+        "day": "2026-10-31",
+        "token": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+        "in_markets": "913460386000000000000000",
+        "in_vaults": "31819837000000000000000"
+      },
+      {
+        "day": "2026-10-31",
+        "token": "0x2260fac5e5542a773aa44fbcfedf7c193bc2c599",
+        "in_markets": "1410529500000",
+        "in_vaults": "0"
+      },
+      {
+        "day": "2026-10-31",
+        "token": "0x6b175474e89094c44da98b954eedeac495271d0f",
+        "in_markets": "406177927928000000000000000",
+        "in_vaults": "8085802338000000000000000"
+      },
+      {
+        "day": "2026-10-31",
+        "token": "0x7f39c581f595b53c5cb19bd0b3f8da6c935e2ca0",
+        "in_markets": "1117673522000000000000000",
+        "in_vaults": "3843395000000000000000"
+      }
+    ]
+  }
+}
