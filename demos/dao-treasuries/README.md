@@ -62,7 +62,7 @@ recording.
 | Uniswap      | Uniswap Foundation  | `0x3d30b1ab88d487b0f3061f40de76845bec3f1e94` | verify before recording |
 | ENS DAO      | DAO Wallet          | `0xfe89cc7abb2c4183683ab71653c4cdc9b02d44b7` |                         |
 | ENS DAO      | Endowment           | `0x4f2083f5fbede34c2714affb3105539775f7fe64` | verify before recording |
-| Arbitrum DAO | Treasury Timelock   | `0xf3fc178157fb3c87548baa86f9d24ba38e649b58` | verify before recording |
+| Arbitrum DAO | DAO Treasury        | `0xf3fc178157fb3c87548baa86f9d24ba38e649b58` | verify before recording |
 | Arbitrum DAO | Core Timelock       | `0x34d45e99f7d8c45ed05b5ca72d54bbd1fb3f98f0` | verify before recording |
 
 | Token | Chain    | Address                                      | Decimals |
@@ -79,20 +79,20 @@ recording.
 
 Windows are half-open: the end is the first day not included.
 
-| Name                                | Function              | Chain | Window                  |
-| ----------------------------------- | --------------------- | ----- | ----------------------- |
-| `uniswap-tokens`                    | `erc20.token_balance` | 1     | 2026-08-03 → 2026-11-02 |
-| `uniswap-tokens-timelock`           | `erc20.token_balance` | 1     | 2026-08-03 → 2026-11-02 |
-| `uniswap-tokens-foundation`         | `erc20.token_balance` | 1     | 2026-08-03 → 2026-11-02 |
-| `uniswap-native`                    | `native.balance`      | 1     | 2026-08-03 → 2026-11-02 |
-| `ens-tokens`                        | `erc20.token_balance` | 1     | 2026-08-03 → 2026-11-02 |
-| `ens-tokens-dao-wallet`             | `erc20.token_balance` | 1     | 2026-08-03 → 2026-11-02 |
-| `ens-tokens-endowment`              | `erc20.token_balance` | 1     | 2026-08-03 → 2026-11-02 |
-| `ens-native`                        | `native.balance`      | 1     | 2026-08-03 → 2026-11-02 |
-| `arbitrum-tokens`                   | `erc20.token_balance` | 42161 | 2026-10-25 → 2026-11-02 |
-| `arbitrum-tokens-treasury-timelock` | `erc20.token_balance` | 42161 | 2026-10-25 → 2026-11-02 |
-| `arbitrum-tokens-core-timelock`     | `erc20.token_balance` | 42161 | 2026-10-25 → 2026-11-02 |
-| `arbitrum-native`                   | `native.balance`      | 42161 | 2026-10-25 → 2026-11-02 |
+| Name                            | Function              | Chain | Window                  |
+| ------------------------------- | --------------------- | ----- | ----------------------- |
+| `uniswap-tokens`                | `erc20.token_balance` | 1     | 2026-08-03 → 2026-11-02 |
+| `uniswap-tokens-timelock`       | `erc20.token_balance` | 1     | 2026-08-03 → 2026-11-02 |
+| `uniswap-tokens-foundation`     | `erc20.token_balance` | 1     | 2026-08-03 → 2026-11-02 |
+| `uniswap-native`                | `native.balance`      | 1     | 2026-08-03 → 2026-11-02 |
+| `ens-tokens`                    | `erc20.token_balance` | 1     | 2026-08-03 → 2026-11-02 |
+| `ens-tokens-dao-wallet`         | `erc20.token_balance` | 1     | 2026-08-03 → 2026-11-02 |
+| `ens-tokens-endowment`          | `erc20.token_balance` | 1     | 2026-08-03 → 2026-11-02 |
+| `ens-native`                    | `native.balance`      | 1     | 2026-08-03 → 2026-11-02 |
+| `arbitrum-tokens`               | `erc20.token_balance` | 42161 | 2026-10-25 → 2026-11-02 |
+| `arbitrum-tokens-treasury`      | `erc20.token_balance` | 42161 | 2026-10-25 → 2026-11-02 |
+| `arbitrum-tokens-core-timelock` | `erc20.token_balance` | 42161 | 2026-10-25 → 2026-11-02 |
+| `arbitrum-native`               | `native.balance`      | 42161 | 2026-10-25 → 2026-11-02 |
 
 ## Record real data
 
