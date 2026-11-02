@@ -127,9 +127,6 @@ h2 {
   gap: 20px;
   padding: 0 20px 20px;
 }
-.flow {
-  padding: 0 20px 20px;
-}
 svg {
   display: block;
   width: 100%;
@@ -145,6 +142,9 @@ svg text {
 }
 svg .end {
   text-anchor: end;
+}
+svg .middle {
+  text-anchor: middle;
 }
 svg .series-label {
   fill: var(--ink);
@@ -242,43 +242,4 @@ a {
   .section-heading {
     display: block;
   }
-}
-svg .area-0 {
-  fill: var(--accent);
-}
-svg .area-1 {
-  fill: var(--warning);
-}
-svg .area-2 {
-  fill: #7d8f77;
-}
-svg .area-3 {
-  fill: #b9a77c;
-}
-svg .area {
-  opacity: 0.8;
-}
-.legend {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 4px 18px;
-  padding: 0 20px 20px;
-  font-size: 13px;
-  color: var(--muted);
-}
-.legend i {
-  display: inline-block;
-  width: 10px;
-  height: 10px;
-  margin-right: 6px;
-  background: var(--accent);
-}
-.legend .area-1 {
-  background: var(--warning);
-}
-.legend .area-2 {
-  background: #7d8f77;
-}
-.legend .area-3 {
-  background: #b9a77c;
 }
