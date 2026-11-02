@@ -6,6 +6,9 @@ const transferBinds = spec.binds.filter(
 const balanceBinds = spec.binds.filter(
   (bind) => bind.function_slug === "native.balance",
 );
+const tokenBalanceBinds = spec.binds.filter(
+  (bind) => bind.function_slug === "erc20.token_balance",
+);
 export const transferWindow = transferBinds[0].window;
 export const hourWindow = balanceBinds[0].window;
 export const wallets = transferBinds.map((bind) => bind.params.wallet);
@@ -35,12 +38,14 @@ const symbols = new Map([
 export const tokens = transferBinds[0].params.tokens;
 
 const unit = 10n ** 18n;
+export const blocksPerHour = 7200 / 24;
+const rebasingTokens = new Set(["0xae7ab96520de3a18e5e111b5eaab095312d7fe84"]);
+const rebaseToleranceDivisor = 2000n;
+const rebaseRoundingWei = 2n;
 const shortAddress = (address) => `${address.slice(0, 6)}…${address.slice(-4)}`;
 const label = (address) => names.get(address) ?? shortAddress(address);
 const transferKey = (row) => `${row.tx}:${row.log_index}`;
 const edgeKey = (from, to) => `${from}>${to}`;
-const byChainOrder = (a, b) =>
-  a.block - b.block || Number(a.log_index) - Number(b.log_index);
 
 export function hoursInWindow() {
   const hours = [];
@@ -114,37 +119,71 @@ function checkBothSidesAgree(rows) {
         throw new Error(`Transfer ${key} is missing from ${label(side)}.`);
 }
 
-function checkBalancesFollowTransfers(rows) {
-  const ordered = [...uniqueTransfers(rows).values()]
-    .map((entry) => entry.row)
-    .sort(byChainOrder);
-  for (const wallet of wallets.filter((address) => address !== source)) {
-    const held = new Map(tokens.map((token) => [token, 0n]));
-    for (const row of ordered) {
-      if (row.to === wallet)
-        held.set(row.token, held.get(row.token) + BigInt(row.value));
-      if (row.from === wallet)
-        held.set(row.token, held.get(row.token) - BigInt(row.value));
-      if (held.get(row.token) < 0n)
-        throw new Error(
-          `${label(wallet)} sends more ${symbols.get(row.token)} than it received by block ${row.block}.`,
-        );
-    }
+function checkHourRows(rows, bind, owner) {
+  const hours = new Set(hoursInWindow());
+  const seen = new Set();
+  for (const row of rows[bind.name]) {
+    const key = `${row.hour}:${row.token ?? ""}`;
+    const tokenOutside = row.token !== undefined && !tokens.includes(row.token);
+    const wrongOwner = row.owner !== undefined && row.owner !== owner;
+    if (wrongOwner || tokenOutside || !hours.has(row.hour) || seen.has(key))
+      throw new Error(`${bind.name} has a stray or repeated ${row.hour} row.`);
+    seen.add(key);
   }
 }
 
 function checkNativeBalances(rows) {
-  const hours = new Set(hoursInWindow());
-  for (const bind of balanceBinds) {
-    const { owners } = bind.params;
-    const seen = new Set();
-    for (const row of rows[bind.name]) {
-      if (row.owner !== owners[0] || !hours.has(row.hour) || seen.has(row.hour))
-        throw new Error(
-          `${bind.name} has a stray or repeated ${row.hour} row.`,
-        );
-      seen.add(row.hour);
+  for (const bind of balanceBinds)
+    checkHourRows(rows, bind, bind.params.owners[0]);
+}
+
+function hourlyTransferChanges(rows) {
+  const changes = new Map();
+  for (const { row } of uniqueTransfers(rows).values()) {
+    const hour = Math.floor(
+      (row.block - transferWindow.from_block) / blocksPerHour,
+    );
+    for (const [wallet, sign] of [
+      [row.to, 1n],
+      [row.from, -1n],
+    ]) {
+      const key = `${wallet}:${row.token}:${hour}`;
+      changes.set(key, (changes.get(key) ?? 0n) + sign * BigInt(row.value));
     }
+  }
+  return changes;
+}
+
+function allowedDrift(token, balance) {
+  return rebasingTokens.has(token)
+    ? balance / rebaseToleranceDivisor + rebaseRoundingWei
+    : 0n;
+}
+
+function checkBalancesFollowTransfers(rows) {
+  const changes = hourlyTransferChanges(rows);
+  const hours = hoursInWindow();
+  for (const bind of tokenBalanceBinds) {
+    const [wallet] = bind.params.reads.owners;
+    checkHourRows(rows, bind, wallet);
+    const balances = new Map(
+      rows[bind.name].map((row) => [
+        `${row.token}:${row.hour}`,
+        BigInt(row.balance),
+      ]),
+    );
+    for (const token of tokens)
+      for (let index = 1; index < hours.length; index++) {
+        const before = balances.get(`${token}:${hours[index - 1]}`) ?? 0n;
+        const after = balances.get(`${token}:${hours[index]}`) ?? 0n;
+        const expected = changes.get(`${wallet}:${token}:${index}`) ?? 0n;
+        const drift = after - before - expected;
+        const allowed = allowedDrift(token, before > after ? before : after);
+        if (drift > allowed || -drift > allowed)
+          throw new Error(
+            `${label(wallet)} ${symbols.get(token)} balance moved by ${formatAmount(after - before, true)} in ${hours[index]}, but its transfers moved ${formatAmount(expected, true)}.`,
+          );
+      }
   }
 }
 
@@ -158,8 +197,8 @@ export function check(rows) {
   return [
     `${entries.length} transfers counted once each, ${readTwice} of them read from both wallets`,
     "Every transfer between two trail wallets appears, identical, on both sides",
-    "No wallet after the Bybit cold wallet sends more of a token than it received",
-    `Native balances sit only in the ${hoursInWindow().length} hours of the window`,
+    "Every wallet's hourly token balance changes by exactly its transfers in that hour (stETH within 0.05% for rebases)",
+    `Balance rows sit only in the ${hoursInWindow().length} hours of the window`,
   ];
 }
 
@@ -177,16 +216,11 @@ function hopsFrom(start, edges) {
 
 function sumEdges(entries) {
   const totals = new Map();
-  for (const { from, to, value } of entries) {
-    const edge = totals.get(edgeKey(from, to)) ?? {
-      from,
-      to,
-      amount: 0n,
-      count: 0,
-    };
+  for (const { from, to, token, value } of entries) {
+    const key = `${edgeKey(from, to)}>${token}`;
+    const edge = totals.get(key) ?? { from, to, token, amount: 0n };
     edge.amount += BigInt(value);
-    edge.count += 1;
-    totals.set(edgeKey(from, to), edge);
+    totals.set(key, edge);
   }
   return [...totals.values()];
 }
@@ -206,42 +240,71 @@ function sparkline(rows, bind) {
   };
 }
 
+const sumValues = (entries) =>
+  entries.reduce((sum, entry) => sum + BigInt(entry.value), 0n);
+
+function walletTokens(entries, address) {
+  return tokens
+    .map((token) => {
+      const ofToken = entries.filter((entry) => entry.token === token);
+      const received = sumValues(ofToken.filter((e) => e.to === address));
+      const sent = sumValues(ofToken.filter((e) => e.from === address));
+      return {
+        symbol: symbols.get(token),
+        received,
+        sent,
+        formatted: {
+          received: formatAmount(received),
+          sent: formatAmount(sent),
+          net: formatAmount(received - sent, true),
+        },
+      };
+    })
+    .filter((entry) => entry.received > 0n || entry.sent > 0n);
+}
+
 export function shape(rows) {
   const entries = [...uniqueTransfers(rows).values()].map((e) => e.row);
   const edges = sumEdges(entries);
   const hops = hopsFrom(source, edges);
   const routes = edges.filter((edge) => edge.amount >= minDrawnAmount);
+  const routeCount = (address) =>
+    routes.filter((edge) => edge.to === address).length;
   const outside = [...new Set(routes.map((edge) => edge.to))]
     .filter((address) => !wallets.includes(address))
-    .map((address) => ({
-      address,
-      volume: edges
-        .filter((edge) => edge.to === address)
-        .reduce((sum, edge) => sum + edge.amount, 0n),
-    }))
-    .sort((a, b) => (b.volume > a.volume ? 1 : b.volume < a.volume ? -1 : 0))
+    .sort((a, b) => routeCount(b) - routeCount(a) || a.localeCompare(b))
     .slice(0, maxNodes - wallets.length);
-  const shown = new Set([...wallets, ...outside.map((node) => node.address)]);
+  const shown = new Set([...wallets, ...outside]);
+  const deepestHop = Math.max(
+    ...wallets.map((address) => hops.get(address) ?? 0),
+  );
   const nodes = [...shown]
     .filter((address) => hops.has(address))
     .map((address) => ({
       address,
       label: label(address),
-      hop: hops.get(address),
+      hop: wallets.includes(address) ? hops.get(address) : deepestHop + 1,
       tracked: wallets.includes(address),
     }));
   const drawn = routes.filter(
     (edge) => shown.has(edge.from) && shown.has(edge.to),
   );
-  const received = (address) =>
-    edges.filter((e) => e.to === address).reduce((s, e) => s + e.amount, 0n);
-  const sent = (address) =>
-    edges.filter((e) => e.from === address).reduce((s, e) => s + e.amount, 0n);
+  const biggest = new Map(
+    tokens.map((token) => [
+      token,
+      Math.max(
+        ...drawn.filter((e) => e.token === token).map((e) => asFloat(e.amount)),
+      ),
+    ]),
+  );
   return {
     transferWindow,
     hourWindow,
     headline: {
-      stolen: formatAmount(received(exploiter)),
+      intoExploiter: walletTokens(entries, exploiter).map((entry) => ({
+        symbol: entry.symbol,
+        amount: entry.formatted.received,
+      })),
       reached: String(
         nodes.filter((node) => node.tracked && node.hop > 0).length,
       ),
@@ -252,17 +315,17 @@ export function shape(rows) {
       symbol: symbols.get(token),
       token,
       moved: formatAmount(
-        entries
-          .filter((e) => e.token === token)
-          .reduce((s, e) => s + BigInt(e.value), 0n),
+        sumValues(entries.filter((entry) => entry.token === token)),
       ),
     })),
     nodes,
     edges: drawn.map((edge) => ({
       from: edge.from,
       to: edge.to,
+      symbol: symbols.get(edge.token),
+      tokenIndex: tokens.indexOf(edge.token),
       amount: formatAmount(edge.amount),
-      units: asFloat(edge.amount),
+      share: asFloat(edge.amount) / biggest.get(edge.token),
     })),
     hiddenEdges: edges.length - drawn.length,
     wallets: transferBinds.map((bind, index) => {
@@ -271,9 +334,10 @@ export function shape(rows) {
         address,
         label: label(address),
         hop: hops.get(address) ?? null,
-        received: formatAmount(received(address)),
-        sent: formatAmount(sent(address)),
-        net: formatAmount(received(address) - sent(address), true),
+        tokens: walletTokens(entries, address).map((entry) => ({
+          symbol: entry.symbol,
+          ...entry.formatted,
+        })),
         spark: sparkline(rows, balanceBinds[index]),
       };
     }),

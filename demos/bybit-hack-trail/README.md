@@ -41,12 +41,13 @@ Token addresses (verify before recording): stETH `0xae7ab96520de3a18e5e111b5eaab
 
 ## Binds
 
-Declared in `testril.json`, one pair per wallet.
+Declared in `testril.json`, one trio per wallet.
 
-| Bind                     | Function                                   | Window                                           |
-| ------------------------ | ------------------------------------------ | ------------------------------------------------ |
-| `transfers-<wallet>` (6) | `erc20.wallet_transfers`, the three tokens | blocks 21890994 to 21948292                      |
-| `balance-<wallet>` (6)   | `native.balance` by hour                   | hours 2025-02-21T00 to 2025-03-01T00 (exclusive) |
+| Bind                         | Function                                        | Window                                           |
+| ---------------------------- | ----------------------------------------------- | ------------------------------------------------ |
+| `transfers-<wallet>` (6)     | `erc20.wallet_transfers`, the three tokens      | blocks 21890994 to 21948292                      |
+| `token-balance-<wallet>` (6) | `erc20.token_balance` by hour, the three tokens | hours 2025-02-21T00 to 2025-03-01T00 (exclusive) |
+| `balance-<wallet>` (6)       | `native.balance` by hour                        | hours 2025-02-21T00 to 2025-03-01T00 (exclusive) |
 
 ## Cross-check
 
@@ -54,10 +55,10 @@ Declared in `testril.json`, one pair per wallet.
 
 - A transfer is keyed by transaction and log index, so one read from both its sender's and recipient's wallet counts once; a repeat inside one wallet fails.
 - A transfer between two trail wallets must appear, identical, on both sides.
-- Every wallet after the cold wallet starts with no tokens, so it never sends more of a token than it received.
-- Native balance rows must lie inside the hour window, once per hour.
+- A wallet's hourly token balance changes between hours by exactly the transfers in the trail in that hour (inflows minus outflows, per token). An hour's blocks are `from_block + hour * 300`, since the window starts at hour 0 and Ethereum has 7,200 blocks a day. stETH rebases daily without a transfer, so it may drift by 0.05% of the balance. The first hour's balance is the starting point.
+- Balance rows must lie inside the hour window, once per hour and token.
 
-Native ETH moves emit no ERC-20 transfer, so hourly ETH balances are charted and window-checked, not reconciled against transfers.
+Native ETH moves emit no ERC-20 transfer, so hourly ETH balances are only charted and window-checked, not reconciled. The roughly 401,000 ETH taken in the hack was native ETH and is not in the transfers; the headline counts stETH, mETH and cmETH separately.
 
 ## Record real data
 
