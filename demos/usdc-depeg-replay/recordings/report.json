@@ -1,0 +1,3284 @@
+{
+  "demo": "usdc-depeg-replay",
+  "source": "synthetic",
+  "recordedAt": "2023-03-16T00:00:00.000Z",
+  "boundFunctions": {
+    "supply": {
+      "function_slug": "erc20.token_supply",
+      "chain_id": 1
+    },
+    "usdc-edges": {
+      "function_slug": "erc20.transfer_edges",
+      "chain_id": 1
+    },
+    "usdc-usd-feed": {
+      "function_slug": "aggregator.latest_answer",
+      "chain_id": 1
+    },
+    "ens-circle": {
+      "function_slug": "ens.primary_name",
+      "chain_id": 1
+    },
+    "ens-binance-14": {
+      "function_slug": "ens.primary_name",
+      "chain_id": 1
+    },
+    "ens-binance-8": {
+      "function_slug": "ens.primary_name",
+      "chain_id": 1
+    },
+    "ens-coinbase-10": {
+      "function_slug": "ens.primary_name",
+      "chain_id": 1
+    },
+    "ens-kraken-4": {
+      "function_slug": "ens.primary_name",
+      "chain_id": 1
+    },
+    "ens-okx-73": {
+      "function_slug": "ens.primary_name",
+      "chain_id": 1
+    },
+    "ens-bitfinex-2": {
+      "function_slug": "ens.primary_name",
+      "chain_id": 1
+    },
+    "ens-uniswap-v3-usdc-weth": {
+      "function_slug": "ens.primary_name",
+      "chain_id": 1
+    },
+    "ens-uniswap-v3-usdc-usdt": {
+      "function_slug": "ens.primary_name",
+      "chain_id": 1
+    },
+    "ens-uniswap-v4-pool-manager": {
+      "function_slug": "ens.primary_name",
+      "chain_id": 1
+    },
+    "ens-uniswap-universal-router": {
+      "function_slug": "ens.primary_name",
+      "chain_id": 1
+    },
+    "ens-curve-3pool": {
+      "function_slug": "ens.primary_name",
+      "chain_id": 1
+    },
+    "ens-aave-v3-ausdc": {
+      "function_slug": "ens.primary_name",
+      "chain_id": 1
+    },
+    "ens-morpho-blue": {
+      "function_slug": "ens.primary_name",
+      "chain_id": 1
+    },
+    "ens-maker-psm-usdc": {
+      "function_slug": "ens.primary_name",
+      "chain_id": 1
+    },
+    "ens-cow-settlement": {
+      "function_slug": "ens.primary_name",
+      "chain_id": 1
+    },
+    "ens-1inch-v6-router": {
+      "function_slug": "ens.primary_name",
+      "chain_id": 1
+    },
+    "ens-0x-exchange-proxy": {
+      "function_slug": "ens.primary_name",
+      "chain_id": 1
+    },
+    "ens-balancer-v2-vault": {
+      "function_slug": "ens.primary_name",
+      "chain_id": 1
+    },
+    "ens-vitalik": {
+      "function_slug": "ens.primary_name",
+      "chain_id": 1
+    }
+  },
+  "window": {
+    "supply": {
+      "from_hour": "2023-03-10T00",
+      "to_hour": "2023-03-15T00"
+    },
+    "usdc-edges": {
+      "from_block": 16794062,
+      "to_block": 16829610
+    },
+    "usdc-usd-feed": {
+      "from_hour": "2023-03-10T00",
+      "to_hour": "2023-03-15T00"
+    },
+    "ens-circle": {
+      "from_block": 16829609,
+      "to_block": 16829610
+    },
+    "ens-binance-14": {
+      "from_block": 16829609,
+      "to_block": 16829610
+    },
+    "ens-binance-8": {
+      "from_block": 16829609,
+      "to_block": 16829610
+    },
+    "ens-coinbase-10": {
+      "from_block": 16829609,
+      "to_block": 16829610
+    },
+    "ens-kraken-4": {
+      "from_block": 16829609,
+      "to_block": 16829610
+    },
+    "ens-okx-73": {
+      "from_block": 16829609,
+      "to_block": 16829610
+    },
+    "ens-bitfinex-2": {
+      "from_block": 16829609,
+      "to_block": 16829610
+    },
+    "ens-uniswap-v3-usdc-weth": {
+      "from_block": 16829609,
+      "to_block": 16829610
+    },
+    "ens-uniswap-v3-usdc-usdt": {
+      "from_block": 16829609,
+      "to_block": 16829610
+    },
+    "ens-uniswap-v4-pool-manager": {
+      "from_block": 16829609,
+      "to_block": 16829610
+    },
+    "ens-uniswap-universal-router": {
+      "from_block": 16829609,
+      "to_block": 16829610
+    },
+    "ens-curve-3pool": {
+      "from_block": 16829609,
+      "to_block": 16829610
+    },
+    "ens-aave-v3-ausdc": {
+      "from_block": 16829609,
+      "to_block": 16829610
+    },
+    "ens-morpho-blue": {
+      "from_block": 16829609,
+      "to_block": 16829610
+    },
+    "ens-maker-psm-usdc": {
+      "from_block": 16829609,
+      "to_block": 16829610
+    },
+    "ens-cow-settlement": {
+      "from_block": 16829609,
+      "to_block": 16829610
+    },
+    "ens-1inch-v6-router": {
+      "from_block": 16829609,
+      "to_block": 16829610
+    },
+    "ens-0x-exchange-proxy": {
+      "from_block": 16829609,
+      "to_block": 16829610
+    },
+    "ens-balancer-v2-vault": {
+      "from_block": 16829609,
+      "to_block": 16829610
+    },
+    "ens-vitalik": {
+      "from_block": 16829609,
+      "to_block": 16829610
+    }
+  },
+  "rows": {
+    "supply": [
+      {
+        "hour": "2023-03-10T00",
+        "token": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        "total_supply": "43900000000289660"
+      },
+      {
+        "hour": "2023-03-10T01",
+        "token": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        "total_supply": "43897999999305723"
+      },
+      {
+        "hour": "2023-03-10T02",
+        "token": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        "total_supply": "43895999998757884"
+      },
+      {
+        "hour": "2023-03-10T03",
+        "token": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        "total_supply": "43893999998339807"
+      },
+      {
+        "hour": "2023-03-10T04",
+        "token": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        "total_supply": "43891999997505606"
+      },
+      {
+        "hour": "2023-03-10T05",
+        "token": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        "total_supply": "43889999997383540"
+      },
+      {
+        "hour": "2023-03-10T06",
+        "token": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        "total_supply": "43887999997269515"
+      },
+      {
+        "hour": "2023-03-10T07",
+        "token": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        "total_supply": "43885999996679003"
+      },
+      {
+        "hour": "2023-03-10T08",
+        "token": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        "total_supply": "43883999995967316"
+      },
+      {
+        "hour": "2023-03-10T09",
+        "token": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        "total_supply": "43881999995341740"
+      },
+      {
+        "hour": "2023-03-10T10",
+        "token": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        "total_supply": "43879999994753753"
+      },
+      {
+        "hour": "2023-03-10T11",
+        "token": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        "total_supply": "43877999994575189"
+      },
+      {
+        "hour": "2023-03-10T12",
+        "token": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        "total_supply": "43875999994430505"
+      },
+      {
+        "hour": "2023-03-10T13",
+        "token": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        "total_supply": "43873999993601889"
+      },
+      {
+        "hour": "2023-03-10T14",
+        "token": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        "total_supply": "43871999992644696"
+      },
+      {
+        "hour": "2023-03-10T15",
+        "token": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        "total_supply": "43869999992367406"
+      },
+      {
+        "hour": "2023-03-10T16",
+        "token": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        "total_supply": "43867999991607401"
+      },
+      {
+        "hour": "2023-03-10T17",
+        "token": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        "total_supply": "43865999991190069"
+      },
+      {
+        "hour": "2023-03-10T18",
+        "token": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        "total_supply": "43863999990319252"
+      },
+      {
+        "hour": "2023-03-10T19",
+        "token": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        "total_supply": "43861999989982454"
+      },
+      {
+        "hour": "2023-03-10T20",
+        "token": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        "total_supply": "43859999989231877"
+      },
+      {
+        "hour": "2023-03-10T21",
+        "token": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        "total_supply": "43857999988546306"
+      },
+      {
+        "hour": "2023-03-10T22",
+        "token": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        "total_supply": "43855999988489435"
+      },
+      {
+        "hour": "2023-03-10T23",
+        "token": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        "total_supply": "43853999987578303"
+      },
+      {
+        "hour": "2023-03-11T00",
+        "token": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        "total_supply": "43851999986766414"
+      },
+      {
+        "hour": "2023-03-11T01",
+        "token": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        "total_supply": "43849999986525493"
+      },
+      {
+        "hour": "2023-03-11T02",
+        "token": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        "total_supply": "43847999985963146"
+      },
+      {
+        "hour": "2023-03-11T03",
+        "token": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        "total_supply": "43845999985953378"
+      },
+      {
+        "hour": "2023-03-11T04",
+        "token": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        "total_supply": "43843999985764346"
+      },
+      {
+        "hour": "2023-03-11T05",
+        "token": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        "total_supply": "43841999985226135"
+      },
+      {
+        "hour": "2023-03-11T06",
+        "token": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        "total_supply": "43839999984784154"
+      },
+      {
+        "hour": "2023-03-11T07",
+        "token": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        "total_supply": "43837999984699336"
+      },
+      {
+        "hour": "2023-03-11T08",
+        "token": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        "total_supply": "43835999984326098"
+      },
+      {
+        "hour": "2023-03-11T09",
+        "token": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        "total_supply": "43833999983983262"
+      },
+      {
+        "hour": "2023-03-11T10",
+        "token": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        "total_supply": "43831999983219962"
+      },
+      {
+        "hour": "2023-03-11T11",
+        "token": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        "total_supply": "43829999982265566"
+      },
+      {
+        "hour": "2023-03-11T12",
+        "token": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        "total_supply": "43827999981747273"
+      },
+      {
+        "hour": "2023-03-11T13",
+        "token": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        "total_supply": "43825792619758042"
+      },
+      {
+        "hour": "2023-03-11T14",
+        "token": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        "total_supply": "43772721046511467"
+      },
+      {
+        "hour": "2023-03-11T15",
+        "token": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        "total_supply": "43759481570180076"
+      },
+      {
+        "hour": "2023-03-11T16",
+        "token": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        "total_supply": "43709851351121074"
+      },
+      {
+        "hour": "2023-03-11T17",
+        "token": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        "total_supply": "43705520113606599"
+      },
+      {
+        "hour": "2023-03-11T18",
+        "token": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        "total_supply": "43638719972037446"
+      },
+      {
+        "hour": "2023-03-11T19",
+        "token": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        "total_supply": "43599002578097647"
+      },
+      {
+        "hour": "2023-03-11T20",
+        "token": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        "total_supply": "43445984031364598"
+      },
+      {
+        "hour": "2023-03-11T21",
+        "token": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        "total_supply": "43343479514442120"
+      },
+      {
+        "hour": "2023-03-11T22",
+        "token": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        "total_supply": "43092810794677893"
+      },
+      {
+        "hour": "2023-03-11T23",
+        "token": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        "total_supply": "42701662783780768"
+      },
+      {
+        "hour": "2023-03-12T00",
+        "token": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        "total_supply": "42507561867270239"
+      },
+      {
+        "hour": "2023-03-12T01",
+        "token": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        "total_supply": "42132733695410985"
+      },
+      {
+        "hour": "2023-03-12T02",
+        "token": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        "total_supply": "41857154766009297"
+      },
+      {
+        "hour": "2023-03-12T03",
+        "token": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        "total_supply": "41428634708681665"
+      },
+      {
+        "hour": "2023-03-12T04",
+        "token": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        "total_supply": "41195800038284410"
+      },
+      {
+        "hour": "2023-03-12T05",
+        "token": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        "total_supply": "40903672756758422"
+      },
+      {
+        "hour": "2023-03-12T06",
+        "token": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        "total_supply": "40591270892109961"
+      },
+      {
+        "hour": "2023-03-12T07",
+        "token": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        "total_supply": "40148297226768259"
+      },
+      {
+        "hour": "2023-03-12T08",
+        "token": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        "total_supply": "39796070908332065"
+      },
+      {
+        "hour": "2023-03-12T09",
+        "token": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        "total_supply": "39195561541113350"
+      },
+      {
+        "hour": "2023-03-12T10",
+        "token": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        "total_supply": "38949487716981796"
+      },
+      {
+        "hour": "2023-03-12T11",
+        "token": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        "total_supply": "38582697762138798"
+      },
+      {
+        "hour": "2023-03-12T12",
+        "token": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        "total_supply": "38270048820375287"
+      },
+      {
+        "hour": "2023-03-12T13",
+        "token": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        "total_supply": "37866342093350512"
+      },
+      {
+        "hour": "2023-03-12T14",
+        "token": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        "total_supply": "37362142734545934"
+      },
+      {
+        "hour": "2023-03-12T15",
+        "token": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        "total_supply": "37147530135935074"
+      },
+      {
+        "hour": "2023-03-12T16",
+        "token": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        "total_supply": "36928078501540060"
+      },
+      {
+        "hour": "2023-03-12T17",
+        "token": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        "total_supply": "36630197052150641"
+      },
+      {
+        "hour": "2023-03-12T18",
+        "token": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        "total_supply": "36488721444938397"
+      },
+      {
+        "hour": "2023-03-12T19",
+        "token": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        "total_supply": "36325981263463128"
+      },
+      {
+        "hour": "2023-03-12T20",
+        "token": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        "total_supply": "36049434837154207"
+      },
+      {
+        "hour": "2023-03-12T21",
+        "token": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        "total_supply": "35655425860794752"
+      },
+      {
+        "hour": "2023-03-12T22",
+        "token": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        "total_supply": "35353843309680284"
+      },
+      {
+        "hour": "2023-03-12T23",
+        "token": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        "total_supply": "35381471637028493"
+      },
+      {
+        "hour": "2023-03-13T00",
+        "token": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        "total_supply": "35330111838583363"
+      },
+      {
+        "hour": "2023-03-13T01",
+        "token": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        "total_supply": "35328940496187755"
+      },
+      {
+        "hour": "2023-03-13T02",
+        "token": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        "total_supply": "35350331676127186"
+      },
+      {
+        "hour": "2023-03-13T03",
+        "token": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        "total_supply": "35403631244680400"
+      },
+      {
+        "hour": "2023-03-13T04",
+        "token": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        "total_supply": "35361576141356259"
+      },
+      {
+        "hour": "2023-03-13T05",
+        "token": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        "total_supply": "35324456963362977"
+      },
+      {
+        "hour": "2023-03-13T06",
+        "token": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        "total_supply": "35329854216857733"
+      },
+      {
+        "hour": "2023-03-13T07",
+        "token": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        "total_supply": "35419135809726016"
+      },
+      {
+        "hour": "2023-03-13T08",
+        "token": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        "total_supply": "35546001741119826"
+      },
+      {
+        "hour": "2023-03-13T09",
+        "token": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        "total_supply": "35649364141703022"
+      },
+      {
+        "hour": "2023-03-13T10",
+        "token": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        "total_supply": "35778826749881690"
+      },
+      {
+        "hour": "2023-03-13T11",
+        "token": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        "total_supply": "35914180354819483"
+      },
+      {
+        "hour": "2023-03-13T12",
+        "token": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        "total_supply": "36069870312323961"
+      },
+      {
+        "hour": "2023-03-13T13",
+        "token": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        "total_supply": "36231117906406764"
+      },
+      {
+        "hour": "2023-03-13T14",
+        "token": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        "total_supply": "36397650912199471"
+      },
+      {
+        "hour": "2023-03-13T15",
+        "token": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        "total_supply": "36568753301958306"
+      },
+      {
+        "hour": "2023-03-13T16",
+        "token": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        "total_supply": "36745892776204221"
+      },
+      {
+        "hour": "2023-03-13T17",
+        "token": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        "total_supply": "36924292956471947"
+      },
+      {
+        "hour": "2023-03-13T18",
+        "token": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        "total_supply": "37110057731181244"
+      },
+      {
+        "hour": "2023-03-13T19",
+        "token": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        "total_supply": "37302907072364804"
+      },
+      {
+        "hour": "2023-03-13T20",
+        "token": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        "total_supply": "37500150487504054"
+      },
+      {
+        "hour": "2023-03-13T21",
+        "token": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        "total_supply": "37698880084142978"
+      },
+      {
+        "hour": "2023-03-13T22",
+        "token": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        "total_supply": "37902619800687942"
+      },
+      {
+        "hour": "2023-03-13T23",
+        "token": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        "total_supply": "38114948077986612"
+      },
+      {
+        "hour": "2023-03-14T00",
+        "token": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        "total_supply": "38328198888540969"
+      },
+      {
+        "hour": "2023-03-14T01",
+        "token": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        "total_supply": "38546232880575691"
+      },
+      {
+        "hour": "2023-03-14T02",
+        "token": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        "total_supply": "38774017086800151"
+      },
+      {
+        "hour": "2023-03-14T03",
+        "token": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        "total_supply": "39004250821383415"
+      },
+      {
+        "hour": "2023-03-14T04",
+        "token": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        "total_supply": "39238820178803378"
+      },
+      {
+        "hour": "2023-03-14T05",
+        "token": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        "total_supply": "39481027570042548"
+      },
+      {
+        "hour": "2023-03-14T06",
+        "token": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        "total_supply": "39726752095245492"
+      },
+      {
+        "hour": "2023-03-14T07",
+        "token": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        "total_supply": "39978158220284729"
+      },
+      {
+        "hour": "2023-03-14T08",
+        "token": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        "total_supply": "40235502122479445"
+      },
+      {
+        "hour": "2023-03-14T09",
+        "token": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        "total_supply": "40493812905594851"
+      },
+      {
+        "hour": "2023-03-14T10",
+        "token": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        "total_supply": "40760250987909940"
+      },
+      {
+        "hour": "2023-03-14T11",
+        "token": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        "total_supply": "41030342389326272"
+      },
+      {
+        "hour": "2023-03-14T12",
+        "token": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        "total_supply": "41306450536216407"
+      },
+      {
+        "hour": "2023-03-14T13",
+        "token": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        "total_supply": "41588297819408301"
+      },
+      {
+        "hour": "2023-03-14T14",
+        "token": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        "total_supply": "41873834601283006"
+      },
+      {
+        "hour": "2023-03-14T15",
+        "token": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        "total_supply": "42164130689897140"
+      },
+      {
+        "hour": "2023-03-14T16",
+        "token": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        "total_supply": "42458087066059874"
+      },
+      {
+        "hour": "2023-03-14T17",
+        "token": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        "total_supply": "42756450073879052"
+      },
+      {
+        "hour": "2023-03-14T18",
+        "token": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        "total_supply": "43060012079735711"
+      },
+      {
+        "hour": "2023-03-14T19",
+        "token": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        "total_supply": "43368992452961463"
+      },
+      {
+        "hour": "2023-03-14T20",
+        "token": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        "total_supply": "43686721223890340"
+      },
+      {
+        "hour": "2023-03-14T21",
+        "token": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        "total_supply": "44008371650080473"
+      },
+      {
+        "hour": "2023-03-14T22",
+        "token": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        "total_supply": "44336357875732197"
+      },
+      {
+        "hour": "2023-03-14T23",
+        "token": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        "total_supply": "44667960331487587"
+      }
+    ],
+    "usdc-edges": [
+      {
+        "block": 16794102,
+        "from": "0x28c6c06298d514db089934071355e5743bf21d60",
+        "to": "0x0000000000000000000000000000000000000000",
+        "amount": "2000000612491",
+        "count": "4"
+      },
+      {
+        "block": 16794213,
+        "from": "0x88e6a0c2ddd26feeb64f039a2c41296fcb3f5640",
+        "to": "0x3416cf6c708da44db2624d63ea0aaef7113527c6",
+        "amount": "3467059855783",
+        "count": "2"
+      },
+      {
+        "block": 16794398,
+        "from": "0x28c6c06298d514db089934071355e5743bf21d60",
+        "to": "0x0000000000000000000000000000000000000000",
+        "amount": "2000000983937",
+        "count": "4"
+      },
+      {
+        "block": 16794690,
+        "from": "0xf977814e90da44bfa03b6295a0616a897441acec",
+        "to": "0x0000000000000000000000000000000000000000",
+        "amount": "2000000547839",
+        "count": "3"
+      },
+      {
+        "block": 16794984,
+        "from": "0x267be1c1d684f78cb4f6a176c4911b741e4ffdc0",
+        "to": "0x0000000000000000000000000000000000000000",
+        "amount": "2000000418077",
+        "count": "2"
+      },
+      {
+        "block": 16795095,
+        "from": "0x66a9893cc07d91d95644aedd05d03f95e1dba8af",
+        "to": "0xbebc44782c7db0a1a60cb6fe97d0b483032ff1c7",
+        "amount": "43607174362463",
+        "count": "2"
+      },
+      {
+        "block": 16795279,
+        "from": "0x28c6c06298d514db089934071355e5743bf21d60",
+        "to": "0x0000000000000000000000000000000000000000",
+        "amount": "2000000834201",
+        "count": "2"
+      },
+      {
+        "block": 16795577,
+        "from": "0x28c6c06298d514db089934071355e5743bf21d60",
+        "to": "0x0000000000000000000000000000000000000000",
+        "amount": "2000000122066",
+        "count": "2"
+      },
+      {
+        "block": 16795871,
+        "from": "0xf977814e90da44bfa03b6295a0616a897441acec",
+        "to": "0x0000000000000000000000000000000000000000",
+        "amount": "2000000114025",
+        "count": "3"
+      },
+      {
+        "block": 16795982,
+        "from": "0xbbbbbbbbbb9cc5e90e3b3af64bdaf62c37eeffcb",
+        "to": "0x0a59649758aa4d66e25f08dd01271e891fe52199",
+        "amount": "39641440084541",
+        "count": "3"
+      },
+      {
+        "block": 16796165,
+        "from": "0x77134cbc06cb00b66f4c7e623d5fdbf6777635ec",
+        "to": "0x0000000000000000000000000000000000000000",
+        "amount": "2000000590512",
+        "count": "2"
+      },
+      {
+        "block": 16796459,
+        "from": "0x28c6c06298d514db089934071355e5743bf21d60",
+        "to": "0x0000000000000000000000000000000000000000",
+        "amount": "2000000711687",
+        "count": "2"
+      },
+      {
+        "block": 16796752,
+        "from": "0x28c6c06298d514db089934071355e5743bf21d60",
+        "to": "0x0000000000000000000000000000000000000000",
+        "amount": "2000000625576",
+        "count": "2"
+      },
+      {
+        "block": 16796863,
+        "from": "0x3416cf6c708da44db2624d63ea0aaef7113527c6",
+        "to": "0x3416cf6c708da44db2624d63ea0aaef7113527c6",
+        "amount": "50817763484560",
+        "count": "1"
+      },
+      {
+        "block": 16797044,
+        "from": "0x28c6c06298d514db089934071355e5743bf21d60",
+        "to": "0x0000000000000000000000000000000000000000",
+        "amount": "2000000587987",
+        "count": "2"
+      },
+      {
+        "block": 16797334,
+        "from": "0x28c6c06298d514db089934071355e5743bf21d60",
+        "to": "0x0000000000000000000000000000000000000000",
+        "amount": "2000000178564",
+        "count": "1"
+      },
+      {
+        "block": 16797629,
+        "from": "0xa9d1e08c7793af67e9d92fe308d5697fb81d3e43",
+        "to": "0x0000000000000000000000000000000000000000",
+        "amount": "2000000144684",
+        "count": "3"
+      },
+      {
+        "block": 16797740,
+        "from": "0xbebc44782c7db0a1a60cb6fe97d0b483032ff1c7",
+        "to": "0xbebc44782c7db0a1a60cb6fe97d0b483032ff1c7",
+        "amount": "38094596882823",
+        "count": "2"
+      },
+      {
+        "block": 16797925,
+        "from": "0x28c6c06298d514db089934071355e5743bf21d60",
+        "to": "0x0000000000000000000000000000000000000000",
+        "amount": "2000000828616",
+        "count": "3"
+      },
+      {
+        "block": 16798222,
+        "from": "0xf977814e90da44bfa03b6295a0616a897441acec",
+        "to": "0x0000000000000000000000000000000000000000",
+        "amount": "2000000957193",
+        "count": "2"
+      },
+      {
+        "block": 16798516,
+        "from": "0x6cc5f688a315f3dc28a7781717a9a798a59fda7b",
+        "to": "0x0000000000000000000000000000000000000000",
+        "amount": "2000000277290",
+        "count": "4"
+      },
+      {
+        "block": 16798627,
+        "from": "0x0a59649758aa4d66e25f08dd01271e891fe52199",
+        "to": "0x0a59649758aa4d66e25f08dd01271e891fe52199",
+        "amount": "36743530208793",
+        "count": "1"
+      },
+      {
+        "block": 16798814,
+        "from": "0x28c6c06298d514db089934071355e5743bf21d60",
+        "to": "0x0000000000000000000000000000000000000000",
+        "amount": "2000000760005",
+        "count": "1"
+      },
+      {
+        "block": 16799109,
+        "from": "0xf977814e90da44bfa03b6295a0616a897441acec",
+        "to": "0x0000000000000000000000000000000000000000",
+        "amount": "2000000417332",
+        "count": "2"
+      },
+      {
+        "block": 16799407,
+        "from": "0x28c6c06298d514db089934071355e5743bf21d60",
+        "to": "0x0000000000000000000000000000000000000000",
+        "amount": "2000000870817",
+        "count": "1"
+      },
+      {
+        "block": 16799518,
+        "from": "0x000000000004444c5dc75cb358380d2e3de08a90",
+        "to": "0x3416cf6c708da44db2624d63ea0aaef7113527c6",
+        "amount": "34943031699713",
+        "count": "2"
+      },
+      {
+        "block": 16799699,
+        "from": "0x28c6c06298d514db089934071355e5743bf21d60",
+        "to": "0x0000000000000000000000000000000000000000",
+        "amount": "2000000336798",
+        "count": "1"
+      },
+      {
+        "block": 16799997,
+        "from": "0x28c6c06298d514db089934071355e5743bf21d60",
+        "to": "0x0000000000000000000000000000000000000000",
+        "amount": "2000000750577",
+        "count": "4"
+      },
+      {
+        "block": 16800295,
+        "from": "0x267be1c1d684f78cb4f6a176c4911b741e4ffdc0",
+        "to": "0x0000000000000000000000000000000000000000",
+        "amount": "2000000685571",
+        "count": "3"
+      },
+      {
+        "block": 16800406,
+        "from": "0x98c23e9d8f34fefb1b7bd6a91b7ff122f4e16f5c",
+        "to": "0xbebc44782c7db0a1a60cb6fe97d0b483032ff1c7",
+        "amount": "4807107742445",
+        "count": "4"
+      },
+      {
+        "block": 16800590,
+        "from": "0xf977814e90da44bfa03b6295a0616a897441acec",
+        "to": "0x0000000000000000000000000000000000000000",
+        "amount": "2000000056871",
+        "count": "3"
+      },
+      {
+        "block": 16800889,
+        "from": "0xf977814e90da44bfa03b6295a0616a897441acec",
+        "to": "0x0000000000000000000000000000000000000000",
+        "amount": "2000000911132",
+        "count": "1"
+      },
+      {
+        "block": 16801184,
+        "from": "0x28c6c06298d514db089934071355e5743bf21d60",
+        "to": "0x0000000000000000000000000000000000000000",
+        "amount": "2000000811889",
+        "count": "4"
+      },
+      {
+        "block": 16801295,
+        "from": "0x88e6a0c2ddd26feeb64f039a2c41296fcb3f5640",
+        "to": "0x0a59649758aa4d66e25f08dd01271e891fe52199",
+        "amount": "48609882029403",
+        "count": "4"
+      },
+      {
+        "block": 16801482,
+        "from": "0x28c6c06298d514db089934071355e5743bf21d60",
+        "to": "0x0000000000000000000000000000000000000000",
+        "amount": "2000000240921",
+        "count": "4"
+      },
+      {
+        "block": 16801780,
+        "from": "0x6cc5f688a315f3dc28a7781717a9a798a59fda7b",
+        "to": "0x0000000000000000000000000000000000000000",
+        "amount": "2000000562347",
+        "count": "2"
+      },
+      {
+        "block": 16802075,
+        "from": "0x28c6c06298d514db089934071355e5743bf21d60",
+        "to": "0x0000000000000000000000000000000000000000",
+        "amount": "2000000009768",
+        "count": "1"
+      },
+      {
+        "block": 16802186,
+        "from": "0x66a9893cc07d91d95644aedd05d03f95e1dba8af",
+        "to": "0x3416cf6c708da44db2624d63ea0aaef7113527c6",
+        "amount": "39220899087569",
+        "count": "2"
+      },
+      {
+        "block": 16802372,
+        "from": "0xf977814e90da44bfa03b6295a0616a897441acec",
+        "to": "0x0000000000000000000000000000000000000000",
+        "amount": "2000000189032",
+        "count": "3"
+      },
+      {
+        "block": 16802668,
+        "from": "0xf977814e90da44bfa03b6295a0616a897441acec",
+        "to": "0x0000000000000000000000000000000000000000",
+        "amount": "2000000538211",
+        "count": "1"
+      },
+      {
+        "block": 16802962,
+        "from": "0xa9d1e08c7793af67e9d92fe308d5697fb81d3e43",
+        "to": "0x0000000000000000000000000000000000000000",
+        "amount": "2000000441981",
+        "count": "1"
+      },
+      {
+        "block": 16803073,
+        "from": "0xbbbbbbbbbb9cc5e90e3b3af64bdaf62c37eeffcb",
+        "to": "0xbebc44782c7db0a1a60cb6fe97d0b483032ff1c7",
+        "amount": "38375092748501",
+        "count": "2"
+      },
+      {
+        "block": 16803257,
+        "from": "0x28c6c06298d514db089934071355e5743bf21d60",
+        "to": "0x0000000000000000000000000000000000000000",
+        "amount": "2000000084818",
+        "count": "3"
+      },
+      {
+        "block": 16803556,
+        "from": "0x28c6c06298d514db089934071355e5743bf21d60",
+        "to": "0x0000000000000000000000000000000000000000",
+        "amount": "2000000373238",
+        "count": "3"
+      },
+      {
+        "block": 16803850,
+        "from": "0xf977814e90da44bfa03b6295a0616a897441acec",
+        "to": "0x0000000000000000000000000000000000000000",
+        "amount": "2000000342836",
+        "count": "3"
+      },
+      {
+        "block": 16803961,
+        "from": "0x3416cf6c708da44db2624d63ea0aaef7113527c6",
+        "to": "0x0a59649758aa4d66e25f08dd01271e891fe52199",
+        "amount": "16146116013622",
+        "count": "4"
+      },
+      {
+        "block": 16804149,
+        "from": "0xf977814e90da44bfa03b6295a0616a897441acec",
+        "to": "0x0000000000000000000000000000000000000000",
+        "amount": "2000000763300",
+        "count": "3"
+      },
+      {
+        "block": 16804444,
+        "from": "0x28c6c06298d514db089934071355e5743bf21d60",
+        "to": "0x0000000000000000000000000000000000000000",
+        "amount": "2000000954396",
+        "count": "4"
+      },
+      {
+        "block": 16804742,
+        "from": "0x28c6c06298d514db089934071355e5743bf21d60",
+        "to": "0x0000000000000000000000000000000000000000",
+        "amount": "2000000518293",
+        "count": "1"
+      },
+      {
+        "block": 16804853,
+        "from": "0xbebc44782c7db0a1a60cb6fe97d0b483032ff1c7",
+        "to": "0x3416cf6c708da44db2624d63ea0aaef7113527c6",
+        "amount": "27211612909884",
+        "count": "2"
+      },
+      {
+        "block": 16805041,
+        "from": "0x77134cbc06cb00b66f4c7e623d5fdbf6777635ec",
+        "to": "0x0000000000000000000000000000000000000000",
+        "amount": "2207361989231",
+        "count": "1"
+      },
+      {
+        "block": 16805336,
+        "from": "0xf977814e90da44bfa03b6295a0616a897441acec",
+        "to": "0x0000000000000000000000000000000000000000",
+        "amount": "53071573246575",
+        "count": "1"
+      },
+      {
+        "block": 16805632,
+        "from": "0x77134cbc06cb00b66f4c7e623d5fdbf6777635ec",
+        "to": "0x0000000000000000000000000000000000000000",
+        "amount": "13239476331391",
+        "count": "1"
+      },
+      {
+        "block": 16805743,
+        "from": "0x0a59649758aa4d66e25f08dd01271e891fe52199",
+        "to": "0xbebc44782c7db0a1a60cb6fe97d0b483032ff1c7",
+        "amount": "28078895180091",
+        "count": "3"
+      },
+      {
+        "block": 16805926,
+        "from": "0x77134cbc06cb00b66f4c7e623d5fdbf6777635ec",
+        "to": "0x0000000000000000000000000000000000000000",
+        "amount": "49630219059002",
+        "count": "4"
+      },
+      {
+        "block": 16806221,
+        "from": "0xf977814e90da44bfa03b6295a0616a897441acec",
+        "to": "0x0000000000000000000000000000000000000000",
+        "amount": "4331237514475",
+        "count": "3"
+      },
+      {
+        "block": 16806518,
+        "from": "0x28c6c06298d514db089934071355e5743bf21d60",
+        "to": "0x0000000000000000000000000000000000000000",
+        "amount": "66800141569153",
+        "count": "4"
+      },
+      {
+        "block": 16806629,
+        "from": "0x000000000004444c5dc75cb358380d2e3de08a90",
+        "to": "0x0a59649758aa4d66e25f08dd01271e891fe52199",
+        "amount": "49741394622392",
+        "count": "1"
+      },
+      {
+        "block": 16806815,
+        "from": "0x28c6c06298d514db089934071355e5743bf21d60",
+        "to": "0x0000000000000000000000000000000000000000",
+        "amount": "39717393939799",
+        "count": "3"
+      },
+      {
+        "block": 16807111,
+        "from": "0x267be1c1d684f78cb4f6a176c4911b741e4ffdc0",
+        "to": "0x0000000000000000000000000000000000000000",
+        "amount": "153018546733049",
+        "count": "1"
+      },
+      {
+        "block": 16807403,
+        "from": "0xa9d1e08c7793af67e9d92fe308d5697fb81d3e43",
+        "to": "0x0000000000000000000000000000000000000000",
+        "amount": "57347852054213",
+        "count": "4"
+      },
+      {
+        "block": 16807440,
+        "from": "0xf977814e90da44bfa03b6295a0616a897441acec",
+        "to": "0x0000000000000000000000000000000000000000",
+        "amount": "45156664868265",
+        "count": "4"
+      },
+      {
+        "block": 16807514,
+        "from": "0x98c23e9d8f34fefb1b7bd6a91b7ff122f4e16f5c",
+        "to": "0x3416cf6c708da44db2624d63ea0aaef7113527c6",
+        "amount": "29258715004037",
+        "count": "2"
+      },
+      {
+        "block": 16807701,
+        "from": "0x6cc5f688a315f3dc28a7781717a9a798a59fda7b",
+        "to": "0x0000000000000000000000000000000000000000",
+        "amount": "250564532785334",
+        "count": "2"
+      },
+      {
+        "block": 16807738,
+        "from": "0x77134cbc06cb00b66f4c7e623d5fdbf6777635ec",
+        "to": "0x0000000000000000000000000000000000000000",
+        "amount": "104186978893",
+        "count": "1"
+      },
+      {
+        "block": 16807999,
+        "from": "0xf977814e90da44bfa03b6295a0616a897441acec",
+        "to": "0x0000000000000000000000000000000000000000",
+        "amount": "263947555414353",
+        "count": "3"
+      },
+      {
+        "block": 16808036,
+        "from": "0x267be1c1d684f78cb4f6a176c4911b741e4ffdc0",
+        "to": "0x0000000000000000000000000000000000000000",
+        "amount": "127200455482772",
+        "count": "2"
+      },
+      {
+        "block": 16808298,
+        "from": "0x28c6c06298d514db089934071355e5743bf21d60",
+        "to": "0x0000000000000000000000000000000000000000",
+        "amount": "127243230390354",
+        "count": "3"
+      },
+      {
+        "block": 16808335,
+        "from": "0x6cc5f688a315f3dc28a7781717a9a798a59fda7b",
+        "to": "0x0000000000000000000000000000000000000000",
+        "amount": "66857686120175",
+        "count": "3"
+      },
+      {
+        "block": 16808409,
+        "from": "0x88e6a0c2ddd26feeb64f039a2c41296fcb3f5640",
+        "to": "0xbebc44782c7db0a1a60cb6fe97d0b483032ff1c7",
+        "amount": "21824422660161",
+        "count": "4"
+      },
+      {
+        "block": 16808591,
+        "from": "0x28c6c06298d514db089934071355e5743bf21d60",
+        "to": "0x0000000000000000000000000000000000000000",
+        "amount": "315043178763032",
+        "count": "2"
+      },
+      {
+        "block": 16808628,
+        "from": "0xf977814e90da44bfa03b6295a0616a897441acec",
+        "to": "0x0000000000000000000000000000000000000000",
+        "amount": "59784993096222",
+        "count": "2"
+      },
+      {
+        "block": 16808887,
+        "from": "0xf977814e90da44bfa03b6295a0616a897441acec",
+        "to": "0x0000000000000000000000000000000000000000",
+        "amount": "89461650694626",
+        "count": "1"
+      },
+      {
+        "block": 16808924,
+        "from": "0x6cc5f688a315f3dc28a7781717a9a798a59fda7b",
+        "to": "0x0000000000000000000000000000000000000000",
+        "amount": "186117278707062",
+        "count": "1"
+      },
+      {
+        "block": 16809180,
+        "from": "0xa9d1e08c7793af67e9d92fe308d5697fb81d3e43",
+        "to": "0x0000000000000000000000000000000000000000",
+        "amount": "356522255175633",
+        "count": "4"
+      },
+      {
+        "block": 16809217,
+        "from": "0x28c6c06298d514db089934071355e5743bf21d60",
+        "to": "0x0000000000000000000000000000000000000000",
+        "amount": "71997802151999",
+        "count": "4"
+      },
+      {
+        "block": 16809291,
+        "from": "0x66a9893cc07d91d95644aedd05d03f95e1dba8af",
+        "to": "0x0a59649758aa4d66e25f08dd01271e891fe52199",
+        "amount": "19206719015538",
+        "count": "2"
+      },
+      {
+        "block": 16809477,
+        "from": "0x28c6c06298d514db089934071355e5743bf21d60",
+        "to": "0x0000000000000000000000000000000000000000",
+        "amount": "215851043837559",
+        "count": "2"
+      },
+      {
+        "block": 16809514,
+        "from": "0xa9d1e08c7793af67e9d92fe308d5697fb81d3e43",
+        "to": "0x0000000000000000000000000000000000000000",
+        "amount": "16983626559696",
+        "count": "2"
+      },
+      {
+        "block": 16809773,
+        "from": "0xa9d1e08c7793af67e9d92fe308d5697fb81d3e43",
+        "to": "0x0000000000000000000000000000000000000000",
+        "amount": "91000132235041",
+        "count": "2"
+      },
+      {
+        "block": 16809810,
+        "from": "0x6cc5f688a315f3dc28a7781717a9a798a59fda7b",
+        "to": "0x0000000000000000000000000000000000000000",
+        "amount": "201127149290947",
+        "count": "2"
+      },
+      {
+        "block": 16810066,
+        "from": "0x28c6c06298d514db089934071355e5743bf21d60",
+        "to": "0x0000000000000000000000000000000000000000",
+        "amount": "124639443682644",
+        "count": "4"
+      },
+      {
+        "block": 16810103,
+        "from": "0x6cc5f688a315f3dc28a7781717a9a798a59fda7b",
+        "to": "0x0000000000000000000000000000000000000000",
+        "amount": "187762420965817",
+        "count": "1"
+      },
+      {
+        "block": 16810177,
+        "from": "0xbbbbbbbbbb9cc5e90e3b3af64bdaf62c37eeffcb",
+        "to": "0x3416cf6c708da44db2624d63ea0aaef7113527c6",
+        "amount": "35317282714987",
+        "count": "2"
+      },
+      {
+        "block": 16810359,
+        "from": "0x28c6c06298d514db089934071355e5743bf21d60",
+        "to": "0x0000000000000000000000000000000000000000",
+        "amount": "380427276935270",
+        "count": "1"
+      },
+      {
+        "block": 16810396,
+        "from": "0xf977814e90da44bfa03b6295a0616a897441acec",
+        "to": "0x0000000000000000000000000000000000000000",
+        "amount": "62546388406432",
+        "count": "1"
+      },
+      {
+        "block": 16810657,
+        "from": "0x28c6c06298d514db089934071355e5743bf21d60",
+        "to": "0x0000000000000000000000000000000000000000",
+        "amount": "140899159960974",
+        "count": "1"
+      },
+      {
+        "block": 16810694,
+        "from": "0x28c6c06298d514db089934071355e5743bf21d60",
+        "to": "0x0000000000000000000000000000000000000000",
+        "amount": "211327158475220",
+        "count": "2"
+      },
+      {
+        "block": 16810954,
+        "from": "0xa9d1e08c7793af67e9d92fe308d5697fb81d3e43",
+        "to": "0x0000000000000000000000000000000000000000",
+        "amount": "451248147187256",
+        "count": "3"
+      },
+      {
+        "block": 16810991,
+        "from": "0x267be1c1d684f78cb4f6a176c4911b741e4ffdc0",
+        "to": "0x0000000000000000000000000000000000000000",
+        "amount": "149261220031459",
+        "count": "1"
+      },
+      {
+        "block": 16811065,
+        "from": "0x3416cf6c708da44db2624d63ea0aaef7113527c6",
+        "to": "0xbebc44782c7db0a1a60cb6fe97d0b483032ff1c7",
+        "amount": "47596642730730",
+        "count": "1"
+      },
+      {
+        "block": 16811253,
+        "from": "0xf977814e90da44bfa03b6295a0616a897441acec",
+        "to": "0x0000000000000000000000000000000000000000",
+        "amount": "167712359844215",
+        "count": "4"
+      },
+      {
+        "block": 16811290,
+        "from": "0x28c6c06298d514db089934071355e5743bf21d60",
+        "to": "0x0000000000000000000000000000000000000000",
+        "amount": "78361464287339",
+        "count": "4"
+      },
+      {
+        "block": 16811548,
+        "from": "0x28c6c06298d514db089934071355e5743bf21d60",
+        "to": "0x0000000000000000000000000000000000000000",
+        "amount": "182958454371518",
+        "count": "1"
+      },
+      {
+        "block": 16811585,
+        "from": "0xa9d1e08c7793af67e9d92fe308d5697fb81d3e43",
+        "to": "0x0000000000000000000000000000000000000000",
+        "amount": "183831500471480",
+        "count": "4"
+      },
+      {
+        "block": 16811847,
+        "from": "0x28c6c06298d514db089934071355e5743bf21d60",
+        "to": "0x0000000000000000000000000000000000000000",
+        "amount": "112412367442076",
+        "count": "1"
+      },
+      {
+        "block": 16811884,
+        "from": "0x6cc5f688a315f3dc28a7781717a9a798a59fda7b",
+        "to": "0x0000000000000000000000000000000000000000",
+        "amount": "240236574477469",
+        "count": "2"
+      },
+      {
+        "block": 16811921,
+        "from": "0x0000000000000000000000000000000000000000",
+        "to": "0x55fe002aeff02f77364de339a1292923a15844b8",
+        "amount": "40000000156034",
+        "count": "4"
+      },
+      {
+        "block": 16811958,
+        "from": "0xbebc44782c7db0a1a60cb6fe97d0b483032ff1c7",
+        "to": "0x0a59649758aa4d66e25f08dd01271e891fe52199",
+        "amount": "44291811259082",
+        "count": "2"
+      },
+      {
+        "block": 16812142,
+        "from": "0x267be1c1d684f78cb4f6a176c4911b741e4ffdc0",
+        "to": "0x0000000000000000000000000000000000000000",
+        "amount": "184091858485387",
+        "count": "3"
+      },
+      {
+        "block": 16812179,
+        "from": "0xf977814e90da44bfa03b6295a0616a897441acec",
+        "to": "0x0000000000000000000000000000000000000000",
+        "amount": "264614869232527",
+        "count": "1"
+      },
+      {
+        "block": 16812216,
+        "from": "0x0000000000000000000000000000000000000000",
+        "to": "0x55fe002aeff02f77364de339a1292923a15844b8",
+        "amount": "45000000693139",
+        "count": "4"
+      },
+      {
+        "block": 16812440,
+        "from": "0x28c6c06298d514db089934071355e5743bf21d60",
+        "to": "0x0000000000000000000000000000000000000000",
+        "amount": "342728950486765",
+        "count": "1"
+      },
+      {
+        "block": 16812477,
+        "from": "0xf977814e90da44bfa03b6295a0616a897441acec",
+        "to": "0x0000000000000000000000000000000000000000",
+        "amount": "211470408344539",
+        "count": "1"
+      },
+      {
+        "block": 16812514,
+        "from": "0x0000000000000000000000000000000000000000",
+        "to": "0x55fe002aeff02f77364de339a1292923a15844b8",
+        "amount": "50000000026726",
+        "count": "3"
+      },
+      {
+        "block": 16812738,
+        "from": "0xf977814e90da44bfa03b6295a0616a897441acec",
+        "to": "0x0000000000000000000000000000000000000000",
+        "amount": "63175469624841",
+        "count": "4"
+      },
+      {
+        "block": 16812775,
+        "from": "0x28c6c06298d514db089934071355e5743bf21d60",
+        "to": "0x0000000000000000000000000000000000000000",
+        "amount": "206437129397128",
+        "count": "2"
+      },
+      {
+        "block": 16812812,
+        "from": "0x0000000000000000000000000000000000000000",
+        "to": "0x55fe002aeff02f77364de339a1292923a15844b8",
+        "amount": "55000000411109",
+        "count": "3"
+      },
+      {
+        "block": 16812849,
+        "from": "0x0a59649758aa4d66e25f08dd01271e891fe52199",
+        "to": "0x3416cf6c708da44db2624d63ea0aaef7113527c6",
+        "amount": "27230469649091",
+        "count": "1"
+      },
+      {
+        "block": 16813034,
+        "from": "0x28c6c06298d514db089934071355e5743bf21d60",
+        "to": "0x0000000000000000000000000000000000000000",
+        "amount": "176589983709649",
+        "count": "1"
+      },
+      {
+        "block": 16813071,
+        "from": "0x77134cbc06cb00b66f4c7e623d5fdbf6777635ec",
+        "to": "0x0000000000000000000000000000000000000000",
+        "amount": "102861651110070",
+        "count": "3"
+      },
+      {
+        "block": 16813108,
+        "from": "0x0000000000000000000000000000000000000000",
+        "to": "0x55fe002aeff02f77364de339a1292923a15844b8",
+        "amount": "60000000424705",
+        "count": "3"
+      },
+      {
+        "block": 16813331,
+        "from": "0x28c6c06298d514db089934071355e5743bf21d60",
+        "to": "0x0000000000000000000000000000000000000000",
+        "amount": "214425677365581",
+        "count": "2"
+      },
+      {
+        "block": 16813368,
+        "from": "0xa9d1e08c7793af67e9d92fe308d5697fb81d3e43",
+        "to": "0x0000000000000000000000000000000000000000",
+        "amount": "148455772111016",
+        "count": "4"
+      },
+      {
+        "block": 16813405,
+        "from": "0x0000000000000000000000000000000000000000",
+        "to": "0x55fe002aeff02f77364de339a1292923a15844b8",
+        "amount": "65000000087178",
+        "count": "1"
+      },
+      {
+        "block": 16813629,
+        "from": "0xf977814e90da44bfa03b6295a0616a897441acec",
+        "to": "0x0000000000000000000000000000000000000000",
+        "amount": "26120264055159",
+        "count": "1"
+      },
+      {
+        "block": 16813666,
+        "from": "0x28c6c06298d514db089934071355e5743bf21d60",
+        "to": "0x0000000000000000000000000000000000000000",
+        "amount": "185355343738882",
+        "count": "2"
+      },
+      {
+        "block": 16813703,
+        "from": "0x0000000000000000000000000000000000000000",
+        "to": "0x55fe002aeff02f77364de339a1292923a15844b8",
+        "amount": "70000000581797",
+        "count": "4"
+      },
+      {
+        "block": 16813740,
+        "from": "0x000000000004444c5dc75cb358380d2e3de08a90",
+        "to": "0xbebc44782c7db0a1a60cb6fe97d0b483032ff1c7",
+        "amount": "10689970192047",
+        "count": "3"
+      },
+      {
+        "block": 16813926,
+        "from": "0x28c6c06298d514db089934071355e5743bf21d60",
+        "to": "0x0000000000000000000000000000000000000000",
+        "amount": "41878297943447",
+        "count": "3"
+      },
+      {
+        "block": 16813963,
+        "from": "0x28c6c06298d514db089934071355e5743bf21d60",
+        "to": "0x0000000000000000000000000000000000000000",
+        "amount": "195861884346464",
+        "count": "4"
+      },
+      {
+        "block": 16814000,
+        "from": "0x0000000000000000000000000000000000000000",
+        "to": "0x55fe002aeff02f77364de339a1292923a15844b8",
+        "amount": "75000000814642",
+        "count": "2"
+      },
+      {
+        "block": 16814222,
+        "from": "0xa9d1e08c7793af67e9d92fe308d5697fb81d3e43",
+        "to": "0x0000000000000000000000000000000000000000",
+        "amount": "225377842674900",
+        "count": "4"
+      },
+      {
+        "block": 16814259,
+        "from": "0x77134cbc06cb00b66f4c7e623d5fdbf6777635ec",
+        "to": "0x0000000000000000000000000000000000000000",
+        "amount": "131168583747817",
+        "count": "2"
+      },
+      {
+        "block": 16814296,
+        "from": "0x0000000000000000000000000000000000000000",
+        "to": "0x55fe002aeff02f77364de339a1292923a15844b8",
+        "amount": "80000000113796",
+        "count": "1"
+      },
+      {
+        "block": 16814522,
+        "from": "0x28c6c06298d514db089934071355e5743bf21d60",
+        "to": "0x0000000000000000000000000000000000000000",
+        "amount": "322777961904965",
+        "count": "3"
+      },
+      {
+        "block": 16814559,
+        "from": "0xf977814e90da44bfa03b6295a0616a897441acec",
+        "to": "0x0000000000000000000000000000000000000000",
+        "amount": "156231014569665",
+        "count": "2"
+      },
+      {
+        "block": 16814596,
+        "from": "0x0000000000000000000000000000000000000000",
+        "to": "0x55fe002aeff02f77364de339a1292923a15844b8",
+        "amount": "85000000115175",
+        "count": "2"
+      },
+      {
+        "block": 16814633,
+        "from": "0x98c23e9d8f34fefb1b7bd6a91b7ff122f4e16f5c",
+        "to": "0x0a59649758aa4d66e25f08dd01271e891fe52199",
+        "amount": "6862531816054",
+        "count": "4"
+      },
+      {
+        "block": 16814817,
+        "from": "0x77134cbc06cb00b66f4c7e623d5fdbf6777635ec",
+        "to": "0x0000000000000000000000000000000000000000",
+        "amount": "309643400956271",
+        "count": "3"
+      },
+      {
+        "block": 16814854,
+        "from": "0x28c6c06298d514db089934071355e5743bf21d60",
+        "to": "0x0000000000000000000000000000000000000000",
+        "amount": "81939150753436",
+        "count": "1"
+      },
+      {
+        "block": 16814891,
+        "from": "0x0000000000000000000000000000000000000000",
+        "to": "0x55fe002aeff02f77364de339a1292923a15844b8",
+        "amount": "90000000595239",
+        "count": "2"
+      },
+      {
+        "block": 16815113,
+        "from": "0x6cc5f688a315f3dc28a7781717a9a798a59fda7b",
+        "to": "0x0000000000000000000000000000000000000000",
+        "amount": "56600106703969",
+        "count": "4"
+      },
+      {
+        "block": 16815150,
+        "from": "0x28c6c06298d514db089934071355e5743bf21d60",
+        "to": "0x0000000000000000000000000000000000000000",
+        "amount": "10771566657604",
+        "count": "4"
+      },
+      {
+        "block": 16815187,
+        "from": "0x0000000000000000000000000000000000000000",
+        "to": "0x55fe002aeff02f77364de339a1292923a15844b8",
+        "amount": "95000000709782",
+        "count": "3"
+      },
+      {
+        "block": 16815407,
+        "from": "0x28c6c06298d514db089934071355e5743bf21d60",
+        "to": "0x0000000000000000000000000000000000000000",
+        "amount": "110491218607913",
+        "count": "1"
+      },
+      {
+        "block": 16815444,
+        "from": "0xf977814e90da44bfa03b6295a0616a897441acec",
+        "to": "0x0000000000000000000000000000000000000000",
+        "amount": "40868580131761",
+        "count": "1"
+      },
+      {
+        "block": 16815481,
+        "from": "0x0000000000000000000000000000000000000000",
+        "to": "0x55fe002aeff02f77364de339a1292923a15844b8",
+        "amount": "100000000294544",
+        "count": "1"
+      },
+      {
+        "block": 16815518,
+        "from": "0x88e6a0c2ddd26feeb64f039a2c41296fcb3f5640",
+        "to": "0x3416cf6c708da44db2624d63ea0aaef7113527c6",
+        "amount": "37761628228444",
+        "count": "2"
+      },
+      {
+        "block": 16815699,
+        "from": "0xa9d1e08c7793af67e9d92fe308d5697fb81d3e43",
+        "to": "0x0000000000000000000000000000000000000000",
+        "amount": "6026856528482",
+        "count": "1"
+      },
+      {
+        "block": 16815736,
+        "from": "0x6cc5f688a315f3dc28a7781717a9a798a59fda7b",
+        "to": "0x0000000000000000000000000000000000000000",
+        "amount": "100144486412933",
+        "count": "2"
+      },
+      {
+        "block": 16815773,
+        "from": "0x0000000000000000000000000000000000000000",
+        "to": "0x55fe002aeff02f77364de339a1292923a15844b8",
+        "amount": "105000000545807",
+        "count": "4"
+      },
+      {
+        "block": 16815998,
+        "from": "0x77134cbc06cb00b66f4c7e623d5fdbf6777635ec",
+        "to": "0x0000000000000000000000000000000000000000",
+        "amount": "88608820810792",
+        "count": "1"
+      },
+      {
+        "block": 16816072,
+        "from": "0x0000000000000000000000000000000000000000",
+        "to": "0x55fe002aeff02f77364de339a1292923a15844b8",
+        "amount": "110000000750223",
+        "count": "3"
+      },
+      {
+        "block": 16816294,
+        "from": "0x267be1c1d684f78cb4f6a176c4911b741e4ffdc0",
+        "to": "0x0000000000000000000000000000000000000000",
+        "amount": "61700431517722",
+        "count": "3"
+      },
+      {
+        "block": 16816368,
+        "from": "0x0000000000000000000000000000000000000000",
+        "to": "0x55fe002aeff02f77364de339a1292923a15844b8",
+        "amount": "115000000070936",
+        "count": "4"
+      },
+      {
+        "block": 16816405,
+        "from": "0x66a9893cc07d91d95644aedd05d03f95e1dba8af",
+        "to": "0xbebc44782c7db0a1a60cb6fe97d0b483032ff1c7",
+        "amount": "6129493607824",
+        "count": "2"
+      },
+      {
+        "block": 16816590,
+        "from": "0xf977814e90da44bfa03b6295a0616a897441acec",
+        "to": "0x0000000000000000000000000000000000000000",
+        "amount": "162055103537348",
+        "count": "1"
+      },
+      {
+        "block": 16816664,
+        "from": "0x0000000000000000000000000000000000000000",
+        "to": "0x55fe002aeff02f77364de339a1292923a15844b8",
+        "amount": "120000000213207",
+        "count": "1"
+      },
+      {
+        "block": 16816887,
+        "from": "0xf977814e90da44bfa03b6295a0616a897441acec",
+        "to": "0x0000000000000000000000000000000000000000",
+        "amount": "162119178925597",
+        "count": "3"
+      },
+      {
+        "block": 16816961,
+        "from": "0x0000000000000000000000000000000000000000",
+        "to": "0x55fe002aeff02f77364de339a1292923a15844b8",
+        "amount": "125000000932315",
+        "count": "1"
+      },
+      {
+        "block": 16817186,
+        "from": "0x28c6c06298d514db089934071355e5743bf21d60",
+        "to": "0x0000000000000000000000000000000000000000",
+        "amount": "124602747147337",
+        "count": "2"
+      },
+      {
+        "block": 16817260,
+        "from": "0x0000000000000000000000000000000000000000",
+        "to": "0x55fe002aeff02f77364de339a1292923a15844b8",
+        "amount": "130000000642093",
+        "count": "3"
+      },
+      {
+        "block": 16817297,
+        "from": "0xbbbbbbbbbb9cc5e90e3b3af64bdaf62c37eeffcb",
+        "to": "0x0a59649758aa4d66e25f08dd01271e891fe52199",
+        "amount": "32642286742333",
+        "count": "1"
+      },
+      {
+        "block": 16817483,
+        "from": "0xf977814e90da44bfa03b6295a0616a897441acec",
+        "to": "0x0000000000000000000000000000000000000000",
+        "amount": "45718407649715",
+        "count": "3"
+      },
+      {
+        "block": 16817557,
+        "from": "0x0000000000000000000000000000000000000000",
+        "to": "0x55fe002aeff02f77364de339a1292923a15844b8",
+        "amount": "135000000517998",
+        "count": "3"
+      },
+      {
+        "block": 16817783,
+        "from": "0x28c6c06298d514db089934071355e5743bf21d60",
+        "to": "0x0000000000000000000000000000000000000000",
+        "amount": "13134068854816",
+        "count": "4"
+      },
+      {
+        "block": 16817857,
+        "from": "0x0000000000000000000000000000000000000000",
+        "to": "0x55fe002aeff02f77364de339a1292923a15844b8",
+        "amount": "140000000248626",
+        "count": "3"
+      },
+      {
+        "block": 16818082,
+        "from": "0x28c6c06298d514db089934071355e5743bf21d60",
+        "to": "0x0000000000000000000000000000000000000000",
+        "amount": "41637600044827",
+        "count": "4"
+      },
+      {
+        "block": 16818156,
+        "from": "0x0000000000000000000000000000000000000000",
+        "to": "0x55fe002aeff02f77364de339a1292923a15844b8",
+        "amount": "145000000628023",
+        "count": "3"
+      },
+      {
+        "block": 16818193,
+        "from": "0x3416cf6c708da44db2624d63ea0aaef7113527c6",
+        "to": "0x3416cf6c708da44db2624d63ea0aaef7113527c6",
+        "amount": "8085434891697",
+        "count": "2"
+      },
+      {
+        "block": 16818377,
+        "from": "0x28c6c06298d514db089934071355e5743bf21d60",
+        "to": "0x0000000000000000000000000000000000000000",
+        "amount": "20537392010552",
+        "count": "4"
+      },
+      {
+        "block": 16818451,
+        "from": "0x0000000000000000000000000000000000000000",
+        "to": "0x55fe002aeff02f77364de339a1292923a15844b8",
+        "amount": "150000000189220",
+        "count": "4"
+      },
+      {
+        "block": 16818674,
+        "from": "0x28c6c06298d514db089934071355e5743bf21d60",
+        "to": "0x0000000000000000000000000000000000000000",
+        "amount": "19646395991040",
+        "count": "3"
+      },
+      {
+        "block": 16818748,
+        "from": "0x0000000000000000000000000000000000000000",
+        "to": "0x55fe002aeff02f77364de339a1292923a15844b8",
+        "amount": "155000000928833",
+        "count": "4"
+      },
+      {
+        "block": 16818972,
+        "from": "0xf977814e90da44bfa03b6295a0616a897441acec",
+        "to": "0x0000000000000000000000000000000000000000",
+        "amount": "4310042879895",
+        "count": "3"
+      },
+      {
+        "block": 16819046,
+        "from": "0x0000000000000000000000000000000000000000",
+        "to": "0x55fe002aeff02f77364de339a1292923a15844b8",
+        "amount": "160000000384373",
+        "count": "1"
+      },
+      {
+        "block": 16819083,
+        "from": "0xbebc44782c7db0a1a60cb6fe97d0b483032ff1c7",
+        "to": "0xbebc44782c7db0a1a60cb6fe97d0b483032ff1c7",
+        "amount": "5164549162632",
+        "count": "3"
+      },
+      {
+        "block": 16819267,
+        "from": "0x6cc5f688a315f3dc28a7781717a9a798a59fda7b",
+        "to": "0x0000000000000000000000000000000000000000",
+        "amount": "3752406029961",
+        "count": "2"
+      },
+      {
+        "block": 16819341,
+        "from": "0x0000000000000000000000000000000000000000",
+        "to": "0x55fe002aeff02f77364de339a1292923a15844b8",
+        "amount": "165000000112764",
+        "count": "2"
+      },
+      {
+        "block": 16819563,
+        "from": "0x28c6c06298d514db089934071355e5743bf21d60",
+        "to": "0x0000000000000000000000000000000000000000",
+        "amount": "3466994839267",
+        "count": "1"
+      },
+      {
+        "block": 16819637,
+        "from": "0x0000000000000000000000000000000000000000",
+        "to": "0x55fe002aeff02f77364de339a1292923a15844b8",
+        "amount": "170000000631974",
+        "count": "4"
+      },
+      {
+        "block": 16819859,
+        "from": "0xf977814e90da44bfa03b6295a0616a897441acec",
+        "to": "0x0000000000000000000000000000000000000000",
+        "amount": "3897610952780",
+        "count": "1"
+      },
+      {
+        "block": 16819933,
+        "from": "0x0000000000000000000000000000000000000000",
+        "to": "0x55fe002aeff02f77364de339a1292923a15844b8",
+        "amount": "175000000711615",
+        "count": "3"
+      },
+      {
+        "block": 16819970,
+        "from": "0x0a59649758aa4d66e25f08dd01271e891fe52199",
+        "to": "0x0a59649758aa4d66e25f08dd01271e891fe52199",
+        "amount": "18749430647709",
+        "count": "2"
+      },
+      {
+        "block": 16820155,
+        "from": "0xf977814e90da44bfa03b6295a0616a897441acec",
+        "to": "0x0000000000000000000000000000000000000000",
+        "amount": "2860526725301",
+        "count": "2"
+      },
+      {
+        "block": 16820229,
+        "from": "0x0000000000000000000000000000000000000000",
+        "to": "0x55fe002aeff02f77364de339a1292923a15844b8",
+        "amount": "180000000971216",
+        "count": "2"
+      },
+      {
+        "block": 16820449,
+        "from": "0x28c6c06298d514db089934071355e5743bf21d60",
+        "to": "0x0000000000000000000000000000000000000000",
+        "amount": "6599819965728",
+        "count": "1"
+      },
+      {
+        "block": 16820523,
+        "from": "0x0000000000000000000000000000000000000000",
+        "to": "0x55fe002aeff02f77364de339a1292923a15844b8",
+        "amount": "185000000233454",
+        "count": "3"
+      },
+      {
+        "block": 16820748,
+        "from": "0x28c6c06298d514db089934071355e5743bf21d60",
+        "to": "0x0000000000000000000000000000000000000000",
+        "amount": "4235225921719",
+        "count": "1"
+      },
+      {
+        "block": 16820822,
+        "from": "0x0000000000000000000000000000000000000000",
+        "to": "0x55fe002aeff02f77364de339a1292923a15844b8",
+        "amount": "190000000631016",
+        "count": "2"
+      },
+      {
+        "block": 16820859,
+        "from": "0x000000000004444c5dc75cb358380d2e3de08a90",
+        "to": "0x3416cf6c708da44db2624d63ea0aaef7113527c6",
+        "amount": "42366542113846",
+        "count": "1"
+      },
+      {
+        "block": 16821048,
+        "from": "0x267be1c1d684f78cb4f6a176c4911b741e4ffdc0",
+        "to": "0x0000000000000000000000000000000000000000",
+        "amount": "2150658966800",
+        "count": "1"
+      },
+      {
+        "block": 16821122,
+        "from": "0x0000000000000000000000000000000000000000",
+        "to": "0x55fe002aeff02f77364de339a1292923a15844b8",
+        "amount": "195000000150360",
+        "count": "3"
+      },
+      {
+        "block": 16821343,
+        "from": "0xa9d1e08c7793af67e9d92fe308d5697fb81d3e43",
+        "to": "0x0000000000000000000000000000000000000000",
+        "amount": "2756585114983",
+        "count": "3"
+      },
+      {
+        "block": 16821417,
+        "from": "0x0000000000000000000000000000000000000000",
+        "to": "0x55fe002aeff02f77364de339a1292923a15844b8",
+        "amount": "200000000254233",
+        "count": "1"
+      },
+      {
+        "block": 16821640,
+        "from": "0x28c6c06298d514db089934071355e5743bf21d60",
+        "to": "0x0000000000000000000000000000000000000000",
+        "amount": "6270403590541",
+        "count": "1"
+      },
+      {
+        "block": 16821714,
+        "from": "0x0000000000000000000000000000000000000000",
+        "to": "0x55fe002aeff02f77364de339a1292923a15844b8",
+        "amount": "205000000229465",
+        "count": "1"
+      },
+      {
+        "block": 16821751,
+        "from": "0x98c23e9d8f34fefb1b7bd6a91b7ff122f4e16f5c",
+        "to": "0xbebc44782c7db0a1a60cb6fe97d0b483032ff1c7",
+        "amount": "11322435251536",
+        "count": "4"
+      },
+      {
+        "block": 16821939,
+        "from": "0xa9d1e08c7793af67e9d92fe308d5697fb81d3e43",
+        "to": "0x0000000000000000000000000000000000000000",
+        "amount": "6260284071269",
+        "count": "1"
+      },
+      {
+        "block": 16822013,
+        "from": "0x0000000000000000000000000000000000000000",
+        "to": "0x55fe002aeff02f77364de339a1292923a15844b8",
+        "amount": "210000000616233",
+        "count": "1"
+      },
+      {
+        "block": 16822235,
+        "from": "0x28c6c06298d514db089934071355e5743bf21d60",
+        "to": "0x0000000000000000000000000000000000000000",
+        "amount": "2671723057213",
+        "count": "2"
+      },
+      {
+        "block": 16822309,
+        "from": "0x0000000000000000000000000000000000000000",
+        "to": "0x55fe002aeff02f77364de339a1292923a15844b8",
+        "amount": "215000000355883",
+        "count": "3"
+      },
+      {
+        "block": 16822532,
+        "from": "0x28c6c06298d514db089934071355e5743bf21d60",
+        "to": "0x0000000000000000000000000000000000000000",
+        "amount": "6749189999142",
+        "count": "3"
+      },
+      {
+        "block": 16822606,
+        "from": "0x0000000000000000000000000000000000000000",
+        "to": "0x55fe002aeff02f77364de339a1292923a15844b8",
+        "amount": "220000000553499",
+        "count": "2"
+      },
+      {
+        "block": 16822643,
+        "from": "0x88e6a0c2ddd26feeb64f039a2c41296fcb3f5640",
+        "to": "0x0a59649758aa4d66e25f08dd01271e891fe52199",
+        "amount": "8408762637553",
+        "count": "1"
+      },
+      {
+        "block": 16822827,
+        "from": "0x267be1c1d684f78cb4f6a176c4911b741e4ffdc0",
+        "to": "0x0000000000000000000000000000000000000000",
+        "amount": "6966008257070",
+        "count": "2"
+      },
+      {
+        "block": 16822901,
+        "from": "0x0000000000000000000000000000000000000000",
+        "to": "0x55fe002aeff02f77364de339a1292923a15844b8",
+        "amount": "225000000291792",
+        "count": "2"
+      },
+      {
+        "block": 16823122,
+        "from": "0xa9d1e08c7793af67e9d92fe308d5697fb81d3e43",
+        "to": "0x0000000000000000000000000000000000000000",
+        "amount": "2215793797934",
+        "count": "4"
+      },
+      {
+        "block": 16823196,
+        "from": "0x0000000000000000000000000000000000000000",
+        "to": "0x55fe002aeff02f77364de339a1292923a15844b8",
+        "amount": "230000000022394",
+        "count": "2"
+      },
+      {
+        "block": 16823419,
+        "from": "0x77134cbc06cb00b66f4c7e623d5fdbf6777635ec",
+        "to": "0x0000000000000000000000000000000000000000",
+        "amount": "4766265521022",
+        "count": "3"
+      },
+      {
+        "block": 16823493,
+        "from": "0x0000000000000000000000000000000000000000",
+        "to": "0x55fe002aeff02f77364de339a1292923a15844b8",
+        "amount": "235000000104286",
+        "count": "3"
+      },
+      {
+        "block": 16823530,
+        "from": "0x66a9893cc07d91d95644aedd05d03f95e1dba8af",
+        "to": "0x3416cf6c708da44db2624d63ea0aaef7113527c6",
+        "amount": "41033422859633",
+        "count": "3"
+      },
+      {
+        "block": 16823713,
+        "from": "0x28c6c06298d514db089934071355e5743bf21d60",
+        "to": "0x0000000000000000000000000000000000000000",
+        "amount": "5430642963863",
+        "count": "1"
+      },
+      {
+        "block": 16823787,
+        "from": "0x0000000000000000000000000000000000000000",
+        "to": "0x55fe002aeff02f77364de339a1292923a15844b8",
+        "amount": "240000000383826",
+        "count": "3"
+      },
+      {
+        "block": 16824011,
+        "from": "0xa9d1e08c7793af67e9d92fe308d5697fb81d3e43",
+        "to": "0x0000000000000000000000000000000000000000",
+        "amount": "2792609743854",
+        "count": "1"
+      },
+      {
+        "block": 16824085,
+        "from": "0x0000000000000000000000000000000000000000",
+        "to": "0x55fe002aeff02f77364de339a1292923a15844b8",
+        "amount": "245000000983024",
+        "count": "1"
+      },
+      {
+        "block": 16824308,
+        "from": "0xf977814e90da44bfa03b6295a0616a897441acec",
+        "to": "0x0000000000000000000000000000000000000000",
+        "amount": "4275475260098",
+        "count": "3"
+      },
+      {
+        "block": 16824382,
+        "from": "0x0000000000000000000000000000000000000000",
+        "to": "0x55fe002aeff02f77364de339a1292923a15844b8",
+        "amount": "250000000463042",
+        "count": "4"
+      },
+      {
+        "block": 16824419,
+        "from": "0xbbbbbbbbbb9cc5e90e3b3af64bdaf62c37eeffcb",
+        "to": "0xbebc44782c7db0a1a60cb6fe97d0b483032ff1c7",
+        "amount": "26231006037317",
+        "count": "3"
+      },
+      {
+        "block": 16824603,
+        "from": "0xf977814e90da44bfa03b6295a0616a897441acec",
+        "to": "0x0000000000000000000000000000000000000000",
+        "amount": "3593875119392",
+        "count": "4"
+      },
+      {
+        "block": 16824677,
+        "from": "0x0000000000000000000000000000000000000000",
+        "to": "0x55fe002aeff02f77364de339a1292923a15844b8",
+        "amount": "255000000158629",
+        "count": "1"
+      },
+      {
+        "block": 16824899,
+        "from": "0xa9d1e08c7793af67e9d92fe308d5697fb81d3e43",
+        "to": "0x0000000000000000000000000000000000000000",
+        "amount": "2656098583158",
+        "count": "1"
+      },
+      {
+        "block": 16824973,
+        "from": "0x0000000000000000000000000000000000000000",
+        "to": "0x55fe002aeff02f77364de339a1292923a15844b8",
+        "amount": "260000000777874",
+        "count": "1"
+      },
+      {
+        "block": 16825195,
+        "from": "0x267be1c1d684f78cb4f6a176c4911b741e4ffdc0",
+        "to": "0x0000000000000000000000000000000000000000",
+        "amount": "6689217143233",
+        "count": "2"
+      },
+      {
+        "block": 16825269,
+        "from": "0x0000000000000000000000000000000000000000",
+        "to": "0x55fe002aeff02f77364de339a1292923a15844b8",
+        "amount": "265000000258639",
+        "count": "2"
+      },
+      {
+        "block": 16825306,
+        "from": "0x3416cf6c708da44db2624d63ea0aaef7113527c6",
+        "to": "0x0a59649758aa4d66e25f08dd01271e891fe52199",
+        "amount": "30691695616698",
+        "count": "2"
+      },
+      {
+        "block": 16825492,
+        "from": "0x77134cbc06cb00b66f4c7e623d5fdbf6777635ec",
+        "to": "0x0000000000000000000000000000000000000000",
+        "amount": "3561918381672",
+        "count": "2"
+      },
+      {
+        "block": 16825566,
+        "from": "0x0000000000000000000000000000000000000000",
+        "to": "0x55fe002aeff02f77364de339a1292923a15844b8",
+        "amount": "270000000696761",
+        "count": "2"
+      },
+      {
+        "block": 16825792,
+        "from": "0x28c6c06298d514db089934071355e5743bf21d60",
+        "to": "0x0000000000000000000000000000000000000000",
+        "amount": "4908598923644",
+        "count": "4"
+      },
+      {
+        "block": 16825866,
+        "from": "0x0000000000000000000000000000000000000000",
+        "to": "0x55fe002aeff02f77364de339a1292923a15844b8",
+        "amount": "275000000339976",
+        "count": "2"
+      },
+      {
+        "block": 16826087,
+        "from": "0x6cc5f688a315f3dc28a7781717a9a798a59fda7b",
+        "to": "0x0000000000000000000000000000000000000000",
+        "amount": "3891853456809",
+        "count": "2"
+      },
+      {
+        "block": 16826161,
+        "from": "0x0000000000000000000000000000000000000000",
+        "to": "0x55fe002aeff02f77364de339a1292923a15844b8",
+        "amount": "280000000346944",
+        "count": "1"
+      },
+      {
+        "block": 16826198,
+        "from": "0xbebc44782c7db0a1a60cb6fe97d0b483032ff1c7",
+        "to": "0x3416cf6c708da44db2624d63ea0aaef7113527c6",
+        "amount": "4455617450686",
+        "count": "2"
+      },
+      {
+        "block": 16826385,
+        "from": "0xa9d1e08c7793af67e9d92fe308d5697fb81d3e43",
+        "to": "0x0000000000000000000000000000000000000000",
+        "amount": "3152717628739",
+        "count": "2"
+      },
+      {
+        "block": 16826459,
+        "from": "0x0000000000000000000000000000000000000000",
+        "to": "0x55fe002aeff02f77364de339a1292923a15844b8",
+        "amount": "285000000820633",
+        "count": "3"
+      },
+      {
+        "block": 16826685,
+        "from": "0x28c6c06298d514db089934071355e5743bf21d60",
+        "to": "0x0000000000000000000000000000000000000000",
+        "amount": "4463218887690",
+        "count": "1"
+      },
+      {
+        "block": 16826759,
+        "from": "0x0000000000000000000000000000000000000000",
+        "to": "0x55fe002aeff02f77364de339a1292923a15844b8",
+        "amount": "290000000762395",
+        "count": "3"
+      },
+      {
+        "block": 16826982,
+        "from": "0x6cc5f688a315f3dc28a7781717a9a798a59fda7b",
+        "to": "0x0000000000000000000000000000000000000000",
+        "amount": "4703911842525",
+        "count": "2"
+      },
+      {
+        "block": 16827056,
+        "from": "0x0000000000000000000000000000000000000000",
+        "to": "0x55fe002aeff02f77364de339a1292923a15844b8",
+        "amount": "295000000456659",
+        "count": "3"
+      },
+      {
+        "block": 16827093,
+        "from": "0x0a59649758aa4d66e25f08dd01271e891fe52199",
+        "to": "0xbebc44782c7db0a1a60cb6fe97d0b483032ff1c7",
+        "amount": "45644261006895",
+        "count": "1"
+      },
+      {
+        "block": 16827281,
+        "from": "0xa9d1e08c7793af67e9d92fe308d5697fb81d3e43",
+        "to": "0x0000000000000000000000000000000000000000",
+        "amount": "6043624728587",
+        "count": "3"
+      },
+      {
+        "block": 16827355,
+        "from": "0x0000000000000000000000000000000000000000",
+        "to": "0x55fe002aeff02f77364de339a1292923a15844b8",
+        "amount": "300000000891321",
+        "count": "4"
+      },
+      {
+        "block": 16827579,
+        "from": "0x6cc5f688a315f3dc28a7781717a9a798a59fda7b",
+        "to": "0x0000000000000000000000000000000000000000",
+        "amount": "6636992945684",
+        "count": "1"
+      },
+      {
+        "block": 16827653,
+        "from": "0x0000000000000000000000000000000000000000",
+        "to": "0x55fe002aeff02f77364de339a1292923a15844b8",
+        "amount": "305000000764862",
+        "count": "2"
+      },
+      {
+        "block": 16827874,
+        "from": "0x6cc5f688a315f3dc28a7781717a9a798a59fda7b",
+        "to": "0x0000000000000000000000000000000000000000",
+        "amount": "6437994675543",
+        "count": "4"
+      },
+      {
+        "block": 16827948,
+        "from": "0x0000000000000000000000000000000000000000",
+        "to": "0x55fe002aeff02f77364de339a1292923a15844b8",
+        "amount": "310000000532202",
+        "count": "3"
+      },
+      {
+        "block": 16827985,
+        "from": "0x000000000004444c5dc75cb358380d2e3de08a90",
+        "to": "0x0a59649758aa4d66e25f08dd01271e891fe52199",
+        "amount": "17096063205252",
+        "count": "4"
+      },
+      {
+        "block": 16828170,
+        "from": "0x6cc5f688a315f3dc28a7781717a9a798a59fda7b",
+        "to": "0x0000000000000000000000000000000000000000",
+        "amount": "6019626775173",
+        "count": "3"
+      },
+      {
+        "block": 16828244,
+        "from": "0x0000000000000000000000000000000000000000",
+        "to": "0x55fe002aeff02f77364de339a1292923a15844b8",
+        "amount": "315000000000925",
+        "count": "3"
+      },
+      {
+        "block": 16828468,
+        "from": "0x28c6c06298d514db089934071355e5743bf21d60",
+        "to": "0x0000000000000000000000000000000000000000",
+        "amount": "2271229752300",
+        "count": "3"
+      },
+      {
+        "block": 16828542,
+        "from": "0x0000000000000000000000000000000000000000",
+        "to": "0x55fe002aeff02f77364de339a1292923a15844b8",
+        "amount": "320000000681177",
+        "count": "4"
+      },
+      {
+        "block": 16828763,
+        "from": "0xa9d1e08c7793af67e9d92fe308d5697fb81d3e43",
+        "to": "0x0000000000000000000000000000000000000000",
+        "amount": "3349573996190",
+        "count": "4"
+      },
+      {
+        "block": 16828837,
+        "from": "0x0000000000000000000000000000000000000000",
+        "to": "0x55fe002aeff02f77364de339a1292923a15844b8",
+        "amount": "325000000186323",
+        "count": "3"
+      },
+      {
+        "block": 16828874,
+        "from": "0x98c23e9d8f34fefb1b7bd6a91b7ff122f4e16f5c",
+        "to": "0x3416cf6c708da44db2624d63ea0aaef7113527c6",
+        "amount": "4286938034984",
+        "count": "1"
+      },
+      {
+        "block": 16829057,
+        "from": "0xa9d1e08c7793af67e9d92fe308d5697fb81d3e43",
+        "to": "0x0000000000000000000000000000000000000000",
+        "amount": "2013775107120",
+        "count": "2"
+      },
+      {
+        "block": 16829131,
+        "from": "0x0000000000000000000000000000000000000000",
+        "to": "0x55fe002aeff02f77364de339a1292923a15844b8",
+        "amount": "330000000758844",
+        "count": "4"
+      },
+      {
+        "block": 16829353,
+        "from": "0x28c6c06298d514db089934071355e5743bf21d60",
+        "to": "0x0000000000000000000000000000000000000000",
+        "amount": "3397544598156",
+        "count": "3"
+      },
+      {
+        "block": 16829427,
+        "from": "0x0000000000000000000000000000000000000000",
+        "to": "0x55fe002aeff02f77364de339a1292923a15844b8",
+        "amount": "335000000353546",
+        "count": "1"
+      }
+    ],
+    "usdc-usd-feed": [
+      {
+        "hour": "2023-03-10T00",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "99966810"
+      },
+      {
+        "hour": "2023-03-10T01",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "100027094"
+      },
+      {
+        "hour": "2023-03-10T02",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "99991292"
+      },
+      {
+        "hour": "2023-03-10T03",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "100033082"
+      },
+      {
+        "hour": "2023-03-10T04",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "99961946"
+      },
+      {
+        "hour": "2023-03-10T05",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "100036162"
+      },
+      {
+        "hour": "2023-03-10T06",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "99972338"
+      },
+      {
+        "hour": "2023-03-10T07",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "99960669"
+      },
+      {
+        "hour": "2023-03-10T08",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "100020288"
+      },
+      {
+        "hour": "2023-03-10T09",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "99972708"
+      },
+      {
+        "hour": "2023-03-10T10",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "100016280"
+      },
+      {
+        "hour": "2023-03-10T11",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "99973844"
+      },
+      {
+        "hour": "2023-03-10T12",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "100037328"
+      },
+      {
+        "hour": "2023-03-10T13",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "99967528"
+      },
+      {
+        "hour": "2023-03-10T14",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "100030719"
+      },
+      {
+        "hour": "2023-03-10T15",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "99990758"
+      },
+      {
+        "hour": "2023-03-10T16",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "99985250"
+      },
+      {
+        "hour": "2023-03-10T17",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "99995135"
+      },
+      {
+        "hour": "2023-03-10T18",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "100018928"
+      },
+      {
+        "hour": "2023-03-10T19",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "100028727"
+      },
+      {
+        "hour": "2023-03-10T20",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "100006529"
+      },
+      {
+        "hour": "2023-03-10T21",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "100018041"
+      },
+      {
+        "hour": "2023-03-10T22",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "100013014"
+      },
+      {
+        "hour": "2023-03-10T23",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "100002937"
+      },
+      {
+        "hour": "2023-03-11T00",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "99994481"
+      },
+      {
+        "hour": "2023-03-11T01",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "99981433"
+      },
+      {
+        "hour": "2023-03-11T02",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "100022173"
+      },
+      {
+        "hour": "2023-03-11T03",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "100001147"
+      },
+      {
+        "hour": "2023-03-11T04",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "99962021"
+      },
+      {
+        "hour": "2023-03-11T05",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "100014480"
+      },
+      {
+        "hour": "2023-03-11T06",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "99987259"
+      },
+      {
+        "hour": "2023-03-11T07",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "99960675"
+      },
+      {
+        "hour": "2023-03-11T08",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "100039870"
+      },
+      {
+        "hour": "2023-03-11T09",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "100014544"
+      },
+      {
+        "hour": "2023-03-11T10",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "99992942"
+      },
+      {
+        "hour": "2023-03-11T11",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "100013884"
+      },
+      {
+        "hour": "2023-03-11T12",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "100005464"
+      },
+      {
+        "hour": "2023-03-11T13",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "99425067"
+      },
+      {
+        "hour": "2023-03-11T14",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "98877775"
+      },
+      {
+        "hour": "2023-03-11T15",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "98352080"
+      },
+      {
+        "hour": "2023-03-11T16",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "97842004"
+      },
+      {
+        "hour": "2023-03-11T17",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "97274305"
+      },
+      {
+        "hour": "2023-03-11T18",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "96697079"
+      },
+      {
+        "hour": "2023-03-11T19",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "96190423"
+      },
+      {
+        "hour": "2023-03-11T20",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "95617973"
+      },
+      {
+        "hour": "2023-03-11T21",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "95078434"
+      },
+      {
+        "hour": "2023-03-11T22",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "94535323"
+      },
+      {
+        "hour": "2023-03-11T23",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "94003743"
+      },
+      {
+        "hour": "2023-03-12T00",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "93470205"
+      },
+      {
+        "hour": "2023-03-12T01",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "92876178"
+      },
+      {
+        "hour": "2023-03-12T02",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "92399276"
+      },
+      {
+        "hour": "2023-03-12T03",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "91848586"
+      },
+      {
+        "hour": "2023-03-12T04",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "91249929"
+      },
+      {
+        "hour": "2023-03-12T05",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "90747581"
+      },
+      {
+        "hour": "2023-03-12T06",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "90197712"
+      },
+      {
+        "hour": "2023-03-12T07",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "89610502"
+      },
+      {
+        "hour": "2023-03-12T08",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "89083940"
+      },
+      {
+        "hour": "2023-03-12T09",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "88516807"
+      },
+      {
+        "hour": "2023-03-12T10",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "87975275"
+      },
+      {
+        "hour": "2023-03-12T11",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "88475020"
+      },
+      {
+        "hour": "2023-03-12T12",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "88900277"
+      },
+      {
+        "hour": "2023-03-12T13",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "89361014"
+      },
+      {
+        "hour": "2023-03-12T14",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "89855274"
+      },
+      {
+        "hour": "2023-03-12T15",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "90287753"
+      },
+      {
+        "hour": "2023-03-12T16",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "90774468"
+      },
+      {
+        "hour": "2023-03-12T17",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "91177512"
+      },
+      {
+        "hour": "2023-03-12T18",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "91639695"
+      },
+      {
+        "hour": "2023-03-12T19",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "92094138"
+      },
+      {
+        "hour": "2023-03-12T20",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "92589065"
+      },
+      {
+        "hour": "2023-03-12T21",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "93024114"
+      },
+      {
+        "hour": "2023-03-12T22",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "93503571"
+      },
+      {
+        "hour": "2023-03-12T23",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "93927988"
+      },
+      {
+        "hour": "2023-03-13T00",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "94367720"
+      },
+      {
+        "hour": "2023-03-13T01",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "94825992"
+      },
+      {
+        "hour": "2023-03-13T02",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "95309079"
+      },
+      {
+        "hour": "2023-03-13T03",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "95756459"
+      },
+      {
+        "hour": "2023-03-13T04",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "96233586"
+      },
+      {
+        "hour": "2023-03-13T05",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "96681039"
+      },
+      {
+        "hour": "2023-03-13T06",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "97153551"
+      },
+      {
+        "hour": "2023-03-13T07",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "97591709"
+      },
+      {
+        "hour": "2023-03-13T08",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "98058462"
+      },
+      {
+        "hour": "2023-03-13T09",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "98546251"
+      },
+      {
+        "hour": "2023-03-13T10",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "98990069"
+      },
+      {
+        "hour": "2023-03-13T11",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "99426081"
+      },
+      {
+        "hour": "2023-03-13T12",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "99897640"
+      },
+      {
+        "hour": "2023-03-13T13",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "99880577"
+      },
+      {
+        "hour": "2023-03-13T14",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "99876495"
+      },
+      {
+        "hour": "2023-03-13T15",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "99863972"
+      },
+      {
+        "hour": "2023-03-13T16",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "99860937"
+      },
+      {
+        "hour": "2023-03-13T17",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "99935833"
+      },
+      {
+        "hour": "2023-03-13T18",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "99925739"
+      },
+      {
+        "hour": "2023-03-13T19",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "99884333"
+      },
+      {
+        "hour": "2023-03-13T20",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "99875012"
+      },
+      {
+        "hour": "2023-03-13T21",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "99900423"
+      },
+      {
+        "hour": "2023-03-13T22",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "99891584"
+      },
+      {
+        "hour": "2023-03-13T23",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "99937743"
+      },
+      {
+        "hour": "2023-03-14T00",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "99870512"
+      },
+      {
+        "hour": "2023-03-14T01",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "99878258"
+      },
+      {
+        "hour": "2023-03-14T02",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "99921322"
+      },
+      {
+        "hour": "2023-03-14T03",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "99918154"
+      },
+      {
+        "hour": "2023-03-14T04",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "99883003"
+      },
+      {
+        "hour": "2023-03-14T05",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "99901422"
+      },
+      {
+        "hour": "2023-03-14T06",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "99923367"
+      },
+      {
+        "hour": "2023-03-14T07",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "99887087"
+      },
+      {
+        "hour": "2023-03-14T08",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "99875086"
+      },
+      {
+        "hour": "2023-03-14T09",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "99865159"
+      },
+      {
+        "hour": "2023-03-14T10",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "99939565"
+      },
+      {
+        "hour": "2023-03-14T11",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "99861163"
+      },
+      {
+        "hour": "2023-03-14T12",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "99931714"
+      },
+      {
+        "hour": "2023-03-14T13",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "99874501"
+      },
+      {
+        "hour": "2023-03-14T14",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "99908834"
+      },
+      {
+        "hour": "2023-03-14T15",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "99886889"
+      },
+      {
+        "hour": "2023-03-14T16",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "99909960"
+      },
+      {
+        "hour": "2023-03-14T17",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "99938783"
+      },
+      {
+        "hour": "2023-03-14T18",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "99873379"
+      },
+      {
+        "hour": "2023-03-14T19",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "99908962"
+      },
+      {
+        "hour": "2023-03-14T20",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "99884493"
+      },
+      {
+        "hour": "2023-03-14T21",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "99890301"
+      },
+      {
+        "hour": "2023-03-14T22",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "99938735"
+      },
+      {
+        "hour": "2023-03-14T23",
+        "feed": "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
+        "answer": "99918345"
+      }
+    ],
+    "ens-circle": [
+      {
+        "block": 16829609,
+        "address": "0x55fe002aeff02f77364de339a1292923a15844b8",
+        "name": ""
+      }
+    ],
+    "ens-binance-14": [
+      {
+        "block": 16829609,
+        "address": "0x28c6c06298d514db089934071355e5743bf21d60",
+        "name": ""
+      }
+    ],
+    "ens-binance-8": [
+      {
+        "block": 16829609,
+        "address": "0xf977814e90da44bfa03b6295a0616a897441acec",
+        "name": ""
+      }
+    ],
+    "ens-coinbase-10": [
+      {
+        "block": 16829609,
+        "address": "0xa9d1e08c7793af67e9d92fe308d5697fb81d3e43",
+        "name": ""
+      }
+    ],
+    "ens-kraken-4": [
+      {
+        "block": 16829609,
+        "address": "0x267be1c1d684f78cb4f6a176c4911b741e4ffdc0",
+        "name": ""
+      }
+    ],
+    "ens-okx-73": [
+      {
+        "block": 16829609,
+        "address": "0x6cc5f688a315f3dc28a7781717a9a798a59fda7b",
+        "name": ""
+      }
+    ],
+    "ens-bitfinex-2": [
+      {
+        "block": 16829609,
+        "address": "0x77134cbc06cb00b66f4c7e623d5fdbf6777635ec",
+        "name": ""
+      }
+    ],
+    "ens-uniswap-v3-usdc-weth": [
+      {
+        "block": 16829609,
+        "address": "0x88e6a0c2ddd26feeb64f039a2c41296fcb3f5640",
+        "name": ""
+      }
+    ],
+    "ens-uniswap-v3-usdc-usdt": [
+      {
+        "block": 16829609,
+        "address": "0x3416cf6c708da44db2624d63ea0aaef7113527c6",
+        "name": ""
+      }
+    ],
+    "ens-uniswap-v4-pool-manager": [
+      {
+        "block": 16829609,
+        "address": "0x000000000004444c5dc75cb358380d2e3de08a90",
+        "name": ""
+      }
+    ],
+    "ens-uniswap-universal-router": [
+      {
+        "block": 16829609,
+        "address": "0x66a9893cc07d91d95644aedd05d03f95e1dba8af",
+        "name": ""
+      }
+    ],
+    "ens-curve-3pool": [
+      {
+        "block": 16829609,
+        "address": "0xbebc44782c7db0a1a60cb6fe97d0b483032ff1c7",
+        "name": ""
+      }
+    ],
+    "ens-aave-v3-ausdc": [
+      {
+        "block": 16829609,
+        "address": "0x98c23e9d8f34fefb1b7bd6a91b7ff122f4e16f5c",
+        "name": ""
+      }
+    ],
+    "ens-morpho-blue": [
+      {
+        "block": 16829609,
+        "address": "0xbbbbbbbbbb9cc5e90e3b3af64bdaf62c37eeffcb",
+        "name": ""
+      }
+    ],
+    "ens-maker-psm-usdc": [
+      {
+        "block": 16829609,
+        "address": "0x0a59649758aa4d66e25f08dd01271e891fe52199",
+        "name": ""
+      }
+    ],
+    "ens-cow-settlement": [
+      {
+        "block": 16829609,
+        "address": "0x9008d19f58aabd9ed0d60971565aa8510560ab41",
+        "name": ""
+      }
+    ],
+    "ens-1inch-v6-router": [
+      {
+        "block": 16829609,
+        "address": "0x111111125421ca6dc452d289314280a0f8842a65",
+        "name": ""
+      }
+    ],
+    "ens-0x-exchange-proxy": [
+      {
+        "block": 16829609,
+        "address": "0xdef1c0ded9bec7f1a1670819833240f027b25eff",
+        "name": ""
+      }
+    ],
+    "ens-balancer-v2-vault": [
+      {
+        "block": 16829609,
+        "address": "0xba12222222228d8ba445958a75a0704d566bf2c8",
+        "name": ""
+      }
+    ],
+    "ens-vitalik": [
+      {
+        "block": 16829609,
+        "address": "0xd8da6bf26964af9d7eed9e03e53415d37aa96045",
+        "name": "vitalik.eth"
+      }
+    ]
+  }
+}
