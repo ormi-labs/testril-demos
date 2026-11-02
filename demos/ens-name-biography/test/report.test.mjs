@@ -1,6 +1,12 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { check, shape, subjects } from "../src/report.mjs";
+import {
+  check,
+  formatEth,
+  gracePeriodSeconds,
+  shape,
+  subjects,
+} from "../src/report.mjs";
 import { fixture } from "./fixture.mjs";
 
 const rows = () => structuredClone(fixture().rows);
@@ -28,10 +34,18 @@ test("check fails when a cost is in ETH instead of wei", () => {
   assert.throws(() => check(corrupted), /non-negative integer of wei/);
 });
 
-test("check fails when a negative cost slips in", () => {
+test("check fails when a wrapped expiry lacks the 90-day grace period", () => {
   const corrupted = rows();
-  corrupted[nick.binds.registration][1].cost = "-1";
-  assert.throws(() => check(corrupted), /non-negative integer of wei/);
+  const [first] = corrupted[vitalik.binds.wrapped];
+  first.expiry = String(BigInt(first.expiry) - BigInt(gracePeriodSeconds));
+  assert.throws(() => check(corrupted), /plus the 90-day grace period/);
+});
+
+test("check fails when registrar expiry is in milliseconds", () => {
+  const corrupted = rows();
+  for (const row of corrupted[nick.binds.registration])
+    row.expires = String(BigInt(row.expires) * 1000n);
+  assert.throws(() => check(corrupted), /plus the 90-day grace period/);
 });
 
 test("check fails when owner changes are out of block order", () => {
@@ -46,16 +60,40 @@ test("check fails when a month of the address record is missing", () => {
   assert.throws(() => check(corrupted), /missing 2020-12/);
 });
 
-test("shape orders the timeline and totals renewal costs in ETH", () => {
-  const view = shape(rows());
-  const blocks = view.timeline.map((event) => event.when);
-  assert.match(blocks[0], /^block /);
-  assert.equal(view.subjects[0].renewals, "5");
-  assert.match(view.subjects[0].renewalCost, /^\d+\.\d{4} ETH$/);
-  assert.ok(view.timeline.some((event) => event.kind === "NameWrapper"));
+test("check fails when a month of the address record is duplicated", () => {
+  const corrupted = rows();
+  corrupted[nick.binds.address][5] = { ...corrupted[nick.binds.address][4] };
+  assert.throws(() => check(corrupted), /extra or duplicate rows for 2020-06/);
+});
+
+test("shape lists events in block order and counts only real changes", () => {
+  const data = rows();
+  const view = shape(data);
+  const blocks = view.timeline.map((event) => Number(event.when.slice(6)));
+  const numbered = blocks.filter((block) => !Number.isNaN(block));
+  assert.ok(numbered.length > 0);
+  assert.deepEqual(
+    numbered,
+    [...numbered].sort((a, b) => a - b),
+  );
+  const [first] = view.subjects;
+  const renewals = data[vitalik.binds.registration].slice(1);
+  assert.equal(first.renewals, String(renewals.length));
+  assert.equal(
+    first.renewalCost,
+    formatEth(renewals.reduce((sum, row) => sum + BigInt(row.cost), 0n)),
+  );
+  assert.equal(first.ownerChanges, "2");
   assert.ok(
-    view.subjects.every((s) =>
-      s.marks.every((m) => m.position >= 0 && m.position < 1),
+    view.timeline.some((event) =>
+      event.text.includes("Owner changed to NameWrapper"),
     ),
+  );
+  assert.ok(first.marks.every((m) => m.position >= 0 && m.position < 1));
+  assert.equal(
+    Math.max(
+      ...view.subjects.flatMap((s) => s.marks.map((m) => m.costBasisPoints)),
+    ),
+    10000,
   );
 });

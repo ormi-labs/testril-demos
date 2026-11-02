@@ -55,7 +55,7 @@
         "name": "vitalik.eth"
       },
       "window": {
-        "from_block": 15000000,
+        "from_block": 16925758,
         "to_block": 26323365
       }
     },
@@ -113,7 +113,7 @@
         "name": "nick.eth"
       },
       "window": {
-        "from_block": 15000000,
+        "from_block": 16925758,
         "to_block": 26323365
       }
     }

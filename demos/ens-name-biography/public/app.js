@@ -1,6 +1,7 @@
 const svgNs = "http://www.w3.org/2000/svg";
 const width = 1000;
 const gutter = { left: 150, right: 16, top: 12 };
+const basisPointsPerWhole = 10000;
 const rowHeight = 22;
 const barRowHeight = 52;
 const laneGap = 28;
@@ -59,11 +60,11 @@ function yearTicks({ from_month: from, to_month: to }) {
   return ticks;
 }
 
-function laneRows(maxEth) {
+function laneRows() {
   let y = 0;
   return rowOrder.map((kind) => {
     const height = kind === "renewal" ? barRowHeight : rowHeight;
-    const row = { kind, y, height, maxEth };
+    const row = { kind, y, height };
     y += height;
     return row;
   });
@@ -72,7 +73,10 @@ function laneRows(maxEth) {
 function mark(row, point, x, top) {
   const base = top + row.y + row.height;
   if (row.kind === "renewal") {
-    const barHeight = Math.max((point.eth / row.maxEth) * (row.height - 6), 3);
+    const barHeight = Math.max(
+      (point.costBasisPoints / basisPointsPerWhole) * (row.height - 6),
+      3,
+    );
     return svg("rect", {
       x: x - 3,
       y: base - barHeight - 2,
@@ -92,10 +96,7 @@ function mark(row, point, x, top) {
 function timelineChart(view) {
   const plotWidth = width - gutter.left - gutter.right;
   const x = (share) => gutter.left + share * plotWidth;
-  const maxEth = Math.max(
-    ...view.subjects.flatMap((subject) => subject.marks.map((p) => p.eth)),
-  );
-  const rows = laneRows(maxEth);
+  const rows = laneRows();
   const laneHeight = rows.reduce((sum, row) => sum + row.height, 0);
   const height =
     gutter.top + view.subjects.length * (laneHeight + laneGap) + axisHeight;

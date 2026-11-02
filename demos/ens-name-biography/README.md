@@ -3,11 +3,14 @@
 The life of two famous ENS names on Ethereum since the registry was deployed:
 every owner, resolver and address change, and every registration and renewal
 with its cost in ETH. The page proves its numbers: each renewal must expire
-later than the one before, costs must be non-negative wei, registry rows must
-be in block order, and the address record must cover every month.
+later than the one before, costs must be integer wei, a wrapped name's expiry
+must equal the registrar expiry plus the 90-day grace period, registry rows
+must be in block order, and the address record must cover every month.
 
 **The shipped recording is synthetic.** `recordings/report.json` is generated
-by `test/fixture.mjs` and the page says so in its banner. Record real data with
+by `test/fixture.mjs` and the page says so in its banner. Its owners,
+resolver switches and timelines are invented; the owner addresses are
+synthetic. Record real data with
 `tools/prepare` (below).
 
 ![Desktop screenshot](docs/screenshot-desktop.png)
@@ -41,15 +44,16 @@ npm run format:check
 ```
 
 `npm test` checks the cross-check passes on the fixture and fails when renewals
-expire out of order, when a cost is in ETH or negative instead of wei, when
-registry rows are out of block order, or when a month is missing, and that the
+expire out of order, when a cost is in ETH instead of wei, when a wrapped
+expiry lacks the grace period or the registrar expiry is in milliseconds, when
+registry rows are out of block order, or when a month is missing or duplicated, and that the
 server returns the shaped report. `npm run test:browser` writes
 `docs/screenshot-desktop.png`. `npm run fixture` regenerates the synthetic
 recording.
 
 ## Subjects and window
 
-Registry history starts at the registry deployment (block 9380380, February
+Registry history starts at the registry deployment (block 9380380, early
 2020); earlier history lives in the pre-2020 registry and is not covered.
 Windows are half-open: the end is the first block or month not included.
 
@@ -63,8 +67,15 @@ Windows are half-open: the end is the first block or month not included.
 | NameWrapper                   | `0xd4416b13d2b3a9abae7acd5d6c2bbdbe25686401` |                         |
 
 Names: `vitalik.eth` and `nick.eth`. Registry and registrar start blocks
-(9380380) and the NameWrapper start block (15000000, before its deployment) are
-also to verify before recording. `cost` counts only the listed controllers.
+(9380380) and the NameWrapper start block (16925758, its creation block, so the
+wrapped window means "since the wrapper existed") are also to verify before
+recording. `cost` counts only the listed controllers.
+
+Both names were registered before the window starts, and the registrar rows
+carry no event kind. The first registrar row in the window is therefore labelled
+"First in window" and is not counted as a renewal: with real data it is most
+likely a renewal. Renewals, renewal cost and owner changes count only what
+follows the first row.
 
 ## Binds (`testril.json`)
 
@@ -73,7 +84,7 @@ also to verify before recording. `cost` counts only the listed controllers.
 | `vitalik-domain`, `nick-domain`   | `ens.domain`         | 1     | `registry`, `name`                       | 9380380 → 26323365  |
 | `vitalik-registration`, `nick-…`  | `ens.registration`   | 1     | `base_registrar`, `label`, `controllers` | 9380380 → 26323365  |
 | `vitalik-address`, `nick-address` | `ens.address_record` | 1     | `registry`, `name`, `by` (`month`)       | 2020-02 → 2026-11   |
-| `vitalik-wrapped`, `nick-wrapped` | `ens.wrapped_domain` | 1     | `name_wrapper`, `name`                   | 15000000 → 26323365 |
+| `vitalik-wrapped`, `nick-wrapped` | `ens.wrapped_domain` | 1     | `name_wrapper`, `name`                   | 16925758 → 26323365 |
 
 Address-record months have no block, so the timeline places them by linear
 interpolation across the block window.
