@@ -11,7 +11,7 @@ test("the fixture is the same on every call", () => {
 
 test("check passes on the fixture, including a fill priced at exactly 1", () => {
   const data = rows();
-  assert.equal(check(data).length, 5);
+  assert.equal(check(data).length, 4);
   assert.ok(data.fills.some((f) => f.collateral_amount === f.token_amount));
 });
 

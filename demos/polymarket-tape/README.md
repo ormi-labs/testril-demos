@@ -30,7 +30,7 @@ npm start
 Open http://127.0.0.1:4180 (set `PORT` to change it). Expected result: the
 synthetic banner, four headline numbers, a table of the 12 largest fills, an
 hourly odds line for the busiest market, a builder leaderboard, the resolved
-conditions, and five passed cross-checks.
+conditions, and four passed cross-checks.
 
 ## Test
 
