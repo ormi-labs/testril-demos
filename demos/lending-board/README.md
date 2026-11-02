@@ -54,8 +54,8 @@ and that the server returns the shaped report. `npm run test:browser` writes
 | -------------------------------------- | ------------------------------------------------------- | ----------------------- |
 | Aave v3 Ethereum PoolAddressesProvider | `0x2f39d218133afab8f2b819b1066c7e434ad94e9e`            |                         |
 | Morpho Blue                            | `0xbbbbbbbbbb9cc5e90e3b3af64bdaf62c37eeffcb`            |                         |
-| MetaMorpho factory v1.1                | `0xa9c3d3a366466fa809d1ae982fb2c46e5fc41101`            | verify before recording |
-| MetaMorpho factory v1.0                | `0x1897a8997241c1cd4bd0698647e4eb7213535c24`            | verify before recording |
+| MetaMorpho factory v1.0                | `0xa9c3d3a366466fa809d1ae982fb2c46e5fc41101`            | verify before recording |
+| MetaMorpho factory v1.1                | `0x1897a8997241c1cd4bd0698647e4eb7213535c24`            | verify before recording |
 | Morpho vault factory v2                | not bound: `in_vaults` covers MetaMorpho v1 vaults only |                         |
 | USDC (6 decimals)                      | `0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48`            |                         |
 | USDT (6)                               | `0xdac17f958d2ee523a2206206994597c13d831ec7`            |                         |
