@@ -94,6 +94,10 @@ function render(report) {
       metric("MARKETS CREATED", view.marketCount),
       metric("TRADES", view.tradeCount),
       metric("TRADE VOLUME", view.volume),
+      metric(
+        "OTHER COLLATERAL",
+        `${view.otherCollateral.reduce((sum, token) => sum + Number(token.markets), 0)} markets`,
+      ),
       metric("QUESTIONS ANSWERED", view.answeredCount),
     );
   document
