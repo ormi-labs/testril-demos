@@ -1,8 +1,8 @@
 const svgNs = "http://www.w3.org/2000/svg";
 const venues = [
-  ["aave", "Aave v3 deposits"],
-  ["markets", "Morpho markets"],
-  ["vaults", "Morpho vault balances"],
+  ["aaveIdle", "Aave v3 unlent liquidity"],
+  ["markets", "Morpho markets (idle)"],
+  ["vaults", "Morpho vault balances (idle)"],
 ];
 
 function svg(name, attributes = {}, text) {
@@ -44,19 +44,19 @@ function tableRows(rows, columns) {
   });
 }
 
-function stackedBars(sleeping) {
+function stackedBars(byVenue) {
   const width = 1000;
   const height = 320;
   const pad = { left: 64, right: 12, top: 16, bottom: 30 };
-  const total = (day) => day.aave + day.markets + day.vaults;
-  const max = Math.max(...sleeping.map(total));
-  const slot = (width - pad.left - pad.right) / sleeping.length;
+  const total = (day) => day.aaveIdle + day.markets + day.vaults;
+  const max = Math.max(...byVenue.map(total));
+  const slot = (width - pad.left - pad.right) / byVenue.length;
   const barWidth = slot * 0.6;
   const scale = (height - pad.top - pad.bottom) / max;
   const chart = svg("svg", {
     viewBox: `0 0 ${width} ${height}`,
     role: "img",
-    "aria-label": "USDC held in Aave, Morpho markets and Morpho vaults per day",
+    "aria-label": "Idle USDC in Aave, Morpho markets and Morpho vaults per day",
   });
   chart.append(
     svg("line", {
@@ -72,7 +72,7 @@ function stackedBars(sleeping) {
       `${(max / 1000).toFixed(1)}B`,
     ),
   );
-  sleeping.forEach((day, i) => {
+  byVenue.forEach((day, i) => {
     const x = pad.left + i * slot + (slot - barWidth) / 2;
     let y = height - pad.bottom;
     venues.forEach(([key], venueIndex) => {
@@ -147,14 +147,14 @@ function render(report) {
         "flashPremium",
       ]),
     );
-  document.querySelector("#sleeping-note").textContent =
-    "millions of USDC at each day's last sample";
+  document.querySelector("#by-venue-note").textContent =
+    "idle USDC in billions, at each day's last sample; Aave unlent = aToken supply minus variable debt";
   document
-    .querySelector("#sleeping")
-    .replaceChildren(stackedBars(view.sleeping));
+    .querySelector("#by-venue")
+    .replaceChildren(stackedBars(view.byVenue));
   document.querySelector("#legend").replaceChildren(
     ...venues.map(([key, name], i) => {
-      const item = element("li", `${name} · ${view.sleepingLatest[key]}`);
+      const item = element("li", `${name} · ${view.byVenueLatest[key]}`);
       item.prepend(element("span", "", `swatch venue-${i}`));
       return item;
     }),

@@ -28,6 +28,13 @@ test("check fails when rates carry nine extra digits", () => {
   assert.throws(() => check(corrupted), /not in ray/);
 });
 
+test("check fails when rates lose nine digits", () => {
+  const corrupted = rows();
+  for (const row of corrupted["reserve-state"])
+    row.variable_borrow_rate = row.variable_borrow_rate.slice(0, -9);
+  assert.throws(() => check(corrupted), /not in ray/);
+});
+
 test("check fails when a lifetime total falls", () => {
   const corrupted = rows();
   const history = usdcRows(corrupted["reserve-totals"]).toSorted(
@@ -40,7 +47,20 @@ test("check fails when a lifetime total falls", () => {
 test("check fails when Morpho holdings are negative", () => {
   const corrupted = rows();
   corrupted["morpho-holdings"][0].in_vaults = "-1";
-  assert.throws(() => check(corrupted), /negative/);
+  assert.throws(() => check(corrupted), /non-negative integers/);
+});
+
+test("check fails when Morpho holdings are decimals", () => {
+  const corrupted = rows();
+  corrupted["morpho-holdings"][0].in_markets = "1.5";
+  assert.throws(() => check(corrupted), /non-negative integers/);
+});
+
+test("check fails when Morpho holds no USDC on a day", () => {
+  const corrupted = rows();
+  for (const row of usdcRows(corrupted["morpho-holdings"]).slice(0, 1))
+    row.in_markets = row.in_vaults = "0";
+  assert.throws(() => check(corrupted), /Morpho holds no USDC/);
 });
 
 test("check fails when an asset is missing its last hour", () => {
@@ -52,7 +72,7 @@ test("check fails when an asset is missing its last hour", () => {
   assert.throws(() => check(corrupted), /USDC has no state at 2026-10-31T23/);
 });
 
-test("shape converts ray to percent and stacks USDC across venues", () => {
+test("shape converts ray to percent and stacks idle USDC across venues", () => {
   const corrupted = rows();
   const last = usdcRows(corrupted["reserve-state"]).at(-1);
   last.variable_borrow_rate = "58750000000000000000000000";
@@ -62,6 +82,6 @@ test("shape converts ray to percent and stacks USDC across venues", () => {
   assert.equal(view.board[0].borrowApr, "5.87%");
   assert.equal(view.board[0].utilization, "75.00%");
   assert.equal(view.board[0].supplied, "2.00B");
-  assert.equal(view.sleeping.length, 7);
-  assert.equal(view.sleepingLatest.aave, "2.00B");
+  assert.equal(view.byVenue.length, 7);
+  assert.equal(view.byVenueLatest.aaveIdle, "500.00M");
 });
