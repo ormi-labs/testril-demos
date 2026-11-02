@@ -7,14 +7,11 @@ export const hourWindow = binds.supply.window;
 export const edgesWindow = binds["usdc-edges"].window;
 export const usdc = binds["usdc-edges"].params.token_address;
 export const feed = binds["usdc-usd-feed"].params.feeds[0];
-export const ensAddresses = spec.binds
-  .filter((bind) => bind.function_slug === "ens.primary_name")
-  .map((bind) => bind.params.address);
 const decimals = 6n;
 const feedDecimals = 8;
 const priceFloor = 80000000n;
 const priceCeiling = 102000000n;
-const topRedeemers = 10;
+const topBurners = 10;
 
 const addHours = (hour, step) =>
   new Date(Date.parse(`${hour}:00:00Z`) + step * 3600000)
@@ -39,9 +36,16 @@ function hourIndexOf(block) {
 const byHour = (rows, field) =>
   new Map(rows.map((row) => [row.hour, BigInt(row[field])]));
 
+const lowercased = (edges) =>
+  edges.map((edge) => ({
+    ...edge,
+    from: edge.from.toLowerCase(),
+    to: edge.to.toLowerCase(),
+  }));
+
 export function mintsAndBurns(edges) {
   const net = hours.map(() => ({ minted: 0n, burned: 0n }));
-  for (const edge of edges) {
+  for (const edge of lowercased(edges)) {
     const hour = net[hourIndexOf(edge.block)];
     if (edge.from === zeroAddress) hour.minted += BigInt(edge.amount);
     if (edge.to === zeroAddress) hour.burned += BigInt(edge.amount);
@@ -50,6 +54,13 @@ export function mintsAndBurns(edges) {
 }
 
 export function check(rows) {
+  if (
+    hourFirstBlocks[0] !== edgesWindow.from_block ||
+    hourFirstBlocks.at(-1) !== edgesWindow.to_block
+  )
+    throw new Error(
+      "hour-first-blocks.json does not span the usdc-edges window in testril.json.",
+    );
   const supply = byHour(
     rows.supply.filter((row) => row.token.toLowerCase() === usdc),
     "total_supply",
@@ -118,23 +129,12 @@ export function formatPrice(answer) {
 
 const shortAddress = (address) => `${address.slice(0, 6)}…${address.slice(-4)}`;
 
-function labels(rows) {
-  const names = new Map(
-    spec.binds
-      .filter((bind) => bind.function_slug === "ens.primary_name")
-      .flatMap((bind) => rows[bind.name] ?? [])
-      .filter((row) => row.name)
-      .map((row) => [row.address.toLowerCase(), row.name]),
-  );
-  return (address) => names.get(address) ?? shortAddress(address);
-}
-
 const millions = (raw) => Number(raw / 10n ** decimals) / 1e6;
 const hourLabel = (hour) => `${hour.slice(5, 10)} ${hour.slice(11)}:00`;
 
-function redeemers(edges, label) {
+function burners(edges) {
   const totals = new Map();
-  for (const edge of edges.filter((e) => e.to === zeroAddress)) {
+  for (const edge of lowercased(edges).filter((e) => e.to === zeroAddress)) {
     const entry = totals.get(edge.from) ?? { amount: 0n, count: 0n };
     entry.amount += BigInt(edge.amount);
     entry.count += BigInt(edge.count);
@@ -143,13 +143,12 @@ function redeemers(edges, label) {
   const burned = [...totals.values()].reduce((sum, e) => sum + e.amount, 0n);
   return [...totals]
     .sort(([, a], [, b]) => (b.amount > a.amount ? 1 : -1))
-    .slice(0, topRedeemers)
+    .slice(0, topBurners)
     .map(([address, { amount, count }]) => ({
-      address,
-      label: label(address),
+      address: shortAddress(address),
       amount: formatUsd(amount),
       share: `${(Number((amount * 1000n) / burned) / 10).toFixed(1)}%`,
-      redemptions: count.toString(),
+      burns: count.toString(),
     }));
 }
 
@@ -184,6 +183,6 @@ export function shape(rows) {
     burned: formatCompact(burned),
     net: formatCompact(burned - minted, true),
     timeline,
-    redeemers: redeemers(rows["usdc-edges"], labels(rows)),
+    burners: burners(rows["usdc-edges"]),
   };
 }
