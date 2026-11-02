@@ -6,7 +6,14 @@ import { rewardWindow as window } from "../src/report.mjs";
 const recordedAt = "2026-11-02T00:00:00.000Z";
 const wei = 10n ** 18n;
 const firstEpoch = 1423;
-const blocksPerEpoch = 321190;
+const epochsInWindow = 7;
+const blocksPerEpoch = Math.floor(
+  (window.to_block - window.from_block) / epochsInWindow,
+);
+const protocolPaymentCutPpm = 10_000n;
+const ppm = 1_000_000n;
+const protocolTaxOn = (net) =>
+  (net * ppm) / (ppm - protocolPaymentCutPpm) - net;
 const generatedIndexerCount = 14;
 
 function seeded(seed) {
@@ -137,7 +144,7 @@ function feeRows(random) {
             total: "0",
             indexer_fees: "0",
             curator_fees: "0",
-            protocol_tax: (BigInt(row.total) / 100n).toString(),
+            protocol_tax: protocolTaxOn(BigInt(row.total)).toString(),
           },
         ]
       : [row],

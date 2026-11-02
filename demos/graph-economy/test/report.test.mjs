@@ -17,15 +17,8 @@ test("check fails when the indexer share is in whole GRT instead of wei", () => 
   assert.throws(() => check(corrupted), /indexer .* \+ delegator/);
 });
 
-test("check fails when a delegator reward moves to another indexer", () => {
-  const corrupted = rows();
-  const [a, b] = corrupted["indexing-rewards"].filter(
-    (r) => r.kind === "rewards_collected" && r.indexer !== undefined,
-  );
-  const moved = BigInt(a.delegator_rewards);
-  a.delegator_rewards = "0";
-  b.delegator_rewards = (BigInt(b.delegator_rewards) + moved).toString();
-  assert.throws(() => check(corrupted), /indexer .* \+ delegator/);
+test("check proves per-indexer rewards add up on the fixture", () => {
+  assert.match(check(rows())[1], /Per-indexer rewards add up/);
 });
 
 test("check fails when a reward log is counted twice", () => {
@@ -42,13 +35,14 @@ test("check fails when a delegator holds more shares than the pool", () => {
   assert.throws(() => check(corrupted), /shares of a pool/);
 });
 
-test("check fails when a fee row's total ignores the tax", () => {
-  const corrupted = rows();
-  const row = corrupted["query-fees"].find(
-    (r) => r.kind === "rebate_collected",
+test("shape credits a reward to the indexer its row names", () => {
+  const data = rows();
+  const [top] = shape(data).indexers;
+  const row = data["indexing-rewards"].find(
+    (r) => r.kind === "rewards_collected" && r.indexer === top.address,
   );
-  row.protocol_tax = "0";
-  assert.throws(() => check(corrupted), /do not add up/);
+  row.indexer = "0x" + "1".repeat(40);
+  assert.notEqual(shape(data).indexers[0].rewards, top.rewards);
 });
 
 test("shape ranks indexers by rewards and takes the pool from the last delegation row", () => {

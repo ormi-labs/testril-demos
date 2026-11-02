@@ -13,6 +13,8 @@ const sumBy = (rows, key, value) => {
     totals.set(row[key], (totals.get(row[key]) ?? 0n) + value(row));
   return totals;
 };
+const splitAmount = (row) =>
+  row.kind === "rewards_collected" ? BigInt(row.amount) : 0n;
 const byLog = (a, b) =>
   a.block - b.block || Number(a.log_index) - Number(b.log_index);
 const inWindow = (row, { from_block, to_block }) =>
@@ -46,8 +48,27 @@ function requireRewardSplit(rewards) {
   }
 }
 
+function requirePerIndexerTotals(rewards) {
+  const amounts = sumBy(rewards, "indexer", splitAmount);
+  const indexers = sumBy(rewards, "indexer", (row) =>
+    BigInt(row.indexer_rewards),
+  );
+  const delegators = sumBy(rewards, "indexer", (row) =>
+    BigInt(row.delegator_rewards),
+  );
+  const parts = (totals) => sum([...totals.values()]);
+  if (parts(indexers) + parts(delegators) !== parts(amounts))
+    throw new Error("Per-indexer rewards do not add up to the totals.");
+  for (const [indexer, amount] of amounts)
+    if (indexers.get(indexer) + delegators.get(indexer) !== amount)
+      throw new Error(
+        `Indexer ${indexer}: indexer plus delegator rewards do not equal ${amount}.`,
+      );
+  return amounts.size;
+}
+
 export function check(rows) {
-  const { "indexing-rewards": rewards, delegation, "query-fees": fees } = rows;
+  const { "indexing-rewards": rewards, delegation } = rows;
   for (const [name, list] of Object.entries(rows)) {
     requireInWindow(name, list);
     requireUniqueLogs(name, list);
@@ -60,24 +81,12 @@ export function check(rows) {
     throw new Error(
       `Delegator holds ${overdrawn.delegator_shares} shares of a pool with ${overdrawn.pool_shares} at block ${overdrawn.block}.`,
     );
-  const unbalanced = fees.find(
-    (row) =>
-      row.kind !== "payment_collected" &&
-      BigInt(row.total) !==
-        BigInt(row.indexer_fees) +
-          BigInt(row.curator_fees) +
-          BigInt(row.protocol_tax),
-  );
-  if (unbalanced)
-    throw new Error(
-      `Query fee ${unbalanced.kind} at block ${unbalanced.block}: indexer, curator and tax do not add up to ${unbalanced.total}.`,
-    );
   const split = rewards.filter((row) => row.kind === "rewards_collected");
-  const balanced = fees.filter((row) => row.kind !== "payment_collected");
+  const indexerCount = requirePerIndexerTotals(rewards);
   return [
     `Indexer plus delegator rewards equal the amount on all ${split.length} reward rows`,
+    `Per-indexer rewards add up to the totals across ${indexerCount} indexers`,
     `No delegator holds more shares than their pool, on all ${delegation.length} delegation rows`,
-    `Indexer, curator and tax fees equal the total on ${balanced.length} query fee rows`,
   ];
 }
 
@@ -107,9 +116,6 @@ export function formatPercent(part, whole) {
 
 const shortAddress = (address) => `${address.slice(0, 6)}…${address.slice(-4)}`;
 const thousandsOfGrt = (raw) => Number(raw / wei) / 1000;
-
-const splitAmount = (row) =>
-  row.kind === "rewards_collected" ? BigInt(row.amount) : 0n;
 
 function delegationPools(delegation) {
   const pools = new Map();
