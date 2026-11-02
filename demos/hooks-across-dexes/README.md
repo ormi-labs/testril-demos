@@ -28,7 +28,7 @@ npm start
 
 Open http://127.0.0.1:4180 (set `PORT` to change it). Expected result: the
 synthetic banner, hooked share and hook pool counts per DEX, a bar per venue
-split into hooked and hookless dollars, a table of the ten largest hook pools,
+split into hooked and hookless dollars, a table of up to ten of the largest hook pools,
 and three passed cross-checks.
 
 ## Test
@@ -43,7 +43,8 @@ npm run format:check
 
 `npm test` checks the cross-check passes on the fixture and fails when a traded
 pool is missing from the pool list, a pool is listed twice, a pool has two rows
-for one day, or a row is outside the window, and that the report splits hooked
+for one day, a row is outside the window, the legs of a stablecoin pair differ
+by more than 1%, or a pool's hooks contradict its hooks_registration, and that the report splits hooked
 from hookless volume on the stablecoin side of each pool. `npm run test:browser`
 writes `docs/screenshot-desktop.png`. `npm run fixture` regenerates the
 synthetic recording.
@@ -62,7 +63,7 @@ WBNB/CAKE) add to swap counts but not to dollars.
 - Pool lists: from each manager's creation block to block 131141195, the first
   block of 2026-11-02, so every pool that traded in the window is listed.
   Creation blocks and the day boundary were found by binary search over public
-  BSC RPC endpoints, not through Testril.
+  BSC RPC endpoints, not through Testril; verify them before recording.
 
 | Subject                             | Address                                      | Note                                         |
 | ----------------------------------- | -------------------------------------------- | -------------------------------------------- |

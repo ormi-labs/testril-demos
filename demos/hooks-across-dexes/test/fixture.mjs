@@ -111,12 +111,16 @@ function listRow(venue, pool, index) {
 }
 
 function volumeRows(random, pool) {
-  const [currency0] = pairs[pool.pair];
-  const stable0 = [usdt, usdc, usd1].includes(currency0);
+  const [currency0, currency1] = pairs[pool.pair];
+  const stables = [usdt, usdc, usd1];
+  const stable0 = stables.includes(currency0);
+  const bothStable = stables.includes(currency0) && stables.includes(currency1);
   return windowDays().flatMap((day) => {
     if (!pool.active || random() < 0.15) return [];
     const stable = raw(pool.dollars * (0.5 + random()), random);
-    const other = raw((pool.dollars / 600) * (0.5 + random()), random);
+    const other = bothStable
+      ? (stable * (1000n + BigInt(Math.floor(random() * 3)) - 1n)) / 1000n
+      : raw((pool.dollars / 600) * (0.5 + random()), random);
     return [
       {
         day,

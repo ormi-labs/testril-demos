@@ -1,6 +1,12 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { check, shape, venues, zeroAddress } from "../src/report.mjs";
+import {
+  check,
+  shape,
+  stablecoins,
+  venues,
+  zeroAddress,
+} from "../src/report.mjs";
 import { fixture } from "./fixture.mjs";
 
 const rows = () => structuredClone(fixture().rows);
@@ -9,10 +15,7 @@ const [cl] = venues;
 test("check proves every venue's days from its pool list", () => {
   const passed = check(rows());
   assert.equal(passed.length, 3);
-  assert.match(
-    passed[2],
-    /Uniswap v4: .* hooked plus hookless equals the total/,
-  );
+  assert.match(passed[2], /Uniswap v4: .* hooks agree with hooks_registration/);
 });
 
 test("check fails when a traded pool is missing from the pool list", () => {
@@ -37,6 +40,30 @@ test("check fails when a row falls outside the day window", () => {
   const corrupted = rows();
   corrupted[cl.volumeBind][0].day = "2026-11-02";
   assert.throws(() => check(corrupted), /outside the window/);
+});
+
+const stablePairRow = (corrupted, venue) => {
+  const pools = new Map(corrupted[venue.poolsBind].map((p) => [p.pool, p]));
+  return corrupted[venue.volumeBind].find((row) => {
+    const pool = pools.get(row.pool);
+    return stablecoins.has(pool.currency0) && stablecoins.has(pool.currency1);
+  });
+};
+
+test("check fails when a stablecoin pair's legs are swapped by 6 decimals", () => {
+  const corrupted = rows();
+  const row = stablePairRow(corrupted, cl);
+  row.volume1 = (BigInt(row.volume1) / 10n ** 12n).toString();
+  assert.throws(() => check(corrupted), /stablecoin legs differ/);
+});
+
+test("check fails when a hooked pool's registration is zero", () => {
+  const corrupted = rows();
+  const pool = corrupted[cl.poolsBind].find(
+    (p) => p.hooks !== zeroAddress && p.hooks_registration === "1",
+  );
+  pool.hooks = zeroAddress;
+  assert.throws(() => check(corrupted), /contradict hooks_registration/);
 });
 
 test("shape reads the stablecoin leg and splits hooked from hookless", () => {
