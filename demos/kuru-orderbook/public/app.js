@@ -37,7 +37,7 @@ function barChart(bars) {
   const labelWidth = 130;
   const valueWidth = 190;
   const height = bars.length * row + 12;
-  const max = Math.max(...bars.map((bar) => bar.amount));
+  const max = Math.max(0, ...bars.map((bar) => bar.amount)) || 1;
   const chart = svg("svg", {
     viewBox: `0 0 ${width} ${height}`,
     role: "img",
@@ -65,8 +65,16 @@ function barChart(bars) {
   return chart;
 }
 
+function daysBetween(from, to) {
+  return (Date.parse(to) - Date.parse(from)) / 86400000;
+}
+
 function render(report) {
   const view = report.view;
+  const days = daysBetween(
+    view.volumeWindow.from_day,
+    view.volumeWindow.to_day,
+  );
   banner(report);
   document.querySelector("#volume-window").textContent =
     `${view.volumeWindow.from_day} to ${view.volumeWindow.to_day} (exclusive)`;
@@ -75,7 +83,11 @@ function render(report) {
   document
     .querySelector("#headline")
     .replaceChildren(
-      metric("USDC-QUOTED VOLUME", view.usdcVolume, "taker volume, 8 days"),
+      metric(
+        "USDC-QUOTED VOLUME",
+        view.usdcVolume,
+        `taker volume, ${days} days`,
+      ),
       metric("TRADES", view.trades, "all markets"),
       metric(
         "ACTIVE MARKETS",
