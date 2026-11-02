@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>DAO Treasuries · Testril demos</title>
+    <link rel="icon" href="assets/favicon.svg" />
+    <link rel="stylesheet" href="style.css" />
+    <script type="module" src="app.js"></script>
+  </head>
+  <body>
+    <header class="measure masthead">
+      <a href="https://testril.ai"
+        ><img
+          src="assets/wordmark.svg"
+          alt="Testril"
+          width="115"
+          height="38" /></a
+      ><span>Data demos / DAO treasuries</span>
+    </header>
+    <main class="measure">
+      <p id="source" class="banner">Loading…</p>
+      <div class="eyebrow">
+        ETHEREUM · ARBITRUM · UNISWAP, ENS, ARBITRUM DAO
+      </div>
+      <h1>What the DAOs hold,<br />day by day.</h1>
+      <p class="intro">
+        Daily balances of each treasury's wallets: the governance token, USDC,
+        WETH and native ETH, with the DAO total proved against its wallets.
+      </p>
+      <section id="scope" class="scope" aria-label="Report scope"></section>
+      <section
+        id="headline"
+        class="metrics"
+        aria-label="Headline numbers"
+      ></section>
+      <div id="cards"></div>
+      <section class="method">
+        <h2>Cross-check</h2>
+        <ul id="checks"></ul>
+      </section>
+    </main>
+    <footer class="measure">
+      Data shaped from the recording in <code>recordings/report.json</code>.
+      Functions: <code>erc20.token_balance</code>, <code>native.balance</code>.
+    </footer>
+  </body>
+</html>

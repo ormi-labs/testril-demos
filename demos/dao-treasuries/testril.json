@@ -1,0 +1,242 @@
+{
+  "demo": "dao-treasuries",
+  "binds": [
+    {
+      "name": "uniswap-tokens",
+      "function_slug": "erc20.token_balance",
+      "chain_id": 1,
+      "params": {
+        "reads": {
+          "tokens": [
+            "0x1f9840a85d5af5bf1d1762f925bdaddc4201f984",
+            "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+            "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2"
+          ],
+          "owners": [
+            "0x1a9c8182c09f50c8318d769245bea52c32be35bc",
+            "0x3d30b1ab88d487b0f3061f40de76845bec3f1e94"
+          ]
+        },
+        "by": "day"
+      },
+      "window": {
+        "from_day": "2026-08-03",
+        "to_day": "2026-11-02"
+      }
+    },
+    {
+      "name": "uniswap-tokens-timelock",
+      "function_slug": "erc20.token_balance",
+      "chain_id": 1,
+      "params": {
+        "reads": {
+          "tokens": [
+            "0x1f9840a85d5af5bf1d1762f925bdaddc4201f984",
+            "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+            "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2"
+          ],
+          "owners": ["0x1a9c8182c09f50c8318d769245bea52c32be35bc"]
+        },
+        "by": "day"
+      },
+      "window": {
+        "from_day": "2026-08-03",
+        "to_day": "2026-11-02"
+      }
+    },
+    {
+      "name": "uniswap-tokens-foundation",
+      "function_slug": "erc20.token_balance",
+      "chain_id": 1,
+      "params": {
+        "reads": {
+          "tokens": [
+            "0x1f9840a85d5af5bf1d1762f925bdaddc4201f984",
+            "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+            "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2"
+          ],
+          "owners": ["0x3d30b1ab88d487b0f3061f40de76845bec3f1e94"]
+        },
+        "by": "day"
+      },
+      "window": {
+        "from_day": "2026-08-03",
+        "to_day": "2026-11-02"
+      }
+    },
+    {
+      "name": "uniswap-native",
+      "function_slug": "native.balance",
+      "chain_id": 1,
+      "params": {
+        "owners": [
+          "0x1a9c8182c09f50c8318d769245bea52c32be35bc",
+          "0x3d30b1ab88d487b0f3061f40de76845bec3f1e94"
+        ],
+        "by": "day"
+      },
+      "window": {
+        "from_day": "2026-08-03",
+        "to_day": "2026-11-02"
+      }
+    },
+    {
+      "name": "ens-tokens",
+      "function_slug": "erc20.token_balance",
+      "chain_id": 1,
+      "params": {
+        "reads": {
+          "tokens": [
+            "0xc18360217d8f7ab5e7c516566761ea12ce7f9d72",
+            "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+            "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2"
+          ],
+          "owners": [
+            "0xfe89cc7abb2c4183683ab71653c4cdc9b02d44b7",
+            "0x4f2083f5fbede34c2714affb3105539775f7fe64"
+          ]
+        },
+        "by": "day"
+      },
+      "window": {
+        "from_day": "2026-08-03",
+        "to_day": "2026-11-02"
+      }
+    },
+    {
+      "name": "ens-tokens-dao-wallet",
+      "function_slug": "erc20.token_balance",
+      "chain_id": 1,
+      "params": {
+        "reads": {
+          "tokens": [
+            "0xc18360217d8f7ab5e7c516566761ea12ce7f9d72",
+            "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+            "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2"
+          ],
+          "owners": ["0xfe89cc7abb2c4183683ab71653c4cdc9b02d44b7"]
+        },
+        "by": "day"
+      },
+      "window": {
+        "from_day": "2026-08-03",
+        "to_day": "2026-11-02"
+      }
+    },
+    {
+      "name": "ens-tokens-endowment",
+      "function_slug": "erc20.token_balance",
+      "chain_id": 1,
+      "params": {
+        "reads": {
+          "tokens": [
+            "0xc18360217d8f7ab5e7c516566761ea12ce7f9d72",
+            "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+            "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2"
+          ],
+          "owners": ["0x4f2083f5fbede34c2714affb3105539775f7fe64"]
+        },
+        "by": "day"
+      },
+      "window": {
+        "from_day": "2026-08-03",
+        "to_day": "2026-11-02"
+      }
+    },
+    {
+      "name": "ens-native",
+      "function_slug": "native.balance",
+      "chain_id": 1,
+      "params": {
+        "owners": [
+          "0xfe89cc7abb2c4183683ab71653c4cdc9b02d44b7",
+          "0x4f2083f5fbede34c2714affb3105539775f7fe64"
+        ],
+        "by": "day"
+      },
+      "window": {
+        "from_day": "2026-08-03",
+        "to_day": "2026-11-02"
+      }
+    },
+    {
+      "name": "arbitrum-tokens",
+      "function_slug": "erc20.token_balance",
+      "chain_id": 42161,
+      "params": {
+        "reads": {
+          "tokens": [
+            "0x912ce59144191c1204e64559fe8253a0e49e6548",
+            "0xaf88d065e77c8cc2239327c5edb3a432268e5831",
+            "0x82af49447d8a07e3bd95bd0d56f35241523fbab1"
+          ],
+          "owners": [
+            "0xf3fc178157fb3c87548baa86f9d24ba38e649b58",
+            "0x34d45e99f7d8c45ed05b5ca72d54bbd1fb3f98f0"
+          ]
+        },
+        "by": "day"
+      },
+      "window": {
+        "from_day": "2026-10-25",
+        "to_day": "2026-11-02"
+      }
+    },
+    {
+      "name": "arbitrum-tokens-treasury",
+      "function_slug": "erc20.token_balance",
+      "chain_id": 42161,
+      "params": {
+        "reads": {
+          "tokens": [
+            "0x912ce59144191c1204e64559fe8253a0e49e6548",
+            "0xaf88d065e77c8cc2239327c5edb3a432268e5831",
+            "0x82af49447d8a07e3bd95bd0d56f35241523fbab1"
+          ],
+          "owners": ["0xf3fc178157fb3c87548baa86f9d24ba38e649b58"]
+        },
+        "by": "day"
+      },
+      "window": {
+        "from_day": "2026-10-25",
+        "to_day": "2026-11-02"
+      }
+    },
+    {
+      "name": "arbitrum-tokens-core-timelock",
+      "function_slug": "erc20.token_balance",
+      "chain_id": 42161,
+      "params": {
+        "reads": {
+          "tokens": [
+            "0x912ce59144191c1204e64559fe8253a0e49e6548",
+            "0xaf88d065e77c8cc2239327c5edb3a432268e5831",
+            "0x82af49447d8a07e3bd95bd0d56f35241523fbab1"
+          ],
+          "owners": ["0x34d45e99f7d8c45ed05b5ca72d54bbd1fb3f98f0"]
+        },
+        "by": "day"
+      },
+      "window": {
+        "from_day": "2026-10-25",
+        "to_day": "2026-11-02"
+      }
+    },
+    {
+      "name": "arbitrum-native",
+      "function_slug": "native.balance",
+      "chain_id": 42161,
+      "params": {
+        "owners": [
+          "0xf3fc178157fb3c87548baa86f9d24ba38e649b58",
+          "0x34d45e99f7d8c45ed05b5ca72d54bbd1fb3f98f0"
+        ],
+        "by": "day"
+      },
+      "window": {
+        "from_day": "2026-10-25",
+        "to_day": "2026-11-02"
+      }
+    }
+  ]
+}
