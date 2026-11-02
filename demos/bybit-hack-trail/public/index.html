@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Bybit Hack Trail · Testril demos</title>
+    <link rel="icon" href="assets/favicon.svg" />
+    <link rel="stylesheet" href="style.css" />
+    <script type="module" src="app.js"></script>
+  </head>
+  <body>
+    <header class="measure masthead">
+      <a href="https://testril.ai"
+        ><img
+          src="assets/wordmark.svg"
+          alt="Testril"
+          width="115"
+          height="38" /></a
+      ><span>Data demos / Bybit hack trail</span>
+    </header>
+    <main class="measure">
+      <p id="source" class="banner">Loading…</p>
+      <div class="eyebrow">ETHEREUM · 21 TO 28 FEBRUARY 2025</div>
+      <h1>Where the funds went,<br />hop by hop.</h1>
+      <p class="intro">
+        On 21 February 2025 about $1.5 billion of assets left a Bybit cold
+        wallet. This page follows token transfers from publicly attributed
+        wallets and each wallet's hourly ETH balance, and reports only what the
+        chain shows.
+      </p>
+      <section class="scope" aria-label="Report scope">
+        <div>
+          <span class="label">TRANSFERS · BLOCKS</span
+          ><strong id="transfer-window"></strong>
+        </div>
+        <div>
+          <span class="label">BALANCES · UTC HOURS</span
+          ><strong id="hour-window"></strong>
+        </div>
+        <div>
+          <span class="label">FUNCTIONS</span
+          ><strong>erc20.wallet_transfers · native.balance</strong>
+        </div>
+        <div>
+          <span class="label">TOKENS</span><strong id="token-list"></strong>
+        </div>
+      </section>
+      <section
+        id="headline"
+        class="metrics"
+        aria-label="Headline numbers"
+      ></section>
+      <section class="results">
+        <div class="section-heading">
+          <h2>Hops from the cold wallet</h2>
+          <span id="hop-note"></span>
+        </div>
+        <div id="hops" class="flow"></div>
+      </section>
+      <section class="results">
+        <div class="section-heading">
+          <h2>ETH balance by hour</h2>
+          <span>each wallet on its own scale</span>
+        </div>
+        <div id="sparklines" class="charts"></div>
+      </section>
+      <section class="results">
+        <div class="section-heading">
+          <h2>Trail wallets</h2>
+          <span>token units, counting each transfer once</span>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Wallet</th>
+                <th>Address</th>
+                <th>Hop</th>
+                <th>Received</th>
+                <th>Sent</th>
+                <th>Net</th>
+              </tr>
+            </thead>
+            <tbody id="wallets"></tbody>
+          </table>
+        </div>
+      </section>
+      <section class="method">
+        <h2>Cross-check</h2>
+        <ul id="checks"></ul>
+      </section>
+    </main>
+    <footer class="measure">
+      Wallet attributions are public and unverified here. Data shaped from the
+      recording in <code>recordings/report.json</code>.
+    </footer>
+  </body>
+</html>
