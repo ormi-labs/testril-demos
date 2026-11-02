@@ -1,6 +1,6 @@
 # Exchange tide
 
-USDT, USDC and ETH held by the hot wallets of six exchanges on Ethereum, hour
+USDT, USDC and ETH held by listed wallets of six exchanges on Ethereum, hour
 by hour for a week: a stacked chart of stablecoins per exchange and a table of
 the hours when the most money moved in or out. The page proves its numbers:
 for every exchange with several wallets, the total Testril returns must equal
@@ -63,12 +63,12 @@ synthetic recording.
 | Binance  | Binance 14  | `0x28c6c06298d514db089934071355e5743bf21d60` |                         |
 | Binance  | Binance 8   | `0xf977814e90da44bfa03b6295a0616a897441acec` |                         |
 | Coinbase | Coinbase 10 | `0xa9d1e08c7793af67e9d92fe308d5697fb81d3e43` |                         |
-| Coinbase | Coinbase 6  | `0x3cd751e6b0078be393132286c442345e5dc49699` | verify before recording |
+| Coinbase | Coinbase 4  | `0x3cd751e6b0078be393132286c442345e5dc49699` | verify before recording |
 | Kraken   | Kraken 4    | `0x267be1c1d684f78cb4f6a176c4911b741e4ffdc0` | verify before recording |
 | Kraken   | Kraken 1    | `0x2910543af39aba0cd09dbb2d50200b3e800a63d2` | verify before recording |
 | OKX      | OKX 73      | `0x6cc5f688a315f3dc28a7781717a9a798a59fda7b` | verify before recording |
 | Bitfinex | Bitfinex 2  | `0x77134cbc06cb00b66f4c7e623d5fdbf6777635ec` | verify before recording |
-| Gemini   | Gemini 4    | `0xd24400ae8bfebb18ca49be86258a3c749cf46853` | verify before recording |
+| Gemini   | Gemini 1    | `0xd24400ae8bfebb18ca49be86258a3c749cf46853` | verify before recording |
 
 ## Binds (`testril.json`)
 
@@ -96,7 +96,9 @@ Windows are half-open: the end is the first hour not included.
 | `gemini-native`    | `native.balance`      | 1 owner(s)              | 2026-10-25T00 → 2026-11-01T00 |
 
 All binds are on chain 1 and read `by: "hour"`. `<exchange>-total` names every
-wallet of the exchange; `<exchange>-owner-N` names one.
+wallet of the exchange; `<exchange>-owner-N` names one. `src/report.mjs` links
+owner binds to totals by this naming. Single-wallet exchanges and the native
+binds get only the presence, positivity and gap checks, no unit check.
 
 ## Record real data
 

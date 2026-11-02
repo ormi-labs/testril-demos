@@ -50,8 +50,14 @@ function balancesByHour(rows, bindName, keyField, keys) {
       `${bindName} has hour ${outside[0].hour}, outside the window.`,
     );
   const series = new Map(keys.map((key) => [key, new Map()]));
-  for (const row of bind)
-    series.get(row[keyField].toLowerCase())?.set(row.hour, row);
+  for (const row of bind) {
+    const key = row[keyField].toLowerCase();
+    if (!series.has(key))
+      throw new Error(`${bindName} has an unexpected ${keyField} ${key}.`);
+    if (series.get(key).has(row.hour))
+      throw new Error(`${bindName} has two rows for ${key} at ${row.hour}.`);
+    series.get(key).set(row.hour, row);
+  }
   for (const [key, byHour] of series)
     for (const hour of expected) {
       if (!byHour.has(hour))
@@ -124,6 +130,11 @@ function stableTotals(rows, exchange) {
 
 const absolute = (value) => (value < 0n ? -value : value);
 
+const bySizeDescending = (a, b) => {
+  const [sizeA, sizeB] = [absolute(a.change), absolute(b.change)];
+  return sizeA === sizeB ? 0 : sizeB > sizeA ? 1 : -1;
+};
+
 function hourlyChanges(exchange, totals) {
   const expected = hours();
   return totals.slice(1).map((balance, i) => ({
@@ -139,13 +150,7 @@ export function shape(rows) {
   const totals = exchanges.map((exchange) => stableTotals(rows, exchange));
   const changes = exchanges
     .flatMap((exchange, i) => hourlyChanges(exchange, totals[i]))
-    .sort((a, b) =>
-      absolute(b.change) > absolute(a.change)
-        ? 1
-        : absolute(b.change) < absolute(a.change)
-          ? -1
-          : 0,
-    );
+    .sort(bySizeDescending);
   const sumLast = (list) =>
     list.reduce((acc, series) => acc + series.at(-1), 0n);
   const sumFirst = (list) => list.reduce((acc, series) => acc + series[0], 0n);

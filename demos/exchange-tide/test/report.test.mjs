@@ -38,6 +38,19 @@ test("check fails when an hour is missing", () => {
   );
 });
 
+test("check fails when a bind returns an unknown token", () => {
+  const corrupted = rows();
+  corrupted["okx-total"][0].token =
+    "0x0000000000000000000000000000000000000001";
+  assert.throws(() => check(corrupted), /okx-total has an unexpected token/);
+});
+
+test("check fails when a bind returns two rows for one hour", () => {
+  const corrupted = rows();
+  corrupted["okx-total"].push({ ...corrupted["okx-total"][0] });
+  assert.throws(() => check(corrupted), /okx-total has two rows for .* at /);
+});
+
 test("check fails when a gap is filled with zero", () => {
   const corrupted = rows();
   corrupted["kraken-native"][5].balance = "0";
