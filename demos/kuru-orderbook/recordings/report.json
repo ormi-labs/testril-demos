@@ -1,0 +1,496 @@
+{
+  "demo": "kuru-orderbook",
+  "source": "synthetic",
+  "recordedAt": "2026-11-02T00:00:00.000Z",
+  "boundFunctions": {
+    "markets": {
+      "function_slug": "kuru.market_list",
+      "chain_id": 143
+    },
+    "volume": {
+      "function_slug": "kuru.market_volume",
+      "chain_id": 143
+    }
+  },
+  "window": {
+    "markets": {
+      "from_block": 0,
+      "to_block": 118765043
+    },
+    "volume": {
+      "from_day": "2026-10-25",
+      "to_day": "2026-11-02"
+    }
+  },
+  "rows": {
+    "markets": [
+      {
+        "block": 41024033,
+        "market": "0x451bd1b13c4558a67a62bc042905ecbf05c03d24",
+        "base_asset": "0x0000000000000000000000000000000000000000",
+        "quote_asset": "0x754704bc059f8c67012fed69bc8a327a5aafb603",
+        "vault": "0xdcfb279964970c20b694f220845b83839621bf04",
+        "price_precision": "10000000",
+        "size_precision": "100000000000",
+        "tick_size": "100",
+        "min_size": "20000000000000",
+        "max_size": "200000000000000000",
+        "taker_fee_bps": "2",
+        "maker_fee_bps": "1",
+        "amm_spread": "30"
+      },
+      {
+        "block": 50336811,
+        "market": "0xc55f8bd0a626e7f9e3971a538a79ea81cbb26510",
+        "base_asset": "0xee8c0e9f1bffb4eb878d8f15f368a02a35481242",
+        "quote_asset": "0x754704bc059f8c67012fed69bc8a327a5aafb603",
+        "vault": "0x019e66e6ec62a7525886a9477aabcc41b984b1d2",
+        "price_precision": "10000000",
+        "size_precision": "100000000000",
+        "tick_size": "100",
+        "min_size": "20000000000000",
+        "max_size": "200000000000000000",
+        "taker_fee_bps": "3",
+        "maker_fee_bps": "1",
+        "amm_spread": "30"
+      },
+      {
+        "block": 59672610,
+        "market": "0xfc1fd364f282ae91c00f82602823452aa725bfb3",
+        "base_asset": "0x0555e30da8f98308edb960aa94c0db47230d2b9c",
+        "quote_asset": "0x754704bc059f8c67012fed69bc8a327a5aafb603",
+        "vault": "0xad300a989cea6acb18f13bed50afff6357a677b9",
+        "price_precision": "10000000",
+        "size_precision": "100000000000",
+        "tick_size": "100",
+        "min_size": "20000000000000",
+        "max_size": "200000000000000000",
+        "taker_fee_bps": "3",
+        "maker_fee_bps": "1",
+        "amm_spread": "30"
+      },
+      {
+        "block": 68927937,
+        "market": "0x9a4f08d3c1fbf047f46898e17ff3e9dc6c908dc7",
+        "base_asset": "0x3bd359c1119da7da1d913d1c4d2b7c461115433a",
+        "quote_asset": "0x754704bc059f8c67012fed69bc8a327a5aafb603",
+        "vault": "0x4d1ec6a0efe7bae592016adee654c430356bbdaf",
+        "price_precision": "10000000",
+        "size_precision": "100000000000",
+        "tick_size": "100",
+        "min_size": "20000000000000",
+        "max_size": "200000000000000000",
+        "taker_fee_bps": "5",
+        "maker_fee_bps": "2",
+        "amm_spread": "30"
+      },
+      {
+        "block": 78218496,
+        "market": "0x43b10791f76dac0be6774484a36b7ae41c3e8feb",
+        "base_asset": "0xe7cd86e13ac4309349f30b3435a9d337750fc82d",
+        "quote_asset": "0x754704bc059f8c67012fed69bc8a327a5aafb603",
+        "vault": "0x4ce09c88f959b49dc9cc60297608d349aef56c5f",
+        "price_precision": "10000000",
+        "size_precision": "100000000000",
+        "tick_size": "100",
+        "min_size": "20000000000000",
+        "max_size": "200000000000000000",
+        "taker_fee_bps": "1",
+        "maker_fee_bps": "0",
+        "amm_spread": "30"
+      },
+      {
+        "block": 87585739,
+        "market": "0xe965f5580250b053d26f626a8503968181245009",
+        "base_asset": "0xee8c0e9f1bffb4eb878d8f15f368a02a35481242",
+        "quote_asset": "0x3bd359c1119da7da1d913d1c4d2b7c461115433a",
+        "vault": "0xa79dc5f3fb4ed43ac8c6a2cb7967b4694f97ec8f",
+        "price_precision": "10000000",
+        "size_precision": "100000000000",
+        "tick_size": "100",
+        "min_size": "20000000000000",
+        "max_size": "200000000000000000",
+        "taker_fee_bps": "5",
+        "maker_fee_bps": "2",
+        "amm_spread": "30"
+      },
+      {
+        "block": 96865384,
+        "market": "0xa00797065358f1fff18de7139e9ae42f1d7344fd",
+        "base_asset": "0x0555e30da8f98308edb960aa94c0db47230d2b9c",
+        "quote_asset": "0x3bd359c1119da7da1d913d1c4d2b7c461115433a",
+        "vault": "0x19a6eea6f08afa73bd37e51f11f8cf9fcc04d9e1",
+        "price_precision": "10000000",
+        "size_precision": "100000000000",
+        "tick_size": "100",
+        "min_size": "20000000000000",
+        "max_size": "200000000000000000",
+        "taker_fee_bps": "5",
+        "maker_fee_bps": "2",
+        "amm_spread": "30"
+      }
+    ],
+    "volume": [
+      {
+        "day": "2026-10-25",
+        "market": "0x451bd1b13c4558a67a62bc042905ecbf05c03d24",
+        "trades": "6265",
+        "quote_volume": "4029556300227000000000000",
+        "base_fee": "14237765594135400000000",
+        "base_rebate": "7118882797067700000000",
+        "quote_fee": "378778292221338000000",
+        "quote_rebate": "189389146110669000000"
+      },
+      {
+        "day": "2026-10-25",
+        "market": "0xc55f8bd0a626e7f9e3971a538a79ea81cbb26510",
+        "trades": "2129",
+        "quote_volume": "1826283904044000000000000",
+        "base_fee": "66068505940415294",
+        "base_rebate": "22022835313471764",
+        "quote_fee": "323252251015788000000",
+        "quote_rebate": "107750750338596000000"
+      },
+      {
+        "day": "2026-10-25",
+        "market": "0xfc1fd364f282ae91c00f82602823452aa725bfb3",
+        "trades": "693",
+        "quote_volume": "822180702229000000000000",
+        "base_fee": "1661670471873347",
+        "base_rebate": "553890157291115",
+        "quote_fee": "88795515840732000000",
+        "quote_rebate": "29598505280244000000"
+      },
+      {
+        "day": "2026-10-25",
+        "market": "0x9a4f08d3c1fbf047f46898e17ff3e9dc6c908dc7",
+        "trades": "400",
+        "quote_volume": "430978207781000000000000",
+        "base_fee": "4668930584294166666666",
+        "base_rebate": "1867572233717666666666",
+        "quote_fee": "75421186361675000000",
+        "quote_rebate": "30168474544670000000"
+      },
+      {
+        "day": "2026-10-26",
+        "market": "0x451bd1b13c4558a67a62bc042905ecbf05c03d24",
+        "trades": "4465",
+        "quote_volume": "5787553466646000000000000",
+        "base_fee": "17362660399938000000000",
+        "base_rebate": "8681330199969000000000",
+        "quote_fee": "636630881331060000000",
+        "quote_rebate": "318315440665530000000"
+      },
+      {
+        "day": "2026-10-26",
+        "market": "0xc55f8bd0a626e7f9e3971a538a79ea81cbb26510",
+        "trades": "1174",
+        "quote_volume": "1144063212785000000000000",
+        "base_fee": "50473377034632352",
+        "base_rebate": "16824459011544117",
+        "quote_fee": "171609481917750000000",
+        "quote_rebate": "57203160639250000000"
+      },
+      {
+        "day": "2026-10-26",
+        "market": "0xfc1fd364f282ae91c00f82602823452aa725bfb3",
+        "trades": "853",
+        "quote_volume": "648652259584000000000000",
+        "base_fee": "819350222632421",
+        "base_rebate": "273116740877473",
+        "quote_fee": "116757406725120000000",
+        "quote_rebate": "38919135575040000000"
+      },
+      {
+        "day": "2026-10-26",
+        "market": "0x9a4f08d3c1fbf047f46898e17ff3e9dc6c908dc7",
+        "trades": "160",
+        "quote_volume": "199844711970000000000000",
+        "base_fee": "1898524763715000000000",
+        "base_rebate": "759409905486000000000",
+        "quote_fee": "42966613073550000000",
+        "quote_rebate": "17186645229420000000"
+      },
+      {
+        "day": "2026-10-26",
+        "market": "0xe965f5580250b053d26f626a8503968181245009",
+        "trades": "71",
+        "quote_volume": "54673629955000000000000",
+        "base_fee": "144724740247765",
+        "base_rebate": "57889896099106",
+        "quote_fee": "10934725991000000000",
+        "quote_rebate": "4373890396400000000"
+      },
+      {
+        "day": "2026-10-27",
+        "market": "0x451bd1b13c4558a67a62bc042905ecbf05c03d24",
+        "trades": "4671",
+        "quote_volume": "4108761719448000000000000",
+        "base_fee": "10134945574638400000000",
+        "base_rebate": "5067472787319200000000",
+        "quote_fee": "517703976650448000000",
+        "quote_rebate": "258851988325224000000"
+      },
+      {
+        "day": "2026-10-27",
+        "market": "0xc55f8bd0a626e7f9e3971a538a79ea81cbb26510",
+        "trades": "862",
+        "quote_volume": "594727022173000000000000",
+        "base_fee": "29911270821053823",
+        "base_rebate": "9970423607017941",
+        "quote_fee": "76719785860317000000",
+        "quote_rebate": "25573261953439000000"
+      },
+      {
+        "day": "2026-10-27",
+        "market": "0xfc1fd364f282ae91c00f82602823452aa725bfb3",
+        "trades": "1310",
+        "quote_volume": "1095138499104000000000000",
+        "base_fee": "1279582877900463",
+        "base_rebate": "426527625966821",
+        "quote_fee": "206981176330656000000",
+        "quote_rebate": "68993725443552000000"
+      },
+      {
+        "day": "2026-10-27",
+        "market": "0x9a4f08d3c1fbf047f46898e17ff3e9dc6c908dc7",
+        "trades": "529",
+        "quote_volume": "414509664518000000000000",
+        "base_fee": "4697776197870666666666",
+        "base_rebate": "1879110479148266666666",
+        "quote_fee": "66321546322880000000",
+        "quote_rebate": "26528618529152000000"
+      },
+      {
+        "day": "2026-10-27",
+        "market": "0x43b10791f76dac0be6774484a36b7ae41c3e8feb",
+        "trades": "207",
+        "quote_volume": "118595935114000000000000",
+        "base_fee": "7115756106840000000",
+        "base_rebate": "0",
+        "quote_fee": "4743837404560000000",
+        "quote_rebate": "0"
+      },
+      {
+        "day": "2026-10-28",
+        "market": "0x451bd1b13c4558a67a62bc042905ecbf05c03d24",
+        "trades": "4520",
+        "quote_volume": "4726930134278000000000000",
+        "base_fee": "19537977888349066666666",
+        "base_rebate": "9768988944174533333333",
+        "quote_fee": "359246690205128000000",
+        "quote_rebate": "179623345102564000000"
+      },
+      {
+        "day": "2026-10-28",
+        "market": "0xc55f8bd0a626e7f9e3971a538a79ea81cbb26510",
+        "trades": "1387",
+        "quote_volume": "1191651383527000000000000",
+        "base_fee": "66241797496059705",
+        "base_rebate": "22080599165353235",
+        "quote_fee": "132273303571497000000",
+        "quote_rebate": "44091101190499000000"
+      },
+      {
+        "day": "2026-10-28",
+        "market": "0xfc1fd364f282ae91c00f82602823452aa725bfb3",
+        "trades": "514",
+        "quote_volume": "400738485367000000000000",
+        "base_fee": "404956785212968",
+        "base_rebate": "134985595070989",
+        "quote_fee": "81750651014868000000",
+        "quote_rebate": "27250217004956000000"
+      },
+      {
+        "day": "2026-10-28",
+        "market": "0x9a4f08d3c1fbf047f46898e17ff3e9dc6c908dc7",
+        "trades": "682",
+        "quote_volume": "440406067521000000000000",
+        "base_fee": "4330659663956500000000",
+        "base_rebate": "1732263865582600000000",
+        "quote_fee": "90283243841805000000",
+        "quote_rebate": "36113297536722000000"
+      },
+      {
+        "day": "2026-10-28",
+        "market": "0x43b10791f76dac0be6774484a36b7ae41c3e8feb",
+        "trades": "64",
+        "quote_volume": "68979134627000000000000",
+        "base_fee": "2552227981199000000",
+        "base_rebate": "0",
+        "quote_fee": "4345685481501000000",
+        "quote_rebate": "0"
+      },
+      {
+        "day": "2026-10-29",
+        "market": "0x451bd1b13c4558a67a62bc042905ecbf05c03d24",
+        "trades": "8072",
+        "quote_volume": "6212913184690000000000000",
+        "base_fee": "18224545341757333333333",
+        "base_rebate": "9112272670878666666666",
+        "quote_fee": "695846276685280000000",
+        "quote_rebate": "347923138342640000000"
+      },
+      {
+        "day": "2026-10-29",
+        "market": "0xc55f8bd0a626e7f9e3971a538a79ea81cbb26510",
+        "trades": "1860",
+        "quote_volume": "1713959345400000000000000",
+        "base_fee": "68054268126176470",
+        "base_rebate": "22684756042058823",
+        "quote_fee": "282803291991000000000",
+        "quote_rebate": "94267763997000000000"
+      },
+      {
+        "day": "2026-10-29",
+        "market": "0xfc1fd364f282ae91c00f82602823452aa725bfb3",
+        "trades": "543",
+        "quote_volume": "479641488204000000000000",
+        "base_fee": "848208105455494",
+        "base_rebate": "282736035151831",
+        "quote_fee": "63312676442928000000",
+        "quote_rebate": "21104225480976000000"
+      },
+      {
+        "day": "2026-10-30",
+        "market": "0x451bd1b13c4558a67a62bc042905ecbf05c03d24",
+        "trades": "8002",
+        "quote_volume": "5401104710760000000000000",
+        "base_fee": "19443976958736000000000",
+        "base_rebate": "9721988479368000000000",
+        "quote_fee": "496901633389920000000",
+        "quote_rebate": "248450816694960000000"
+      },
+      {
+        "day": "2026-10-30",
+        "market": "0xc55f8bd0a626e7f9e3971a538a79ea81cbb26510",
+        "trades": "1750",
+        "quote_volume": "1839817314907000000000000",
+        "base_fee": "68181465199494705",
+        "base_rebate": "22727155066498235",
+        "quote_fee": "320128212793818000000",
+        "quote_rebate": "106709404264606000000"
+      },
+      {
+        "day": "2026-10-30",
+        "market": "0xfc1fd364f282ae91c00f82602823452aa725bfb3",
+        "trades": "1489",
+        "quote_volume": "897531023711000000000000",
+        "base_fee": "992007973575315",
+        "base_rebate": "330669324525105",
+        "quote_fee": "175018549623645000000",
+        "quote_rebate": "58339516541215000000"
+      },
+      {
+        "day": "2026-10-30",
+        "market": "0x9a4f08d3c1fbf047f46898e17ff3e9dc6c908dc7",
+        "trades": "439",
+        "quote_volume": "320281120691000000000000",
+        "base_fee": "1654785790236833333333",
+        "base_rebate": "661914316094733333333",
+        "quote_fee": "110496986638395000000",
+        "quote_rebate": "44198794655358000000"
+      },
+      {
+        "day": "2026-10-30",
+        "market": "0xe965f5580250b053d26f626a8503968181245009",
+        "trades": "91",
+        "quote_volume": "47724374254000000000000",
+        "base_fee": "103169171311356",
+        "base_rebate": "41267668524542",
+        "quote_fee": "12169715434770000000",
+        "quote_rebate": "4867886173908000000"
+      },
+      {
+        "day": "2026-10-31",
+        "market": "0x451bd1b13c4558a67a62bc042905ecbf05c03d24",
+        "trades": "3960",
+        "quote_volume": "4027092616079000000000000",
+        "base_fee": "17182261828603733333333",
+        "base_rebate": "8591130914301866666666",
+        "quote_fee": "289950668357688000000",
+        "quote_rebate": "144975334178844000000"
+      },
+      {
+        "day": "2026-10-31",
+        "market": "0xc55f8bd0a626e7f9e3971a538a79ea81cbb26510",
+        "trades": "895",
+        "quote_volume": "1045712543896000000000000",
+        "base_fee": "35062126471807058",
+        "base_rebate": "11687375490602352",
+        "quote_fee": "194502533164656000000",
+        "quote_rebate": "64834177721552000000"
+      },
+      {
+        "day": "2026-10-31",
+        "market": "0xfc1fd364f282ae91c00f82602823452aa725bfb3",
+        "trades": "760",
+        "quote_volume": "1051651832148000000000000",
+        "base_fee": "1261982198577600",
+        "base_rebate": "420660732859200",
+        "quote_fee": "195607240779528000000",
+        "quote_rebate": "65202413593176000000"
+      },
+      {
+        "day": "2026-10-31",
+        "market": "0x43b10791f76dac0be6774484a36b7ae41c3e8feb",
+        "trades": "184",
+        "quote_volume": "127160570373000000000000",
+        "base_fee": "6485189089023000000",
+        "base_rebate": "0",
+        "quote_fee": "6230867948277000000",
+        "quote_rebate": "0"
+      },
+      {
+        "day": "2026-11-01",
+        "market": "0x451bd1b13c4558a67a62bc042905ecbf05c03d24",
+        "trades": "4353",
+        "quote_volume": "3934692246938000000000000",
+        "base_fee": "12853328006664133333333",
+        "base_rebate": "6426664003332066666666",
+        "quote_fee": "401338609187676000000",
+        "quote_rebate": "200669304593838000000"
+      },
+      {
+        "day": "2026-11-01",
+        "market": "0xc55f8bd0a626e7f9e3971a538a79ea81cbb26510",
+        "trades": "1458",
+        "quote_volume": "1667565519842000000000000",
+        "base_fee": "52969728277334117",
+        "base_rebate": "17656576092444705",
+        "quote_fee": "320172579809664000000",
+        "quote_rebate": "106724193269888000000"
+      },
+      {
+        "day": "2026-11-01",
+        "market": "0xfc1fd364f282ae91c00f82602823452aa725bfb3",
+        "trades": "1099",
+        "quote_volume": "893152411033000000000000",
+        "base_fee": "1184602145159557",
+        "base_rebate": "394867381719852",
+        "quote_fee": "155408519519742000000",
+        "quote_rebate": "51802839839914000000"
+      },
+      {
+        "day": "2026-11-01",
+        "market": "0x9a4f08d3c1fbf047f46898e17ff3e9dc6c908dc7",
+        "trades": "414",
+        "quote_volume": "283838343533000000000000",
+        "base_fee": "2980302607096500000000",
+        "base_rebate": "1192121042838600000000",
+        "quote_fee": "52510093553605000000",
+        "quote_rebate": "21004037421442000000"
+      },
+      {
+        "day": "2026-11-01",
+        "market": "0x43b10791f76dac0be6774484a36b7ae41c3e8feb",
+        "trades": "80",
+        "quote_volume": "92192106170000000000000",
+        "base_fee": "4609605308500000000",
+        "base_rebate": "0",
+        "quote_fee": "4609605308500000000",
+        "quote_rebate": "0"
+      }
+    ]
+  }
+}
