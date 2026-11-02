@@ -1,13 +1,13 @@
 import { writeFile } from "node:fs/promises";
 import { pathToFileURL } from "node:url";
 import spec from "../testril.json" with { type: "json" };
-import { window } from "../src/report.mjs";
+import { rewardWindow as window } from "../src/report.mjs";
 
 const recordedAt = "2026-11-02T00:00:00.000Z";
 const wei = 10n ** 18n;
-const firstEpoch = 1700;
-const blocksPerEpoch = 23700;
-const indexerCount = 14;
+const firstEpoch = 1423;
+const blocksPerEpoch = 321190;
+const generatedIndexerCount = 14;
 
 function seeded(seed) {
   let state = seed;
@@ -105,15 +105,15 @@ function feeRows(random) {
     "rebate_collected",
     "query_fees_collected",
   ];
-  return logRows(sortedBlocks(120, random), random, (_block, index) => {
+  const rows = logRows(sortedBlocks(120, random), random, (_block, index) => {
     const kind = kinds[index % kinds.length];
     const total = grt(300 + random() ** 2 * 9e3, random);
     if (kind === "query_fees_collected")
       return {
         kind,
         total: total.toString(),
-        indexer_fees: "0",
-        curator_fees: "0",
+        indexer_fees: (total - total / 20n).toString(),
+        curator_fees: (total / 20n).toString(),
         protocol_tax: "0",
       };
     const tax = total / 100n;
@@ -126,12 +126,28 @@ function feeRows(random) {
       protocol_tax: tax.toString(),
     };
   });
+  return rows.flatMap((row) =>
+    row.kind === "query_fees_collected"
+      ? [
+          row,
+          {
+            ...row,
+            kind: "payment_collected",
+            log_index: "10",
+            total: "0",
+            indexer_fees: "0",
+            curator_fees: "0",
+            protocol_tax: (BigInt(row.total) / 100n).toString(),
+          },
+        ]
+      : [row],
+  );
 }
 
 export function fixture() {
   const random = seeded(11);
   const indexers = Array.from(
-    { length: indexerCount },
+    { length: generatedIndexerCount },
     () => `0x${hex(random, 40)}`,
   );
   return {

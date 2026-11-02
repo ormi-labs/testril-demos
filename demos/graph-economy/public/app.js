@@ -108,7 +108,7 @@ function render(report) {
     .querySelector("#headline")
     .replaceChildren(
       metric("INDEXING REWARDS", view.rewards),
-      metric("TO DELEGATORS", view.delegatorShare, "of all rewards"),
+      metric("TO DELEGATORS", view.delegatorShare, "of split rewards"),
       metric(
         "NET DELEGATION",
         view.netDelegation,
