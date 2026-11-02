@@ -33,8 +33,9 @@ const splitFields = ["creator", "buyback", "protocol"];
 function tokenTotals(rows, sweepsOf) {
   const totals = new Map();
   for (const row of rows) {
-    const entry = totals.get(row.token) ?? {
-      token: row.token,
+    const token = row.token.toLowerCase();
+    const entry = totals.get(token) ?? {
+      token,
       sweeps: 0n,
       creator: 0n,
       buyback: 0n,
@@ -43,7 +44,7 @@ function tokenTotals(rows, sweepsOf) {
     entry.sweeps += sweepsOf(row);
     for (const field of splitFields)
       entry[field] += raw(row[`${field}_amount`], `${field}_amount`);
-    totals.set(row.token, entry);
+    totals.set(token, entry);
   }
   return totals;
 }
@@ -52,7 +53,8 @@ const feeTotals = (feeRows) =>
   tokenTotals(feeRows, (row) => raw(row.sweeps, "sweeps"));
 const sweepTotals = (sweepRows) => tokenTotals(sweepRows, () => 1n);
 const totalOf = (entry) => entry.creator + entry.buyback + entry.protocol;
-const byTotalDesc = (a, b) => (totalOf(b) > totalOf(a) ? 1 : -1);
+const byTotalDesc = (a, b) =>
+  (totalOf(b) > totalOf(a)) - (totalOf(b) < totalOf(a));
 
 const tokensOf = (rows) => new Set(rows.map((row) => row.token.toLowerCase()));
 
@@ -79,7 +81,7 @@ export function check(rows) {
     throw new Error(`Curve ${strayCurve} traded but was never launched.`);
   const seen = new Set();
   for (const row of rows["pool-fees"]) {
-    const key = `${row.day}/${row.token}`;
+    const key = `${row.day}/${row.token.toLowerCase()}`;
     if (seen.has(key))
       throw new Error(`Token ${row.token} has two fee rows on ${row.day}.`);
     seen.add(key);
@@ -119,7 +121,7 @@ export function formatEth(wei) {
 }
 
 const percent = (part, whole) =>
-  whole === 0 ? "0%" : `${Math.round((part / whole) * 100)}%`;
+  whole === 0n ? "0%" : `${(part * 100n + whole / 2n) / whole}%`;
 
 const shortAddress = (address) => `${address.slice(0, 6)}…${address.slice(-4)}`;
 const eth = (wei) => Number(wei / 10n ** 12n) / 1e6;
@@ -152,15 +154,15 @@ export function shape(rows) {
       { label: "Graduated", count: graduated },
       { label: "Fees swept", count: sweptTokenCount },
     ],
-    graduationRate: percent(graduated, launched),
+    graduationRate: percent(BigInt(graduated), BigInt(launched)),
     volume: formatEth(volume),
     swept: formatEth(total),
     creator: formatEth(creator),
     buyback: formatEth(buyback),
     protocol: formatEth(protocol),
-    creatorShare: percent(Number(creator), Number(total)),
-    buybackShare: percent(Number(buyback), Number(total)),
-    protocolShare: percent(Number(protocol), Number(total)),
+    creatorShare: percent(creator, total),
+    buybackShare: percent(buyback, total),
+    protocolShare: percent(protocol, total),
     daily: feeDays().map((day) => ({
       day,
       eth: eth(dailyFees.get(day) ?? 0n),

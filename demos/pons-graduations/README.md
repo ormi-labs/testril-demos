@@ -54,21 +54,25 @@ sweep is counted twice, and that the server returns the shaped report.
 
 Chain id `46630` is declared as the Robinhood Chain testnet id, from memory:
 the local daemon's `inspect chains` does not serve it, so verify it before
-recording. The pool manager and hook addresses below are invented placeholders,
-not real contracts, and must be replaced with the real addresses before
-recording. The factory address is copied from the function's example row.
+recording. The hook and position manager are the literal placeholders
+`REPLACE_WITH_PONS_HOOK_ADDRESS` and `REPLACE_WITH_V4_POSITION_MANAGER_ADDRESS`
+in `testril.json`; `npm run record` refuses to run until both are real
+addresses. The `pool_manager` param of `pons.graduated_pool_list` is the Uniswap
+v4 PositionManager (it serves `positionInfo`), not the v4 PoolManager
+singleton. The factory address is copied from the function's example row.
 
 | Subject                                    | Address                                      | Note                    |
 | ------------------------------------------ | -------------------------------------------- | ----------------------- |
 | Pons launch factory                        | `0x7ed598bcef8bd9edd8c97a195c6d13f40801ec7e` | verify before recording |
-| Pons fee hook                              | `0x5c2e9a4b7d1f3e6a8c0b2d4f6e8a1c3b5d7f09a8` | placeholder, replace    |
-| Uniswap v4 position manager (positionInfo) | `0x1b0c5a0e2f1d4c3b8a7f6e5d4c3b2a1908f7e6d5` | placeholder, replace    |
+| Pons fee hook                              | `REPLACE_WITH_PONS_HOOK_ADDRESS`             | placeholder, replace    |
+| Uniswap v4 position manager (positionInfo) | `REPLACE_WITH_V4_POSITION_MANAGER_ADDRESS`   | placeholder, replace    |
 
 - Launches and graduations: blocks `[0, 10000000)`, meant to cover everything
   from the factory's creation; replace the end with the chain head.
-- Volume and fees: UTC days `[2026-10-02, 2026-11-02)`.
-- Sweeps: blocks `[0, 10000000)` in the shipped recording; when recording, set
-  them to the blocks of the fees window so the per-token sums are comparable.
+- Volume and fees: UTC days `[2026-08-01, 2026-11-02)`, meant to start at the
+  factory's creation day (verify it). Sweeps cover every block from creation, so
+  the fees window must start at the same point for the cross-check to compare
+  like with like.
 - Amounts are raw wei of the pair token, which is the native coin (ETH).
 
 ## Binds (`testril.json`)
@@ -79,9 +83,15 @@ Windows are half-open: the end is the first block or day not included.
 | ---------------- | -------------------------- | ----- | --------------------------------------------- | ----------------------- |
 | `launches`       | `pons.curve_list`          | 46630 | `factory`                                     | 0 → 10000000            |
 | `graduations`    | `pons.graduated_pool_list` | 46630 | `factory`, `pool_manager`                     | 0 → 10000000            |
-| `curve-volume`   | `pons.curve_volume`        | 46630 | `swap.curve_list`, `by`                       | 2026-10-02 → 2026-11-02 |
-| `pool-fees`      | `pons.pool_fees`           | 46630 | `swap.hook`, `swap.graduated_pool_list`, `by` | 2026-10-02 → 2026-11-02 |
+| `curve-volume`   | `pons.curve_volume`        | 46630 | `swap.curve_list`, `by`                       | 2026-08-01 → 2026-11-02 |
+| `pool-fees`      | `pons.pool_fees`           | 46630 | `swap.hook`, `swap.graduated_pool_list`, `by` | 2026-08-01 → 2026-11-02 |
 | `pool-fee-sweep` | `pons.pool_fee_sweep`      | 46630 | `hook`, `graduated_pool_list`                 | 0 → 10000000            |
+
+`pons.pool_fee_sweep` is a fifth bind beyond the four functions the demo is
+about. The spec's check that creator, buyback and protocol amounts equal the
+sweep total cannot be made because `PoolFeesSwept` emits no total, so the demo
+instead cross-checks each token's `pons.pool_fees` sums against its individual
+sweeps.
 
 ## Record real data
 
