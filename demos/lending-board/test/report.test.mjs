@@ -35,6 +35,16 @@ test("check fails when rates lose nine digits", () => {
   assert.throws(() => check(corrupted), /not in ray/);
 });
 
+test("check fails when supply and borrow rates are swapped", () => {
+  const corrupted = rows();
+  for (const row of usdcRows(corrupted["reserve-state"]))
+    [row.liquidity_rate, row.variable_borrow_rate] = [
+      row.variable_borrow_rate,
+      row.liquidity_rate,
+    ];
+  assert.throws(() => check(corrupted), /supply rate .* above its borrow rate/);
+});
+
 test("check fails when a lifetime total falls", () => {
   const corrupted = rows();
   const history = usdcRows(corrupted["reserve-totals"]).toSorted(

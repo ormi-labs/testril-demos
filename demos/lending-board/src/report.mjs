@@ -48,7 +48,7 @@ const rawAmount = /^[0-9]+$/;
 const basisPointsPerPercent = 100n;
 const rayPerBasisPoint = 10n ** 23n;
 const maxBorrowRate = 10n * 10n ** 27n;
-const minBorrowRate = 10n ** 21n;
+const minBorrowRate = 10n ** 22n;
 const totalsFields = [
   "supplied",
   "withdrawn",
@@ -82,7 +82,7 @@ export function holdingDays() {
 }
 export const lastStateHour = addHours(stateWindow.to_hour, -1);
 
-const bySymbol = (asset) =>
+const assetByAddress = (asset) =>
   assets.find((a) => a.address === asset.toLowerCase());
 const utilizationBp = (row) => {
   const supply = BigInt(row.a_token_supply);
@@ -102,7 +102,7 @@ function latestPerAsset(rows, order) {
 function checkState(rows) {
   const listed = new Set(rows.reserves.map((row) => row.asset.toLowerCase()));
   for (const row of rows["reserve-state"]) {
-    const name = bySymbol(row.asset)?.symbol ?? row.asset;
+    const name = assetByAddress(row.asset)?.symbol ?? row.asset;
     if (!listed.has(row.asset.toLowerCase()))
       throw new Error(
         `${name} has hourly state but is not in the reserve list.`,
@@ -137,7 +137,7 @@ function checkTotals(rows) {
     row.asset.toLowerCase(),
   );
   for (const [asset, list] of history) {
-    const name = bySymbol(asset)?.symbol ?? asset;
+    const name = assetByAddress(asset)?.symbol ?? asset;
     const sorted = list.toSorted((a, b) => a.block - b.block);
     sorted.forEach((row, i) => {
       if (row.block >= totalsWindow.to_block)
@@ -195,20 +195,16 @@ export function formatPercent(bp) {
 }
 const formatRate = (ray) => formatPercent(BigInt(ray) / rayPerBasisPoint);
 
+const toUnits = (raw, decimals) =>
+  Number(BigInt(raw) / 10n ** BigInt(decimals - 2)) / 100;
+const scales = Object.entries({ B: 1e9, M: 1e6, K: 1e3 });
+
 export function formatAmount(raw, decimals) {
-  const units = Number(BigInt(raw) / 10n ** BigInt(decimals - 2)) / 100;
-  const [scale, suffix] =
-    units >= 1e9
-      ? [1e9, "B"]
-      : units >= 1e6
-        ? [1e6, "M"]
-        : units >= 1e3
-          ? [1e3, "K"]
-          : [1, ""];
+  const units = toUnits(raw, decimals);
+  const [suffix, scale] = scales.find(([, size]) => units >= size) ?? ["", 1];
   return `${(units / scale).toFixed(2)}${suffix}`;
 }
-const millions = (raw, decimals) =>
-  Number(BigInt(raw) / 10n ** BigInt(decimals - 2)) / 100 / 1e6;
+const millions = (raw, decimals) => toUnits(raw, decimals) / 1e6;
 
 function usdcByVenue(rows, day) {
   const aave = rows["reserve-state"]
