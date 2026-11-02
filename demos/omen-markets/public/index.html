@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Omen Markets · Testril demos</title>
+    <link rel="icon" href="assets/favicon.svg" />
+    <link rel="stylesheet" href="style.css" />
+    <script type="module" src="app.js"></script>
+  </head>
+  <body>
+    <header class="measure masthead">
+      <a href="https://testril.ai"
+        ><img
+          src="assets/wordmark.svg"
+          alt="Testril"
+          width="115"
+          height="38" /></a
+      ><span>Data demos / Omen markets</span>
+    </header>
+    <main class="measure">
+      <p id="source" class="banner">Loading…</p>
+      <div class="eyebrow">GNOSIS · OMEN PREDICTION MARKETS</div>
+      <h1>What people bet on,<br />and how it was settled.</h1>
+      <p class="intro">
+        Every market Omen created in a 30-day window, the buys and sells on it,
+        and the Reality.eth answers that settle questions.
+      </p>
+      <section class="scope" aria-label="Report scope">
+        <div>
+          <span class="label">BLOCKS · GNOSIS</span
+          ><strong id="window"></strong>
+        </div>
+        <div>
+          <span class="label">MARKETS AND TRADES</span
+          ><strong>omen.market_list · omen.trade</strong>
+        </div>
+        <div>
+          <span class="label">FUNDING</span><strong>omen.liquidity</strong>
+        </div>
+        <div>
+          <span class="label">ANSWERS</span><strong>realitio.answer</strong>
+        </div>
+      </section>
+      <section
+        id="headline"
+        class="metrics"
+        aria-label="Headline numbers"
+      ></section>
+      <section class="results">
+        <div class="section-heading">
+          <h2>Trade volume per market</h2>
+          <span>the ten busiest markets, buys plus sells</span>
+        </div>
+        <div id="volume" class="flow"></div>
+      </section>
+      <section class="results">
+        <div class="section-heading">
+          <h2>Markets</h2>
+          <span>ranked by trade volume</span>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Market</th>
+                <th>Creator</th>
+                <th>Trades</th>
+                <th>Volume</th>
+              </tr>
+            </thead>
+            <tbody id="markets"></tbody>
+          </table>
+        </div>
+      </section>
+      <section class="results">
+        <div class="section-heading">
+          <h2>Settling answers</h2>
+          <span>the latest Reality.eth answer to each question</span>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Question</th>
+                <th>Answer</th>
+                <th>Bond</th>
+                <th>Finalizes</th>
+              </tr>
+            </thead>
+            <tbody id="answers"></tbody>
+          </table>
+        </div>
+      </section>
+      <section class="method">
+        <h2>Cross-check</h2>
+        <ul id="checks"></ul>
+      </section>
+    </main>
+    <footer class="measure">
+      Data shaped from the recording in <code>recordings/report.json</code>.
+    </footer>
+  </body>
+</html>
