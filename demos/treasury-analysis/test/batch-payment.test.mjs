@@ -34,7 +34,7 @@ test("the deposit signature targets the collector; vouchers authorize only accum
     config,
   );
   const signed = await signBatchPayment(accepted, [], config, "100000");
-  const first = JSON.parse(signed.payload).payload;
+  const first = signed.payload.payload;
   assert.equal(signed.depositRaw, "100000");
   assert.equal(first.voucher.maxClaimableAmount, "120");
   const voucherSigner = await recoverTypedDataAddress({
@@ -81,16 +81,14 @@ test("the deposit signature targets the collector; vouchers authorize only accum
     chargedCumulativeAmount: "120",
     closed: false,
   };
-  const second = JSON.parse(
-    (
-      await signBatchPayment(
-        { ...accepted, amount: "21" },
-        [channel],
-        config,
-        "0",
-      )
-    ).payload,
-  ).payload;
+  const second = (
+    await signBatchPayment(
+      { ...accepted, amount: "21" },
+      [channel],
+      config,
+      "0",
+    )
+  ).payload.payload;
   assert.equal(second.type, "voucher");
   assert.equal(second.voucher.maxClaimableAmount, "141");
   assert.equal(second.deposit, undefined);

@@ -409,7 +409,8 @@ export async function createLiveDemo({
         );
       const amount = BigInt(amountRaw);
       if (amount <= 0n || amount > BigInt(state.balances[from]))
-        throw refusal(
+        throw demoFailure(
+          "INVALID_AMOUNT",
           "Enter a positive amount within the sending wallet's available USDC balance.",
         );
     }
@@ -468,7 +469,6 @@ export async function createLiveDemo({
                 "Use a USDC amount with up to six decimal places.",
               );
             }
-            validateTransfer(input.from, input.to, amount);
             const transfer = await send(input.from, input.to, amount);
             progress.transferred();
             progress.refreshing();
@@ -636,10 +636,6 @@ function stale() {
     "STALE_REVISION",
     "This view is out of date. Try again with the latest demo balances.",
   );
-}
-
-function refusal(message) {
-  return demoFailure("INVALID_AMOUNT", message);
 }
 
 async function journalOperation(operation, work) {

@@ -204,12 +204,12 @@ export async function signBatchPayment(accepted, channels, config, depositRaw) {
     };
   }
   return {
-    payload: JSON.stringify({
+    payload: {
       x402Version: 2,
       scheme: "batch-settlement",
       accepted,
       payload,
-    }),
+    },
     depositRaw: deposit.toString(),
     channel: {
       channelId,

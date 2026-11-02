@@ -241,11 +241,13 @@ export function createLiveTestril(
         BigInt(state.depositedRaw) + BigInt(signed.depositRaw)
       ).toString();
       await save();
-      const payment = JSON.parse(signed.payload);
       // Name the request without persisting its signature. A lost settlement
       // remains quarantined; no second payment is authorized automatically.
-      payment.extensions = {
-        "payment-identifier": { info: { id: entry.paymentIdentifier } },
+      const payment = {
+        ...signed.payload,
+        extensions: {
+          "payment-identifier": { info: { id: entry.paymentIdentifier } },
+        },
       };
       let result;
       try {
