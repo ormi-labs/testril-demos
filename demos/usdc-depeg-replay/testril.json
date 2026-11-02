@@ -1,0 +1,46 @@
+{
+  "demo": "usdc-depeg-replay",
+  "binds": [
+    {
+      "name": "supply",
+      "function_slug": "erc20.token_supply",
+      "chain_id": 1,
+      "params": {
+        "tokens": ["0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"],
+        "by": "hour"
+      },
+      "window": {
+        "from_hour": "2023-03-10T00",
+        "to_hour": "2023-03-15T00"
+      }
+    },
+    {
+      "name": "usdc-edges",
+      "function_slug": "erc20.transfer_edges",
+      "chain_id": 1,
+      "params": {
+        "token_address": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"
+      },
+      "window": {
+        "from_block": 16794062,
+        "to_block": 16829610
+      },
+      "read": {
+        "chunk_blocks": 600
+      }
+    },
+    {
+      "name": "usdc-usd-feed",
+      "function_slug": "aggregator.latest_answer",
+      "chain_id": 1,
+      "params": {
+        "feeds": ["0x8fffffd4afb6115b954bd326cbe7b4ba576818f6"],
+        "by": "hour"
+      },
+      "window": {
+        "from_hour": "2023-03-10T00",
+        "to_hour": "2023-03-15T00"
+      }
+    }
+  ]
+}
