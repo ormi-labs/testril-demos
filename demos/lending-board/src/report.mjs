@@ -44,9 +44,11 @@ export const assets = [
   },
 ];
 const usdc = assets[0];
+const rawAmount = /^[0-9]+$/;
 const basisPointsPerPercent = 100n;
 const rayPerBasisPoint = 10n ** 23n;
 const maxBorrowRate = 10n * 10n ** 27n;
+const minBorrowRate = 10n ** 21n;
 const totalsFields = [
   "supplied",
   "withdrawn",
@@ -112,9 +114,12 @@ function checkState(rows) {
         `${name} utilization at ${row.hour} is above 100%: variable debt ${row.variable_debt} exceeds aToken supply ${row.a_token_supply}.`,
       );
     const borrow = BigInt(row.variable_borrow_rate);
-    if (borrow > maxBorrowRate)
+    if (
+      borrow > maxBorrowRate ||
+      (BigInt(row.variable_debt) > 0n && borrow <= minBorrowRate)
+    )
       throw new Error(
-        `${name} borrow rate at ${row.hour} is above 1000% a year: ${row.variable_borrow_rate} is not in ray.`,
+        `${name} borrow rate at ${row.hour} is outside 0.001%–1000% a year: ${row.variable_borrow_rate} is not in ray.`,
       );
     if (BigInt(row.liquidity_rate) > borrow)
       throw new Error(
@@ -157,15 +162,19 @@ function checkTotals(rows) {
 
 function checkHoldings(rows) {
   for (const row of rows["morpho-holdings"])
-    if (BigInt(row.in_markets) < 0n || BigInt(row.in_vaults) < 0n)
+    if (!rawAmount.test(row.in_markets) || !rawAmount.test(row.in_vaults))
       throw new Error(
-        `Morpho holdings of ${row.token} on ${row.day} are negative.`,
+        `Morpho holdings of ${row.token} on ${row.day} are not non-negative integers.`,
       );
-  for (const day of holdingDays())
-    if (!usdcSleeping(rows, day))
+  for (const day of holdingDays()) {
+    const venues = usdcByVenue(rows, day);
+    if (!venues)
       throw new Error(
         `USDC is missing from Aave state or Morpho holdings on ${day}.`,
       );
+    if (venues.markets + venues.vaults === 0n)
+      throw new Error(`Morpho holds no USDC on ${day}.`);
+  }
 }
 
 export function check(rows) {
@@ -175,9 +184,9 @@ export function check(rows) {
   const days = holdingDays().length;
   return [
     `Every Aave reserve with state is in the reserve list, and all ${rows["reserve-state"].length} hourly rows lie inside the window`,
-    "Variable debt never exceeds aToken supply (utilization within 0–100%); supply rates never exceed borrow rates; borrow rates read as ray stay under 1000%",
+    "Variable debt never exceeds aToken supply (utilization within 0–100%); supply rates never exceed borrow rates; borrow rates read as ray stay between 0.001% and 1000%",
     "Lifetime totals only grow between blocks, and flash-loan premiums never exceed flash-loaned amounts",
-    `Morpho markets and vaults hold non-negative USDC, and USDC is present in Aave and Morpho for all ${days} days`,
+    `Morpho holdings are non-negative integers, Morpho holds USDC every day, and USDC is present in Aave and Morpho for all ${days} days`,
   ];
 }
 
@@ -201,7 +210,7 @@ export function formatAmount(raw, decimals) {
 const millions = (raw, decimals) =>
   Number(BigInt(raw) / 10n ** BigInt(decimals - 2)) / 100 / 1e6;
 
-function usdcSleeping(rows, day) {
+function usdcByVenue(rows, day) {
   const aave = rows["reserve-state"]
     .filter(
       (row) =>
@@ -215,7 +224,7 @@ function usdcSleeping(rows, day) {
     aave &&
     morpho && {
       day,
-      aave: BigInt(aave.a_token_supply),
+      aaveIdle: BigInt(aave.a_token_supply) - BigInt(aave.variable_debt),
       markets: BigInt(morpho.in_markets),
       vaults: BigInt(morpho.in_vaults),
     }
@@ -258,9 +267,9 @@ function lifetimeTotals(rows) {
 }
 
 export function shape(rows) {
-  const sleeping = holdingDays().map((day) => usdcSleeping(rows, day));
+  const byVenue = holdingDays().map((day) => usdcByVenue(rows, day));
   const display = (raw) => formatAmount(raw, usdc.decimals);
-  const latest = sleeping.at(-1);
+  const latest = byVenue.at(-1);
   const board = rateBoard(rows);
   const totals = lifetimeTotals(rows);
   return {
@@ -276,14 +285,14 @@ export function shape(rows) {
     },
     board,
     totals,
-    sleeping: sleeping.map((s) => ({
+    byVenue: byVenue.map((s) => ({
       day: s.day,
-      aave: millions(s.aave, usdc.decimals),
+      aaveIdle: millions(s.aaveIdle, usdc.decimals),
       markets: millions(s.markets, usdc.decimals),
       vaults: millions(s.vaults, usdc.decimals),
     })),
-    sleepingLatest: {
-      aave: display(latest.aave),
+    byVenueLatest: {
+      aaveIdle: display(latest.aaveIdle),
       markets: display(latest.markets),
       vaults: display(latest.vaults),
     },
