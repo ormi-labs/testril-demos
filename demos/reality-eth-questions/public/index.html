@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Reality.eth Questions · Testril demos</title>
+    <link rel="icon" href="assets/favicon.svg" />
+    <link rel="stylesheet" href="style.css" />
+    <script type="module" src="app.js"></script>
+  </head>
+  <body>
+    <header class="measure masthead">
+      <a href="https://testril.ai"
+        ><img
+          src="assets/wordmark.svg"
+          alt="Testril"
+          width="115"
+          height="38" /></a
+      ><span>Data demos / Reality.eth questions</span>
+    </header>
+    <main class="measure">
+      <p id="source" class="banner">Loading…</p>
+      <div class="eyebrow">ETHEREUM · GNOSIS · REALITY.ETH V3</div>
+      <h1>Every answer costs<br />double the last.</h1>
+      <p class="intro">
+        Questions asked on Reality.eth in the last 30 days, and the bonds that
+        doubled as each answer was disputed. The more rounds, the more someone
+        was willing to stake on the truth.
+      </p>
+      <section class="scope" aria-label="Report scope">
+        <div>
+          <span class="label">ETHEREUM · BLOCKS</span
+          ><strong id="window-ethereum"></strong>
+        </div>
+        <div>
+          <span class="label">GNOSIS · BLOCKS</span
+          ><strong id="window-gnosis"></strong>
+        </div>
+        <div>
+          <span class="label">FUNCTIONS</span
+          ><strong>realitio.question · realitio.answer</strong>
+        </div>
+        <div>
+          <span class="label">OPTIONS</span
+          ><strong>realitio.question_outcomes</strong>
+        </div>
+      </section>
+      <section
+        id="headline"
+        class="metrics"
+        aria-label="Headline numbers"
+      ></section>
+      <section class="results">
+        <div class="section-heading">
+          <h2>The most disputed question</h2>
+          <span id="ladder-note"></span>
+        </div>
+        <div id="ladder" class="charts"></div>
+      </section>
+      <section class="results">
+        <div class="section-heading">
+          <h2>Questions by rounds of dispute</h2>
+          <span>the 20 with the most answers</span>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Question</th>
+                <th>Chain</th>
+                <th>Answers</th>
+                <th>Top bond</th>
+                <th>Leading answer</th>
+              </tr>
+            </thead>
+            <tbody id="questions"></tbody>
+          </table>
+        </div>
+      </section>
+      <section class="method">
+        <h2>Cross-check</h2>
+        <ul id="checks"></ul>
+      </section>
+    </main>
+    <footer class="measure">
+      Data shaped from the recording in <code>recordings/report.json</code>.
+    </footer>
+  </body>
+</html>
