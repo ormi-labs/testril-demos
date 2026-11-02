@@ -1,12 +1,12 @@
 import spec from "../testril.json" with { type: "json" };
 
-export const zeroBuilder = `0x${"0".repeat(64)}`;
+export const zeroWord = `0x${"0".repeat(64)}`;
 const binds = Object.fromEntries(spec.binds.map((bind) => [bind.name, bind]));
 export const fillWindow = binds.fills.window;
 export const payoutWindow = binds.payouts.window;
 export const exchanges = binds.fills.params.exchanges;
 export const conditionalTokens = binds.payouts.params.conditional_tokens;
-export const day = "2026-11-01";
+export const day = spec.day;
 export const blocksPerHour = 2400;
 const tapeSize = 12;
 const leaderboardSize = 8;
@@ -52,6 +52,14 @@ function conditionsOf(payouts) {
   return [...conditions.values()];
 }
 
+const feeIsInRequiredAsset = (fill) => {
+  const feeInTokens = fill.exchange_version === "1" && fill.is_buy;
+  const [paid, unpaid] = feeInTokens
+    ? [fill.token_fee, fill.collateral_fee]
+    : [fill.collateral_fee, fill.token_fee];
+  return BigInt(unpaid) === 0n && BigInt(paid) >= 0n;
+};
+
 export function check(rows) {
   const { fills, payouts } = rows;
   const outside = fills.find((fill) => !inWindow(fill, fillWindow));
@@ -71,30 +79,42 @@ export function check(rows) {
         `Fill ${shortHex(fill.tx)} moves ${collateral} collateral for ${tokens} tokens, a price outside (0, 1].`,
       );
   }
-  const total = totalVolume(fills);
-  const builderTotal = [...builderVolumes(fills).values()].reduce(
-    (sum, volume) => sum + volume,
-    0n,
-  );
-  if (builderTotal !== total)
+  const feeProblem = fills.find((fill) => !feeIsInRequiredAsset(fill));
+  if (feeProblem)
     throw new Error(
-      `Builder volumes add up to ${builderTotal}, total volume is ${total}.`,
+      `Fill ${shortHex(feeProblem.tx)} books its fee in the wrong asset: collateral_fee ${feeProblem.collateral_fee}, token_fee ${feeProblem.token_fee} for a version ${feeProblem.exchange_version} ${feeProblem.is_buy ? "buy" : "sell"}.`,
+    );
+  const versionOne = fills.filter((fill) => fill.exchange_version === "1");
+  const coded = versionOne.find(
+    (fill) => fill.builder !== zeroWord || fill.metadata !== zeroWord,
+  );
+  if (coded)
+    throw new Error(
+      `Version 1 fill ${shortHex(coded.tx)} carries a builder or metadata, but version 1 emits none.`,
+    );
+  const total = totalVolume(fills);
+  const uncodedVolume = builderVolumes(fills).get(zeroWord) ?? 0n;
+  if (uncodedVolume < totalVolume(versionOne))
+    throw new Error(
+      `No-builder volume is ${uncodedVolume}, below the ${totalVolume(versionOne)} that version 1 fills moved.`,
     );
   const conditions = conditionsOf(payouts);
   for (const condition of conditions) {
-    const sum = condition.numerators.reduce((s, n) => s + n, 0n);
-    const stray = condition.rows.find(
-      (row) =>
-        !inWindow(row, payoutWindow) || BigInt(row.payout_denominator) !== sum,
-    );
-    if (stray)
+    const early = condition.rows.find((row) => !inWindow(row, payoutWindow));
+    if (early)
       throw new Error(
-        `Condition ${shortHex(condition.id)} pays numerators summing to ${sum} against a denominator of ${stray.payout_denominator}, or resolved outside the window.`,
+        `Condition ${shortHex(condition.id)} resolved at block ${early.block}, outside the window.`,
+      );
+    const sum = condition.numerators.reduce((s, n) => s + n, 0n);
+    if (condition.rows.some((r) => BigInt(r.payout_denominator) !== sum))
+      throw new Error(
+        `Condition ${shortHex(condition.id)} pays numerators summing to ${sum}, not its denominator.`,
       );
   }
   return [
     `All ${fills.length} fills price within (0, 1]: collateral never exceeds outcome tokens`,
-    `Builder volumes (${formatUsd(builderTotal)}) add up to total fill volume (${formatUsd(total)})`,
+    `Every fee is booked in the asset its version and side require`,
+    `Version 1 fills carry no builder code, so the no-builder bucket (${formatUsd(uncodedVolume)}) holds at least their volume (${formatUsd(totalVolume(versionOne))}) of ${formatUsd(total)}`,
     `${conditions.length} resolved conditions each pay a denominator equal to the sum of their numerators`,
   ];
 }
@@ -120,7 +140,7 @@ export function priceText(fill) {
 
 const tokensText = (raw) => (BigInt(raw) / 10n ** 6n).toLocaleString("en-US");
 const builderLabel = (builder) =>
-  builder === zeroBuilder ? "No builder code" : shortHex(builder);
+  builder === zeroWord ? "No builder code" : shortHex(builder);
 
 function tape(fills) {
   return [...fills]
@@ -207,7 +227,7 @@ export function shape(rows) {
   const total = totalVolume(fills);
   const largest = fills.reduce((a, b) => (volumeOf(b) > volumeOf(a) ? b : a));
   const builders = builderVolumes(fills);
-  builders.delete(zeroBuilder);
+  builders.delete(zeroWord);
   return {
     day,
     fillWindow,
