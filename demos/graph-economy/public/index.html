@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Graph Economy · Testril demos</title>
+    <link rel="icon" href="assets/favicon.svg" />
+    <link rel="stylesheet" href="style.css" />
+    <script type="module" src="app.js"></script>
+  </head>
+  <body>
+    <header class="measure masthead">
+      <a href="https://testril.ai"
+        ><img
+          src="assets/wordmark.svg"
+          alt="Testril"
+          width="115"
+          height="38" /></a
+      ><span>Data demos / Graph economy</span>
+    </header>
+    <main class="measure">
+      <p id="source" class="banner">Loading…</p>
+      <div class="eyebrow">THE GRAPH · ARBITRUM · ONE WEEK</div>
+      <h1>Who earned the rewards,<br />and who shared them.</h1>
+      <p class="intro">
+        Indexing rewards, delegation and query fees on The Graph for one week:
+        which indexers earned the most, how much went to their delegators, and
+        how large each delegation pool is.
+      </p>
+      <section class="scope" aria-label="Report scope">
+        <div>
+          <span class="label">BLOCKS · ARBITRUM</span
+          ><strong id="window"></strong>
+        </div>
+        <div>
+          <span class="label">EPOCHS</span><strong id="epochs"></strong>
+        </div>
+        <div>
+          <span class="label">FUNCTIONS</span
+          ><strong>graph_network.indexing_rewards · delegation</strong>
+        </div>
+        <div>
+          <span class="label">FEES</span
+          ><strong>graph_network.query_fees</strong>
+        </div>
+      </section>
+      <section
+        id="headline"
+        class="metrics"
+        aria-label="Headline numbers"
+      ></section>
+      <section class="results">
+        <div class="section-heading">
+          <h2>Query fees per epoch</h2>
+          <span>thousands of GRT collected in each Graph epoch</span>
+        </div>
+        <div id="fees-chart" class="flow"></div>
+      </section>
+      <section class="results">
+        <div class="section-heading">
+          <h2>Top indexers by rewards</h2>
+          <span>weekly delegator yield is delegator rewards over the pool</span>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Indexer</th>
+                <th>Rewards</th>
+                <th>To delegators</th>
+                <th>Delegators' cut of split rewards</th>
+                <th>Delegation pool</th>
+                <th>Weekly delegator yield</th>
+              </tr>
+            </thead>
+            <tbody id="indexers"></tbody>
+          </table>
+        </div>
+      </section>
+      <section class="method">
+        <h2>Cross-check</h2>
+        <ul id="checks"></ul>
+      </section>
+    </main>
+    <footer class="measure">
+      Data shaped from the recording in <code>recordings/report.json</code>. An
+      indexer with no delegation change in the week shows a dash for its pool.
+    </footer>
+  </body>
+</html>
