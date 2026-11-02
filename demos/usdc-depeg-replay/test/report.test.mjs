@@ -52,3 +52,14 @@ test("shape finds the bottom of the dip and the burning addresses", () => {
   assert.equal(view.burners.length, 6);
   assert.ok(Number.parseFloat(view.burners[0].share) > 0);
 });
+
+test("check fails when supply is read at an hour's first block instead of its last", () => {
+  const corrupted = rows();
+  const supply = corrupted.supply.filter((row) => row.hour);
+  const shifted = supply.map((row, i) => ({
+    ...row,
+    hour: supply[(i + 1) % supply.length].hour,
+  }));
+  corrupted.supply = shifted;
+  assert.throws(() => check(corrupted), /mints minus burns/);
+});
