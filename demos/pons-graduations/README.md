@@ -52,9 +52,8 @@ sweep is counted twice, and that the server returns the shaped report.
 
 ## Subjects and window
 
-All values are verified: chain id `4663` is Robinhood Chain mainnet (`46630` was
-the testnet); the factory, hook and position manager come from testril's
-DefiLlama card for Pons v2. The `pool_manager` param of
+Chain id `4663` is Robinhood Chain mainnet. The factory, hook and position
+manager come from testril's DefiLlama card for Pons v2. The `pool_manager` param of
 `pons.graduated_pool_list` is the Uniswap v4 position manager, whose
 `positionInfo` turns a graduated position into its pool id.
 
