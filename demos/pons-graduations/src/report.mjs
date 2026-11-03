@@ -142,7 +142,7 @@ export function shape(rows) {
   ];
   const total = creator + buyback + protocol;
   const volume = rows["curve-volume"].reduce(
-    (s, row) => s + BigInt(row.bought) + BigInt(row.sold),
+    (s, row) => s + raw(row.bought, "bought") + raw(row.sold, "sold"),
     0n,
   );
   const dailyFees = sumBy(rows["pool-fees"], "day");
