@@ -64,5 +64,5 @@ test("shape builds the funnel and splits the swept fees 50/25/25", () => {
   assert.equal(view.creatorShare, "50%");
   assert.equal(view.buybackShare, "25%");
   assert.equal(view.protocolShare, "25%");
-  assert.equal(view.daily.length, 93);
+  assert.equal(view.daily.length, 91);
 });

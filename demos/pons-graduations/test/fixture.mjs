@@ -4,8 +4,10 @@ import spec from "../testril.json" with { type: "json" };
 import { feeDays } from "../src/report.mjs";
 
 const binds = Object.fromEntries(spec.binds.map((bind) => [bind.name, bind]));
-const sweepBlocksPerDay = 100000;
-const dayStartBlock = (dayIndex) => dayIndex * sweepBlocksPerDay;
+const blocksPerDay = 823950;
+const factoryDeploymentBlock = 26841846;
+const dayStartBlock = (dayIndex) =>
+  binds.launches.window.from_block + dayIndex * blocksPerDay;
 
 const recordedAt = "2026-11-02T00:00:00.000Z";
 const launchCount = 48;
@@ -21,22 +23,26 @@ function seeded(seed) {
   };
 }
 
-const address = (random) =>
-  `0x${Array.from({ length: 5 }, () =>
+const hexBytes = (random, bytes) =>
+  Array.from({ length: Math.ceil(bytes / 4) }, () =>
     Math.floor(random() * 4294967296)
       .toString(16)
       .padStart(8, "0"),
-  ).join("")}`;
+  )
+    .join("")
+    .slice(0, bytes * 2);
+
+const address = (random) => `0x${hexBytes(random, 20)}`;
 
 const milliEth = (thousandths) =>
   (BigInt(Math.round(thousandths)) * wei) / 1000n;
 
 function launchRows(random) {
   const { factory } = binds.launches.params;
-  const blocks = binds.launches.window;
-  const step = Math.floor((blocks.to_block - blocks.from_block) / launchCount);
+  const end = dayStartBlock(feeDays().length);
+  const step = Math.floor((end - factoryDeploymentBlock) / launchCount);
   return Array.from({ length: launchCount }, (_, i) => ({
-    block: blocks.from_block + i * step + Math.floor(random() * step),
+    block: factoryDeploymentBlock + i * step + Math.floor(random() * step),
     curve: address(random),
     factory,
     token: address(random),
@@ -50,7 +56,7 @@ function launchRows(random) {
 function graduationRows(launches, random) {
   return launches.slice(0, graduatedCount).map((launch, i) => ({
     block: launch.block + 20000 + Math.floor(random() * 5000),
-    pool_id_prefix: `${address(random)}${"0".repeat(24)}`.slice(0, 66),
+    pool_id_prefix: `0x${hexBytes(random, 25)}${"0".repeat(14)}`,
     position_id: String(1000 + i),
     token: launch.token,
   }));
@@ -96,7 +102,7 @@ function sweepRows(graduations, random) {
           day,
           block: dayStartBlock(d) + n * 100 + Math.floor(random() * 100),
           log_index: String(n),
-          tx: `0x${address(random)}${"0".repeat(24)}`.slice(0, 66),
+          tx: `0x${hexBytes(random, 32)}`,
           token: graduation.token,
           protocol_amount: (fees - creator - buyback).toString(),
           buyback_amount: buyback.toString(),
