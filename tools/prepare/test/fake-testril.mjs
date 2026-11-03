@@ -37,7 +37,7 @@ const within = (kind, args, range) =>
   range[`from_${kind}`] <= args[`from_${kind}`] &&
   range[`to_${kind}`] >= args[`to_${kind}`];
 
-export function fakeTestril({ channelBalance = "1000000" } = {}) {
+export function fakeTestril({ credits = 0n, channel: channelState } = {}) {
   const calls = [];
   const bound = new Map();
   const jobs = new Map();
@@ -50,19 +50,20 @@ export function fakeTestril({ channelBalance = "1000000" } = {}) {
     withdrawDelay: 3600,
     salt: `0x${"0".repeat(64)}`,
   };
-  const channel = {
-    channelId: hashTypedData({
-      domain: batchDomain(network),
-      types: channelTypes,
-      primaryType: "ChannelConfig",
-      message: channelConfig,
-    }),
+  const channelId = hashTypedData({
+    domain: batchDomain(network),
+    types: channelTypes,
+    primaryType: "ChannelConfig",
+    message: channelConfig,
+  });
+  const channel = channelState && {
+    channelId,
     network,
     channelConfig,
-    balance: channelBalance,
-    chargedCumulativeAmount: "0",
     closed: false,
+    ...channelState,
   };
+  const usageCredits = { credits, charged: 0n };
 
   function quote(charge) {
     return {
@@ -100,14 +101,24 @@ export function fakeTestril({ channelBalance = "1000000" } = {}) {
       },
       signature: voucher.signature,
     });
+    const ceiling = BigInt(channel?.chargedCumulativeAmount ?? 0) + charge;
     if (
       signer !== operatorAddress ||
-      voucher.channelId !== channel.channelId ||
-      BigInt(voucher.maxClaimableAmount) !==
-        BigInt(channel.chargedCumulativeAmount) + charge
+      voucher.channelId !== channelId ||
+      BigInt(voucher.maxClaimableAmount) !== ceiling
     )
       throw new Error("The fake rejected the voucher.");
-    channel.chargedCumulativeAmount = voucher.maxClaimableAmount;
+    if (usageCredits.credits - usageCredits.charged >= charge) {
+      usageCredits.charged += charge;
+      return {
+        success: true,
+        network,
+        payer: operatorAddress,
+        extra: { chargedAmount: "0" },
+      };
+    }
+    if (!channel || BigInt(channel.balance) < ceiling) return undefined;
+    channel.chargedCumulativeAmount = ceiling.toString();
     return {
       success: true,
       network,
@@ -139,7 +150,8 @@ export function fakeTestril({ channelBalance = "1000000" } = {}) {
             },
           ],
         });
-      if (args.subject === "channels") return success({ channels: [channel] });
+      if (args.subject === "channels")
+        return success({ channels: channel ? [channel] : [] });
       if (args.subject === "bound_function")
         return success(bound.get(args.bound_function_id));
       if (args.subject === "job") {
@@ -179,6 +191,7 @@ export function fakeTestril({ channelBalance = "1000000" } = {}) {
       return { outcome: "error", kind: "range_unavailable" };
     if (!payment) return quote(charge);
     const settlement = await settle(payment, charge);
+    if (!settlement) return quote(charge);
     if (name === "materialize") {
       const jobId = `job:${jobs.size + 1}`;
       const range = {
@@ -241,6 +254,7 @@ export function fakeTestril({ channelBalance = "1000000" } = {}) {
   return {
     calls,
     channel,
+    usageCredits,
     async listen() {
       await new Promise((done) => server.listen(0, "127.0.0.1", done));
       return `http://127.0.0.1:${server.address().port}/mcp`;

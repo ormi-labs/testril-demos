@@ -10,9 +10,10 @@ Demos never call Testril themselves; they serve the recording this tool wrote.
 
 - Node.js 22.13 or later
 - A Testril MCP URL
-- For recording only: an operator key whose address holds a funded Testril
-  batch-settlement channel on the quote's network. This tool signs vouchers
-  against that channel and never deposits.
+- For recording only: an operator key whose address holds Testril usage
+  credits (the operator adds them on `/admin/mcp`). This tool signs a voucher
+  on the quote's first batch-settlement network and never deposits, so the
+  wallet needs no USDC.
 
 ## Setup
 
@@ -64,4 +65,4 @@ npm run format:check
 ```
 
 Tests run against an HTTP fake of Testril (`test/fake-testril.mjs`) that
-checks every voucher's signature and cumulative amount.
+checks every voucher's signature and amount and charges usage credits.

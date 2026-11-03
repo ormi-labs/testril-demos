@@ -30,45 +30,45 @@ export function batchDomain(network) {
   };
 }
 
-const same = (a, b) => a?.toLowerCase() === b?.toLowerCase();
+const zeroSalt = `0x${"0".repeat(64)}`;
+
+export function channelConfigFor(accepted, payer) {
+  return {
+    payer,
+    payerAuthorizer: payer,
+    receiver: accepted.payTo,
+    receiverAuthorizer: accepted.extra.receiverAuthorizer,
+    token: accepted.asset,
+    withdrawDelay: accepted.extra.withdrawDelay,
+    salt: zeroSalt,
+  };
+}
 
 export function createOperator(privateKey) {
   const account = privateKeyToAccount(privateKey);
   return {
     address: account.address,
     async pay(accepted, channels) {
-      const charge = BigInt(accepted.amount);
-      const channel = channels.find(
-        (c) =>
-          !c.closed &&
-          c.network === accepted.network &&
-          same(c.channelConfig.payer, account.address) &&
-          same(c.channelConfig.receiver, accepted.payTo) &&
-          same(c.channelConfig.token, accepted.asset) &&
-          BigInt(c.balance) >= BigInt(c.chargedCumulativeAmount) + charge,
-      );
-      if (!channel)
-        throw new Error(
-          `No funded Testril channel for ${account.address} on ${accepted.network} covers ${charge} atoms. Deposit into a channel first.`,
-        );
       const domain = batchDomain(accepted.network);
+      const channelConfig = channelConfigFor(accepted, account.address);
       const channelId = hashTypedData({
         domain,
         types: channelTypes,
         primaryType: "ChannelConfig",
-        message: channel.channelConfig,
+        message: channelConfig,
       });
-      if (!same(channelId, channel.channelId))
-        throw new Error("The inspected channel does not match its config.");
+      const channel = channels.find(
+        (c) => c.channelId.toLowerCase() === channelId,
+      );
       const maxClaimableAmount =
-        BigInt(channel.chargedCumulativeAmount) + charge;
+        BigInt(channel?.chargedCumulativeAmount ?? 0) + BigInt(accepted.amount);
       return {
         x402Version: 2,
         scheme: "batch-settlement",
         accepted,
         payload: {
           type: "voucher",
-          channelConfig: channel.channelConfig,
+          channelConfig,
           voucher: {
             channelId,
             maxClaimableAmount: maxClaimableAmount.toString(),
