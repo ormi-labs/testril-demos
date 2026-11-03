@@ -70,8 +70,11 @@ test("plan counts blocks and credits per bind without binding", async (t) => {
   assert.deepEqual([...new Set(fake.calls.map((c) => c.name))], ["inspect"]);
 });
 
-test("record pays vouchers, reads in chunks and writes a dev report", async (t) => {
-  const { fake, testril } = await session(t);
+test("record pays with usage credits, reads in chunks and writes a dev report", async (t) => {
+  const { fake, testril } = await session(t, {
+    credits: 100_000_000n,
+    channel: { balance: "0", chargedCumulativeAmount: "5000" },
+  });
   const dir = await demoDir();
   const operator = createOperator(operatorKey);
   await record(dir, { testril, operator, ...quiet });
@@ -96,7 +99,12 @@ test("record pays vouchers, reads in chunks and writes a dev report", async (t) 
     ],
   );
   const charged = 150 * 120 + 7200 * 120 + (20 + 100) + (20 + 50) + (20 + 7200);
-  assert.equal(fake.channel.chargedCumulativeAmount, String(charged));
+  assert.equal(fake.usageCredits.charged, BigInt(charged));
+  assert.equal(
+    fake.channel.chargedCumulativeAmount,
+    "5000",
+    "usage credits leave the channel's charged total where it was",
+  );
 
   await record(dir, { testril, operator, ...quiet });
   assert.equal(
@@ -106,14 +114,14 @@ test("record pays vouchers, reads in chunks and writes a dev report", async (t) 
   );
 });
 
-test("record refuses to pay when no channel covers the charge", async (t) => {
-  const { fake, testril } = await session(t, { channelBalance: "100" });
+test("record stops when neither usage credits nor a channel cover the charge", async (t) => {
+  const { fake, testril } = await session(t, { credits: 100n });
   const dir = await demoDir();
   await assert.rejects(
     record(dir, { testril, operator: createOperator(operatorKey), ...quiet }),
-    /No funded Testril channel/,
+    /did not confirm payment/,
   );
-  assert.equal(fake.calls.filter((c) => c.paid).length, 0);
+  assert.equal(fake.usageCredits.charged, 0n);
   const report = JSON.parse(
     await readFile(join(dir, "recordings", "report.json"), "utf8"),
   );
@@ -121,7 +129,7 @@ test("record refuses to pay when no channel covers the charge", async (t) => {
 });
 
 test("--max-jobs leaves binds that need more jobs for the next run", async (t) => {
-  const { fake, testril } = await session(t);
+  const { fake, testril } = await session(t, { credits: 100_000_000n });
   const dir = await demoDir();
   const { pending } = await record(dir, {
     testril,

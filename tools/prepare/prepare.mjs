@@ -150,7 +150,7 @@ export function createPayer(testril, operator, log) {
       const result = await testril.call(name, args, payment);
       if (result.outcome === "payment_required" || !result.settlement?.success)
         throw new Error(
-          `Testril did not confirm payment for ${name}. Inspect the channel before running again.`,
+          `Testril did not confirm payment for ${name}. Check the operator's usage credits with inspect subject usage_credits before running again.`,
         );
       spent += BigInt(accepted.amount);
       log(`  paid ${accepted.amount} atoms for ${name}`);
