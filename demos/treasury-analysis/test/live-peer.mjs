@@ -1,3 +1,5 @@
+import { recoverTypedDataAddress } from "viem";
+import { batchDomain, voucherTypes } from "../src/batch-payment.mjs";
 import { createServer } from "node:http";
 import { once } from "node:events";
 import { mkdtemp } from "node:fs/promises";
@@ -7,12 +9,23 @@ import { privateKeyToAccount } from "viem/accounts";
 import { liveConfig, sameAddress } from "../src/live-config.mjs";
 import { connectMcp } from "../src/mcp.mjs";
 import { createLiveDemo } from "../src/live-demo.mjs";
+import { AjvJsonSchemaValidator } from "@modelcontextprotocol/sdk/validation/ajv";
+import balanceParams from "./fixtures/erc20-token-balance-params.json" with { type: "json" };
+import transferEdgesParams from "./fixtures/erc20-transfer-edges-params.json" with { type: "json" };
+
+const validateBalanceParams = new AjvJsonSchemaValidator().getValidator(
+  balanceParams,
+);
+const validateTransferEdgesParams = new AjvJsonSchemaValidator().getValidator(
+  transferEdgesParams,
+);
 
 // Public throwaway keys, used only by the local HTTP peer.
 export function testConfig() {
   const env = {
     TESTRIL_CHARGE_CAP_USDC: "0.1",
     TESTRIL_ESCROW_CAP_USDC: "0.1",
+    BASE_SEPOLIA_RPC_URL: "http://127.0.0.1:1",
   };
   for (const [i, key, address] of [
     [1, "TREASURY_PRIVATE_KEY", "TREASURY_ADDRESS"],
@@ -35,6 +48,8 @@ export async function livePeer(t, options = {}) {
   const pendingRanges = new Set();
   const channels = [];
   const records = new Map();
+  const settled = new Map();
+  let lostSettlement = false;
   let block = 100;
   let prepares = 0;
   let uncertain = false;
@@ -105,6 +120,18 @@ export async function livePeer(t, options = {}) {
     calls.push({ name, args, payment });
     await options.beforeTool?.(name, args, payment);
     if (name === "bind") {
+      if (options.bindingResponse) return options.bindingResponse(args);
+      const validator =
+        args.function_slug === "erc20.token_balance"
+          ? validateBalanceParams
+          : args.function_slug === "erc20.transfer_edges"
+            ? validateTransferEdgesParams
+            : undefined;
+      if (
+        options.refuseBinding === args.function_slug ||
+        !validator?.(args.params).valid
+      )
+        return { outcome: "error", kind: "invalid_params" };
       const id = JSON.stringify([args.function_slug, args.params]);
       functions.set(id, args);
       return { outcome: "success", bound_function_id: id };
@@ -142,6 +169,48 @@ export async function livePeer(t, options = {}) {
           )
         )
           throw new Error("Invalid payment identifier");
+        if (payment.payload?.voucher?.maxClaimableAmount === "0") {
+          const voucher = payment.payload.voucher;
+          const signer = await recoverTypedDataAddress({
+            domain: batchDomain,
+            types: voucherTypes,
+            primaryType: "Voucher",
+            message: { channelId: voucher.channelId, maxClaimableAmount: 0n },
+            signature: voucher.signature,
+          });
+          if (
+            !sameAddress(signer, config.payer.address) ||
+            payment.payload.deposit
+          )
+            throw new Error(
+              "Recovery proof must authenticate without spending",
+            );
+          const old = settled.get(
+            payment.extensions["payment-identifier"].info.id,
+          );
+          if (
+            !old ||
+            old.verb !== name ||
+            JSON.stringify(old.args) !== JSON.stringify(args) ||
+            old.amount !== payment.accepted.amount
+          )
+            return { outcome: "error", kind: "payment_recovery_pending" };
+          const result = {
+            outcome: "success",
+            result: "receipt",
+            quote_id: old.id,
+            amount: { atoms: old.amount },
+            receipt: {
+              quote_id: old.id,
+              amount: { atoms: old.amount },
+              state: "paid",
+            },
+            paymentResponse: old.paymentResponse,
+          };
+          return options.reconciliationResponse
+            ? options.reconciliationResponse(result, { verb: name, args })
+            : result;
+        }
         if (uncertain) {
           uncertain = false;
           throw new Error("uncertain settlement");
@@ -174,6 +243,7 @@ export async function livePeer(t, options = {}) {
           throw new Error("Incorrect cumulative voucher.");
         channel.chargedCumulativeAmount = payload.voucher.maxClaimableAmount;
         quote.paid = true;
+        const quoteId = [...quotes].find(([, value]) => value === quote)[0];
         const paymentResponse = {
           success: true,
           network: "eip155:84532",
@@ -181,6 +251,11 @@ export async function livePeer(t, options = {}) {
           transaction: "0x" + "1".repeat(64),
           extra: { chargedAmount: quote.amount },
         };
+        settled.set(payment.extensions["payment-identifier"].info.id, {
+          ...quote,
+          id: quoteId,
+          paymentResponse,
+        });
         const work = quote.args;
         if (name === "materialize") {
           covered.add(JSON.stringify(work));
@@ -197,7 +272,7 @@ export async function livePeer(t, options = {}) {
           definition.function_slug === "erc20.token_balance"
             ? config.wallets
                 .filter((w) =>
-                  sameAddress(w.address, definition.params.owners[0]),
+                  sameAddress(w.address, definition.params.reads.owners[0]),
                 )
                 .flatMap((w) =>
                   snapshot[w.id] === "0"
@@ -222,6 +297,8 @@ export async function livePeer(t, options = {}) {
         return { outcome: "success", values, paymentResponse };
       }
       if (name === "read" && !covered.has(JSON.stringify(args))) {
+        if (options.rangeUnavailableResponse)
+          return options.rangeUnavailableResponse(args);
         const key = JSON.stringify(args);
         if (options.existingMaterialization && !pendingRanges.has(key)) {
           pendingRanges.add(key);
@@ -300,7 +377,7 @@ export async function livePeer(t, options = {}) {
           const challenge = {
             x402Version: 2,
             error: "payment_required",
-            accepts,
+            accepts: options.paymentOffers ?? accepts,
           };
           result = {
             content: [
@@ -313,6 +390,19 @@ export async function livePeer(t, options = {}) {
           if (options.malformedChallenge) result.content.pop();
         } else {
           const { paymentResponse, ...body } = value;
+          if (
+            paymentResponse &&
+            options.loseFirstSettlement &&
+            (!options.loseSettlementFor ||
+              message.params.name === options.loseSettlementFor) &&
+            !lostSettlement &&
+            message.params._meta?.["x402/payment"]?.payload?.voucher
+              ?.maxClaimableAmount !== "0"
+          ) {
+            lostSettlement = true;
+            response.destroy();
+            return;
+          }
           if (paymentResponse && options.wrongSettlement)
             paymentResponse.network = "eip155:1";
           result = {
@@ -367,6 +457,9 @@ export async function livePeer(t, options = {}) {
     },
     advanceBlock() {
       block++;
+    },
+    clearBindings() {
+      functions.clear();
     },
     failNextPayment() {
       uncertain = true;

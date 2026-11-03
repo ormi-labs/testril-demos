@@ -1,3 +1,4 @@
+import { demoFailure } from "./errors.mjs";
 import { mkdir, readFile, rename, rm, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 
@@ -18,16 +19,22 @@ export async function createFileJournal(directory) {
         process.kill(owner, 0);
       } catch (error) {
         if (error.code === "ESRCH")
-          throw new Error(
+          throw demoFailure(
+            "JOURNAL_LOCKED",
             `Previous live server (PID ${owner}) has stopped. Remove the stale .live-lock directory and retry; keep .live-state.json.`,
+            { reason: "stale" },
           );
       }
-      throw new Error(
+      throw demoFailure(
+        "JOURNAL_LOCKED",
         `Live server PID ${owner} holds .live-lock. Stop that server before starting live mode.`,
+        { reason: "held" },
       );
     }
-    throw new Error(
+    throw demoFailure(
+      "JOURNAL_LOCKED",
       "The .live-lock directory has no owner record. After checking that all demo servers have stopped, remove only .live-lock and retry; keep .live-state.json.",
+      { reason: "unknown" },
     );
   }
   const path = join(directory, ".live-state.json");

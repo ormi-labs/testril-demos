@@ -5,6 +5,7 @@ import { once } from "node:events";
 import { encodeEventTopics, erc20Abi } from "viem";
 import { createLiveChain } from "../src/live-chain.mjs";
 import { testConfig } from "./live-peer.mjs";
+import { describeFailure } from "../src/errors.mjs";
 
 for (const missingBlocks of [0, 1])
   test(
@@ -162,13 +163,15 @@ for (const outcome of ["accepted", "already-known", "rejected"])
     const pending = { hash, serialized: "0x1234" };
     const broadcast = createLiveChain(config).broadcast(pending);
     if (outcome === "rejected")
-      await assert.rejects(
-        broadcast,
-        (error) =>
-          /did not acknowledge/.test(error.message) &&
-          !error.message.includes("private payload") &&
-          !error.message.includes(pending.serialized),
-      );
+      await assert.rejects(broadcast, (error) => {
+        assert.deepEqual(describeFailure(error), {
+          code: "RPC_BROADCAST_UNACKNOWLEDGED",
+          details: { reason: "provider-or-connection-error" },
+        });
+        assert.match(error.message, /did not acknowledge/);
+        assert.doesNotMatch(error.message, /private payload|0x1234/);
+        return true;
+      });
     else await broadcast;
     assert.deepEqual(
       methods,
@@ -176,4 +179,58 @@ for (const outcome of ["accepted", "already-known", "rejected"])
         ? ["eth_sendRawTransaction"]
         : ["eth_sendRawTransaction", "eth_getTransactionByHash"],
     );
+  });
+
+for (const wrongChain of [true, false])
+  test(`RPC preparation reports ${wrongChain ? "a wrong chain" : "a provider failure"} before signing`, async (t) => {
+    const { config } = testConfig();
+    const methods = [];
+    const server = createServer(async (request, response) => {
+      let body = "";
+      for await (const chunk of request) body += chunk;
+      const message = JSON.parse(body);
+      methods.push(message.method);
+      response.setHeader("content-type", "application/json");
+      response.end(
+        JSON.stringify({
+          jsonrpc: "2.0",
+          id: message.id,
+          ...(wrongChain
+            ? { result: "0x1" }
+            : {
+                error: {
+                  code: -32000,
+                  message: "provider private path and signed-payload secret",
+                },
+              }),
+        }),
+      );
+    });
+    server.listen(0, "127.0.0.1");
+    await once(server, "listening");
+    t.after(async () => {
+      server.closeAllConnections();
+      await new Promise((resolve) => server.close(resolve));
+    });
+    config.rpcUrl = `http://127.0.0.1:${server.address().port}`;
+    await assert.rejects(
+      createLiveChain(config).prepare("treasury", "a", "250000"),
+      (error) => {
+        assert.deepEqual(
+          describeFailure(error),
+          wrongChain
+            ? { code: "RPC_CONFIGURATION_INVALID", details: {} }
+            : {
+                code: "RPC_REQUEST_FAILED",
+                details: { operation: "prepare", transportCode: "unknown" },
+              },
+        );
+        assert.doesNotMatch(
+          error.message,
+          /private path|signed-payload|secret/,
+        );
+        return true;
+      },
+    );
+    assert.deepEqual(methods, ["eth_chainId"]);
   });

@@ -311,6 +311,11 @@ test("live progress reports actual overlapping work without adding Testril calls
   assert.equal(first.phases.rpc.complete, false);
   assert.equal(first.phases.testril.started, false);
   assert.equal(first.steps.pay.started, false);
+  const calls = peer.calls.length;
+  await progress();
+  await progress();
+  await progress();
+  assert.equal(peer.calls.length, calls);
   gates.get("transfer").release();
   await gates.get("broadcast").started;
   const submitting = await progress();
@@ -345,11 +350,6 @@ test("live progress reports actual overlapping work without adding Testril calls
   );
   assert.equal(reading.steps.materialize.complete, true);
   assert.equal(reading.steps.pay.complete, false);
-  const calls = peer.calls.length;
-  await progress();
-  await progress();
-  await progress();
-  assert.equal(peer.calls.length, calls);
   gates.get("read").release();
   const result = await (await response).json();
   assert.equal(result.timing.outcome, "success");

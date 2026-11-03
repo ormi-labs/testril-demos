@@ -13,18 +13,76 @@ import { createLiveChain } from "../src/live-chain.mjs";
 import { createLiveDemo } from "../src/live-demo.mjs";
 import { connectMcp } from "../src/mcp.mjs";
 import { createLiveTestril } from "../src/live-testril.mjs";
+import { describeFailure } from "../src/errors.mjs";
 
-test("the live CLI checks Testril's head object without making payments or transfers", async (t) => {
+test("the live CLI checks Testril's head and Function bindings without making payments or transfers", async (t) => {
   const peer = await livePeer(t);
   const { stdout } = await promisify(execFile)(
     process.execPath,
     [fileURLToPath(new URL("../src/live-cli.mjs", import.meta.url)), "check"],
     {
-      env: { ...process.env, ...peer.env, TESTRIL_MCP_URL: peer.config.mcpUrl },
+      env: {
+        ...process.env,
+        ...peer.env,
+        TESTRIL_MCP_URL: peer.config.mcpUrl,
+        TESTRIL_CHARGE_CAP_USDC: "0",
+        TESTRIL_ESCROW_CAP_USDC: "0",
+      },
     },
   );
   assert.match(stdout, /Testril reports Base Sepolia block 100/);
+  assert.match(stdout, /live Function bindings/);
+  assert.deepEqual(
+    peer.calls
+      .filter((call) => call.name === "bind")
+      .map((call) => [call.args.function_slug, call.args.params]),
+    [
+      ["erc20.transfer_edges", { token_address: peer.config.token.address }],
+      ...peer.config.wallets.map((wallet) => [
+        "erc20.token_balance",
+        {
+          reads: {
+            tokens: [peer.config.token.address],
+            owners: [wallet.address],
+          },
+        },
+      ]),
+    ],
+  );
   assert.equal(peer.calls.filter((c) => !!c.payment).length, 0);
+  assert.equal(peer.prepares, 0);
+});
+
+test("the live CLI reports a refused Function binding and exits without paying", async (t) => {
+  const peer = await livePeer(t, {
+    refuseBinding: "erc20.token_balance",
+  });
+  await assert.rejects(
+    promisify(execFile)(
+      process.execPath,
+      [fileURLToPath(new URL("../src/live-cli.mjs", import.meta.url)), "check"],
+      {
+        env: {
+          ...process.env,
+          ...peer.env,
+          TESTRIL_MCP_URL: peer.config.mcpUrl,
+        },
+      },
+    ),
+    (error) => {
+      assert.equal(error.code, 1);
+      assert.match(
+        error.stderr,
+        /refused binding erc20\.token_balance \(Treasury\): invalid_params/,
+      );
+      assert.match(
+        error.stderr,
+        /test\/fixtures\/erc20-token-balance-params\.json/,
+      );
+      return true;
+    },
+  );
+  assert.equal(peer.calls.filter((call) => !!call.payment).length, 0);
   assert.equal(peer.prepares, 0);
 });
 
@@ -140,6 +198,107 @@ test("reads wait for existing materialization without paying to index the same r
   assert.equal(peer.calls.filter((c) => !!c.payment).length, 3);
 });
 
+test("malformed materialization ranges retain the read failure classification without paying", async (t) => {
+  for (const materializing of [
+    {},
+    "private-provider-payload",
+    1,
+    false,
+    [null],
+    [[]],
+    [{}],
+    [{ from_block: 100 }],
+    [{ from_block: "100", to_block: 101 }],
+    [{ from_block: 100, to_block: "101" }],
+    [{ from_block: -1, to_block: 101 }],
+    [{ from_block: 100.5, to_block: 101 }],
+    [{ from_block: 100, to_block: 101.5 }],
+    [{ from_block: 100, to_block: Number.MAX_SAFE_INTEGER + 1 }],
+    [{ from_block: 101, to_block: 100 }],
+    [{ from_block: 100, to_block: 100 }],
+    [{ from_block: 100, to_block: 101 }, null],
+  ])
+    await t.test(JSON.stringify(materializing), async (t) => {
+      const peer = await livePeer(t, {
+        rangeUnavailableResponse: () => ({
+          outcome: "error",
+          kind: "range_unavailable",
+          materializing,
+        }),
+      });
+      await assert.rejects(peer.demo.refresh(), (error) => {
+        assert.deepEqual(describeFailure(error), {
+          code: "TESTRIL_RESPONSE_INVALID",
+          details: { operation: "read" },
+        });
+        assert.doesNotMatch(error.message, /private-provider-payload/);
+        return true;
+      });
+      assert.equal(peer.calls.filter((call) => call.payment).length, 0);
+      assert.equal(
+        peer.calls.filter((call) => call.name === "materialize").length,
+        0,
+      );
+      assert.equal(peer.prepares, 0);
+    });
+});
+
+test("absent, empty and unrelated valid materialization ranges allow new materialization", async (t) => {
+  for (const materializing of [
+    undefined,
+    null,
+    [],
+    [{ from_block: 0, to_block: 1 }],
+  ])
+    await t.test(String(JSON.stringify(materializing)), async (t) => {
+      const peer = await livePeer(t, {
+        rangeUnavailableResponse: () => ({
+          outcome: "error",
+          kind: "range_unavailable",
+          ...(materializing !== undefined && { materializing }),
+        }),
+      });
+      assert.equal((await peer.demo.refresh()).actualBalances.a, "500000");
+      assert.equal(
+        peer.calls.filter((call) => call.name === "materialize" && call.payment)
+          .length,
+        3,
+      );
+      assert.equal(peer.calls.filter((call) => call.payment).length, 6);
+      assert.equal(peer.prepares, 0);
+    });
+});
+
+test("materialization ranges are validated again on polling replies", async (t) => {
+  const seen = new Set();
+  const peer = await livePeer(t, {
+    rangeUnavailableResponse: (args) => {
+      const first = !seen.has(args.bound_function_id);
+      seen.add(args.bound_function_id);
+      return {
+        outcome: "error",
+        kind: "range_unavailable",
+        materializing: first
+          ? [{ from_block: args.from_block, to_block: args.to_block }]
+          : [null],
+      };
+    },
+  });
+  await assert.rejects(peer.demo.refresh(), (error) => {
+    assert.deepEqual(describeFailure(error), {
+      code: "TESTRIL_RESPONSE_INVALID",
+      details: { operation: "read" },
+    });
+    return true;
+  });
+  assert.ok(peer.calls.filter((call) => call.name === "read").length > 3);
+  assert.equal(peer.calls.filter((call) => call.payment).length, 0);
+  assert.equal(
+    peer.calls.filter((call) => call.name === "materialize").length,
+    0,
+  );
+});
+
 test("HTTP MCP payments reuse escrow; all wallet funds are available and reset sweeps A and B", async (t) => {
   const peer = await livePeer(t);
   const demo = peer.demo;
@@ -251,7 +410,7 @@ test("HTTP MCP payments reuse escrow; all wallet funds are available and reset s
   assert.equal(peer.demo.state().id, saved.id);
 });
 
-test("zero and over-balance transfers are typed as 400 refusals", async (t) => {
+test("zero and over-balance transfers have stable input failures without HTTP policy", async (t) => {
   const peer = await livePeer(t, {
     balances: { treasury: "1000000", a: "0", b: "0" },
   });
@@ -267,7 +426,11 @@ test("zero and over-balance transfers are typed as 400 refusals", async (t) => {
         amount,
       }),
       (error) => {
-        assert.equal(error.status, 400);
+        assert.deepEqual(describeFailure(error), {
+          code: "INVALID_AMOUNT",
+          details: {},
+        });
+        assert.equal(error.status, undefined);
         assert.match(error.message, /available USDC balance/);
         return true;
       },
@@ -421,6 +584,42 @@ test("an uncertain settlement reserves the caps and refuses any second payment a
   assert.equal(peer.calls.filter((c) => !!c.payment).length, 1);
 });
 
+test("a queued read preserves the payment failure that blocked it", async (t) => {
+  const b = testConfig().config.wallets.find((w) => w.id === "b").address;
+  const peer = await livePeer(t, {
+    beforeTool(name, args, payment) {
+      if (
+        payment &&
+        name === "materialize" &&
+        JSON.parse(args.bound_function_id)[1].reads.owners[0] === b
+      )
+        throw new Error("Simulated lost settlement response");
+    },
+  });
+  await assert.rejects(peer.demo.refresh(), (error) => {
+    const failure = describeFailure(error);
+    assert.equal(failure.code, "TESTRIL_REQUEST_FAILED");
+    assert.equal(failure.details.operation, "materialize");
+    return true;
+  });
+  assert.equal(
+    peer.demo.export().allReceipts.filter((r) => r.status === "paying").length,
+    1,
+  );
+  const submitted = peer.calls.filter((c) => c.payment).length;
+  for (const restart of [false, true]) {
+    if (restart) await peer.restart();
+    await assert.rejects(peer.demo.refresh(), (error) => {
+      assert.deepEqual(describeFailure(error), {
+        code: "PAYMENT_RECONCILIATION_REQUIRED",
+        details: { reason: "uncertain-settlement" },
+      });
+      return true;
+    });
+    assert.equal(peer.calls.filter((c) => c.payment).length, submitted);
+  }
+});
+
 test("MCP payment challenges retain the request arguments and settle through metadata", async (t) => {
   const peer = await livePeer(t);
   await peer.demo.refresh();
@@ -448,20 +647,35 @@ test("MCP payment challenges retain the request arguments and settle through met
   assert.ok(peer.demo.export().allReceipts.every((r) => r.status === "done"));
 });
 
-test("a malformed MCP challenge cannot authorize a payment", async (t) => {
-  const peer = await livePeer(t, { malformedChallenge: true });
-  await assert.rejects(peer.demo.refresh(), /invalid payment challenge/);
-  assert.equal(peer.calls.filter((c) => c.payment).length, 0);
-  assert.equal(peer.demo.export().allReceipts.length, 0);
-});
+for (const [label, options] of [
+  ["missing quote", { malformedChallenge: true }],
+  ["null offer", { paymentOffers: [null] }],
+  ["non-object offer", { paymentOffers: ["batch-settlement"] }],
+  ["array offer", { paymentOffers: [[]] }],
+])
+  test(`a malformed MCP challenge (${label}) cannot authorize a payment`, async (t) => {
+    const peer = await livePeer(t, options);
+    await assert.rejects(peer.demo.refresh(), (error) => {
+      assert.deepEqual(describeFailure(error), {
+        code: "TESTRIL_PAYMENT_CHALLENGE_INVALID",
+        details: { operation: "materialize" },
+      });
+      return true;
+    });
+    assert.equal(peer.calls.filter((c) => c.payment).length, 0);
+    assert.equal(peer.demo.export().allReceipts.length, 0);
+  });
 
 for (const response of ["omitSettlement", "wrongSettlement"]) {
   test(`${response} keeps the paid call uncertain and forbids another payment after restart`, async (t) => {
     const peer = await livePeer(t, { [response]: true });
-    await assert.rejects(
-      peer.demo.refresh(),
-      /settlement confirmation|uncertain/,
-    );
+    await assert.rejects(peer.demo.refresh(), (error) => {
+      assert.equal(
+        describeFailure(error).code,
+        "PAYMENT_RECONCILIATION_REQUIRED",
+      );
+      return true;
+    });
     assert.equal(peer.demo.export().allReceipts[0].status, "paying");
     assert.equal(peer.calls.filter((c) => c.payment).length, 1);
     await peer.restart();
@@ -489,7 +703,13 @@ test("saved paid tickets need reconciliation before a new payment under the new 
 
 test("quotes for a different network are refused before signing or paying", async (t) => {
   const peer = await livePeer(t, { network: "eip155:8453" });
-  await assert.rejects(peer.demo.refresh(), /Base Sepolia/);
+  await assert.rejects(peer.demo.refresh(), (error) => {
+    assert.deepEqual(describeFailure(error), {
+      code: "PAYMENT_CONFIGURATION_INVALID",
+      details: { reason: "unsupported-terms" },
+    });
+    return true;
+  });
   assert.equal(peer.calls.filter((c) => !!c.payment).length, 0);
 });
 
@@ -498,7 +718,13 @@ test("a charge cap smaller than the next quote stops before payment", async (t) 
   // Saved-session cap can be lowered, never refilled by restart.
   peer.config.chargeCapRaw = "119";
   await peer.restart();
-  await assert.rejects(peer.demo.refresh(), /charge cap/);
+  await assert.rejects(peer.demo.refresh(), (error) => {
+    assert.deepEqual(describeFailure(error), {
+      code: "PAYMENT_LIMIT_REACHED",
+      details: { limit: "charge" },
+    });
+    return true;
+  });
   assert.equal(peer.calls.filter((c) => !!c.payment).length, 0);
 });
 
@@ -830,7 +1056,296 @@ test("durable journals survive a new engine and failed persistence prevents paym
   peer.advanceBlock();
   rejectPaymentSave = true;
   const payments = peer.calls.filter((c) => !!c.payment).length;
-  await assert.rejects(second.refresh(), /Durable storage unavailable/);
+  await assert.rejects(second.refresh(), (error) => {
+    assert.deepEqual(describeFailure(error), {
+      code: "JOURNAL_UNAVAILABLE",
+      details: { operation: "save" },
+    });
+    assert.doesNotMatch(error.message, /Durable storage unavailable/);
+    return true;
+  });
   assert.equal(peer.calls.filter((c) => !!c.payment).length, payments);
   await assert.rejects(second.refresh(), /journal could not be persisted/);
 });
+
+test("balance bindings satisfy the captured Testril 0.13 schema and old top-level scope is refused", async (t) => {
+  const peer = await livePeer(t);
+  const client = await connectMcp(peer.config.mcpUrl);
+  t.after(() => client.close());
+  const refused = await client.call("bind", {
+    function_slug: "erc20.token_balance",
+    chain_id: 84532,
+    params: {
+      tokens: [peer.config.token.address],
+      owners: [peer.config.wallets[0].address],
+    },
+  });
+  assert.equal(refused.kind, "invalid_params");
+  await peer.demo.refresh();
+  assert.equal(peer.demo.state().balances.treasury, peer.balances.treasury);
+});
+
+test("a saved session rebinds after a service restart without erasing payment or transfer history", async (t) => {
+  const peer = await livePeer(t);
+  await peer.demo.refresh();
+  await peer.demo.transfer({
+    revision: peer.demo.state().revision,
+    from: "treasury",
+    to: "a",
+    amount: "0.25",
+  });
+  const before = peer.demo.export();
+  const bindings = peer.calls.filter((c) => c.name === "bind").length;
+  peer.clearBindings();
+  peer.advanceBlock();
+  await peer.restart();
+  await peer.demo.refresh();
+  const after = peer.demo.export();
+  assert.equal(
+    peer.calls.filter((c) => c.name === "bind").length,
+    bindings + 4,
+  );
+  assert.deepEqual(after.transfers, before.transfers);
+  assert.deepEqual(
+    after.allReceipts.slice(0, before.allReceipts.length),
+    before.allReceipts,
+  );
+  assert.equal(after.actualBalances.a, peer.balances.a);
+});
+
+test("reconciliation authenticates an existing payment without spending and survives restart", async (t) => {
+  let authorizations = 0;
+  const peer = await livePeer(t, {
+    loseFirstSettlement: true,
+    authorizePayment() {
+      authorizations++;
+    },
+  });
+  await assert.rejects(peer.demo.refresh());
+  const before = peer.demo.export();
+  const channels = JSON.stringify(peer.channels);
+  await peer.restart();
+  await peer.demo.reconcile();
+  assert.equal(authorizations, 1);
+  assert.equal(JSON.stringify(peer.channels), channels);
+  const after = peer.demo.export();
+  assert.equal(after.allReceipts.length, before.allReceipts.length);
+  assert.equal(after.allReceipts[0].status, "done");
+  assert.equal(after.payment.lifetimeSpentRaw, before.payment.lifetimeSpentRaw);
+  assert.equal(after.payment.depositedRaw, before.payment.depositedRaw);
+  const proof = peer.calls.find(
+    (c) => c.payment?.payload.voucher?.maxClaimableAmount === "0",
+  ).payment;
+  assert.equal(proof.payload.type, "voucher");
+  assert.equal(proof.payload.deposit, undefined);
+  assert.equal(
+    proof.extensions["payment-identifier"].info.id,
+    peer.calls.find((c) => c.payment).payment.extensions["payment-identifier"]
+      .info.id,
+  );
+  await peer.restart();
+  await peer.demo.reconcile();
+  assert.equal(
+    peer.calls.filter(
+      (c) => c.payment?.payload.voucher?.maxClaimableAmount === "0",
+    ).length,
+    1,
+  );
+  peer.advanceBlock();
+  await peer.demo.refresh();
+  assert.equal(peer.demo.state().refreshNeeded, false);
+  assert.equal(
+    JSON.stringify(after).includes(proof.payload.voucher.signature),
+    false,
+  );
+});
+
+test("reconciliation supports older journals without saved payment terms", async (t) => {
+  const peer = await livePeer(t, { loseFirstSettlement: true });
+  await assert.rejects(peer.demo.refresh());
+  await peer.demo.close();
+  const path = join(peer.directory, ".live-state.json");
+  const saved = JSON.parse(await readFile(path, "utf8"));
+  delete saved.receipts[0].accepted;
+  await writeFile(path, JSON.stringify(saved));
+  await peer.restart();
+  await peer.demo.reconcile();
+  assert.equal(peer.demo.export().allReceipts[0].status, "done");
+});
+
+for (const ambiguity of ["receiver", "channel hash"])
+  test(`reconciliation refuses ambiguous ${ambiguity} evidence without signing a payment`, async (t) => {
+    const peer = await livePeer(t, { loseFirstSettlement: true });
+    await assert.rejects(peer.demo.refresh());
+    await peer.demo.close();
+    const path = join(peer.directory, ".live-state.json");
+    const saved = JSON.parse(await readFile(path, "utf8"));
+    delete saved.receipts[0].accepted;
+    await writeFile(path, JSON.stringify(saved));
+    if (ambiguity === "receiver") {
+      const alternate = structuredClone(peer.channels[0]);
+      alternate.channelConfig.receiver = peer.config.wallets[1].address;
+      peer.channels.push(alternate);
+    } else peer.channels[0].channelId = "0x" + "0".repeat(64);
+    await peer.restart();
+    await assert.rejects(
+      peer.demo.reconcile(),
+      (error) =>
+        describeFailure(error)?.code === "PAYMENT_RECONCILIATION_REQUIRED",
+    );
+    assert.equal(
+      peer.calls.filter(
+        (c) => c.payment?.payload.voucher?.maxClaimableAmount === "0",
+      ).length,
+      0,
+    );
+    assert.equal(peer.demo.export().allReceipts[0].status, "paying");
+  });
+
+test("an expired receipt confirms payment without pretending it contains read results", async (t) => {
+  const peer = await livePeer(t, {
+    loseFirstSettlement: true,
+    loseSettlementFor: "read",
+  });
+  await assert.rejects(peer.demo.refresh());
+  await peer.demo.reconcile();
+  const original = peer.calls.find((c) => c.payment && c.name === "read");
+  peer.advanceBlock();
+  await peer.demo.refresh();
+  assert.equal(
+    peer.calls.filter(
+      (c) =>
+        c.payment &&
+        c.payment.payload.voucher.maxClaimableAmount !== "0" &&
+        c.name === original.name &&
+        JSON.stringify(c.args) === JSON.stringify(original.args),
+    ).length,
+    1,
+  );
+});
+
+for (const verb of ["materialize", "read"])
+  test(`reconciliation accepts a live ${verb} replay as well as an expired receipt`, async (t) => {
+    const peer = await livePeer(t, {
+      loseFirstSettlement: true,
+      loseSettlementFor: verb,
+      reconciliationResponse(result, { args }) {
+        const { quote_id, paymentResponse } = result;
+        return verb === "materialize"
+          ? {
+              outcome: "success",
+              result: "materializing",
+              job: { job_id: "job:1", quote_id, state: "done" },
+              paymentResponse,
+            }
+          : { outcome: "success", ...args, values: [], paymentResponse };
+      },
+    });
+    await assert.rejects(peer.demo.refresh());
+    const before = peer.demo.export();
+    await peer.demo.reconcile();
+    assert.ok(peer.demo.export().allReceipts.every((r) => r.status === "done"));
+    assert.equal(
+      peer.demo.export().payment.lifetimeSpentRaw,
+      before.payment.lifetimeSpentRaw,
+    );
+  });
+
+test("failed reconciliation persistence keeps the durable payment uncertain and blocks further actions", async (t) => {
+  const peer = await livePeer(t, { loseFirstSettlement: true });
+  await assert.rejects(peer.demo.refresh());
+  await peer.demo.close();
+  const path = join(peer.directory, ".live-state.json");
+  const before = await readFile(path, "utf8");
+  let rejectSave = false;
+  const demo = await createLiveDemo({
+    config: peer.config,
+    chain: peer.chain,
+    mcp: await connectMcp(peer.config.mcpUrl),
+    journal: {
+      load: () => before,
+      save: async () => {
+        if (rejectSave) throw new Error("storage unavailable");
+      },
+      close: async () => {},
+    },
+  });
+  rejectSave = true;
+  const storageFailure = (error) =>
+    describeFailure(error)?.code === "JOURNAL_UNAVAILABLE";
+  await assert.rejects(demo.reconcile(), storageFailure);
+  await assert.rejects(demo.refresh(), storageFailure);
+  await demo.close();
+  assert.equal(await readFile(path, "utf8"), before);
+  await peer.restart();
+  assert.equal(peer.demo.export().allReceipts[0].status, "paying");
+  await peer.demo.reconcile();
+  assert.equal(peer.demo.export().allReceipts[0].status, "done");
+});
+
+for (const [label, alter] of [
+  ["quote", (r) => ({ ...r, quote_id: "quote:other" })],
+  [
+    "network",
+    (r) => ({
+      ...r,
+      paymentResponse: { ...r.paymentResponse, network: "eip155:1" },
+    }),
+  ],
+  [
+    "payer",
+    (r) => ({
+      ...r,
+      paymentResponse: {
+        ...r.paymentResponse,
+        payer: testConfig().config.wallets[0].address,
+      },
+    }),
+  ],
+  [
+    "charge",
+    (r) => ({
+      ...r,
+      paymentResponse: {
+        ...r.paymentResponse,
+        extra: { chargedAmount: "119" },
+      },
+    }),
+  ],
+  [
+    "receipt amount",
+    (r) => ({ ...r, receipt: { ...r.receipt, amount: { atoms: "119" } } }),
+  ],
+  [
+    "receipt quote",
+    (r) => ({ ...r, receipt: { ...r.receipt, quote_id: "quote:other" } }),
+  ],
+  ["pending", () => ({ outcome: "error", kind: "payment_recovery_pending" })],
+])
+  test(`reconciliation preserves uncertainty when ${label} does not confirm the original purchase`, async (t) => {
+    const peer = await livePeer(t, {
+      loseFirstSettlement: true,
+      reconciliationResponse: alter,
+    });
+    await assert.rejects(peer.demo.refresh());
+    const before = peer.demo.export();
+    await assert.rejects(
+      peer.demo.reconcile(),
+      (error) =>
+        describeFailure(error)?.code === "PAYMENT_RECONCILIATION_REQUIRED",
+    );
+    assert.deepEqual(peer.demo.export().allReceipts, before.allReceipts);
+    assert.equal(
+      peer.calls.filter(
+        (c) =>
+          c.payment && c.payment.payload.voucher.maxClaimableAmount !== "0",
+      ).length,
+      1,
+    );
+    await peer.restart();
+    await assert.rejects(
+      peer.demo.refresh(),
+      (error) =>
+        describeFailure(error)?.code === "PAYMENT_RECONCILIATION_REQUIRED",
+    );
+  });

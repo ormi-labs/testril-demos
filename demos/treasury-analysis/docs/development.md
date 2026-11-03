@@ -33,6 +33,14 @@ the session and connects the chain, Testril, and storage adapters. These adapter
 do not import the server or browser controller. Browser modules used by Node.js
 are pure functions and do not access the DOM.
 
+The browser explicitly requests Mock or Live and only accepts session state for
+that mode. A saved session in the wrong mode or returning HTTP 404 starts fresh;
+other failures are shown without retrying or switching modes. Error text is
+displayed as supplied by the local server or harness, without message matching.
+
+The CLI's free compatibility check and the live engine share Function binding
+and chain-head validation. Binding uses MCP directly and needs no payment state.
+
 ## Amounts and session state
 
 Amounts travel through JSON as unsigned decimal integer strings. USDC has six
@@ -86,9 +94,14 @@ explicitly configured caps.
 
 ## Embedding the live engine
 
+Read the [structured failure interface and catalog](errors.md) when embedding
+this engine. Import `describeFailure` from `src/errors.mjs`; do not interpret
+exception messages, HTTP properties, or arbitrary `cause` chains as domain
+classifications. Host authorization rejections retain their original identity.
+
 `createLiveDemo({ config, chain, mcp, directory, authorizePayment, journal })`
 returns an engine with `state`, `progress`, `refresh`, `transfer`, `reset`,
-`provenance`, `balanceProvenance`, `export`, and `close` methods.
+`reconcile`, `provenance`, `balanceProvenance`, `export`, and `close` methods.
 
 - `config` comes from `liveConfig(env)` and contains validated signers and caps.
 - `chain` comes from `createLiveChain(config)`; `mcp` comes from
@@ -109,6 +122,28 @@ latest state's revision. `reset({ revision })` sweeps all A and B funds back to
 Treasury. `refresh()` recovers pending work and refreshes reads. Call `close()`
 at shutdown; it waits for queued work and closes MCP and the journal. The engine
 owns those resources once passed to it.
+
+`reconcile()` is an explicit, serialized payment recovery operation. It replays
+only saved `paying` entries with their original request scope, amount, and payment
+identifier. It signs a **zero cumulative voucher**, with no deposit authorization,
+to authenticate the payer to Testril's payment-identifier lookup. It never calls
+`authorizePayment`, buys new work, or submits an RPC transfer. Unknown, pending,
+conflicting, or mismatched replies leave the entry uncertain. A successful lookup
+must confirm the payer, network, amount, and original receipt or request scope;
+receipt and materialization replies must also match the saved quote ID.
+
+The private journal saves accepted quote terms for new payments, but no payment
+signatures. Older entries can use inspected channel terms only when they identify
+one receiver unambiguously. Reconciliation saves each confirmation durably without
+changing reserved charges or deposits. A failed save blocks further actions until
+storage is repaired and the engine is reopened.
+
+An expired receipt confirms settlement without supplying expired results. The
+next refresh reads a newer block under normal authorization and caps. Live replay
+results remain cached for their original scope. Ordinary refresh never initiates
+payment reconciliation; the embedding operator decides when to call it. A host
+must keep the sandbox isolated through reconciliation, fresh reads, cleanup,
+verification, and successful closure before reusing it.
 
 Keep keys in the host process. Authentication, user sessions, payment approval
 policy, and durable hosted storage belong to the embedding application. The

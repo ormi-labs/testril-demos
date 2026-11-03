@@ -19,9 +19,13 @@ Keep keys out of chat, browser code, and source control.
 cp .env.example .env  # only if you do not already have one
 chmod 600 .env
 # Edit .env with your local keys and explicitly approved payment limits.
-npm run live:check   # address validation and Testril chain head; no transfers or payments
+npm run live:check   # schemas; no paid Testril reads, payments, or transfers
 npm start
 ```
+
+`live:check` binds the transfer Function and all three balance Functions, so it
+fails if a Testril release changes their accepted parameters. It makes no paid
+Testril reads, payments, or transfers.
 
 The payment limits default to zero. After approving spending, set both
 `TESTRIL_CHARGE_CAP_USDC=0.1` and `TESTRIL_ESCROW_CAP_USDC=0.1`, then restart.
@@ -37,6 +41,10 @@ block for each balance, using Testril’s reported chain head. Balance reads and
 transfer-edge reads come exclusively from Testril. The local signer uses
 `https://sepolia.base.org` (or `BASE_SEPOLIA_RPC_URL`) to prepare, submit, and confirm
 wallet transactions.
+Balance scope uses Testril 0.13's `reads: { tokens: [...], owners: [...] }` parameters.
+On the first refresh after opening an engine, the demo rebinds its four Functions
+before reading. Saved binding IDs may no longer exist after a service upgrade;
+rebinding preserves payment history, pending transfers, and the frozen retry block.
 Send checks the last successful Testril balance, then waits for one block
 confirmation (receipt polling every 200 ms). It refreshes only the sender and
 recipient, together with transfer edges, at the confirmed transaction's block.
@@ -79,7 +87,16 @@ and all saved payments in `allReceipts`, with cumulative payment totals in
 If a transfer or a later read fails, use **Refresh**. The recorded
 transaction hash is recovered without signing another transfer; paid results are
 reused. If a settlement response is lost, the charge and deposit remain reserved
-and new payments are refused until the quote is reconciled. The signed payment
+and new payments are refused until the quote is reconciled.
+Within a refresh, queued reads retain the settlement failure that blocked them,
+so their refusal to pay cannot hide the original cause. A later refresh or restart
+reports the unresolved payment and does not submit another payment. An embedding
+operator can call the documented [`reconcile()` operation](development.md#embedding-the-live-engine)
+to authenticate an existing payment without authorizing spending. Confirmed
+expired receipts remain in the accounting history; subsequent reads use a newer
+block and the normal caps. Unconfirmed payments keep their reservations and must
+remain isolated.
+The signed payment
 travels only in `_meta["x402/payment"]`; settlement is confirmed by
 `_meta["x402/payment-response"]`. Signatures are never saved in the receipt history. The interface shows
 its quote ID and status. A stalled materialization remains attached to its job.
@@ -105,6 +122,34 @@ Maximum gas fee per transfer is limited to 0.0001 ETH.
 If that sequence is interrupted, use `node --env-file=.env src/live-cli.mjs
 resume-smoke` to recover its pending transaction and continue only the remaining
 steps. Use the interface to recover an unrelated run.
+
+### Hosted release and deployment check
+
+After every Testril release or deployment, test the harness's exact inputs. Read
+`demoRevision` from the deployed harness `/healthz` response and copy
+`TESTRIL_MCP_URL` from that harness environment. Do not assume the pin is the
+latest demos `main` commit or use this demo's default MCP endpoint.
+
+From a clean `testril-demos` clone:
+
+```sh
+DEMO_REVISION='<demoRevision from the deployed harness /healthz>'
+git fetch origin "$DEMO_REVISION"
+git checkout --detach "$DEMO_REVISION"
+test "$(git rev-parse HEAD)" = "$DEMO_REVISION"
+cd demos/treasury-analysis
+npm ci
+# Configure .env with dedicated testnet-only wallets, approved test-USDC caps,
+# and the exact TESTRIL_MCP_URL value from the hosted harness environment.
+npm run live:check
+npm run live:smoke
+```
+
+Do not print, share, or commit the harness configuration. The code refuses any
+chain other than Base Sepolia (84532) and any payment network other than
+`eip155:84532`, but an EOA can hold funds on several networks. Use dedicated
+testnet-only wallets that have never held mainnet funds, and never point
+`TESTRIL_MCP_URL` or `BASE_SEPOLIA_RPC_URL` at mainnet services.
 
 Live Send opens a progress modal with separate **Base Sepolia · RPC** and
 **Testril** sections. RPC shows preparation, submission, and confirmation; Testril
@@ -197,3 +242,8 @@ exact signed transaction. The saved transaction remains available for recovery;
 do not send a replacement just because submission or confirmation failed.
 Confirmation waits for one receipt and checks its canonical block, without
 transaction-replacement scanning.
+
+A server that allocates sessions before opening this interface can return the
+current `sessionId` from `/api/config`. The browser opens that session directly,
+ahead of any ID remembered in session storage. Without a server-selected ID,
+the standalone interface resumes its remembered session or creates a new one.
