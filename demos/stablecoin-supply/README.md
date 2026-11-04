@@ -8,7 +8,7 @@ burns over the same blocks.
 
 **The shipped recording is synthetic.** `recordings/report.json` is generated
 by `test/fixture.mjs` and the page says so in its banner. Record real data with
-`tools/prepare` (below).
+`npm run record` (below).
 
 ![Desktop screenshot](docs/screenshot-desktop.png)
 
@@ -42,7 +42,9 @@ npm run format:check
 
 `npm test` checks the cross-check passes on the fixture and fails when a burn
 is read as a mint, when supply is in whole dollars instead of raw units, or
-when a day is missing, and that the server returns the shaped report.
+when a day is missing, that the server returns the shaped report, and that
+`npm run record` pays a fake Testril with the payer's vouchers, follows each
+`materialize` answer and keeps every row.
 `npm run test:browser` writes `docs/screenshot-desktop.png`.
 `npm run fixture` regenerates the synthetic recording.
 
@@ -116,16 +118,25 @@ Windows are half-open: the end is the first block or day not included.
 
 ## Record real data
 
-Recording needs `tools/prepare` from this repository and a Testril operator
-key with a funded channel; neither is part of an extracted demo. From the
-repository root:
+The demo records itself. It needs a private key whose address holds Testril
+usage credits; it pays with vouchers against those credits, so the wallet
+needs no USDC.
+
+| Variable            | Purpose                                                    |
+| ------------------- | ---------------------------------------------------------- |
+| `TESTRIL_PAYER_KEY` | Hex private key that signs vouchers; required to record    |
+| `TESTRIL_MCP_URL`   | Testril MCP endpoint; default `https://dev.testril.ai/mcp` |
+
+Working directory: `demos/stablecoin-supply`
 
 ```sh
-cd tools/prepare && npm ci && cp .env.example .env   # set TESTRIL_MCP_URL and TESTRIL_OPERATOR_KEY
-node prepare.mjs --plan ../../demos/stablecoin-supply   # free estimate
-cd ../../demos/stablecoin-supply && npm run record
+export TESTRIL_PAYER_KEY=<hex private key>
+npm run record
 ```
 
-`npm run record` replaces `recordings/report.json` with `source: "dev"`, the
-bound function ids, job ids and timings. The page then shows "Recorded from
-Testril on <date>".
+For each bind in `testril.json`, `npm run record` calls `bind`, asks
+`materialize` for the whole window (Testril charges only for blocks not yet
+indexed), waits for the job, then `read`s the window. It replaces
+`recordings/report.json` with `source: "dev"`, the bound function ids, job ids,
+timings and the usage credits spent. The page then shows "Recorded from
+Testril on <date>". A failed run leaves the previous recording in place.
