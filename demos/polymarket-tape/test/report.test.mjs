@@ -80,23 +80,17 @@ test("check fails on a condition that pays nothing at all", () => {
   assert.throws(() => check(corrupted), /not its denominator/);
 });
 
-test("check fails when a payout row is listed twice or an outcome is missing", () => {
+test("check fails when a payout row is listed twice", () => {
   const repeated = rows();
   repeated.payouts.push(structuredClone(repeated.payouts[0]));
-  assert.throws(() => check(repeated), /repeated or missing/);
+  assert.throws(() => check(repeated), /must appear exactly once/);
+});
+
+test("check fails when a losing outcome is missing from a condition", () => {
   const missing = rows();
-  const [first] = missing.payouts;
-  missing.payouts = missing.payouts.filter(
-    (r) =>
-      !(
-        r.condition_id === first.condition_id &&
-        r.outcome_index === first.outcome_index
-      ),
-  );
-  assert.throws(
-    () => check(missing),
-    /repeated or missing|not its denominator/,
-  );
+  const loser = missing.payouts.find((r) => r.payout_numerator === "0");
+  missing.payouts = missing.payouts.filter((r) => r !== loser);
+  assert.throws(() => check(missing), /must appear exactly once/);
 });
 
 test("check fails when a version 1 fill carries a builder code", () => {

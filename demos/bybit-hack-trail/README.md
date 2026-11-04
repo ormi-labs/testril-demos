@@ -6,7 +6,7 @@ Follows the stolen funds of the February 2025 Bybit hack, hop by hop, from publi
 
 ## Prerequisites
 
-Node.js 22.13 or newer. No runtime dependencies.
+Node.js 22.13 or newer.
 
 ## Run
 

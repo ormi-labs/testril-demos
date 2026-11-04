@@ -1,8 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import {
-  check as checkWith,
-  poolMaps,
+  check,
   shape,
   stablecoins,
   venues,
@@ -12,7 +11,6 @@ import { fixture } from "./fixture.mjs";
 
 const rows = () => structuredClone(fixture().rows);
 const [cl] = venues;
-const check = (data) => checkWith(data, poolMaps(data));
 
 test("check proves every venue's days from its pool list", () => {
   const passed = check(rows());
@@ -123,7 +121,7 @@ test("shape reads the stablecoin leg and splits hooked from hookless", () => {
       day(nonStablePool, "7", "999", "999"),
     ],
   };
-  const v4 = shape(small, poolMaps(small)).venues[2];
+  const v4 = shape(small).venues[2];
   assert.equal(v4.hookedMillions, 3);
   assert.equal(v4.hooklessMillions, 1);
   assert.equal(v4.hookedShare, "75.0%");
