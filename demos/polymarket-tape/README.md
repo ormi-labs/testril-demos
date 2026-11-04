@@ -5,9 +5,8 @@ One UTC day of Polymarket order-book fills on Polygon: the largest fills
 by builder code, plus the conditions that resolved that day. The page proves
 its numbers: every fill prices within (0, 1] (collateral over outcome tokens,
 compared as integers), every fee is booked in the asset its version and side
-require, builder volumes and the leaderboard (top 8 plus other builders) add up
-to the total, and each resolved condition pays a denominator equal to the sum of
-its numerators.
+require, every fill carries a builder word, and each resolved condition lists
+both outcomes once and pays a denominator equal to the sum of its numerators.
 
 **The shipped recording is synthetic.** `recordings/synthetic.json` is generated
 by `test/fixture.mjs` and the page says so in its banner. Record real data with
@@ -47,9 +46,10 @@ npm run format:check
 price of exactly 1) and fail when amounts are swapped so a price exceeds 1,
 collateral is zero, a fill is outside the window, from an unnamed exchange or
 read twice, a fee is booked in the wrong asset, a version 1 fill carries a
-builder code, a condition resolves outside the window, a payout denominator is
-not the sum of its numerators, or a leaderboard presents truncated volumes as
-the whole; it also checks the shaped tape, odds line and server. `npm run test:browser` writes
+builder code, a fill has no builder word, a condition resolves outside the
+window, repeats or misses an outcome, pays nothing at all, or pays a denominator
+that is not the sum of its numerators, or a leaderboard presents truncated
+volumes as the whole; it also checks the shaped tape, odds line and server. `npm run test:browser` writes
 `docs/screenshot-desktop.png`. `npm run fixture` regenerates the recording.
 
 ## Subjects and window

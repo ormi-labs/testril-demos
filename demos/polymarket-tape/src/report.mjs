@@ -8,6 +8,7 @@ export const exchanges = binds.fills.params.exchanges;
 export const conditionalTokens = binds.payouts.params.conditional_tokens;
 export const day = "2026-11-01";
 export const blocksPerHour = 2400;
+const outcomesPerCondition = 2;
 const tapeSize = 12;
 const leaderboardSize = 8;
 const priceScale = 10000n;
@@ -104,13 +105,14 @@ export function check(rows) {
       throw new Error(
         `Condition ${shortHex(condition.id)} resolved at block ${outside.block}, outside the window.`,
       );
-    const outcomes = new Set(condition.rows.map((r) => r.outcome_index));
-    if (
-      outcomes.size !== condition.rows.length ||
-      condition.numerators.length !== outcomes.size
-    )
+    const indices = condition.rows.map((r) => Number(r.outcome_index));
+    const complete = Array.from(
+      { length: outcomesPerCondition },
+      (_, outcome) => outcome,
+    ).every((outcome) => indices.filter((i) => i === outcome).length === 1);
+    if (!complete || indices.length !== outcomesPerCondition)
       throw new Error(
-        `Condition ${shortHex(condition.id)} lists ${condition.rows.length} payout rows for outcomes ${[...outcomes].join(", ")}: an outcome is repeated or missing.`,
+        `Condition ${shortHex(condition.id)} lists outcomes ${indices.join(", ")}: each of the ${outcomesPerCondition} outcomes must appear exactly once.`,
       );
     const sum = condition.numerators.reduce((s, n) => s + n, 0n);
     if (
@@ -125,7 +127,7 @@ export function check(rows) {
     `All ${fills.length} fills price within (0, 1]: collateral never exceeds outcome tokens`,
     `Every fee is booked in the asset its version and side require`,
     `Every fill carries a builder word, and the leaderboard (top ${leaderboardSize} plus other builders) adds up to the ${formatUsd(total)} total`,
-    `${conditions.length} resolved conditions each list every outcome once and pay a non-zero denominator equal to the sum of their numerators`,
+    `${conditions.length} resolved conditions each list both of their outcomes once and pay a non-zero denominator equal to the sum of their numerators`,
   ];
 }
 

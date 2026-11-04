@@ -74,8 +74,7 @@ Windows are half-open: the end is the first block or day not included.
 | `volume`  | `kuru.market_volume` | 143   | `swap.market_list`, `by` day | 2026-10-25 → 2026-11-02 |
 
 `volume` depends on the router's `kuru.trade` rows, which depend on
-`kuru.market_list`. Counting only the blocks in the windows
-underestimates the cost: both functions are indexed from the router's creation.
+`kuru.market_list`.
 
 ## Record real data
 
