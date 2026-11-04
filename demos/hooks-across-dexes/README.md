@@ -8,9 +8,9 @@ proves its numbers: every traded pool must be in its pool list, have at most
 one row per day, and on each day hooked plus hookless must equal the total,
 with every pool counted in exactly one class.
 
-**The shipped recording is synthetic.** `recordings/report.json` is generated
+**The shipped recording is synthetic.** `recordings/synthetic.json` is generated
 by `test/fixture.mjs` and the page says so in its banner. Record real data with
-`tools/prepare` (below).
+`npm run record` (below).
 
 ![Desktop screenshot](docs/screenshot-desktop.png)
 
@@ -104,16 +104,29 @@ Pool lists are read in chunks of 10,000,000 blocks.
 
 ## Record real data
 
-Recording needs `tools/prepare` from this repository and a Testril operator
-key with a funded channel; neither is part of an extracted demo. From the
-repository root:
+The demo records itself. It needs a private key whose address holds Testril
+usage credits; it pays with vouchers against those credits, so the wallet
+needs no USDC.
+
+| Variable            | Purpose                                                    |
+| ------------------- | ---------------------------------------------------------- |
+| `TESTRIL_PAYER_KEY` | Hex private key that signs vouchers; required to record    |
+| `TESTRIL_MCP_URL`   | Testril MCP endpoint; default `https://dev.testril.ai/mcp` |
+
+Working directory: `demos/hooks-across-dexes`
 
 ```sh
-cd tools/prepare && npm ci && cp .env.example .env   # set TESTRIL_MCP_URL and TESTRIL_OPERATOR_KEY
-node prepare.mjs --plan ../../demos/hooks-across-dexes   # free estimate
-cd ../../demos/hooks-across-dexes && npm run record
+export TESTRIL_PAYER_KEY=<hex private key>
+npm run record
 ```
 
-`npm run record` replaces `recordings/report.json` with `source: "dev"`, the
-bound function ids, job ids and timings. The page then shows "Recorded from
-Testril on <date>".
+For each bind in `testril.json`, `npm run record` calls `bind`, asks
+`materialize` for the whole window (Testril charges only for blocks not yet
+indexed), waits for the job, then `read`s the window. It writes
+`recordings/recorded.json` (git-ignored) with `source: "dev"`, the bound
+function ids, job ids, timings and the usage credits spent. The page then
+shows "Recorded from Testril on <date>". A failed run leaves the previous
+recording in place.
+
+`npm test` runs `npm run record` against a fake Testril: it pays with the
+payer's vouchers, follows each `materialize` answer and keeps every row.

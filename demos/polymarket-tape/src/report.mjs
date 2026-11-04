@@ -82,6 +82,11 @@ export function check(rows) {
     throw new Error(
       `Fill ${shortHex(feeProblem.tx)} books its fee in the wrong asset: collateral_fee ${feeProblem.collateral_fee}, token_fee ${feeProblem.token_fee} for a version ${feeProblem.exchange_version} ${feeProblem.is_buy ? "buy" : "sell"}.`,
     );
+  const uncoded = fills.find((fill) => !/^0x[0-9a-f]{64}$/.test(fill.builder));
+  if (uncoded)
+    throw new Error(
+      `Fill ${shortHex(uncoded.tx)} has no 32-byte builder word: ${uncoded.builder}.`,
+    );
   const versionOne = fills.filter((fill) => fill.exchange_version === "1");
   const coded = versionOne.find(
     (fill) => fill.builder !== zeroWord || fill.metadata !== zeroWord,
@@ -91,14 +96,6 @@ export function check(rows) {
       `Version 1 fill ${shortHex(coded.tx)} carries a builder or metadata, but version 1 emits none.`,
     );
   const total = totalVolume(fills);
-  const builderSum = [...builderVolumes(fills).values()].reduce(
-    (sum, volume) => sum + volume,
-    0n,
-  );
-  if (builderSum !== total)
-    throw new Error(
-      `Builder volumes sum to ${builderSum}, not the total ${total}.`,
-    );
   assertLeaderboardAddsUp(leaderboardEntries(fills), total);
   const conditions = conditionsOf(payouts);
   for (const condition of conditions) {
@@ -107,8 +104,19 @@ export function check(rows) {
       throw new Error(
         `Condition ${shortHex(condition.id)} resolved at block ${outside.block}, outside the window.`,
       );
+    const outcomes = new Set(condition.rows.map((r) => r.outcome_index));
+    if (
+      outcomes.size !== condition.rows.length ||
+      condition.numerators.length !== outcomes.size
+    )
+      throw new Error(
+        `Condition ${shortHex(condition.id)} lists ${condition.rows.length} payout rows for outcomes ${[...outcomes].join(", ")}: an outcome is repeated or missing.`,
+      );
     const sum = condition.numerators.reduce((s, n) => s + n, 0n);
-    if (condition.rows.some((r) => BigInt(r.payout_denominator) !== sum))
+    if (
+      sum === 0n ||
+      condition.rows.some((r) => BigInt(r.payout_denominator) !== sum)
+    )
       throw new Error(
         `Condition ${shortHex(condition.id)} pays numerators summing to ${sum}, not its denominator.`,
       );
@@ -116,8 +124,8 @@ export function check(rows) {
   return [
     `All ${fills.length} fills price within (0, 1]: collateral never exceeds outcome tokens`,
     `Every fee is booked in the asset its version and side require`,
-    `Builder volumes and the leaderboard (top ${leaderboardSize} plus other builders) each add up to the ${formatUsd(total)} total`,
-    `${conditions.length} resolved conditions each pay a denominator equal to the sum of their numerators`,
+    `Every fill carries a builder word, and the leaderboard (top ${leaderboardSize} plus other builders) adds up to the ${formatUsd(total)} total`,
+    `${conditions.length} resolved conditions each list every outcome once and pay a non-zero denominator equal to the sum of their numerators`,
   ];
 }
 

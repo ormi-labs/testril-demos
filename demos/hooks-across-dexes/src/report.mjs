@@ -96,25 +96,12 @@ function sumRows(volumeRows, pools, include = () => true) {
   return total;
 }
 
-function checkPartition(volumeRows, pools, venue, days) {
+function checkPartition(pools, venue) {
   for (const pool of pools.values())
     if (isHooked(pool) === isHookless(pool))
       throw new Error(
         `${venue.name} pool ${pool.pool}: hooks ${pool.hooks} count as ${isHooked(pool) ? "both hooked and hookless" : "neither hooked nor hookless"}.`,
       );
-  for (const day of days) {
-    const dayRows = volumeRows.filter((row) => row.day === day);
-    const total = sumRows(dayRows, pools);
-    const hooked = sumRows(dayRows, pools, isHooked);
-    const hookless = sumRows(dayRows, pools, isHookless);
-    if (
-      hooked.stable + hookless.stable !== total.stable ||
-      hooked.swaps + hookless.swaps !== total.swaps
-    )
-      throw new Error(
-        `${venue.name} on ${day}: hooked plus hookless volume does not equal the total.`,
-      );
-  }
 }
 
 function checkVenue(rows, pools, venue, days) {
@@ -141,19 +128,20 @@ function checkVenue(rows, pools, venue, days) {
       throw new Error(
         `${venue.name} pool ${pool.pool}: zero hooks contradict hooks_registration ${pool.hooks_registration}.`,
       );
-  checkPartition(rows[venue.volumeBind], pools, venue, days);
+  checkPartition(pools, venue);
   return seen.size;
 }
 
-export function check(rows, pools) {
+export function check(rows) {
   const days = windowDays();
+  const pools = poolMaps(rows);
   return venues.map((venue) => {
     const venuePools = pools.get(venue.key);
     const count = checkVenue(rows, venuePools, venue, days);
     const registered = [...venuePools.values()].some(
       (pool) => pool.hooks_registration !== undefined,
     );
-    return `${venue.name}: ${count} pool-day rows over ${days.length} days all belong to the ${venuePools.size} listed pools, on each day hooked plus hookless volume equals the total, hookless stablecoin pairs trade equal legs${registered ? ", and hookless pools have zero hooks_registration" : ""}`;
+    return `${venue.name}: ${count} pool-day rows over ${days.length} days all belong to the ${venuePools.size} listed pools, every pool is exactly one of hooked or hookless, so on each day hooked plus hookless volume equals the total, hookless stablecoin pairs trade equal legs${registered ? ", and hookless pools have zero hooks_registration" : ""}`;
   });
 }
 
@@ -240,7 +228,8 @@ function topHooked(rows, poolMaps) {
     }));
 }
 
-export function shape(rows, pools) {
+export function shape(rows) {
+  const pools = poolMaps(rows);
   const summaries = venues.map((venue) =>
     venueSummary(rows, venue, pools.get(venue.key)),
   );

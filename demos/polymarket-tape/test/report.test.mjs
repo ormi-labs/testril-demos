@@ -62,6 +62,43 @@ test("check fails when a payout denominator is not the numerators' sum", () => {
   assert.throws(() => check(corrupted), /not its denominator/);
 });
 
+test("check fails when a fill has no builder word", () => {
+  const corrupted = rows();
+  delete corrupted.fills[0].builder;
+  assert.throws(() => check(corrupted), /no 32-byte builder word/);
+});
+
+test("check fails on a condition that pays nothing at all", () => {
+  const corrupted = rows();
+  const [first] = corrupted.payouts;
+  for (const row of corrupted.payouts.filter(
+    (r) => r.condition_id === first.condition_id,
+  )) {
+    row.payout_numerator = "0";
+    row.payout_denominator = "0";
+  }
+  assert.throws(() => check(corrupted), /not its denominator/);
+});
+
+test("check fails when a payout row is listed twice or an outcome is missing", () => {
+  const repeated = rows();
+  repeated.payouts.push(structuredClone(repeated.payouts[0]));
+  assert.throws(() => check(repeated), /repeated or missing/);
+  const missing = rows();
+  const [first] = missing.payouts;
+  missing.payouts = missing.payouts.filter(
+    (r) =>
+      !(
+        r.condition_id === first.condition_id &&
+        r.outcome_index === first.outcome_index
+      ),
+  );
+  assert.throws(
+    () => check(missing),
+    /repeated or missing|not its denominator/,
+  );
+});
+
 test("check fails when a version 1 fill carries a builder code", () => {
   const corrupted = rows();
   const fill = corrupted.fills.find((f) => f.exchange_version === "1");

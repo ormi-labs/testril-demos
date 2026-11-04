@@ -106,6 +106,6 @@ function holdLast(answers) {
 
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href)
   await writeFile(
-    new URL("../recordings/report.json", import.meta.url),
+    new URL("../recordings/synthetic.json", import.meta.url),
     `${JSON.stringify(fixture(), null, 2)}\n`,
   );

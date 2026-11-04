@@ -129,9 +129,13 @@ export function check(rows) {
         throw new Error(`No ${pair.title} volume on ${day}.`);
       checkPrices(pair, day, volumes);
     }
+    const bandOnly = pair.subjects.filter((s) => s.bandOnly).map(label);
+    const comparable = bandOnly.length
+      ? `all but ${bandOnly.join(", ")}`
+      : "all";
     passed.push(
       `${pair.title} every subject pool has rows in its bind over the window`,
-      `${pair.title} priced pools trade inside the plausible band on every day, and all but Curve within ${priceTolerancePercent}% of ${label(pair.subjects[0])}'s price, so each ETH side is an ETH side despite token order`,
+      `${pair.title} priced pools trade inside the plausible band on every day, and ${comparable} within ${priceTolerancePercent}% of ${label(pair.subjects[0])}'s price, so each ETH side is an ETH side despite token order`,
     );
   }
   return passed;

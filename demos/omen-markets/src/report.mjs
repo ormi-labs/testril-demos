@@ -59,16 +59,18 @@ function checkPoolReconciles(market, states, trades, funding) {
   const blocks = groupBy(states, (state) => state.block);
   const ordered = [...blocks.keys()].sort((a, b) => a - b);
   for (const [index, block] of ordered.entries()) {
+    const malformed = blocks
+      .get(block)
+      .find((state) => !/^[0-9]+$/.test(state.amount));
+    if (malformed)
+      throw new Error(
+        `Market ${market} holds ${malformed.amount} tokens of outcome ${malformed.outcome_index}, not a non-negative integer of raw units.`,
+      );
     const holdings = new Map(
       blocks
         .get(block)
         .map((state) => [state.outcome_index, BigInt(state.amount)]),
     );
-    const negative = [...holdings].find(([, amount]) => amount < 0n);
-    if (negative)
-      throw new Error(
-        `Market ${market} holds ${negative[1]} tokens of outcome ${negative[0]}.`,
-      );
     if (index === 0 || fundedBlocks.has(block)) continue;
     const before = new Map(
       blocks
@@ -103,6 +105,14 @@ export function check(rows) {
   ].find((row) => !markets.has(row.market));
   if (unlisted)
     throw new Error(`Market ${unlisted.market} is not in market_list.`);
+
+  const early = [...rows.trades, ...rows.liquidity, ...rows.market_state].find(
+    (row) => row.block < markets.get(row.market).block,
+  );
+  if (early)
+    throw new Error(
+      `Market ${early.market} has a row at block ${early.block}, before the factory created it at block ${markets.get(early.market).block}.`,
+    );
 
   for (const trade of rows.trades) {
     if (trade.side !== "buy" && trade.side !== "sell")

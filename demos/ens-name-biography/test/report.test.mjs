@@ -42,6 +42,17 @@ test("check fails when a cost is in gwei or 1000x too large", () => {
   }
 });
 
+test("check accepts a free renewal and a four-letter name priced at 1.2 ETH a year", () => {
+  const data = rows();
+  const registration = data[nick.binds.registration];
+  registration[1].cost = "0";
+  const years =
+    (BigInt(registration[2].expires) - BigInt(registration[1].expires)) /
+    (365n * 86400n);
+  registration[2].cost = String(years * 1_200_000_000_000_000_000n);
+  assert.equal(check(data).length, 6);
+});
+
 test("check fails when a wrapped expiry lacks the 90-day grace period", () => {
   const corrupted = rows();
   const [first] = corrupted[vitalik.binds.wrapped];
