@@ -7,15 +7,20 @@ for every exchange with several wallets, the total Testril returns must equal
 the sum of its wallets in every hour, with no missing, zero or out-of-window
 hours.
 
-**The shipped recording is synthetic.** `recordings/synthetic.json` is generated
-by `test/fixture.mjs` and the page says so in its banner. Record real data with
-`npm run record` (below).
-
-![Desktop screenshot](docs/screenshot-desktop.png)
+Every number on the page comes live from Testril when you press **Fetch from
+Testril**. The first fetch has Testril index the data; later fetches only read
+what Testril already indexed.
 
 ## Prerequisites
 
 - Node.js 22.13 or later
+- A private key whose address holds Testril usage credits. The demo pays with
+  vouchers against those credits, so the wallet needs no USDC.
+
+| Variable            | Purpose                                                    |
+| ------------------- | ---------------------------------------------------------- |
+| `TESTRIL_PAYER_KEY` | Hex private key that signs vouchers; required to fetch     |
+| `TESTRIL_MCP_URL`   | Testril MCP endpoint; default `https://dev.testril.ai/mcp` |
 
 ## Run
 
@@ -23,13 +28,20 @@ Working directory: `demos/exchange-tide`
 
 ```sh
 npm ci
+export TESTRIL_PAYER_KEY=<hex private key>
 npm start
 ```
 
-Open http://127.0.0.1:4180 (set `PORT` to change it). Expected result: the
-synthetic banner, four headline numbers, a stacked area of stablecoins per
-exchange, a table of the ten biggest hours in or out, and three passed
-cross-checks.
+Open http://127.0.0.1:4180 (set `PORT` to change it) and press **Fetch from
+Testril**. For each bind the server calls `bind`, asks `materialize` for the
+whole window (Testril charges only for what it has not indexed yet), follows the
+job, then `read`s the window. The page shows a bar per bind and overall from
+Testril's own job progress and the usage credits spent. Then it draws four
+headline numbers, a stacked area of stablecoins per exchange, a table of the ten
+biggest hours in or out, and three passed cross-checks. Nothing is saved: a
+restart starts empty and the next fetch reads again.
+
+Without `TESTRIL_PAYER_KEY` the button is disabled and the page says what to set.
 
 ## Test
 
@@ -44,9 +56,11 @@ npm run format:check
 `npm test` checks the cross-check passes on the fixture and fails when a total
 is only its first wallet, when the two tokens are swapped, when an hour is
 missing, when a gap is zero-filled and when an hour is outside the window, and
-that the biggest hours are ranked by size and direction. `npm run test:browser`
-writes `docs/screenshot-desktop.png`. `npm run fixture` regenerates the
-synthetic recording.
+that the biggest hours are ranked by size and direction.
+`npm test` also fetches from a fake Testril: the fetch pays with the payer's
+vouchers, reports Testril's job progress and keeps every row.
+`npm run test:browser` presses the button against the fake Testril and waits
+for the report. The fixture lives in `test/` and is never shown on the page.
 
 ## Subjects and window
 
@@ -58,19 +72,19 @@ synthetic recording.
   named, so each wallet of a multi-wallet exchange also has its own bind to
   check the total against.
 
-| Exchange | Wallet      | Address                                      | Note                    |
-| -------- | ----------- | -------------------------------------------- | ----------------------- |
-| Binance  | Binance 14  | `0x28c6c06298d514db089934071355e5743bf21d60` |                         |
-| Binance  | Binance 8   | `0xf977814e90da44bfa03b6295a0616a897441acec` |                         |
-| Coinbase | Coinbase 10 | `0xa9d1e08c7793af67e9d92fe308d5697fb81d3e43` |                         |
-| Coinbase | Coinbase 4  | `0x3cd751e6b0078be393132286c442345e5dc49699` | verify before recording |
-| Kraken   | Kraken 4    | `0x267be1c1d684f78cb4f6a176c4911b741e4ffdc0` | verify before recording |
-| Kraken   | Kraken 1    | `0x2910543af39aba0cd09dbb2d50200b3e800a63d2` | verify before recording |
-| OKX      | OKX 73      | `0x6cc5f688a315f3dc28a7781717a9a798a59fda7b` | verify before recording |
-| Bitfinex | Bitfinex 2  | `0x77134cbc06cb00b66f4c7e623d5fdbf6777635ec` | verify before recording |
-| Gemini   | Gemini 1    | `0xd24400ae8bfebb18ca49be86258a3c749cf46853` | verify before recording |
+| Exchange | Wallet      | Address                                      | Note   |
+| -------- | ----------- | -------------------------------------------- | ------ |
+| Binance  | Binance 14  | `0x28c6c06298d514db089934071355e5743bf21d60` |        |
+| Binance  | Binance 8   | `0xf977814e90da44bfa03b6295a0616a897441acec` |        |
+| Coinbase | Coinbase 10 | `0xa9d1e08c7793af67e9d92fe308d5697fb81d3e43` |        |
+| Coinbase | Coinbase 4  | `0x3cd751e6b0078be393132286c442345e5dc49699` | verify |
+| Kraken   | Kraken 4    | `0x267be1c1d684f78cb4f6a176c4911b741e4ffdc0` | verify |
+| Kraken   | Kraken 1    | `0x2910543af39aba0cd09dbb2d50200b3e800a63d2` | verify |
+| OKX      | OKX 73      | `0x6cc5f688a315f3dc28a7781717a9a798a59fda7b` | verify |
+| Bitfinex | Bitfinex 2  | `0x77134cbc06cb00b66f4c7e623d5fdbf6777635ec` | verify |
+| Gemini   | Gemini 1    | `0xd24400ae8bfebb18ca49be86258a3c749cf46853` | verify |
 
-## Binds (`testril.json`)
+## Binds (`src/report.mjs`)
 
 Windows are half-open: the end is the first hour not included.
 
@@ -99,32 +113,3 @@ All binds are on chain 1 and read `by: "hour"`. `<exchange>-total` names every
 wallet of the exchange; `<exchange>-owner-N` names one. `src/report.mjs` links
 owner binds to totals by this naming. Single-wallet exchanges and the native
 binds get only the presence, positivity and gap checks, no unit check.
-
-## Record real data
-
-The demo records itself. It needs a private key whose address holds Testril
-usage credits; it pays with vouchers against those credits, so the wallet
-needs no USDC.
-
-| Variable            | Purpose                                                    |
-| ------------------- | ---------------------------------------------------------- |
-| `TESTRIL_PAYER_KEY` | Hex private key that signs vouchers; required to record    |
-| `TESTRIL_MCP_URL`   | Testril MCP endpoint; default `https://dev.testril.ai/mcp` |
-
-Working directory: `demos/exchange-tide`
-
-```sh
-export TESTRIL_PAYER_KEY=<hex private key>
-npm run record
-```
-
-For each bind in `testril.json`, `npm run record` calls `bind`, asks
-`materialize` for the whole window (Testril charges only for blocks not yet
-indexed), waits for the job, then `read`s the window. It writes
-`recordings/recorded.json` (git-ignored) with `source: "dev"`, the bound
-function ids, job ids, timings and the usage credits spent. The page then
-shows "Recorded from Testril on <date>". A failed run leaves the previous
-recording in place.
-
-`npm test` runs `npm run record` against a fake Testril: it pays with the
-payer's vouchers, follows each `materialize` answer and keeps every row.

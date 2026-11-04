@@ -1,9 +1,5 @@
-import { writeFile } from "node:fs/promises";
-import { pathToFileURL } from "node:url";
-import spec from "../testril.json" with { type: "json" };
-import { usdc, volumeDays, zeroAddress } from "../src/report.mjs";
+import { binds, usdc, volumeDays, zeroAddress } from "../src/report.mjs";
 
-const recordedAt = "2026-11-02T00:00:00.000Z";
 const wmon = "0x3bd359c1119da7da1d913d1c4d2b7c461115433a";
 const weth = "0xee8c0e9f1bffb4eb878d8f15f368a02a35481242";
 const wbtc = "0x0555e30da8f98308edb960aa94c0db47230d2b9c";
@@ -140,23 +136,32 @@ function volumeRows(random, markets) {
 export function fixture() {
   const random = seeded(11);
   const markets = marketRows(random);
-  return {
-    demo: spec.demo,
-    source: "synthetic",
-    recordedAt,
-    boundFunctions: Object.fromEntries(
-      spec.binds.map((bind) => [
-        bind.name,
-        { function_slug: bind.function_slug, chain_id: bind.chain_id },
-      ]),
-    ),
-    window: Object.fromEntries(spec.binds.map((b) => [b.name, b.window])),
-    rows: { markets, volume: volumeRows(random, markets) },
-  };
+  return { markets, volume: volumeRows(random, markets) };
 }
 
-if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href)
-  await writeFile(
-    new URL("../recordings/synthetic.json", import.meta.url),
-    `${JSON.stringify(fixture(), null, 2)}\n`,
+const sameParams = (a, b) => JSON.stringify(a) === JSON.stringify(b);
+const covers = (outer, inner) =>
+  Object.keys(inner).every((key) =>
+    key.startsWith("from_")
+      ? inner[key] >= outer[key]
+      : inner[key] <= outer[key],
   );
+
+export function fixtureRows() {
+  const rows = fixture();
+  return (bound, window) => {
+    const bind = binds.find(
+      (candidate) =>
+        candidate.function_slug === bound.function_slug &&
+        candidate.chain_id === bound.chain_id &&
+        sameParams(candidate.params, bound.params) &&
+        covers(candidate.window, window),
+    );
+    return "from_block" in window && bind.read
+      ? rows[bind.name].filter(
+          (row) =>
+            row.block >= window.from_block && row.block < window.to_block,
+        )
+      : rows[bind.name];
+  };
+}

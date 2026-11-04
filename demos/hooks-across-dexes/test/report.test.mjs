@@ -9,7 +9,7 @@ import {
 } from "../src/report.mjs";
 import { fixture } from "./fixture.mjs";
 
-const rows = () => structuredClone(fixture().rows);
+const rows = () => structuredClone(fixture());
 const [cl] = venues;
 
 test("check proves every venue's days from its pool list", () => {

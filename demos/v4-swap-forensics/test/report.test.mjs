@@ -3,7 +3,7 @@ import assert from "node:assert/strict";
 import { check, jitEvents, sandwiches, shape } from "../src/report.mjs";
 import { fixture } from "./fixture.mjs";
 
-const rows = () => structuredClone(fixture().rows);
+const rows = () => structuredClone(fixture());
 
 test("check passes on the fixture with all three invariants", () => {
   const passed = check(rows());

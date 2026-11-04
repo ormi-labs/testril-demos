@@ -15,7 +15,7 @@ export default defineConfig({
     },
   ],
   webServer: {
-    command: "node src/server.mjs",
+    command: "node test/serve-with-fake-testril.mjs",
     env: { PORT: "4181" },
     url: "http://127.0.0.1:4181",
     reuseExistingServer: false,

@@ -1,9 +1,32 @@
-import spec from "../testril.json" with { type: "json" };
+export const binds = [
+  {
+    name: "ticks",
+    function_slug: "uniswap_v4.tick",
+    chain_id: 1,
+    params: {
+      manager: "0x000000000004444c5dc75cb358380d2e3de08a90",
+      pool: "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
+    },
+    window: { from_block: 21688329, to_block: 26323365 },
+    read: { chunk_blocks: 200000 },
+  },
+  {
+    name: "pool-state",
+    function_slug: "uniswap_v4.pool_state",
+    chain_id: 1,
+    params: {
+      manager: "0x000000000004444c5dc75cb358380d2e3de08a90",
+      pool: "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
+      by: "day",
+    },
+    window: { from_day: "2026-11-01", to_day: "2026-11-02" },
+  },
+];
 
-const binds = Object.fromEntries(spec.binds.map((bind) => [bind.name, bind]));
-export const { manager, pool } = binds.ticks.params;
-export const tickWindow = binds.ticks.window;
-export const stateDay = binds["pool-state"].window.from_day;
+const bindByName = Object.fromEntries(binds.map((bind) => [bind.name, bind]));
+export const { manager, pool } = bindByName.ticks.params;
+export const tickWindow = bindByName.ticks.window;
+export const stateDay = bindByName["pool-state"].window.from_day;
 const decimalsGap = 1e12;
 const barTicks = 100;
 const barCount = 60;

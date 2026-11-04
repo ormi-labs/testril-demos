@@ -1,11 +1,35 @@
-import spec from "../testril.json" with { type: "json" };
+export const binds = [
+  {
+    name: "metadata",
+    function_slug: "erc721.collection_metadata",
+    chain_id: 1,
+    params: { nft_address: "0xbd3531da5cf5857e7cfaa92426877b022e612cf8" },
+    window: { from_block: 26323364, to_block: 26323365 },
+  },
+  {
+    name: "transfers",
+    function_slug: "erc721.transfer",
+    chain_id: 1,
+    params: { nft_address: "0xbd3531da5cf5857e7cfaa92426877b022e612cf8" },
+    window: { from_block: 26316189, to_block: 26323365 },
+    read: { chunk_blocks: 1200 },
+  },
+  {
+    name: "owners",
+    function_slug: "erc721.nft_owners",
+    chain_id: 1,
+    params: { nft_address: "0xbd3531da5cf5857e7cfaa92426877b022e612cf8" },
+    window: { from_block: 12876179, to_block: 26323365 },
+    read: { chunk_blocks: 1000000 },
+  },
+];
 
 export const zeroAddress = "0x0000000000000000000000000000000000000000";
-const binds = Object.fromEntries(spec.binds.map((bind) => [bind.name, bind]));
-export const collection = binds.transfers.params.nft_address;
-export const dayWindow = binds.transfers.window;
-export const ownersWindow = binds.owners.window;
-export const metadataWindow = binds.metadata.window;
+const bindByName = Object.fromEntries(binds.map((bind) => [bind.name, bind]));
+export const collection = bindByName.transfers.params.nft_address;
+export const dayWindow = bindByName.transfers.window;
+export const ownersWindow = bindByName.owners.window;
+export const metadataWindow = bindByName.metadata.window;
 export const day = "2026-11-01";
 const hoursPerDay = 24;
 const topHolders = 10;

@@ -3,7 +3,7 @@ import assert from "node:assert/strict";
 import { check, ethFeed, shape, windowHours } from "../src/report.mjs";
 import { fixture } from "./fixture.mjs";
 
-const rows = () => structuredClone(fixture().rows);
+const rows = () => structuredClone(fixture());
 
 test("check proves the pool stays within 2% of the feed every hour", () => {
   const passed = check(rows());

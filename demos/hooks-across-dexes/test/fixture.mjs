@@ -1,9 +1,5 @@
-import { writeFile } from "node:fs/promises";
-import { pathToFileURL } from "node:url";
-import spec from "../testril.json" with { type: "json" };
-import { venues, windowDays, zeroAddress } from "../src/report.mjs";
+import { binds, venues, windowDays, zeroAddress } from "../src/report.mjs";
 
-const recordedAt = "2026-11-02T00:00:00.000Z";
 const usdt = "0x55d398326f99059ff775485246999027b3197955";
 const usdc = "0x8ac76a51cc950d9822d68b83fe1ad97b32cd580d";
 const usd1 = "0x8d0d000ee44948fc98c9b98a4fa4921476f08b0d";
@@ -88,9 +84,7 @@ function poolList(random, venue, hookAddresses) {
 
 function listRow(venue, pool, index) {
   const [currency0, currency1] = pairs[pool.pair];
-  const bounds = spec.binds.find(
-    (bind) => bind.name === venue.poolsBind,
-  ).window;
+  const bounds = binds.find((bind) => bind.name === venue.poolsBind).window;
   const row = {
     block: bounds.from_block + 1000 + index * 1000003,
     currency0,
@@ -144,23 +138,31 @@ export function fixture() {
     );
     rows[venue.volumeBind] = pools.flatMap((pool) => volumeRows(random, pool));
   }
-  return {
-    demo: spec.demo,
-    source: "synthetic",
-    recordedAt,
-    boundFunctions: Object.fromEntries(
-      spec.binds.map((bind) => [
-        bind.name,
-        { function_slug: bind.function_slug, chain_id: bind.chain_id },
-      ]),
-    ),
-    window: Object.fromEntries(spec.binds.map((b) => [b.name, b.window])),
-    rows,
-  };
+  return rows;
 }
 
-if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href)
-  await writeFile(
-    new URL("../recordings/synthetic.json", import.meta.url),
-    `${JSON.stringify(fixture(), null, 2)}\n`,
+const sameParams = (a, b) => JSON.stringify(a) === JSON.stringify(b);
+const covers = (outer, inner) =>
+  Object.keys(inner).every((key) =>
+    key.startsWith("from_")
+      ? inner[key] >= outer[key]
+      : inner[key] <= outer[key],
   );
+
+export function fixtureRows(rows = fixture()) {
+  return (bound, window) => {
+    const bind = binds.find(
+      (candidate) =>
+        candidate.function_slug === bound.function_slug &&
+        candidate.chain_id === bound.chain_id &&
+        sameParams(candidate.params, bound.params) &&
+        covers(candidate.window, window),
+    );
+    return "from_block" in window && bind.read
+      ? rows[bind.name].filter(
+          (row) =>
+            row.block >= window.from_block && row.block < window.to_block,
+        )
+      : rows[bind.name];
+  };
+}

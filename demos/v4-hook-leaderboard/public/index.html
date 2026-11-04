@@ -19,7 +19,6 @@
       ><span>Data demos / V4 hook leaderboard</span>
     </header>
     <main class="measure">
-      <p id="source" class="banner">Loading…</p>
       <div class="eyebrow">ETHEREUM · UNISWAP V4</div>
       <h1>Which hooks carry<br />the swaps.</h1>
       <p class="intro">
@@ -29,11 +28,11 @@
       <section class="scope" aria-label="Report scope">
         <div>
           <span class="label">POOLS · BLOCKS</span
-          ><strong id="pools-window"></strong>
+          ><strong id="pools-window">shown after fetch</strong>
         </div>
         <div>
           <span class="label">VOLUME · UTC DAYS</span
-          ><strong id="volume-window"></strong>
+          ><strong id="volume-window">shown after fetch</strong>
         </div>
         <div>
           <span class="label">FUNCTIONS</span
@@ -43,45 +42,55 @@
           <span class="label">LABELS</span><strong>arrakis.hook_list</strong>
         </div>
       </section>
-      <section
-        id="headline"
-        class="metrics"
-        aria-label="Headline numbers"
-      ></section>
-      <section class="results">
-        <div class="section-heading">
-          <h2>Swaps by hook</h2>
-          <span>the ten busiest; no hook is pools at the zero address</span>
+      <section id="fetch-panel" class="fetch" aria-label="Fetch from Testril">
+        <div class="fetch-head">
+          <button id="fetch" type="button" disabled>Fetch from Testril</button>
+          <span id="fetch-status">Loading…</span>
         </div>
-        <div id="chart" class="flow"></div>
+        <progress id="fetch-overall" max="1" value="0" hidden></progress>
+        <ol id="fetch-binds" class="fetch-binds" hidden></ol>
       </section>
-      <section class="results">
-        <div class="section-heading">
-          <h2>Leaderboard</h2>
-          <span>volume counts the USDC or USDT side of each pool</span>
-        </div>
-        <div class="table-wrap">
-          <table>
-            <thead>
-              <tr>
-                <th>Hook</th>
-                <th>Label</th>
-                <th>Pools</th>
-                <th>Swaps</th>
-                <th>Stablecoin volume</th>
-              </tr>
-            </thead>
-            <tbody id="hooks"></tbody>
-          </table>
-        </div>
-      </section>
-      <section class="method">
-        <h2>Cross-check</h2>
-        <ul id="checks"></ul>
-      </section>
+      <div id="report" hidden>
+        <section
+          id="headline"
+          class="metrics"
+          aria-label="Headline numbers"
+        ></section>
+        <section class="results">
+          <div class="section-heading">
+            <h2>Swaps by hook</h2>
+            <span>the ten busiest; no hook is pools at the zero address</span>
+          </div>
+          <div id="chart" class="flow"></div>
+        </section>
+        <section class="results">
+          <div class="section-heading">
+            <h2>Leaderboard</h2>
+            <span>volume counts the USDC or USDT side of each pool</span>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Hook</th>
+                  <th>Label</th>
+                  <th>Pools</th>
+                  <th>Swaps</th>
+                  <th>Stablecoin volume</th>
+                </tr>
+              </thead>
+              <tbody id="hooks"></tbody>
+            </table>
+          </div>
+        </section>
+        <section class="method">
+          <h2>Cross-check</h2>
+          <ul id="checks"></ul>
+        </section>
+      </div>
     </main>
     <footer class="measure">
-      Data shaped from the recording in <code>recordings/</code>.
+      Data fetched live from Testril when you press the button.
     </footer>
   </body>
 </html>

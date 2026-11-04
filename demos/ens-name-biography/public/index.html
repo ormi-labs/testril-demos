@@ -19,7 +19,6 @@
       ><span>Data demos / ENS name biography</span>
     </header>
     <main class="measure">
-      <p id="source" class="banner">Loading…</p>
       <div class="eyebrow">ETHEREUM · VITALIK.ETH AND NICK.ETH</div>
       <h1>Who held the name,<br />and what it cost to keep.</h1>
       <p class="intro">
@@ -29,11 +28,11 @@
       <section class="scope" aria-label="Report scope">
         <div>
           <span class="label">REGISTRY EVENTS · BLOCKS</span
-          ><strong id="block-window"></strong>
+          ><strong id="block-window">shown after fetch</strong>
         </div>
         <div>
           <span class="label">ADDRESS RECORD · UTC MONTHS</span
-          ><strong id="month-window"></strong>
+          ><strong id="month-window">shown after fetch</strong>
         </div>
         <div>
           <span class="label">FUNCTIONS</span
@@ -44,47 +43,57 @@
           ><strong>ens.address_record · ens.wrapped_domain</strong>
         </div>
       </section>
-      <section
-        id="headline"
-        class="metrics"
-        aria-label="Headline numbers"
-      ></section>
-      <section class="results">
-        <div class="section-heading">
-          <h2>Timeline</h2>
-          <span
-            >one lane per name; renewal bars grow with cost; address months are
-            placed by interpolation</span
-          >
+      <section id="fetch-panel" class="fetch" aria-label="Fetch from Testril">
+        <div class="fetch-head">
+          <button id="fetch" type="button" disabled>Fetch from Testril</button>
+          <span id="fetch-status">Loading…</span>
         </div>
-        <div id="timeline-chart" class="flow"></div>
+        <progress id="fetch-overall" max="1" value="0" hidden></progress>
+        <ol id="fetch-binds" class="fetch-binds" hidden></ol>
       </section>
-      <section class="results">
-        <div class="section-heading">
-          <h2>Every change, in order</h2>
-          <span id="timeline-note"></span>
-        </div>
-        <div class="table-wrap">
-          <table>
-            <thead>
-              <tr>
-                <th>Name</th>
-                <th>When</th>
-                <th>Kind</th>
-                <th>What happened</th>
-              </tr>
-            </thead>
-            <tbody id="events"></tbody>
-          </table>
-        </div>
-      </section>
-      <section class="method">
-        <h2>Cross-check</h2>
-        <ul id="checks"></ul>
-      </section>
+      <div id="report" hidden>
+        <section
+          id="headline"
+          class="metrics"
+          aria-label="Headline numbers"
+        ></section>
+        <section class="results">
+          <div class="section-heading">
+            <h2>Timeline</h2>
+            <span
+              >one lane per name; renewal bars grow with cost; address months
+              are placed by interpolation</span
+            >
+          </div>
+          <div id="timeline-chart" class="flow"></div>
+        </section>
+        <section class="results">
+          <div class="section-heading">
+            <h2>Every change, in order</h2>
+            <span id="timeline-note"></span>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>When</th>
+                  <th>Kind</th>
+                  <th>What happened</th>
+                </tr>
+              </thead>
+              <tbody id="events"></tbody>
+            </table>
+          </div>
+        </section>
+        <section class="method">
+          <h2>Cross-check</h2>
+          <ul id="checks"></ul>
+        </section>
+      </div>
     </main>
     <footer class="measure">
-      Data shaped from the recording in <code>recordings/</code>.
+      Data fetched live from Testril when you press the button.
     </footer>
   </body>
 </html>

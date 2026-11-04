@@ -10,15 +10,20 @@ wstETH) per ETH must sit within 5% of the first pool's price and inside a
 broad band (500 to 20,000 USDC per ETH, below 1 wstETH per ETH), which fails
 if a pool's ETH side is read from the wrong token column.
 
-**The shipped recording is synthetic.** `recordings/synthetic.json` is generated
-by `test/fixture.mjs` and the page says so in its banner. Record real data with
-`npm run record` (below).
-
-![Desktop screenshot](docs/screenshot-desktop.png)
+Every number on the page comes live from Testril when you press **Fetch from
+Testril**. The first fetch has Testril index the data; later fetches only read
+what Testril already indexed.
 
 ## Prerequisites
 
 - Node.js 22.13 or later
+- A private key whose address holds Testril usage credits. The demo pays with
+  vouchers against those credits, so the wallet needs no USDC.
+
+| Variable            | Purpose                                                    |
+| ------------------- | ---------------------------------------------------------- |
+| `TESTRIL_PAYER_KEY` | Hex private key that signs vouchers; required to fetch     |
+| `TESTRIL_MCP_URL`   | Testril MCP endpoint; default `https://dev.testril.ai/mcp` |
 
 ## Run
 
@@ -26,13 +31,21 @@ Working directory: `demos/dex-venue-share`
 
 ```sh
 npm ci
+export TESTRIL_PAYER_KEY=<hex private key>
 npm start
 ```
 
-Open http://127.0.0.1:4180 (set `PORT` to change it). Expected result: the
-synthetic banner, four headline numbers, a stacked share chart per day for
-ETH/USDC, the Uniswap v3 fee-tier table, a stacked share chart for
-wstETH/ETH, and four passed cross-checks and the reading notes.
+Open http://127.0.0.1:4180 (set `PORT` to change it) and press **Fetch from
+Testril**. For each bind the server calls `bind`, asks `materialize` for the
+whole window (Testril charges only for what it has not indexed yet), follows the
+job, then `read`s the window. The page shows a bar per bind and overall from
+Testril's own job progress and the usage credits spent. Then it draws four
+headline numbers, a stacked share chart per day for ETH/USDC, the Uniswap v3
+fee-tier table, a stacked share chart for wstETH/ETH, and four passed
+cross-checks and the reading notes. Nothing is saved: a restart starts empty and
+the next fetch reads again.
+
+Without `TESTRIL_PAYER_KEY` the button is disabled and the page says what to set.
 
 ## Test
 
@@ -49,9 +62,11 @@ USDC side is read as ETH, when a subject pool address matches no rows, when
 Curve's ETH coin index points at USDC, when a venue's price drifts past the
 tolerance, when both wstETH pools have their sides swapped, or when a day has
 no volume, that leftover basis points go to the largest remainders, and that
-the server returns the shaped report. `npm run test:browser` writes
-`docs/screenshot-desktop.png`. `npm run fixture` regenerates the synthetic
-recording.
+the server returns the shaped report.
+`npm test` also fetches from a fake Testril: the fetch pays with the payer's
+vouchers, reports Testril's job progress and keeps every row.
+`npm run test:browser` presses the button against the fake Testril and waits
+for the report. The fixture lives in `test/` and is never shown on the page.
 
 ## Subjects and window
 
@@ -62,7 +77,7 @@ recording.
   units. Uniswap v2, v3 and Fluid sort tokens by address, so USDC and wstETH
   are token0 and WETH or the native-ETH sentinel (`0xEeee...`) is token1; v4
   sorts native ETH (address 0) first. These side claims are assumptions to
-  check against `fluid_dex.pool_list` and the v4 pool key before recording.
+  check against `fluid_dex.pool_list` and the v4 pool key before fetching.
   `src/report.mjs` records which field holds the ETH side of each pool.
 - Curve rows are per coin index and cannot isolate a pair. The Curve series,
   labelled "Curve (all WETH in TricryptoUSDC)", is all WETH volume (coin 2) of
@@ -80,30 +95,30 @@ recording.
   no Uniswap v4 wstETH/ETH pool is included.
 - All addresses are lowercase.
 
-| Subject                      | Address                                                              | Note                    |
-| ---------------------------- | -------------------------------------------------------------------- | ----------------------- |
-| Uniswap v2 factory           | `0x5c69bee701ef814a2b6a3edd4b1652cb9cc5aa6f`                         |                         |
-| Uniswap v3 factory           | `0x1f98431c8ad98523631ae4a59f267346ea31f984`                         |                         |
-| Uniswap v4 PoolManager       | `0x000000000004444c5dc75cb358380d2e3de08a90`                         |                         |
-| Curve Tricrypto-NG factory   | `0x0c0e5f2ff0ff18a3be9b835635039256dc4b4963`                         | verify before recording |
-| Fluid DEX factory            | `0x91716c4eda1fb55e84bf8b4c7085f84285c19085`                         | verify before recording |
-| Uniswap v2 USDC/WETH pair    | `0xb4e16d0168e52d35cacd2c6185b44281ec28c9dc`                         |                         |
-| Uniswap v3 USDC/WETH 0.05%   | `0x88e6a0c2ddd26feeb64f039a2c41296fcb3f5640`                         |                         |
-| Uniswap v3 USDC/WETH 0.3%    | `0x8ad599c3a0ff1de082011efddc58f1908eb6e6d8`                         |                         |
-| Uniswap v3 USDC/WETH 0.01%   | `0xe0554a476a092703abdb3ef35c80e0d76d32939f`                         | verify before recording |
-| Uniswap v3 USDC/WETH 1%      | `0x7bea39867e4169dbe237d55c8242a8f2fcdcc387`                         | verify before recording |
-| Uniswap v4 ETH/USDC pool id  | `0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27` | verify before recording |
-| Curve TricryptoUSDC pool     | `0x7f86bf177dd4f3494b841a37e810a34dd56c829b`                         | verify before recording |
-| Fluid ETH/USDC dex pool      | `0x2886a01a0645390872a9eb99dae1283664b0c524`                         | verify before recording |
-| Uniswap v3 wstETH/WETH 0.01% | `0x109830a1aaad605bbf02a9dfa7b0b92ec2fb7daa`                         | verify before recording |
-| Fluid wstETH/ETH dex pool    | `0x0b1a513ee24972daef112bc777a5610d4325c9e7`                         | verify before recording |
+| Subject                      | Address                                                              | Note   |
+| ---------------------------- | -------------------------------------------------------------------- | ------ |
+| Uniswap v2 factory           | `0x5c69bee701ef814a2b6a3edd4b1652cb9cc5aa6f`                         |        |
+| Uniswap v3 factory           | `0x1f98431c8ad98523631ae4a59f267346ea31f984`                         |        |
+| Uniswap v4 PoolManager       | `0x000000000004444c5dc75cb358380d2e3de08a90`                         |        |
+| Curve Tricrypto-NG factory   | `0x0c0e5f2ff0ff18a3be9b835635039256dc4b4963`                         | verify |
+| Fluid DEX factory            | `0x91716c4eda1fb55e84bf8b4c7085f84285c19085`                         | verify |
+| Uniswap v2 USDC/WETH pair    | `0xb4e16d0168e52d35cacd2c6185b44281ec28c9dc`                         |        |
+| Uniswap v3 USDC/WETH 0.05%   | `0x88e6a0c2ddd26feeb64f039a2c41296fcb3f5640`                         |        |
+| Uniswap v3 USDC/WETH 0.3%    | `0x8ad599c3a0ff1de082011efddc58f1908eb6e6d8`                         |        |
+| Uniswap v3 USDC/WETH 0.01%   | `0xe0554a476a092703abdb3ef35c80e0d76d32939f`                         | verify |
+| Uniswap v3 USDC/WETH 1%      | `0x7bea39867e4169dbe237d55c8242a8f2fcdcc387`                         | verify |
+| Uniswap v4 ETH/USDC pool id  | `0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27` | verify |
+| Curve TricryptoUSDC pool     | `0x7f86bf177dd4f3494b841a37e810a34dd56c829b`                         | verify |
+| Fluid ETH/USDC dex pool      | `0x2886a01a0645390872a9eb99dae1283664b0c524`                         | verify |
+| Uniswap v3 wstETH/WETH 0.01% | `0x109830a1aaad605bbf02a9dfa7b0b92ec2fb7daa`                         | verify |
+| Fluid wstETH/ETH dex pool    | `0x0b1a513ee24972daef112bc777a5610d4325c9e7`                         | verify |
 
 Also verify token0/token1 of both Fluid pools in `fluid_dex.pool_list` (the
 ETH/USDC pool's address and order are the least certain), that ETH is the
 token0 side of the v4 pool, and that Curve coin 2 is WETH. The price
 cross-check fails on a wrong side.
 
-## Binds (`testril.json`)
+## Binds (`src/report.mjs`)
 
 Windows are half-open: the end is the first day not included.
 
@@ -115,34 +130,4 @@ Windows are half-open: the end is the first day not included.
 | `curve`      | `curve.pool_volume`      | 1     | `swap.pool_list.factory`, `by` | 2026-10-25 → 2026-11-02 |
 | `fluid-dex`  | `fluid_dex.pool_volume`  | 1     | `swap.pool_list.factory`, `by` | 2026-10-25 → 2026-11-02 |
 
-Each read returns every pool of the factory for each day; the real recording
-is much larger than the synthetic one.
-
-## Record real data
-
-The demo records itself. It needs a private key whose address holds Testril
-usage credits; it pays with vouchers against those credits, so the wallet
-needs no USDC.
-
-| Variable            | Purpose                                                    |
-| ------------------- | ---------------------------------------------------------- |
-| `TESTRIL_PAYER_KEY` | Hex private key that signs vouchers; required to record    |
-| `TESTRIL_MCP_URL`   | Testril MCP endpoint; default `https://dev.testril.ai/mcp` |
-
-Working directory: `demos/dex-venue-share`
-
-```sh
-export TESTRIL_PAYER_KEY=<hex private key>
-npm run record
-```
-
-For each bind in `testril.json`, `npm run record` calls `bind`, asks
-`materialize` for the whole window (Testril charges only for blocks not yet
-indexed), waits for the job, then `read`s the window. It writes
-`recordings/recorded.json` (git-ignored) with `source: "dev"`, the bound
-function ids, job ids, timings and the usage credits spent. The page then
-shows "Recorded from Testril on <date>". A failed run leaves the previous
-recording in place.
-
-`npm test` runs `npm run record` against a fake Testril: it pays with the
-payer's vouchers, follows each `materialize` answer and keeps every row.
+Each read returns every pool of the factory for each day.

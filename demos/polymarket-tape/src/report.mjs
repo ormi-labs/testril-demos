@@ -1,11 +1,35 @@
-import spec from "../testril.json" with { type: "json" };
+export const binds = [
+  {
+    name: "fills",
+    function_slug: "polymarket_clob.order_fill",
+    chain_id: 137,
+    params: {
+      exchanges: [
+        "0x4bfb41d5b3570defd03c39a9a4d8de6bd8b8982e",
+        "0xc5d563a36ae78145c45a50134d48a1215220f80a",
+        "0xe2222d279d744050d28e00520010520000310f59",
+      ],
+    },
+    window: { from_block: 96523829, to_block: 96581429 },
+    read: { chunk_blocks: 2400 },
+  },
+  {
+    name: "payouts",
+    function_slug: "conditional_tokens.condition_payouts",
+    chain_id: 137,
+    params: {
+      conditional_tokens: "0x4d97dcd97ec945f40cf65f87097ace5ea0476045",
+    },
+    window: { from_block: 96523829, to_block: 96581429 },
+  },
+];
 
 export const zeroWord = `0x${"0".repeat(64)}`;
-const binds = Object.fromEntries(spec.binds.map((bind) => [bind.name, bind]));
-export const fillWindow = binds.fills.window;
-export const payoutWindow = binds.payouts.window;
-export const exchanges = binds.fills.params.exchanges;
-export const conditionalTokens = binds.payouts.params.conditional_tokens;
+const bindByName = Object.fromEntries(binds.map((bind) => [bind.name, bind]));
+export const fillWindow = bindByName.fills.window;
+export const payoutWindow = bindByName.payouts.window;
+export const exchanges = bindByName.fills.params.exchanges;
+export const conditionalTokens = bindByName.payouts.params.conditional_tokens;
 export const day = "2026-11-01";
 export const blocksPerHour = 2400;
 const outcomesPerCondition = 2;

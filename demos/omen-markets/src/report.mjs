@@ -1,9 +1,67 @@
-import spec from "../testril.json" with { type: "json" };
+export const binds = [
+  {
+    name: "markets",
+    function_slug: "omen.market_list",
+    chain_id: 100,
+    params: {
+      factory: "0x9083a2b699c0a4ad06f63580bde2635d26a3eef0",
+      conditional_tokens: "0xceafdd6bc0bef976fdcd1112955828e00543c0ce",
+    },
+    window: { from_block: 0, to_block: 49062480 },
+  },
+  {
+    name: "trades",
+    function_slug: "omen.trade",
+    chain_id: 100,
+    params: {
+      market_list: {
+        factory: "0x9083a2b699c0a4ad06f63580bde2635d26a3eef0",
+        conditional_tokens: "0xceafdd6bc0bef976fdcd1112955828e00543c0ce",
+      },
+    },
+    window: { from_block: 48558286, to_block: 49062480 },
+    read: { chunk_blocks: 20000 },
+  },
+  {
+    name: "liquidity",
+    function_slug: "omen.liquidity",
+    chain_id: 100,
+    params: {
+      market_list: {
+        factory: "0x9083a2b699c0a4ad06f63580bde2635d26a3eef0",
+        conditional_tokens: "0xceafdd6bc0bef976fdcd1112955828e00543c0ce",
+      },
+    },
+    window: { from_block: 48558286, to_block: 49062480 },
+    read: { chunk_blocks: 20000 },
+  },
+  {
+    name: "market_state",
+    function_slug: "omen.market_state",
+    chain_id: 100,
+    params: {
+      market_list: {
+        factory: "0x9083a2b699c0a4ad06f63580bde2635d26a3eef0",
+        conditional_tokens: "0xceafdd6bc0bef976fdcd1112955828e00543c0ce",
+      },
+    },
+    window: { from_block: 48558286, to_block: 49062480 },
+    read: { chunk_blocks: 20000 },
+  },
+  {
+    name: "answers",
+    function_slug: "realitio.answer",
+    chain_id: 100,
+    params: { realitio: "0x79e32ae03fb27b07c89c0c568f80287c01ca2e57" },
+    window: { from_block: 48558286, to_block: 49062480 },
+    read: { chunk_blocks: 20000 },
+  },
+];
 
-const binds = Object.fromEntries(spec.binds.map((bind) => [bind.name, bind]));
-export const window = binds.trades.window;
-export const factory = binds.markets.params.factory;
-export const realitio = binds.answers.params.realitio;
+const bindByName = Object.fromEntries(binds.map((bind) => [bind.name, bind]));
+export const window = bindByName.trades.window;
+export const factory = bindByName.markets.params.factory;
+export const realitio = bindByName.answers.params.realitio;
 export const wxdai = "0xe91d153e0b41518a2ce8dd3d7944fa863463a97d";
 const one = 10n ** 18n;
 const invalidAnswer = `0x${"f".repeat(64)}`;

@@ -1,10 +1,29 @@
-import spec from "../testril.json" with { type: "json" };
+export const binds = [
+  {
+    name: "volume",
+    function_slug: "flap.token_volume",
+    chain_id: 56,
+    params: {
+      swap: { portal: "0xe2ce6ab80874fa9fa2aae65d277dd6b8e65c9de0" },
+      by: "day",
+    },
+    window: { from_day: "2026-10-25", to_day: "2026-11-02" },
+  },
+  {
+    name: "trades",
+    function_slug: "flap.trade",
+    chain_id: 56,
+    params: { portal: "0xe2ce6ab80874fa9fa2aae65d277dd6b8e65c9de0" },
+    window: { from_block: 130949246, to_block: 131141195 },
+    read: { chunk_blocks: 20000 },
+  },
+];
 
 export const zeroAddress = "0x0000000000000000000000000000000000000000";
-const binds = Object.fromEntries(spec.binds.map((bind) => [bind.name, bind]));
-export const portal = binds.trades.params.portal;
-export const volumeWindow = binds.volume.window;
-export const tradesWindow = binds.trades.window;
+const bindByName = Object.fromEntries(binds.map((bind) => [bind.name, bind]));
+export const portal = bindByName.trades.params.portal;
+export const volumeWindow = bindByName.volume.window;
+export const tradesWindow = bindByName.trades.window;
 const decimals = 18n;
 const topTokens = 20;
 const chartTokens = 10;

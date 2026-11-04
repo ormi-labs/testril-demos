@@ -3,7 +3,7 @@ import assert from "node:assert/strict";
 import { check, shape, weekWindow, wallets } from "../src/report.mjs";
 import { fixture } from "./fixture.mjs";
 
-const rows = () => structuredClone(fixture().rows);
+const rows = () => structuredClone(fixture());
 
 test("check passes for every wallet on the fixture", () => {
   assert.equal(check(rows()).length, 3);

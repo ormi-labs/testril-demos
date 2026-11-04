@@ -1,11 +1,38 @@
-import spec from "../testril.json" with { type: "json" };
+export const binds = [
+  {
+    name: "pools",
+    function_slug: "uniswap_v4.pool_list",
+    chain_id: 1,
+    params: { manager: "0x000000000004444c5dc75cb358380d2e3de08a90" },
+    window: { from_block: 21688329, to_block: 26323365 },
+    read: { chunk_blocks: 100000 },
+  },
+  {
+    name: "volume",
+    function_slug: "uniswap_v4.pool_volume",
+    chain_id: 1,
+    params: {
+      swap: { manager: "0x000000000004444c5dc75cb358380d2e3de08a90" },
+      by: "day",
+    },
+    window: { from_day: "2026-10-25", to_day: "2026-11-02" },
+  },
+  {
+    name: "arrakis-hooks",
+    function_slug: "arrakis.hook_list",
+    chain_id: 1,
+    params: { factory: "0xef129a430032c8183aba158c1a70799e3b840df9" },
+    window: { from_block: 21688329, to_block: 26323365 },
+    read: { chunk_blocks: 100000 },
+  },
+];
 
 export const zeroAddress = "0x0000000000000000000000000000000000000000";
-const binds = Object.fromEntries(spec.binds.map((bind) => [bind.name, bind]));
-export const poolsWindow = binds.pools.window;
-export const volumeWindow = binds.volume.window;
-export const manager = binds.pools.params.manager;
-export const arrakisFactory = binds["arrakis-hooks"].params.factory;
+const bindByName = Object.fromEntries(binds.map((bind) => [bind.name, bind]));
+export const poolsWindow = bindByName.pools.window;
+export const volumeWindow = bindByName.volume.window;
+export const manager = bindByName.pools.params.manager;
+export const arrakisFactory = bindByName["arrakis-hooks"].params.factory;
 export const usdc = "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48";
 export const usdt = "0xdac17f958d2ee523a2206206994597c13d831ec7";
 const stablecoins = new Set([usdc, usdt]);

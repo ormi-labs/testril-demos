@@ -5,15 +5,20 @@ every position edge tick since the pool began, with the current price marked.
 The page proves its numbers: net liquidity summed across ticks from the lowest
 up to the current tick must equal the pool's in-range liquidity.
 
-**The shipped recording is synthetic.** `recordings/synthetic.json` is generated
-by `test/fixture.mjs` and the page says so in its banner. Record real data with
-`npm run record` (below).
-
-![Desktop screenshot](docs/screenshot-desktop.png)
+Every number on the page comes live from Testril when you press **Fetch from
+Testril**. The first fetch has Testril index the data; later fetches only read
+what Testril already indexed.
 
 ## Prerequisites
 
 - Node.js 22.13 or later
+- A private key whose address holds Testril usage credits. The demo pays with
+  vouchers against those credits, so the wallet needs no USDC.
+
+| Variable            | Purpose                                                    |
+| ------------------- | ---------------------------------------------------------- |
+| `TESTRIL_PAYER_KEY` | Hex private key that signs vouchers; required to fetch     |
+| `TESTRIL_MCP_URL`   | Testril MCP endpoint; default `https://dev.testril.ai/mcp` |
 
 ## Run
 
@@ -21,13 +26,21 @@ Working directory: `demos/v4-tick-heatmap`
 
 ```sh
 npm ci
+export TESTRIL_PAYER_KEY=<hex private key>
 npm start
 ```
 
-Open http://127.0.0.1:4180 (set `PORT` to change it). Expected result: the
-synthetic banner, price, tick and in-range liquidity, a histogram of liquidity
-across 60 price buckets with a marker at the current price, a table of the 12
-busiest edge ticks, and three passed cross-checks.
+Open http://127.0.0.1:4180 (set `PORT` to change it) and press **Fetch from
+Testril**. For each bind the server calls `bind`, asks `materialize` for the
+whole window (Testril charges only for what it has not indexed yet), follows the
+job, then `read`s the window. The page shows a bar per bind and overall from
+Testril's own job progress and the usage credits spent. Then it draws price,
+tick and in-range liquidity, a histogram of liquidity across 60 price buckets
+with a marker at the current price, a table of the 12 busiest edge ticks, and
+three passed cross-checks. Nothing is saved: a restart starts empty and the next
+fetch reads again.
+
+Without `TESTRIL_PAYER_KEY` the button is disabled and the page says what to set.
 
 ## Test
 
@@ -42,8 +55,11 @@ npm run format:check
 `npm test` checks the cross-check passes on the fixture and fails when an upper
 edge is read as added liquidity, when a tick's latest row is missing, when the
 pool's tick is off by one spacing, or when a row belongs to another pool, and
-that the server returns the shaped report. `npm run test:browser` writes
-`docs/screenshot-desktop.png`. `npm run fixture` regenerates the recording.
+that the server returns the shaped report.
+`npm test` also fetches from a fake Testril: the fetch pays with the payer's
+vouchers, reports Testril's job progress and keeps every row.
+`npm run test:browser` presses the button against the fake Testril and waits
+for the report. The fixture lives in `test/` and is never shown on the page.
 
 ## Subjects and window
 
@@ -51,7 +67,7 @@ that the server returns the shaped report. `npm run test:browser` writes
 | ------------------------- | -------------------------------------------------------------------- | -------------------------- |
 | Uniswap v4 PoolManager    | `0x000000000004444c5dc75cb358380d2e3de08a90`                         |                            |
 | ETH/USDC 0.05% pool id    | `0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27` | hash of the pool key below |
-| Tick window start (block) | 21688329                                                             | verify before recording    |
+| Tick window start (block) | 21688329                                                             | verify                     |
 | Tick window end (block)   | 26323365                                                             | first block of 2026-11-02  |
 
 - Pool key (hashed to the pool id as `keccak256(abi.encode(currency0, currency1, fee, tickSpacing, hooks))`):
@@ -67,7 +83,7 @@ that the server returns the shaped report. `npm run test:browser` writes
 - Price is USDC per ETH: `1.0001^tick × 10^12`, as ETH has 18 decimals and
   USDC 6.
 
-## Binds (`testril.json`)
+## Binds (`src/report.mjs`)
 
 Windows are half-open: the end is the first block or day not included.
 
@@ -77,32 +93,3 @@ Windows are half-open: the end is the first block or day not included.
 | `pool-state` | `uniswap_v4.pool_state` | 1     | `manager`, `pool`, `by` | 2026-11-01 → 2026-11-02 |
 
 `ticks` is read in chunks of 200000 blocks.
-
-## Record real data
-
-The demo records itself. It needs a private key whose address holds Testril
-usage credits; it pays with vouchers against those credits, so the wallet
-needs no USDC.
-
-| Variable            | Purpose                                                    |
-| ------------------- | ---------------------------------------------------------- |
-| `TESTRIL_PAYER_KEY` | Hex private key that signs vouchers; required to record    |
-| `TESTRIL_MCP_URL`   | Testril MCP endpoint; default `https://dev.testril.ai/mcp` |
-
-Working directory: `demos/v4-tick-heatmap`
-
-```sh
-export TESTRIL_PAYER_KEY=<hex private key>
-npm run record
-```
-
-For each bind in `testril.json`, `npm run record` calls `bind`, asks
-`materialize` for the whole window (Testril charges only for blocks not yet
-indexed), waits for the job, then `read`s the window. It writes
-`recordings/recorded.json` (git-ignored) with `source: "dev"`, the bound
-function ids, job ids, timings and the usage credits spent. The page then
-shows "Recorded from Testril on <date>". A failed run leaves the previous
-recording in place.
-
-`npm test` runs `npm run record` against a fake Testril: it pays with the
-payer's vouchers, follows each `materialize` answer and keeps every row.

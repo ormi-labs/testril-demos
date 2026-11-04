@@ -1,10 +1,40 @@
-import spec from "../testril.json" with { type: "json" };
+export const binds = [
+  {
+    name: "swaps",
+    function_slug: "uniswap_v4.swap",
+    chain_id: 1,
+    params: { manager: "0x000000000004444c5dc75cb358380d2e3de08a90" },
+    window: { from_block: 26316189, to_block: 26323365 },
+    read: { chunk_blocks: 300 },
+  },
+  {
+    name: "liquidity",
+    function_slug: "uniswap_v4.modify_liquidity",
+    chain_id: 1,
+    params: { manager: "0x000000000004444c5dc75cb358380d2e3de08a90" },
+    window: { from_block: 26316189, to_block: 26323365 },
+    read: { chunk_blocks: 300 },
+  },
+  {
+    name: "tokens",
+    function_slug: "erc20.token_metadata",
+    chain_id: 1,
+    params: {
+      tokens: [
+        "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        "0xdac17f958d2ee523a2206206994597c13d831ec7",
+      ],
+      by: "day",
+    },
+    window: { from_day: "2026-11-01", to_day: "2026-11-02" },
+  },
+];
 
-const binds = Object.fromEntries(spec.binds.map((bind) => [bind.name, bind]));
-export const blockWindow = binds.swaps.window;
-export const [usdc, usdt] = binds.tokens.params.tokens;
-export const day = binds.tokens.window.from_day;
-export const blocksPerHour = binds.swaps.read.chunk_blocks;
+const bindByName = Object.fromEntries(binds.map((bind) => [bind.name, bind]));
+export const blockWindow = bindByName.swaps.window;
+export const [usdc, usdt] = bindByName.tokens.params.tokens;
+export const day = bindByName.tokens.window.from_day;
+export const blocksPerHour = bindByName.swaps.read.chunk_blocks;
 export const knownPools = [
   {
     id: "0xdce6394339af00981949f5f3baf27e3610c76326a700af57e4b3e3ae4977f78d",

@@ -1,10 +1,69 @@
-import spec from "../testril.json" with { type: "json" };
+export const binds = [
+  {
+    name: "reserves",
+    function_slug: "aave_v3.reserve_list",
+    chain_id: 1,
+    params: {
+      proxy_list: {
+        pool_addresses_provider: "0x2f39d218133afab8f2b819b1066c7e434ad94e9e",
+      },
+    },
+    window: { from_block: 16291000, to_block: 26323365 },
+  },
+  {
+    name: "reserve-state",
+    function_slug: "aave_v3.reserve_state",
+    chain_id: 1,
+    params: {
+      proxy_list: {
+        pool_addresses_provider: "0x2f39d218133afab8f2b819b1066c7e434ad94e9e",
+      },
+      reserve_list: {
+        proxy_list: {
+          pool_addresses_provider: "0x2f39d218133afab8f2b819b1066c7e434ad94e9e",
+        },
+      },
+      by: "hour",
+    },
+    window: { from_hour: "2026-10-25T00", to_hour: "2026-11-01T00" },
+  },
+  {
+    name: "reserve-totals",
+    function_slug: "aave_v3.reserve_totals",
+    chain_id: 1,
+    params: {
+      proxy_list: {
+        pool_addresses_provider: "0x2f39d218133afab8f2b819b1066c7e434ad94e9e",
+      },
+    },
+    window: { from_block: 26316189, to_block: 26323365 },
+  },
+  {
+    name: "morpho-holdings",
+    function_slug: "morpho_blue.token_holdings",
+    chain_id: 1,
+    params: {
+      morpho_blue: "0xbbbbbbbbbb9cc5e90e3b3af64bdaf62c37eeffcb",
+      market_list: {
+        morpho_blue: "0xbbbbbbbbbb9cc5e90e3b3af64bdaf62c37eeffcb",
+      },
+      vault_list: {
+        factories: [
+          "0xa9c3d3a366466fa809d1ae982fb2c46e5fc41101",
+          "0x1897a8997241c1cd4bd0698647e4eb7213535c24",
+        ],
+      },
+      by: "day",
+    },
+    window: { from_day: "2026-10-25", to_day: "2026-11-01" },
+  },
+];
 
-const binds = Object.fromEntries(spec.binds.map((bind) => [bind.name, bind]));
-export const stateWindow = binds["reserve-state"].window;
-export const totalsWindow = binds["reserve-totals"].window;
-export const holdingsWindow = binds["morpho-holdings"].window;
-export const reservesWindow = binds.reserves.window;
+const bindByName = Object.fromEntries(binds.map((bind) => [bind.name, bind]));
+export const stateWindow = bindByName["reserve-state"].window;
+export const totalsWindow = bindByName["reserve-totals"].window;
+export const holdingsWindow = bindByName["morpho-holdings"].window;
+export const reservesWindow = bindByName.reserves.window;
 
 export const assets = [
   {

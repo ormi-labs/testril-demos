@@ -1,4 +1,59 @@
-import spec from "../testril.json" with { type: "json" };
+export const binds = [
+  {
+    name: "cl-volume",
+    function_slug: "pancakeswap_infinity.cl_pool_volume",
+    chain_id: 56,
+    params: {
+      swap: { manager: "0xa0ffb9c1ce1fe56963b0321b32e7a0302114058b" },
+      by: "day",
+    },
+    window: { from_day: "2026-10-25", to_day: "2026-11-02" },
+  },
+  {
+    name: "cl-pools",
+    function_slug: "pancakeswap_infinity.cl_pool_list",
+    chain_id: 56,
+    params: { manager: "0xa0ffb9c1ce1fe56963b0321b32e7a0302114058b" },
+    window: { from_block: 47214308, to_block: 131141195 },
+    read: { chunk_blocks: 10000000 },
+  },
+  {
+    name: "bin-volume",
+    function_slug: "pancakeswap_infinity.bin_pool_volume",
+    chain_id: 56,
+    params: {
+      swap: { manager: "0xc697d2898e0d09264376196696c51d7abbbaa4a9" },
+      by: "day",
+    },
+    window: { from_day: "2026-10-25", to_day: "2026-11-02" },
+  },
+  {
+    name: "bin-pools",
+    function_slug: "pancakeswap_infinity.bin_pool_list",
+    chain_id: 56,
+    params: { manager: "0xc697d2898e0d09264376196696c51d7abbbaa4a9" },
+    window: { from_block: 47214336, to_block: 131141195 },
+    read: { chunk_blocks: 10000000 },
+  },
+  {
+    name: "v4-volume",
+    function_slug: "uniswap_v4.pool_volume",
+    chain_id: 56,
+    params: {
+      swap: { manager: "0x28e2ea090877bf75740558f6bfb36a5ffee9e9df" },
+      by: "day",
+    },
+    window: { from_day: "2026-10-25", to_day: "2026-11-02" },
+  },
+  {
+    name: "v4-pools",
+    function_slug: "uniswap_v4.pool_list",
+    chain_id: 56,
+    params: { manager: "0x28e2ea090877bf75740558f6bfb36a5ffee9e9df" },
+    window: { from_block: 45970610, to_block: 131141195 },
+    read: { chunk_blocks: 10000000 },
+  },
+];
 
 export const zeroAddress = "0x0000000000000000000000000000000000000000";
 export const stablecoins = new Map([
@@ -16,12 +71,12 @@ export const symbols = new Map([
 const decimals = 18n;
 const topHookPools = 10;
 
-const binds = Object.fromEntries(spec.binds.map((bind) => [bind.name, bind]));
+const bindByName = Object.fromEntries(binds.map((bind) => [bind.name, bind]));
 const volumeWindows = ["cl", "bin", "v4"].map(
-  (key) => binds[`${key}-volume`].window,
+  (key) => bindByName[`${key}-volume`].window,
 );
 if (new Set(volumeWindows.map((w) => JSON.stringify(w))).size !== 1)
-  throw new Error("The three volume binds must share one day window.");
+  throw new Error("The three volume bindByName must share one day window.");
 export const [dayWindow] = volumeWindows;
 export const venues = [
   { key: "cl", dex: "PancakeSwap Infinity", name: "PancakeSwap Infinity CL" },
@@ -31,7 +86,7 @@ export const venues = [
   ...venue,
   volumeBind: `${venue.key}-volume`,
   poolsBind: `${venue.key}-pools`,
-  manager: binds[`${venue.key}-volume`].params.swap.manager,
+  manager: bindByName[`${venue.key}-volume`].params.swap.manager,
 }));
 
 const nextDay = (day) =>

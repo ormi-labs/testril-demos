@@ -19,12 +19,11 @@
       ><span>Data demos / Wallet lookup</span>
     </header>
     <main class="measure">
-      <p id="source" class="banner">Loading…</p>
       <div class="eyebrow">ETHEREUM · ONE WEEK</div>
       <h1>Who is this wallet,<br />and what did it do.</h1>
       <p class="intro">
-        Pick one of three recorded wallets: its ENS name, its ETH balance, and
-        its stablecoin and WETH transfers over the last seven days.
+        Pick one of three wallets: its ENS name, its ETH balance, and its
+        stablecoin and WETH transfers over the last seven days.
       </p>
       <section class="scope" aria-label="Report scope">
         <div>
@@ -33,7 +32,7 @@
         </div>
         <div>
           <span class="label">TRANSFERS · SEVEN DAYS</span
-          ><strong id="week-window"></strong>
+          ><strong id="week-window">shown after fetch</strong>
         </div>
         <div>
           <span class="label">FUNCTIONS</span
@@ -42,48 +41,59 @@
           >
         </div>
         <div>
-          <span class="label">ADDRESS</span><strong id="address"></strong>
+          <span class="label">ADDRESS</span
+          ><strong id="address">shown after fetch</strong>
         </div>
       </section>
-      <section
-        id="headline"
-        class="metrics"
-        aria-label="Headline numbers"
-      ></section>
-      <section class="results">
-        <div class="section-heading">
-          <h2>Transfers per day</h2>
-          <span>green incoming, brown outgoing; days of 7,200 blocks</span>
+      <section id="fetch-panel" class="fetch" aria-label="Fetch from Testril">
+        <div class="fetch-head">
+          <button id="fetch" type="button" disabled>Fetch from Testril</button>
+          <span id="fetch-status">Loading…</span>
         </div>
-        <div id="daily-chart" class="flow"></div>
+        <progress id="fetch-overall" max="1" value="0" hidden></progress>
+        <ol id="fetch-binds" class="fetch-binds" hidden></ol>
       </section>
-      <section class="results">
-        <div class="section-heading">
-          <h2>Transfer list</h2>
-          <span id="list-note"></span>
-        </div>
-        <div class="table-wrap">
-          <table>
-            <thead>
-              <tr>
-                <th>Block</th>
-                <th>Direction</th>
-                <th>Counterparty</th>
-                <th>Token</th>
-                <th>Amount</th>
-              </tr>
-            </thead>
-            <tbody id="transfers"></tbody>
-          </table>
-        </div>
-      </section>
-      <section class="method">
-        <h2>Cross-check</h2>
-        <ul id="checks"></ul>
-      </section>
+      <div id="report" hidden>
+        <section
+          id="headline"
+          class="metrics"
+          aria-label="Headline numbers"
+        ></section>
+        <section class="results">
+          <div class="section-heading">
+            <h2>Transfers per day</h2>
+            <span>green incoming, brown outgoing; days of 7,200 blocks</span>
+          </div>
+          <div id="daily-chart" class="flow"></div>
+        </section>
+        <section class="results">
+          <div class="section-heading">
+            <h2>Transfer list</h2>
+            <span id="list-note"></span>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Block</th>
+                  <th>Direction</th>
+                  <th>Counterparty</th>
+                  <th>Token</th>
+                  <th>Amount</th>
+                </tr>
+              </thead>
+              <tbody id="transfers"></tbody>
+            </table>
+          </div>
+        </section>
+        <section class="method">
+          <h2>Cross-check</h2>
+          <ul id="checks"></ul>
+        </section>
+      </div>
     </main>
     <footer class="measure">
-      Data shaped from the recording in <code>recordings/</code>. Looking up any
+      Data fetched live from Testril when you press the button. Looking up any
       pasted wallet live is not built yet.
     </footer>
   </body>

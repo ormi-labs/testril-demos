@@ -9,7 +9,7 @@ import {
   shape,
 } from "../src/report.mjs";
 
-const rowsOf = () => structuredClone(fixture().rows);
+const rowsOf = () => structuredClone(fixture());
 
 test("check passes on the fixture", () => {
   assert.equal(check(rowsOf()).length, 3);

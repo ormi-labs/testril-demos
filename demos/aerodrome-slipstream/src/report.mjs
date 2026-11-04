@@ -1,8 +1,19 @@
-import spec from "../testril.json" with { type: "json" };
+export const binds = [
+  {
+    name: "pool-volume",
+    function_slug: "uniswap_v3.pool_volume",
+    chain_id: 8453,
+    params: {
+      swap: {
+        pool_list: { factory: "0x5e7bb104d84c7cb9b682aac2f3d509f5f406809a" },
+      },
+      by: "day",
+    },
+    window: { from_day: "2026-10-25", to_day: "2026-11-02" },
+  },
+];
 
-export const poolVolume = spec.binds.find(
-  (bind) => bind.name === "pool-volume",
-);
+export const poolVolume = binds.find((bind) => bind.name === "pool-volume");
 export const window = poolVolume.window;
 export const factory = poolVolume.params.swap.pool_list.factory;
 const dollarDecimals = 6n;

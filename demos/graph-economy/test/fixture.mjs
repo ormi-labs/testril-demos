@@ -1,9 +1,5 @@
-import { writeFile } from "node:fs/promises";
-import { pathToFileURL } from "node:url";
-import spec from "../testril.json" with { type: "json" };
-import { rewardWindow as window } from "../src/report.mjs";
+import { binds, rewardWindow as window } from "../src/report.mjs";
 
-const recordedAt = "2026-11-02T00:00:00.000Z";
 const wei = 10n ** 18n;
 const firstEpoch = 1423;
 const epochsInWindow = 7;
@@ -91,7 +87,7 @@ function delegationRows(indexers, random) {
     const poolShares = (pool * 97n) / 100n;
     return {
       indexer,
-      verifier: spec.binds[0].params.subgraph_service,
+      verifier: binds[0].params.subgraph_service,
       delegator: `0x${hex(random, 40)}`,
       tokens: tokens.toString(),
       shares: ((tokens * 97n) / 100n).toString(),
@@ -158,28 +154,35 @@ export function fixture() {
     () => `0x${hex(random, 40)}`,
   );
   return {
-    demo: spec.demo,
-    source: "synthetic",
-    recordedAt,
-    boundFunctions: Object.fromEntries(
-      spec.binds.map((bind) => [
-        bind.name,
-        { function_slug: bind.function_slug, chain_id: bind.chain_id },
-      ]),
-    ),
-    window: Object.fromEntries(
-      spec.binds.map((bind) => [bind.name, bind.window]),
-    ),
-    rows: {
-      "indexing-rewards": rewardRows(indexers, random),
-      delegation: delegationRows(indexers, random),
-      "query-fees": feeRows(random),
-    },
+    "indexing-rewards": rewardRows(indexers, random),
+    delegation: delegationRows(indexers, random),
+    "query-fees": feeRows(random),
   };
 }
 
-if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href)
-  await writeFile(
-    new URL("../recordings/synthetic.json", import.meta.url),
-    `${JSON.stringify(fixture(), null, 2)}\n`,
+const sameParams = (a, b) => JSON.stringify(a) === JSON.stringify(b);
+const covers = (outer, inner) =>
+  Object.keys(inner).every((key) =>
+    key.startsWith("from_")
+      ? inner[key] >= outer[key]
+      : inner[key] <= outer[key],
   );
+
+export function fixtureRows() {
+  const rows = fixture();
+  return (bound, window) => {
+    const bind = binds.find(
+      (candidate) =>
+        candidate.function_slug === bound.function_slug &&
+        candidate.chain_id === bound.chain_id &&
+        sameParams(candidate.params, bound.params) &&
+        covers(candidate.window, window),
+    );
+    return "from_block" in window && bind.read
+      ? rows[bind.name].filter(
+          (row) =>
+            row.block >= window.from_block && row.block < window.to_block,
+        )
+      : rows[bind.name];
+  };
+}

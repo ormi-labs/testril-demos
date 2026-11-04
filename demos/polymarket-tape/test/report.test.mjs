@@ -8,7 +8,7 @@ import {
 } from "../src/report.mjs";
 import { fixture } from "./fixture.mjs";
 
-const rows = () => structuredClone(fixture().rows);
+const rows = () => structuredClone(fixture());
 
 test("the fixture is the same on every call", () => {
   assert.deepEqual(fixture(), fixture());

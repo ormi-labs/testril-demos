@@ -19,7 +19,6 @@
       ><span>Data demos / DAO treasuries</span>
     </header>
     <main class="measure">
-      <p id="source" class="banner">Loading…</p>
       <div class="eyebrow">
         ETHEREUM · ARBITRUM · UNISWAP, ENS, ARBITRUM DAO
       </div>
@@ -29,19 +28,29 @@
         WETH and native ETH, with the DAO total proved against its wallets.
       </p>
       <section id="scope" class="scope" aria-label="Report scope"></section>
-      <section
-        id="headline"
-        class="metrics"
-        aria-label="Headline numbers"
-      ></section>
-      <div id="cards"></div>
-      <section class="method">
-        <h2>Cross-check</h2>
-        <ul id="checks"></ul>
+      <section id="fetch-panel" class="fetch" aria-label="Fetch from Testril">
+        <div class="fetch-head">
+          <button id="fetch" type="button" disabled>Fetch from Testril</button>
+          <span id="fetch-status">Loading…</span>
+        </div>
+        <progress id="fetch-overall" max="1" value="0" hidden></progress>
+        <ol id="fetch-binds" class="fetch-binds" hidden></ol>
       </section>
+      <div id="report" hidden>
+        <section
+          id="headline"
+          class="metrics"
+          aria-label="Headline numbers"
+        ></section>
+        <div id="cards"></div>
+        <section class="method">
+          <h2>Cross-check</h2>
+          <ul id="checks"></ul>
+        </section>
+      </div>
     </main>
     <footer class="measure">
-      Data shaped from the recording in <code>recordings/</code>. Functions:
+      Data fetched live from Testril when you press the button. Functions:
       <code>erc20.token_balance</code>, <code>native.balance</code>.
     </footer>
   </body>

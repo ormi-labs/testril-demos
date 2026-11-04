@@ -19,7 +19,6 @@
       ><span>Data demos / NFT collection day</span>
     </header>
     <main class="measure">
-      <p id="source" class="banner">Loading…</p>
       <div class="eyebrow" id="eyebrow">ETHEREUM · ERC-721 COLLECTION</div>
       <h1>One day of a collection:<br />minted, traded, and who holds it.</h1>
       <p class="intro">
@@ -29,11 +28,11 @@
       <section class="scope" aria-label="Report scope">
         <div>
           <span class="label">DAY · BLOCKS</span
-          ><strong id="day-window"></strong>
+          ><strong id="day-window">shown after fetch</strong>
         </div>
         <div>
           <span class="label">OWNERS · FROM CREATION</span
-          ><strong id="owners-window"></strong>
+          ><strong id="owners-window">shown after fetch</strong>
         </div>
         <div>
           <span class="label">FUNCTIONS</span
@@ -43,47 +42,58 @@
           >
         </div>
         <div>
-          <span class="label">COLLECTION</span><strong id="collection"></strong>
+          <span class="label">COLLECTION</span
+          ><strong id="collection">shown after fetch</strong>
         </div>
       </section>
-      <section
-        id="headline"
-        class="metrics"
-        aria-label="Headline numbers"
-      ></section>
-      <section class="results">
-        <div class="section-heading">
-          <h2>Mints vs trades by hour</h2>
-          <span>one bar per approx. UTC hour, 1/24 of the day's blocks</span>
+      <section id="fetch-panel" class="fetch" aria-label="Fetch from Testril">
+        <div class="fetch-head">
+          <button id="fetch" type="button" disabled>Fetch from Testril</button>
+          <span id="fetch-status">Loading…</span>
         </div>
-        <div id="hours" class="flow"></div>
+        <progress id="fetch-overall" max="1" value="0" hidden></progress>
+        <ol id="fetch-binds" class="fetch-binds" hidden></ol>
       </section>
-      <section class="results">
-        <div class="section-heading">
-          <h2>Holder concentration</h2>
-          <span id="concentration-note"></span>
-        </div>
-        <div id="concentration" class="flow"></div>
-        <div class="table-wrap">
-          <table>
-            <thead>
-              <tr>
-                <th>Holder</th>
-                <th>Tokens</th>
-                <th>Share of held tokens</th>
-              </tr>
-            </thead>
-            <tbody id="holders"></tbody>
-          </table>
-        </div>
-      </section>
-      <section class="method">
-        <h2>Cross-check</h2>
-        <ul id="checks"></ul>
-      </section>
+      <div id="report" hidden>
+        <section
+          id="headline"
+          class="metrics"
+          aria-label="Headline numbers"
+        ></section>
+        <section class="results">
+          <div class="section-heading">
+            <h2>Mints vs trades by hour</h2>
+            <span>one bar per approx. UTC hour, 1/24 of the day's blocks</span>
+          </div>
+          <div id="hours" class="flow"></div>
+        </section>
+        <section class="results">
+          <div class="section-heading">
+            <h2>Holder concentration</h2>
+            <span id="concentration-note"></span>
+          </div>
+          <div id="concentration" class="flow"></div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Holder</th>
+                  <th>Tokens</th>
+                  <th>Share of held tokens</th>
+                </tr>
+              </thead>
+              <tbody id="holders"></tbody>
+            </table>
+          </div>
+        </section>
+        <section class="method">
+          <h2>Cross-check</h2>
+          <ul id="checks"></ul>
+        </section>
+      </div>
     </main>
     <footer class="measure">
-      Data shaped from the recording in <code>recordings/</code>.
+      Data fetched live from Testril when you press the button.
     </footer>
   </body>
 </html>

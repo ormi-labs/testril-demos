@@ -19,7 +19,6 @@
       ><span>Data demos / Aerodrome Slipstream</span>
     </header>
     <main class="measure">
-      <p id="source" class="banner">Loading…</p>
       <div class="eyebrow">BASE · AERODROME SLIPSTREAM</div>
       <h1>Which concentrated-liquidity<br />pools trade the most.</h1>
       <p class="intro">
@@ -28,74 +27,87 @@
       </p>
       <section class="scope" aria-label="Report scope">
         <div>
-          <span class="label">UTC DAYS</span><strong id="window"></strong>
+          <span class="label">UTC DAYS</span
+          ><strong id="window">shown after fetch</strong>
         </div>
         <div>
-          <span class="label">FACTORY</span><strong id="factory"></strong>
+          <span class="label">FACTORY</span
+          ><strong id="factory">shown after fetch</strong>
         </div>
         <div>
           <span class="label">FUNCTION</span
           ><strong>uniswap_v3.pool_volume</strong>
         </div>
       </section>
-      <section
-        id="headline"
-        class="metrics"
-        aria-label="Headline numbers"
-      ></section>
-      <section class="results">
-        <div class="section-heading">
-          <h2>Dollar volume per day</h2>
-          <span>millions of dollars, each on its own scale</span>
+      <section id="fetch-panel" class="fetch" aria-label="Fetch from Testril">
+        <div class="fetch-head">
+          <button id="fetch" type="button" disabled>Fetch from Testril</button>
+          <span id="fetch-status">Loading…</span>
         </div>
-        <div id="chart" class="charts"></div>
+        <progress id="fetch-overall" max="1" value="0" hidden></progress>
+        <ol id="fetch-binds" class="fetch-binds" hidden></ol>
       </section>
-      <section class="results">
-        <div class="section-heading">
-          <h2>Pools ranked by dollar volume</h2>
-          <span
-            >known pools only; volume counts dollars paid in plus paid out</span
-          >
-        </div>
-        <div class="table-wrap">
-          <table>
-            <thead>
-              <tr>
-                <th>#</th>
-                <th>Pool</th>
-                <th>Pair</th>
-                <th>Swaps</th>
-                <th>Dollar volume</th>
-              </tr>
-            </thead>
-            <tbody id="pools"></tbody>
-          </table>
-        </div>
-      </section>
-      <section class="results">
-        <div class="section-heading">
-          <h2>By swaps, dollar side unknown</h2>
-          <span>not ranked: these pools' dollar token is not known</span>
-        </div>
-        <div class="table-wrap">
-          <table>
-            <thead>
-              <tr>
-                <th>Pool</th>
-                <th>Swaps</th>
-              </tr>
-            </thead>
-            <tbody id="unranked"></tbody>
-          </table>
-        </div>
-      </section>
-      <section class="method">
-        <h2>Cross-check</h2>
-        <ul id="checks"></ul>
-      </section>
+      <div id="report" hidden>
+        <section
+          id="headline"
+          class="metrics"
+          aria-label="Headline numbers"
+        ></section>
+        <section class="results">
+          <div class="section-heading">
+            <h2>Dollar volume per day</h2>
+            <span>millions of dollars, each on its own scale</span>
+          </div>
+          <div id="chart" class="charts"></div>
+        </section>
+        <section class="results">
+          <div class="section-heading">
+            <h2>Pools ranked by dollar volume</h2>
+            <span
+              >known pools only; volume counts dollars paid in plus paid
+              out</span
+            >
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Pool</th>
+                  <th>Pair</th>
+                  <th>Swaps</th>
+                  <th>Dollar volume</th>
+                </tr>
+              </thead>
+              <tbody id="pools"></tbody>
+            </table>
+          </div>
+        </section>
+        <section class="results">
+          <div class="section-heading">
+            <h2>By swaps, dollar side unknown</h2>
+            <span>not ranked: these pools' dollar token is not known</span>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Pool</th>
+                  <th>Swaps</th>
+                </tr>
+              </thead>
+              <tbody id="unranked"></tbody>
+            </table>
+          </div>
+        </section>
+        <section class="method">
+          <h2>Cross-check</h2>
+          <ul id="checks"></ul>
+        </section>
+      </div>
     </main>
     <footer class="measure">
-      Data shaped from the recording in <code>recordings/</code>.
+      Data fetched live from Testril when you press the button.
     </footer>
   </body>
 </html>

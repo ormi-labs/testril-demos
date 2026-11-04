@@ -1,12 +1,265 @@
-import spec from "../testril.json" with { type: "json" };
+export const binds = [
+  {
+    name: "transfers-bybit-cold-wallet",
+    function_slug: "erc20.wallet_transfers",
+    chain_id: 1,
+    params: {
+      wallet: "0x1db92e2eebc8e0c075a02bea49a2935bcd2dfcf4",
+      tokens: [
+        "0xae7ab96520de3a18e5e111b5eaab095312d7fe84",
+        "0xd5f7838f5c461feff7fe49ea5ebaf7728bb0adfa",
+        "0xe6829d9a7ee3040e1276fa75293bde931859e8fa",
+      ],
+    },
+    window: { from_block: 21890994, to_block: 21948292 },
+    read: { chunk_blocks: 3000 },
+  },
+  {
+    name: "transfers-exploiter",
+    function_slug: "erc20.wallet_transfers",
+    chain_id: 1,
+    params: {
+      wallet: "0x47666fab8bd0ac7003bce3f5c3585383f09486e2",
+      tokens: [
+        "0xae7ab96520de3a18e5e111b5eaab095312d7fe84",
+        "0xd5f7838f5c461feff7fe49ea5ebaf7728bb0adfa",
+        "0xe6829d9a7ee3040e1276fa75293bde931859e8fa",
+      ],
+    },
+    window: { from_block: 21890994, to_block: 21948292 },
+    read: { chunk_blocks: 3000 },
+  },
+  {
+    name: "transfers-hop-a4b2",
+    function_slug: "erc20.wallet_transfers",
+    chain_id: 1,
+    params: {
+      wallet: "0xa4b2fd68593b6f34e51cb9edb66e71c1b4ab449e",
+      tokens: [
+        "0xae7ab96520de3a18e5e111b5eaab095312d7fe84",
+        "0xd5f7838f5c461feff7fe49ea5ebaf7728bb0adfa",
+        "0xe6829d9a7ee3040e1276fa75293bde931859e8fa",
+      ],
+    },
+    window: { from_block: 21890994, to_block: 21948292 },
+    read: { chunk_blocks: 3000 },
+  },
+  {
+    name: "transfers-hop-bdd0",
+    function_slug: "erc20.wallet_transfers",
+    chain_id: 1,
+    params: {
+      wallet: "0xbdd077f651ebe7f7b3ce16fe5f2b025be2969516",
+      tokens: [
+        "0xae7ab96520de3a18e5e111b5eaab095312d7fe84",
+        "0xd5f7838f5c461feff7fe49ea5ebaf7728bb0adfa",
+        "0xe6829d9a7ee3040e1276fa75293bde931859e8fa",
+      ],
+    },
+    window: { from_block: 21890994, to_block: 21948292 },
+    read: { chunk_blocks: 3000 },
+  },
+  {
+    name: "transfers-hop-0fa0",
+    function_slug: "erc20.wallet_transfers",
+    chain_id: 1,
+    params: {
+      wallet: "0x0fa09c3a328792253f8dee7116848723b72a6d2e",
+      tokens: [
+        "0xae7ab96520de3a18e5e111b5eaab095312d7fe84",
+        "0xd5f7838f5c461feff7fe49ea5ebaf7728bb0adfa",
+        "0xe6829d9a7ee3040e1276fa75293bde931859e8fa",
+      ],
+    },
+    window: { from_block: 21890994, to_block: 21948292 },
+    read: { chunk_blocks: 3000 },
+  },
+  {
+    name: "transfers-hop-1542",
+    function_slug: "erc20.wallet_transfers",
+    chain_id: 1,
+    params: {
+      wallet: "0x1542368a03ad1f03d96d51b414f4a2d6d2fe0d04",
+      tokens: [
+        "0xae7ab96520de3a18e5e111b5eaab095312d7fe84",
+        "0xd5f7838f5c461feff7fe49ea5ebaf7728bb0adfa",
+        "0xe6829d9a7ee3040e1276fa75293bde931859e8fa",
+      ],
+    },
+    window: { from_block: 21890994, to_block: 21948292 },
+    read: { chunk_blocks: 3000 },
+  },
+  {
+    name: "balance-bybit-cold-wallet",
+    function_slug: "native.balance",
+    chain_id: 1,
+    params: {
+      owners: ["0x1db92e2eebc8e0c075a02bea49a2935bcd2dfcf4"],
+      by: "hour",
+    },
+    window: { from_hour: "2025-02-21T00", to_hour: "2025-03-01T00" },
+  },
+  {
+    name: "balance-exploiter",
+    function_slug: "native.balance",
+    chain_id: 1,
+    params: {
+      owners: ["0x47666fab8bd0ac7003bce3f5c3585383f09486e2"],
+      by: "hour",
+    },
+    window: { from_hour: "2025-02-21T00", to_hour: "2025-03-01T00" },
+  },
+  {
+    name: "balance-hop-a4b2",
+    function_slug: "native.balance",
+    chain_id: 1,
+    params: {
+      owners: ["0xa4b2fd68593b6f34e51cb9edb66e71c1b4ab449e"],
+      by: "hour",
+    },
+    window: { from_hour: "2025-02-21T00", to_hour: "2025-03-01T00" },
+  },
+  {
+    name: "balance-hop-bdd0",
+    function_slug: "native.balance",
+    chain_id: 1,
+    params: {
+      owners: ["0xbdd077f651ebe7f7b3ce16fe5f2b025be2969516"],
+      by: "hour",
+    },
+    window: { from_hour: "2025-02-21T00", to_hour: "2025-03-01T00" },
+  },
+  {
+    name: "balance-hop-0fa0",
+    function_slug: "native.balance",
+    chain_id: 1,
+    params: {
+      owners: ["0x0fa09c3a328792253f8dee7116848723b72a6d2e"],
+      by: "hour",
+    },
+    window: { from_hour: "2025-02-21T00", to_hour: "2025-03-01T00" },
+  },
+  {
+    name: "balance-hop-1542",
+    function_slug: "native.balance",
+    chain_id: 1,
+    params: {
+      owners: ["0x1542368a03ad1f03d96d51b414f4a2d6d2fe0d04"],
+      by: "hour",
+    },
+    window: { from_hour: "2025-02-21T00", to_hour: "2025-03-01T00" },
+  },
+  {
+    name: "token-balance-bybit-cold-wallet",
+    function_slug: "erc20.token_balance",
+    chain_id: 1,
+    params: {
+      reads: {
+        tokens: [
+          "0xae7ab96520de3a18e5e111b5eaab095312d7fe84",
+          "0xd5f7838f5c461feff7fe49ea5ebaf7728bb0adfa",
+          "0xe6829d9a7ee3040e1276fa75293bde931859e8fa",
+        ],
+        owners: ["0x1db92e2eebc8e0c075a02bea49a2935bcd2dfcf4"],
+      },
+      by: "hour",
+    },
+    window: { from_hour: "2025-02-21T00", to_hour: "2025-03-01T00" },
+  },
+  {
+    name: "token-balance-exploiter",
+    function_slug: "erc20.token_balance",
+    chain_id: 1,
+    params: {
+      reads: {
+        tokens: [
+          "0xae7ab96520de3a18e5e111b5eaab095312d7fe84",
+          "0xd5f7838f5c461feff7fe49ea5ebaf7728bb0adfa",
+          "0xe6829d9a7ee3040e1276fa75293bde931859e8fa",
+        ],
+        owners: ["0x47666fab8bd0ac7003bce3f5c3585383f09486e2"],
+      },
+      by: "hour",
+    },
+    window: { from_hour: "2025-02-21T00", to_hour: "2025-03-01T00" },
+  },
+  {
+    name: "token-balance-hop-a4b2",
+    function_slug: "erc20.token_balance",
+    chain_id: 1,
+    params: {
+      reads: {
+        tokens: [
+          "0xae7ab96520de3a18e5e111b5eaab095312d7fe84",
+          "0xd5f7838f5c461feff7fe49ea5ebaf7728bb0adfa",
+          "0xe6829d9a7ee3040e1276fa75293bde931859e8fa",
+        ],
+        owners: ["0xa4b2fd68593b6f34e51cb9edb66e71c1b4ab449e"],
+      },
+      by: "hour",
+    },
+    window: { from_hour: "2025-02-21T00", to_hour: "2025-03-01T00" },
+  },
+  {
+    name: "token-balance-hop-bdd0",
+    function_slug: "erc20.token_balance",
+    chain_id: 1,
+    params: {
+      reads: {
+        tokens: [
+          "0xae7ab96520de3a18e5e111b5eaab095312d7fe84",
+          "0xd5f7838f5c461feff7fe49ea5ebaf7728bb0adfa",
+          "0xe6829d9a7ee3040e1276fa75293bde931859e8fa",
+        ],
+        owners: ["0xbdd077f651ebe7f7b3ce16fe5f2b025be2969516"],
+      },
+      by: "hour",
+    },
+    window: { from_hour: "2025-02-21T00", to_hour: "2025-03-01T00" },
+  },
+  {
+    name: "token-balance-hop-0fa0",
+    function_slug: "erc20.token_balance",
+    chain_id: 1,
+    params: {
+      reads: {
+        tokens: [
+          "0xae7ab96520de3a18e5e111b5eaab095312d7fe84",
+          "0xd5f7838f5c461feff7fe49ea5ebaf7728bb0adfa",
+          "0xe6829d9a7ee3040e1276fa75293bde931859e8fa",
+        ],
+        owners: ["0x0fa09c3a328792253f8dee7116848723b72a6d2e"],
+      },
+      by: "hour",
+    },
+    window: { from_hour: "2025-02-21T00", to_hour: "2025-03-01T00" },
+  },
+  {
+    name: "token-balance-hop-1542",
+    function_slug: "erc20.token_balance",
+    chain_id: 1,
+    params: {
+      reads: {
+        tokens: [
+          "0xae7ab96520de3a18e5e111b5eaab095312d7fe84",
+          "0xd5f7838f5c461feff7fe49ea5ebaf7728bb0adfa",
+          "0xe6829d9a7ee3040e1276fa75293bde931859e8fa",
+        ],
+        owners: ["0x1542368a03ad1f03d96d51b414f4a2d6d2fe0d04"],
+      },
+      by: "hour",
+    },
+    window: { from_hour: "2025-02-21T00", to_hour: "2025-03-01T00" },
+  },
+];
 
-export const transferBinds = spec.binds.filter(
+export const transferBinds = binds.filter(
   (bind) => bind.function_slug === "erc20.wallet_transfers",
 );
-export const balanceBinds = spec.binds.filter(
+export const balanceBinds = binds.filter(
   (bind) => bind.function_slug === "native.balance",
 );
-export const tokenBalanceBinds = spec.binds.filter(
+export const tokenBalanceBinds = binds.filter(
   (bind) => bind.function_slug === "erc20.token_balance",
 );
 export const transferWindow = transferBinds[0].window;
