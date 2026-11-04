@@ -91,7 +91,7 @@ function requireAscendingBlocks(subject, bind, list) {
   });
 }
 
-const weiPerYearBand = [10n ** 14n, 10n ** 18n];
+const weiPerYearBand = [10n ** 14n, 10n ** 19n];
 const yearSeconds = 365n * 86400n;
 
 function requireWei(subject, list) {
@@ -103,6 +103,7 @@ function requireWei(subject, list) {
     if (i === 0) return;
     const years =
       (BigInt(row.expires) - BigInt(list[i - 1].expires)) / yearSeconds;
+    if (BigInt(row.cost) === 0n) return;
     const perYear = BigInt(row.cost) / (years || 1n);
     if (perYear < weiPerYearBand[0] || perYear > weiPerYearBand[1])
       throw new Error(

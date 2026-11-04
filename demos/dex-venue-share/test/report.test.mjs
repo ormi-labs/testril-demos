@@ -51,6 +51,24 @@ test("check fails when both wstETH pools are read with the sides swapped", () =>
   assert.throws(() => check(corrupted), /outside the plausible/);
 });
 
+test("check fails when a venue's price drifts past the tolerance inside the band", () => {
+  const corrupted = rows();
+  for (const row of corrupted["uniswap-v4"].filter((r) => r.pool === v4Pool))
+    row.volume1 = ((BigInt(row.volume1) * 12n) / 10n).toString();
+  assert.throws(
+    () => check(corrupted),
+    /Uniswap v4 trades .* token sides are not comparable/,
+  );
+});
+
+test("check names Curve only on the pair that has it", () => {
+  const [usdc, wsteth] = check(rows()).filter((line) =>
+    line.includes("priced pools"),
+  );
+  assert.match(usdc, /all but Curve/);
+  assert.doesNotMatch(wsteth, /Curve/);
+});
+
 test("check fails when a day has no volume at any venue", () => {
   const corrupted = rows();
   const [, second] = days();

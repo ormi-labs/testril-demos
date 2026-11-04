@@ -6,8 +6,17 @@ import { join } from "node:path";
 import { createApp } from "../src/server.mjs";
 import { fixture } from "./fixture.mjs";
 
+async function recordingsDir(files) {
+  const dir = await mkdtemp(join(tmpdir(), "oracle-vs-pool-"));
+  for (const [name, recording] of Object.entries(files))
+    await writeFile(join(dir, name), JSON.stringify(recording));
+  return dir;
+}
+
 test("server returns the shaped report and the page", async (t) => {
-  const server = createApp();
+  const server = createApp(
+    await recordingsDir({ "synthetic.json": fixture() }),
+  );
   await new Promise((done) => server.listen(0, "127.0.0.1", done));
   t.after(() => server.close());
   const base = `http://127.0.0.1:${server.address().port}`;
@@ -27,9 +36,9 @@ test("server returns the shaped report and the page", async (t) => {
 test("a recording with a missing hour reports a failed check, not an error", async (t) => {
   const recording = fixture();
   recording.rows.feeds.splice(10, 1);
-  const path = join(await mkdtemp(join(tmpdir(), "oracle-vs-pool-")), "r.json");
-  await writeFile(path, JSON.stringify(recording));
-  const server = createApp(path);
+  const server = createApp(
+    await recordingsDir({ "synthetic.json": recording }),
+  );
   await new Promise((done) => server.listen(0, "127.0.0.1", done));
   t.after(() => server.close());
   const response = await fetch(
@@ -39,4 +48,20 @@ test("a recording with a missing hour reports a failed check, not an error", asy
   const report = await response.json();
   assert.equal(report.checks.ok, false);
   assert.match(report.checks.error, /ETH \/ USD feed is missing/);
+});
+
+test("server prefers recorded.json over synthetic.json", async (t) => {
+  const recording = fixture();
+  const server = createApp(
+    await recordingsDir({
+      "synthetic.json": recording,
+      "recorded.json": { ...recording, source: "dev" },
+    }),
+  );
+  await new Promise((done) => server.listen(0, "127.0.0.1", done));
+  t.after(() => server.close());
+  const report = await (
+    await fetch(`http://127.0.0.1:${server.address().port}/api/report`)
+  ).json();
+  assert.equal(report.source, "dev");
 });

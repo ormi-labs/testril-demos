@@ -119,7 +119,7 @@ async function main() {
   try {
     const recording = await record({ spec, testril });
     await writeFile(
-      new URL("../recordings/report.json", import.meta.url),
+      new URL("../recordings/recorded.json", import.meta.url),
       `${JSON.stringify(recording, null, 2)}\n`,
     );
     console.info(

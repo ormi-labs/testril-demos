@@ -2,7 +2,7 @@ import { createServer } from "node:http";
 import { readFile } from "node:fs/promises";
 import { extname, join, normalize } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
-import { check, poolMaps, shape } from "./report.mjs";
+import { check, shape } from "./report.mjs";
 
 const root = fileURLToPath(new URL("..", import.meta.url));
 const publicDir = join(root, "public");
@@ -15,12 +15,11 @@ const types = {
 
 export function report({ source, recordedAt, rows }) {
   try {
-    const pools = poolMaps(rows);
     return {
       source,
       recordedAt,
-      checks: { ok: true, passed: check(rows, pools) },
-      view: shape(rows, pools),
+      checks: { ok: true, passed: check(rows) },
+      view: shape(rows),
     };
   } catch (error) {
     return {
@@ -32,9 +31,18 @@ export function report({ source, recordedAt, rows }) {
   }
 }
 
-export function createApp(
-  recordingPath = join(root, "recordings", "report.json"),
-) {
+async function readRecording(directory) {
+  try {
+    return JSON.parse(await readFile(join(directory, "recorded.json"), "utf8"));
+  } catch (error) {
+    if (error.code !== "ENOENT") throw error;
+    return JSON.parse(
+      await readFile(join(directory, "synthetic.json"), "utf8"),
+    );
+  }
+}
+
+export function createApp(recordingsDir = join(root, "recordings")) {
   return createServer(async (request, response) => {
     response.setHeader("X-Content-Type-Options", "nosniff");
     response.setHeader("Referrer-Policy", "no-referrer");
@@ -51,7 +59,7 @@ export function createApp(
     try {
       if (request.method !== "GET") return send(405, "text/plain", "");
       if (pathname === "/api/report") {
-        const recording = JSON.parse(await readFile(recordingPath, "utf8"));
+        const recording = await readRecording(recordingsDir);
         return send(200, "application/json", JSON.stringify(report(recording)));
       }
       const file = normalize(pathname === "/" ? "/index.html" : pathname);

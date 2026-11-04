@@ -15,11 +15,18 @@
     "format:check": "prettier --check .",
     "format": "prettier --write .",
     "fixture": "node test/fixture.mjs",
-    "record": "node ../../tools/prepare/prepare.mjs ."
+    "record": "node src/record.mjs"
   },
   "devDependencies": {
     "@playwright/test": "1.63.0",
     "eslint": "10.12.0",
     "prettier": "3.9.9"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "1.32.1",
+    "@x402/core": "2.27.0",
+    "@x402/evm": "2.27.0",
+    "@x402/mcp": "2.27.0",
+    "viem": "2.57.3"
   }
 }

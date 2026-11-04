@@ -6,13 +6,17 @@ import { join } from "node:path";
 import { createApp } from "../src/server.mjs";
 import { fixture } from "./fixture.mjs";
 
+async function recordingsDir(files) {
+  const dir = await mkdtemp(join(tmpdir(), "stablecoin-supply-"));
+  for (const [name, recording] of Object.entries(files))
+    await writeFile(join(dir, name), JSON.stringify(recording));
+  return dir;
+}
+
 test("server returns the shaped report and the page", async (t) => {
-  const recordingPath = join(
-    await mkdtemp(join(tmpdir(), "stablecoin-supply-")),
-    "report.json",
+  const server = createApp(
+    await recordingsDir({ "synthetic.json": fixture() }),
   );
-  await writeFile(recordingPath, JSON.stringify(fixture()));
-  const server = createApp(recordingPath);
   await new Promise((done) => server.listen(0, "127.0.0.1", done));
   t.after(() => server.close());
   const base = `http://127.0.0.1:${server.address().port}`;
@@ -27,4 +31,20 @@ test("server returns the shaped report and the page", async (t) => {
   );
   assert.match(await page.text(), /Stablecoin Supply/);
   assert.equal((await fetch(`${base}/../testril.json`)).status, 404);
+});
+
+test("server prefers recorded.json over synthetic.json", async (t) => {
+  const recording = fixture();
+  const server = createApp(
+    await recordingsDir({
+      "synthetic.json": recording,
+      "recorded.json": { ...recording, source: "dev" },
+    }),
+  );
+  await new Promise((done) => server.listen(0, "127.0.0.1", done));
+  t.after(() => server.close());
+  const report = await (
+    await fetch(`http://127.0.0.1:${server.address().port}/api/report`)
+  ).json();
+  assert.equal(report.source, "dev");
 });

@@ -4,7 +4,7 @@ import spec from "../testril.json" with { type: "json" };
 import { days, pairs } from "../src/report.mjs";
 
 const recordedAt = "2026-11-02T00:00:00.000Z";
-const wei = 10n ** 18n;
+const wbtcSide = 25n * 10n ** 8n;
 const wstethPerEth = 0.82;
 const noisePools = {
   "uniswap-v2": ["0x0d4a11d5eeaac28ec3f61d100daf4d40471f1852"],
@@ -69,7 +69,7 @@ function poolRows(s, day, eth, other, random) {
         [s.other]: other.toString(),
       },
     ];
-  return coinRows(s.pool, day, swaps, [other, wei / 10n, eth], random);
+  return coinRows(s.pool, day, swaps, [other, wbtcSide, eth], random);
 }
 
 function noiseRows(bind, day, random) {
@@ -78,7 +78,7 @@ function noiseRows(bind, day, random) {
     const ethSide = rawUnits(40 + random() * 900, 18, random);
     const usdcSide = rawUnits(9e4 + random() * 4e6, 6, random);
     if (bind === "curve")
-      return coinRows(pool, day, swaps, [usdcSide, wei / 10n, ethSide], random);
+      return coinRows(pool, day, swaps, [usdcSide, wbtcSide, ethSide], random);
     return [
       {
         day,
@@ -137,6 +137,6 @@ export function fixture() {
 
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href)
   await writeFile(
-    new URL("../recordings/report.json", import.meta.url),
+    new URL("../recordings/synthetic.json", import.meta.url),
     `${JSON.stringify(fixture(), null, 2)}\n`,
   );

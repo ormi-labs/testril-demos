@@ -15,6 +15,22 @@ test("check fails when a trade is on a market that is not listed", () => {
   assert.throws(() => check(corrupted), /not in market_list/);
 });
 
+test("check fails when a trade is dated before its market was created", () => {
+  const corrupted = rows();
+  const [created] = corrupted.markets.filter(
+    (m) => m.block > window.from_block,
+  );
+  const trade = corrupted.trades.find((t) => t.market === created.market);
+  trade.block = created.block - 1;
+  assert.throws(() => check(corrupted), /before the factory created it/);
+});
+
+test("check fails when a pool amount is not a plain integer", () => {
+  const corrupted = rows();
+  corrupted.market_state[0].amount = "1.5";
+  assert.throws(() => check(corrupted), /holds 1.5 tokens/);
+});
+
 test("check fails when buys are read as sells", () => {
   const corrupted = rows();
   const buy = corrupted.trades.find((trade) => trade.side === "buy");

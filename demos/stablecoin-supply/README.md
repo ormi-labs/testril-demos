@@ -6,9 +6,10 @@ pairs moved the most, with ENS names on the addresses. The page proves its
 numbers: the USDC supply change on the transfer day must equal mints minus
 burns over the same blocks.
 
-**The shipped recording is synthetic.** `recordings/report.json` is generated
+**The shipped recording is synthetic.** `recordings/synthetic.json` is generated
 by `test/fixture.mjs` and the page says so in its banner. Record real data with
-`npm run record` (below).
+`npm run record` (below); the server serves `recordings/recorded.json` when it
+exists, else the synthetic one.
 
 ![Desktop screenshot](docs/screenshot-desktop.png)
 
@@ -42,11 +43,9 @@ npm run format:check
 
 `npm test` checks the cross-check passes on the fixture and fails when a burn
 is read as a mint, when supply is in whole dollars instead of raw units, or
-when a day is missing, that the server returns the shaped report, and that
-`npm run record` pays a fake Testril with the payer's vouchers, follows each
-`materialize` answer and keeps every row.
+when a day is missing, and that the server returns the shaped report.
 `npm run test:browser` writes `docs/screenshot-desktop.png`.
-`npm run fixture` regenerates the synthetic recording.
+`npm run fixture` regenerates `recordings/synthetic.json`.
 
 ## Subjects and window
 
@@ -136,7 +135,11 @@ npm run record
 
 For each bind in `testril.json`, `npm run record` calls `bind`, asks
 `materialize` for the whole window (Testril charges only for blocks not yet
-indexed), waits for the job, then `read`s the window. It replaces
-`recordings/report.json` with `source: "dev"`, the bound function ids, job ids,
-timings and the usage credits spent. The page then shows "Recorded from
-Testril on <date>". A failed run leaves the previous recording in place.
+indexed), waits for the job, then `read`s the window. It writes
+`recordings/recorded.json` (git-ignored) with `source: "dev"`, the bound
+function ids, job ids, timings and the usage credits spent. The page then
+shows "Recorded from Testril on <date>". A failed run leaves the previous
+recording in place.
+
+`npm test` runs `npm run record` against a fake Testril: it pays with the
+payer's vouchers, follows each `materialize` answer and keeps every row.

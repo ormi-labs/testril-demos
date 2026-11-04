@@ -64,7 +64,7 @@ function tradeRows(random, markets, traders) {
     [other, 100, 150, "sell", 1],
   ].map(([market, collateral, tokens, side, outcome], index) =>
     trade(random, {
-      block: blockAt(0.5 + index / 100),
+      block: Math.max(blockAt(0.5 + index / 100), market.createdBlock),
       market: market.address,
       trader,
       side,
@@ -79,7 +79,7 @@ function tradeRows(random, markets, traders) {
     const tokens = amount(5 + random() * 60);
     randomTrades.push(
       trade(random, {
-        block: blockAt(random()),
+        block: Math.max(blockAt(random()), market.createdBlock),
         market: market.address,
         trader: traders[Math.floor(random() * traders.length)],
         side: random() < 0.3 ? "sell" : "buy",
@@ -221,6 +221,6 @@ export function fixture() {
 
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href)
   await writeFile(
-    new URL("../recordings/report.json", import.meta.url),
+    new URL("../recordings/synthetic.json", import.meta.url),
     `${JSON.stringify(fixture(), null, 2)}\n`,
   );

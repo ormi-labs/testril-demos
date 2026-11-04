@@ -6,10 +6,10 @@ numbers: every pool-day row has at least one swap, each known pool's dollar side
 implies a sane token price, and the ranking covers every known pool that traded,
 is in descending order of dollar volume and matches the sum of each pool's rows.
 
-**The shipped recording is synthetic.** `recordings/report.json` is generated
+**The shipped recording is synthetic.** `recordings/synthetic.json` is generated
 by `test/fixture.mjs` and the page says so in its banner. The eight pools
 without a known dollar side use made-up addresses (`0x1111…`). Record real data
-with `tools/prepare` (below).
+with `npm run record` (below).
 
 ![Desktop screenshot](docs/screenshot-desktop.png)
 
@@ -76,11 +76,31 @@ USDC on Base is `0x833589fcd6edb6e08f4c7c32d4f71b54bda02913` with 6 decimals.
 
 ## Record real data
 
-Needs a funded payment channel and an operator key in `tools/prepare/.env`; both
-are absent after extraction from the repository. Verify the USDC / cbBTC pool is
-from the Slipstream factory first. Run from `demos/aerodrome-slipstream`; it
-writes `recordings/report.json` with source `"dev"`.
+Verify the USDC / cbBTC pool is from the Slipstream factory before recording.
+
+The demo records itself. It needs a private key whose address holds Testril
+usage credits; it pays with vouchers against those credits, so the wallet
+needs no USDC.
+
+| Variable            | Purpose                                                    |
+| ------------------- | ---------------------------------------------------------- |
+| `TESTRIL_PAYER_KEY` | Hex private key that signs vouchers; required to record    |
+| `TESTRIL_MCP_URL`   | Testril MCP endpoint; default `https://dev.testril.ai/mcp` |
+
+Working directory: `demos/aerodrome-slipstream`
 
 ```sh
+export TESTRIL_PAYER_KEY=<hex private key>
 npm run record
 ```
+
+For each bind in `testril.json`, `npm run record` calls `bind`, asks
+`materialize` for the whole window (Testril charges only for blocks not yet
+indexed), waits for the job, then `read`s the window. It writes
+`recordings/recorded.json` (git-ignored) with `source: "dev"`, the bound
+function ids, job ids, timings and the usage credits spent. The page then
+shows "Recorded from Testril on <date>". A failed run leaves the previous
+recording in place.
+
+`npm test` runs `npm run record` against a fake Testril: it pays with the
+payer's vouchers, follows each `materialize` answer and keeps every row.

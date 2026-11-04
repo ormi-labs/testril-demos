@@ -22,9 +22,9 @@ Reality.eth answers are keyed by question id, and none of the five functions
 links a market to its question, so answers are listed beside the markets, not
 joined to them.
 
-**The shipped recording is synthetic.** `recordings/report.json` is generated
+**The shipped recording is synthetic.** `recordings/synthetic.json` is generated
 by `test/fixture.mjs` and the page says so in its banner. Record real data with
-`tools/prepare` (below).
+`npm run record` (below).
 
 ![Desktop screenshot](docs/screenshot-desktop.png)
 
@@ -102,16 +102,29 @@ window, not only those created in it. `trades`, `liquidity`, `market_state` and
 
 ## Record real data
 
-Recording needs `tools/prepare` from this repository and a Testril operator
-key with an existing funded channel (it signs vouchers only and never
-deposits); neither is part of an extracted demo. From the repository root:
+The demo records itself. It needs a private key whose address holds Testril
+usage credits; it pays with vouchers against those credits, so the wallet
+needs no USDC.
+
+| Variable            | Purpose                                                    |
+| ------------------- | ---------------------------------------------------------- |
+| `TESTRIL_PAYER_KEY` | Hex private key that signs vouchers; required to record    |
+| `TESTRIL_MCP_URL`   | Testril MCP endpoint; default `https://dev.testril.ai/mcp` |
+
+Working directory: `demos/omen-markets`
 
 ```sh
-cd tools/prepare && npm ci && cp .env.example .env   # set TESTRIL_MCP_URL and TESTRIL_OPERATOR_KEY
-node prepare.mjs --plan ../../demos/omen-markets   # free estimate
-cd ../../demos/omen-markets && npm run record
+export TESTRIL_PAYER_KEY=<hex private key>
+npm run record
 ```
 
-`npm run record` replaces `recordings/report.json` with `source: "dev"`, the
-bound function ids, job ids and timings. The page then shows "Recorded from
-Testril on <date>".
+For each bind in `testril.json`, `npm run record` calls `bind`, asks
+`materialize` for the whole window (Testril charges only for blocks not yet
+indexed), waits for the job, then `read`s the window. It writes
+`recordings/recorded.json` (git-ignored) with `source: "dev"`, the bound
+function ids, job ids, timings and the usage credits spent. The page then
+shows "Recorded from Testril on <date>". A failed run leaves the previous
+recording in place.
+
+`npm test` runs `npm run record` against a fake Testril: it pays with the
+payer's vouchers, follows each `materialize` answer and keeps every row.

@@ -1,13 +1,22 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { writeFile } from "node:fs/promises";
+import { mkdtemp, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { createApp } from "../src/server.mjs";
 import { fixture } from "./fixture.mjs";
 
+async function recordingsDir(files) {
+  const dir = await mkdtemp(join(tmpdir(), "hooks-across-dexes-"));
+  for (const [name, recording] of Object.entries(files))
+    await writeFile(join(dir, name), JSON.stringify(recording));
+  return dir;
+}
+
 test("server returns the shaped report and the page", async (t) => {
-  const server = createApp();
+  const server = createApp(
+    await recordingsDir({ "synthetic.json": fixture() }),
+  );
   await new Promise((done) => server.listen(0, "127.0.0.1", done));
   t.after(() => server.close());
   const base = `http://127.0.0.1:${server.address().port}`;
@@ -27,9 +36,9 @@ test("server returns the shaped report and the page", async (t) => {
 test("a recording that fails the cross-check still answers 200 with the failure", async (t) => {
   const recording = fixture();
   recording.rows["cl-pools"].shift();
-  const path = join(tmpdir(), `hooks-corrupted-${process.pid}.json`);
-  await writeFile(path, JSON.stringify(recording));
-  const server = createApp(path);
+  const server = createApp(
+    await recordingsDir({ "synthetic.json": recording }),
+  );
   await new Promise((done) => server.listen(0, "127.0.0.1", done));
   t.after(() => server.close());
   const response = await fetch(
@@ -40,4 +49,20 @@ test("a recording that fails the cross-check still answers 200 with the failure"
   assert.equal(report.checks.ok, false);
   assert.match(report.checks.error, /not in its pool list/);
   assert.equal(report.view, null);
+});
+
+test("server prefers recorded.json over synthetic.json", async (t) => {
+  const recording = fixture();
+  const server = createApp(
+    await recordingsDir({
+      "synthetic.json": recording,
+      "recorded.json": { ...recording, source: "dev" },
+    }),
+  );
+  await new Promise((done) => server.listen(0, "127.0.0.1", done));
+  t.after(() => server.close());
+  const report = await (
+    await fetch(`http://127.0.0.1:${server.address().port}/api/report`)
+  ).json();
+  assert.equal(report.source, "dev");
 });
