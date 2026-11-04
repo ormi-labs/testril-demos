@@ -1,7 +1,5 @@
-import { writeFile } from "node:fs/promises";
-import { pathToFileURL } from "node:url";
-import spec from "../testril.json" with { type: "json" };
 import {
+  binds,
   edgesWindow,
   ensAddresses,
   supplyDays,
@@ -10,7 +8,6 @@ import {
   zeroAddress,
 } from "../src/report.mjs";
 
-const recordedAt = "2026-11-02T00:00:00.000Z";
 const blockSpacing = 30;
 
 function seeded(seed) {
@@ -71,7 +68,7 @@ export function fixture() {
     0n,
   );
   const ensRows = Object.fromEntries(
-    spec.binds
+    binds
       .filter((bind) => bind.function_slug === "ens.primary_name")
       .map((bind) => [
         bind.name,
@@ -85,29 +82,28 @@ export function fixture() {
       ]),
   );
   return {
-    demo: spec.demo,
-    source: "synthetic",
-    recordedAt,
-    boundFunctions: Object.fromEntries(
-      spec.binds.map((bind) => [
-        bind.name,
-        { function_slug: bind.function_slug, chain_id: bind.chain_id },
-      ]),
-    ),
-    window: Object.fromEntries(spec.binds.map((b) => [b.name, b.window])),
-    rows: {
-      supply: [
-        ...supplyRows(random, usdt, 96.4e9, raw(3.1e8, random)),
-        ...supplyRows(random, usdc, 43.8e9, net),
-      ],
-      "usdc-edges": edges,
-      ...ensRows,
-    },
+    supply: [
+      ...supplyRows(random, usdt, 96.4e9, raw(3.1e8, random)),
+      ...supplyRows(random, usdc, 43.8e9, net),
+    ],
+    "usdc-edges": edges,
+    ...ensRows,
   };
 }
 
-if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href)
-  await writeFile(
-    new URL("../recordings/synthetic.json", import.meta.url),
-    `${JSON.stringify(fixture(), null, 2)}\n`,
-  );
+export function fixtureRows() {
+  const rows = fixture();
+  const nameOf = (bind) =>
+    binds.find(
+      (b) =>
+        b.function_slug === bind.function_slug &&
+        JSON.stringify(b.params) === JSON.stringify(bind.params),
+    ).name;
+  return (bind, window) =>
+    "from_block" in window && bind.function_slug === "erc20.transfer_edges"
+      ? rows[nameOf(bind)].filter(
+          (row) =>
+            row.block >= window.from_block && row.block < window.to_block,
+        )
+      : rows[nameOf(bind)];
+}

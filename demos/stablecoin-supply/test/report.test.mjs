@@ -3,7 +3,7 @@ import assert from "node:assert/strict";
 import { check, edgesDay, shape, zeroAddress } from "../src/report.mjs";
 import { fixture } from "./fixture.mjs";
 
-const rows = () => structuredClone(fixture().rows);
+const rows = () => structuredClone(fixture());
 
 test("check proves the fixture day's supply change from mints and burns", () => {
   assert.match(check(rows())[1], /equals mints .* minus burns/);
