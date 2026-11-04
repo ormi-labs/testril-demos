@@ -6,6 +6,8 @@ This repository contains demos showcasing [Testril](https://testril.ai), using i
 
 **Readability and simplicity are primary requirements here.** Prefer a small, obvious example over a clever abstraction or an exhaustive feature showcase.
 
+**Every demo is driven from its page, with live data only.** The visitor's action on the page fetches from Testril, and the page shows its progress and cost. Ship no static data: no committed or saved recordings, no mock mode. Test fixtures stay inside `test/`.
+
 ## Project Structure & Module Organization
 
 Place each demo in `demos/<descriptive-kebab-case-name>/`, with its own README, source, tests, and assets. Each demo must be independently understandable and runnable, including after extraction from its source archive without root tooling or sibling imports. Start with multiple demos in this repository; split them into separate repositories if their setup or organization becomes confusing.
