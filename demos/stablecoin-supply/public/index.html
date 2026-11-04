@@ -19,7 +19,6 @@
       ><span>Data demos / Stablecoin supply</span>
     </header>
     <main class="measure">
-      <p id="source" class="banner">Loading…</p>
       <div class="eyebrow">ETHEREUM · USDT AND USDC</div>
       <h1>Where the dollars came from,<br />and where they went.</h1>
       <p class="intro">
@@ -29,11 +28,11 @@
       <section class="scope" aria-label="Report scope">
         <div>
           <span class="label">SUPPLY · UTC DAYS</span
-          ><strong id="supply-window"></strong>
+          ><strong id="supply-window">shown after fetch</strong>
         </div>
         <div>
           <span class="label">TRANSFERS · ONE DAY</span
-          ><strong id="edges-window"></strong>
+          ><strong id="edges-window">shown after fetch</strong>
         </div>
         <div>
           <span class="label">FUNCTIONS</span
@@ -43,51 +42,61 @@
           <span class="label">NAMES</span><strong>ens.primary_name</strong>
         </div>
       </section>
-      <section
-        id="headline"
-        class="metrics"
-        aria-label="Headline numbers"
-      ></section>
-      <section class="results">
-        <div class="section-heading">
-          <h2>Total supply per day</h2>
-          <span>millions of dollars, each on its own scale</span>
+      <section id="fetch-panel" class="fetch" aria-label="Fetch from Testril">
+        <div class="fetch-head">
+          <button id="fetch" type="button" disabled>Fetch from Testril</button>
+          <span id="fetch-status">Loading…</span>
         </div>
-        <div id="supply-chart" class="charts"></div>
+        <progress id="fetch-overall" max="1" value="0" hidden></progress>
+        <ol id="fetch-binds" class="fetch-binds" hidden></ol>
       </section>
-      <section class="results">
-        <div class="section-heading">
-          <h2>Who moved the USDC</h2>
-          <span id="flow-note"></span>
-        </div>
-        <div id="flow" class="flow"></div>
-      </section>
-      <section class="results">
-        <div class="section-heading">
-          <h2>Top sender → recipient pairs</h2>
-          <span>names from each address's ENS primary name</span>
-        </div>
-        <div class="table-wrap">
-          <table>
-            <thead>
-              <tr>
-                <th>From</th>
-                <th>To</th>
-                <th>Transfers</th>
-                <th>Amount (USDC)</th>
-              </tr>
-            </thead>
-            <tbody id="pairs"></tbody>
-          </table>
-        </div>
-      </section>
-      <section class="method">
-        <h2>Cross-check</h2>
-        <ul id="checks"></ul>
-      </section>
+      <div id="report" hidden>
+        <section
+          id="headline"
+          class="metrics"
+          aria-label="Headline numbers"
+        ></section>
+        <section class="results">
+          <div class="section-heading">
+            <h2>Total supply per day</h2>
+            <span>millions of dollars, each on its own scale</span>
+          </div>
+          <div id="supply-chart" class="charts"></div>
+        </section>
+        <section class="results">
+          <div class="section-heading">
+            <h2>Who moved the USDC</h2>
+            <span id="flow-note"></span>
+          </div>
+          <div id="flow" class="flow"></div>
+        </section>
+        <section class="results">
+          <div class="section-heading">
+            <h2>Top sender → recipient pairs</h2>
+            <span>names from each address's ENS primary name</span>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>From</th>
+                  <th>To</th>
+                  <th>Transfers</th>
+                  <th>Amount (USDC)</th>
+                </tr>
+              </thead>
+              <tbody id="pairs"></tbody>
+            </table>
+          </div>
+        </section>
+        <section class="method">
+          <h2>Cross-check</h2>
+          <ul id="checks"></ul>
+        </section>
+      </div>
     </main>
     <footer class="measure">
-      Data shaped from the recording in <code>recordings/</code>.
+      Data fetched live from Testril when you press the button.
     </footer>
   </body>
 </html>
