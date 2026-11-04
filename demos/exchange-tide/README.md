@@ -38,7 +38,7 @@ whole window (Testril charges only for what it has not indexed yet), follows the
 job, then `read`s the window. The page shows a bar per bind and overall from
 Testril's own job progress and the usage credits spent. Then it draws four
 headline numbers, a stacked area of stablecoins per exchange, a table of the ten
-biggest hours in or out, and three passed cross-checks. Nothing is saved: a
+biggest hours in or out, and three cross-checks. Nothing is saved: a
 restart starts empty and the next fetch reads again.
 
 Without `TESTRIL_PAYER_KEY` the button is disabled and the page says what to set.

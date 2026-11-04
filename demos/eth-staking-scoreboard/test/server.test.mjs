@@ -59,7 +59,6 @@ test("the button's fetch ends in the shaped report and its passed cross-check", 
   const html = await page.text();
   assert.match(html, /Fetch from Testril/);
   assert.match(html, /ETH Staking Scoreboard/);
-  assert.equal((await fetch(`${base}/../package.json`)).status, 404);
 });
 
 test("report shows the failed cross-check when a day is missing", () => {

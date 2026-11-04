@@ -46,7 +46,7 @@ whole window (Testril charges only for what it has not indexed yet), follows the
 job, then `read`s the window. The page shows a bar per bind and overall from
 Testril's own job progress and the usage credits spent. Then it draws four
 headline numbers, the bond ladder of the most disputed question, a table of 20
-questions and two passed cross-checks. Nothing is saved: a restart starts empty
+questions and two cross-checks. Nothing is saved: a restart starts empty
 and the next fetch reads again.
 
 Without `TESTRIL_PAYER_KEY` the button is disabled and the page says what to set.

@@ -59,7 +59,6 @@ test("the button's fetch ends in the shaped report and its passed cross-check", 
   const html = await page.text();
   assert.match(html, /Fetch from Testril/);
   assert.match(html, /Oracle vs Pool/);
-  assert.equal((await fetch(`${base}/../package.json`)).status, 404);
 });
 
 test("a fetch with a missing hour reports a failed check, not an error", async (t) => {

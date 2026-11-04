@@ -1,3 +1,5 @@
+import { pairs } from "./pairs.mjs";
+
 export const binds = [
   {
     name: "uniswap-v2",
@@ -58,7 +60,6 @@ export const binds = [
     window: { from_day: "2026-10-25", to_day: "2026-11-02" },
   },
 ];
-import { pairs } from "./pairs.mjs";
 
 export { pairs };
 

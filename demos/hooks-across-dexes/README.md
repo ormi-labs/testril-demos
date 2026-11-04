@@ -40,7 +40,7 @@ job, then `read`s the window. The page shows a bar per bind and overall from
 Testril's own job progress and the usage credits spent. Then it draws hooked
 share and hook pool counts per DEX, a bar per venue split into hooked and
 hookless dollars, a table of up to ten of the largest hook pools, and three
-passed cross-checks. Nothing is saved: a restart starts empty and the next fetch
+cross-checks. Nothing is saved: a restart starts empty and the next fetch
 reads again.
 
 Without `TESTRIL_PAYER_KEY` the button is disabled and the page says what to set.
@@ -59,9 +59,10 @@ npm run format:check
 pool is missing from the pool list, a pool is listed twice, a pool has two rows
 for one day, a row is outside the window, the legs of a stablecoin pair differ
 by more than 1%, a hookless pool has a non-zero hooks_registration, a pool counts
-as both or neither of hooked and hookless, and that a failed cross-check still
-renders on the page, and that the report splits hooked
-from hookless volume on the stablecoin side of each pool.
+as both or neither of hooked and hookless, and that the report splits hooked from
+hookless volume on the stablecoin side of each pool. The server test checks that
+a fetch whose rows fail the cross-check still ends done, carrying the failure
+and no report view.
 `npm test` also fetches from a fake Testril: the fetch pays with the payer's
 vouchers, reports Testril's job progress and keeps every row.
 `npm run test:browser` presses the button against the fake Testril and waits

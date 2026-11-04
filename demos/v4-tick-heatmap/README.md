@@ -37,7 +37,7 @@ job, then `read`s the window. The page shows a bar per bind and overall from
 Testril's own job progress and the usage credits spent. Then it draws price,
 tick and in-range liquidity, a histogram of liquidity across 60 price buckets
 with a marker at the current price, a table of the 12 busiest edge ticks, and
-three passed cross-checks. Nothing is saved: a restart starts empty and the next
+three cross-checks. Nothing is saved: a restart starts empty and the next
 fetch reads again.
 
 Without `TESTRIL_PAYER_KEY` the button is disabled and the page says what to set.

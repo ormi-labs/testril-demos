@@ -109,3 +109,36 @@ test("a fetch pays with the payer's vouchers, reports Testril's job progress and
   );
   assert.equal(run.spentAtoms, String(150 * 120 + 120 + 70 + 7220 + 21));
 });
+
+test("after another job's refusal the window is asked for again before reading", async () => {
+  const fake = fakeTestril({
+    payer: payerAccount(payerKey).address,
+    busy: [
+      { function_slug: "ens.primary_name", job_id: "job:7", partial: true },
+    ],
+  });
+  const testril = await connectTestril({
+    url: await fake.listen(),
+    payerKey,
+    name: "fetch-test",
+  });
+  const bind = { ...binds[2], window: { from_block: 100, to_block: 160 } };
+  const run = newRun([bind]);
+  let rows;
+  try {
+    rows = await fetchRows({ binds: [bind], testril, run, pollMs: 1 });
+  } finally {
+    await testril.close();
+    await fake.close();
+  }
+
+  assert.equal(rows["ens-vitalik"].length, 60);
+  assert.equal(run.binds[0].jobId, "job:2");
+  assert.deepEqual(
+    fake.charges.map((c) => [c.tool, c.amount]),
+    [
+      ["materialize", 60 * 120],
+      ["read", 20 + 60],
+    ],
+  );
+});

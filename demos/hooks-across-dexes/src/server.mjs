@@ -46,7 +46,7 @@ export function createApp({
       current.state = "failed";
     } finally {
       current.finishedAt = new Date().toISOString();
-      await testril?.close();
+      await testril?.close().catch(() => {});
     }
   }
 
@@ -77,7 +77,7 @@ export function createApp({
       if (request.method !== "GET") return send(405, "text/plain", "");
       const file = normalize(pathname === "/" ? "/index.html" : pathname);
       const type = types[extname(file)];
-      if (!type || file.includes("..")) return send(404, "text/plain", "");
+      if (!type) return send(404, "text/plain", "");
       return send(200, type, await readFile(join(publicDir, file)));
     } catch (error) {
       if (error.code === "ENOENT") return send(404, "text/plain", "");

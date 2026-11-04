@@ -107,6 +107,7 @@ function renderWallet(wallet, weekWindow) {
 function render(report) {
   const { wallets, weekWindow } = report.view;
   const picker = document.querySelector("#wallet");
+  picker.hidden = false;
   picker.replaceChildren(
     ...wallets.map((wallet, index) => {
       const option = element("option", wallet.name);
@@ -204,7 +205,15 @@ function renderRun(run) {
 }
 
 async function poll() {
-  const run = await (await fetch("/api/run")).json();
+  let run;
+  try {
+    run = await (await fetch("/api/run")).json();
+  } catch (error) {
+    document.querySelector("#fetch-status").textContent =
+      `Cannot reach the server (${error.message}). Retrying…`;
+    setTimeout(poll, 3000);
+    return;
+  }
   renderRun(run);
   if (run.state === "running") setTimeout(poll, 1000);
 }

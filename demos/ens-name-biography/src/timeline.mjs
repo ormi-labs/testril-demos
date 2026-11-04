@@ -1,5 +1,4 @@
-import { nameWrapper } from "./report.mjs";
-
+export const nameWrapper = "0xd4416b13d2b3a9abae7acd5d6c2bbdbe25686401";
 export const zeroAddress = "0x0000000000000000000000000000000000000000";
 export const kindLabels = {
   owner: "Owner",
