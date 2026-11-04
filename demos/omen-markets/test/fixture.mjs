@@ -1,17 +1,13 @@
-import { writeFile } from "node:fs/promises";
-import { pathToFileURL } from "node:url";
-import spec from "../testril.json" with { type: "json" };
-import { window } from "../src/report.mjs";
+import { binds, window } from "../src/report.mjs";
 
-const recordedAt = "2026-11-02T00:00:00.000Z";
 const marketCount = 12;
 const randomTradeCount = 120;
 const secondsPerBlock = 5;
 const firstBlockTime = 1790985600;
 const answerTimeout = 3 * 86400;
 const collateralToken = "0xe91d153e0b41518a2ce8dd3d7944fa863463a97d";
-const conditionalTokens = spec.binds[0].params.conditional_tokens;
-const factory = spec.binds[0].params.factory;
+const conditionalTokens = binds[0].params.conditional_tokens;
+const factory = binds[0].params.factory;
 
 function seeded(seed) {
   let state = seed;
@@ -199,28 +195,37 @@ export function fixture() {
   const trades = tradeRows(random, markets, traders);
   const liquidity = liquidityRows(random, markets, [factory, ...creators]);
   return {
-    demo: spec.demo,
-    source: "synthetic",
-    recordedAt,
-    boundFunctions: Object.fromEntries(
-      spec.binds.map((bind) => [
-        bind.name,
-        { function_slug: bind.function_slug, chain_id: bind.chain_id },
-      ]),
-    ),
-    window: Object.fromEntries(spec.binds.map((b) => [b.name, b.window])),
-    rows: {
-      markets: marketList,
-      trades,
-      liquidity,
-      market_state: marketStateRows(markets, trades, liquidity),
-      answers: answerRows(random),
-    },
+    markets: marketList,
+    trades,
+    liquidity,
+    market_state: marketStateRows(markets, trades, liquidity),
+    answers: answerRows(random),
   };
 }
 
-if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href)
-  await writeFile(
-    new URL("../recordings/synthetic.json", import.meta.url),
-    `${JSON.stringify(fixture(), null, 2)}\n`,
+const sameParams = (a, b) => JSON.stringify(a) === JSON.stringify(b);
+const covers = (outer, inner) =>
+  Object.keys(inner).every((key) =>
+    key.startsWith("from_")
+      ? inner[key] >= outer[key]
+      : inner[key] <= outer[key],
   );
+
+export function fixtureRows() {
+  const rows = fixture();
+  return (bound, window) => {
+    const bind = binds.find(
+      (candidate) =>
+        candidate.function_slug === bound.function_slug &&
+        candidate.chain_id === bound.chain_id &&
+        sameParams(candidate.params, bound.params) &&
+        covers(candidate.window, window),
+    );
+    return "from_block" in window && bind.read
+      ? rows[bind.name].filter(
+          (row) =>
+            row.block >= window.from_block && row.block < window.to_block,
+        )
+      : rows[bind.name];
+  };
+}

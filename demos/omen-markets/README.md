@@ -22,15 +22,20 @@ Reality.eth answers are keyed by question id, and none of the five functions
 links a market to its question, so answers are listed beside the markets, not
 joined to them.
 
-**The shipped recording is synthetic.** `recordings/synthetic.json` is generated
-by `test/fixture.mjs` and the page says so in its banner. Record real data with
-`npm run record` (below).
-
-![Desktop screenshot](docs/screenshot-desktop.png)
+Every number on the page comes live from Testril when you press **Fetch from
+Testril**. The first fetch has Testril index the data; later fetches only read
+what Testril already indexed.
 
 ## Prerequisites
 
 - Node.js 22.13 or later
+- A private key whose address holds Testril usage credits. The demo pays with
+  vouchers against those credits, so the wallet needs no USDC.
+
+| Variable            | Purpose                                                    |
+| ------------------- | ---------------------------------------------------------- |
+| `TESTRIL_PAYER_KEY` | Hex private key that signs vouchers; required to fetch     |
+| `TESTRIL_MCP_URL`   | Testril MCP endpoint; default `https://dev.testril.ai/mcp` |
 
 ## Run
 
@@ -38,13 +43,20 @@ Working directory: `demos/omen-markets`
 
 ```sh
 npm ci
+export TESTRIL_PAYER_KEY=<hex private key>
 npm start
 ```
 
-Open http://127.0.0.1:4180 (set `PORT` to change it). Expected result: the
-synthetic banner, five headline numbers, a bar chart of the ten busiest
-markets, a table of markets, a table of settling answers, and three passed
-cross-checks.
+Open http://127.0.0.1:4180 (set `PORT` to change it) and press **Fetch from
+Testril**. For each bind the server calls `bind`, asks `materialize` for the
+whole window (Testril charges only for what it has not indexed yet), follows the
+job, then `read`s the window. The page shows a bar per bind and overall from
+Testril's own job progress and the usage credits spent. Then it draws five
+headline numbers, a bar chart of the ten busiest markets, a table of markets, a
+table of settling answers, and three passed cross-checks. Nothing is saved: a
+restart starts empty and the next fetch reads again.
+
+Without `TESTRIL_PAYER_KEY` the button is disabled and the page says what to set.
 
 ## Test
 
@@ -61,8 +73,11 @@ for an unlisted market, buys read as sells, a fee off by 10^2, a pool balance
 that holds fewer tokens than its trades leave or is negative, and an answer that finalizes
 before it was given; that the report counts only window markets, keeps
 non-wxDAI collateral out of the wxDAI total and survives an unlisted market;
-and that the server returns the shaped report. `npm run test:browser` writes `docs/screenshot-desktop.png`.
-`npm run fixture` regenerates the synthetic recording.
+and that the server returns the shaped report.
+`npm test` also fetches from a fake Testril: the fetch pays with the payer's
+vouchers, reports Testril's job progress and keeps every row.
+`npm run test:browser` presses the button against the fake Testril and waits
+for the report. The fixture lives in `test/` and is never shown on the page.
 
 ## Subjects and window
 
@@ -71,18 +86,18 @@ Window: Gnosis blocks `[48558286, 49062480)`, the first block at or after
 2026-11-01), found by binary search over the public RPC
 gnosis-rpc.publicnode.com.
 
-| Subject                              | Address                                      | Note                    |
-| ------------------------------------ | -------------------------------------------- | ----------------------- |
-| Omen FPMM deterministic factory      | `0x9083a2b699c0a4ad06f63580bde2635d26a3eef0` |                         |
-| Conditional Tokens                   | `0xceafdd6bc0bef976fdcd1112955828e00543c0ce` |                         |
-| Reality.eth (Realitio) on Gnosis     | `0x79e32ae03fb27b07c89c0c568f80287c01ca2e57` | verify before recording |
-| wxDAI (collateral counted in volume) | `0xe91d153e0b41518a2ce8dd3d7944fa863463a97d` |                         |
+| Subject                              | Address                                      | Note   |
+| ------------------------------------ | -------------------------------------------- | ------ |
+| Omen FPMM deterministic factory      | `0x9083a2b699c0a4ad06f63580bde2635d26a3eef0` |        |
+| Conditional Tokens                   | `0xceafdd6bc0bef976fdcd1112955828e00543c0ce` |        |
+| Reality.eth (Realitio) on Gnosis     | `0x79e32ae03fb27b07c89c0c568f80287c01ca2e57` | verify |
+| wxDAI (collateral counted in volume) | `0xe91d153e0b41518a2ce8dd3d7944fa863463a97d` |        |
 
 The factory, Conditional Tokens and wxDAI addresses are the well-known Omen
 on Gnosis deployments; only the Reality.eth address is
 unconfirmed as the instance Omen uses.
 
-## Binds (`testril.json`)
+## Binds (`src/report.mjs`)
 
 Windows are half-open: the end is the first block not included.
 
@@ -99,32 +114,3 @@ holds negative or too few outcome tokens needs it, at the cost of its credits.
 `markets` starts at block 0 so it lists every market that can trade in the
 window, not only those created in it. `trades`, `liquidity`, `market_state` and
 `answers` are read in chunks of 20,000 blocks.
-
-## Record real data
-
-The demo records itself. It needs a private key whose address holds Testril
-usage credits; it pays with vouchers against those credits, so the wallet
-needs no USDC.
-
-| Variable            | Purpose                                                    |
-| ------------------- | ---------------------------------------------------------- |
-| `TESTRIL_PAYER_KEY` | Hex private key that signs vouchers; required to record    |
-| `TESTRIL_MCP_URL`   | Testril MCP endpoint; default `https://dev.testril.ai/mcp` |
-
-Working directory: `demos/omen-markets`
-
-```sh
-export TESTRIL_PAYER_KEY=<hex private key>
-npm run record
-```
-
-For each bind in `testril.json`, `npm run record` calls `bind`, asks
-`materialize` for the whole window (Testril charges only for blocks not yet
-indexed), waits for the job, then `read`s the window. It writes
-`recordings/recorded.json` (git-ignored) with `source: "dev"`, the bound
-function ids, job ids, timings and the usage credits spent. The page then
-shows "Recorded from Testril on <date>". A failed run leaves the previous
-recording in place.
-
-`npm test` runs `npm run record` against a fake Testril: it pays with the
-payer's vouchers, follows each `materialize` answer and keeps every row.

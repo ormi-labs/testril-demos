@@ -1,4 +1,35 @@
-import spec from "../testril.json" with { type: "json" };
+export const binds = [
+  {
+    name: "aqua-ethereum",
+    function_slug: "aqua.push_volume",
+    chain_id: 1,
+    params: {
+      swap: { registry: "0x499943e74fb0ce105688beee8ef2abec5d936d31" },
+      by: "day",
+    },
+    window: { from_day: "2026-10-25", to_day: "2026-11-02" },
+  },
+  {
+    name: "aqua-base",
+    function_slug: "aqua.push_volume",
+    chain_id: 8453,
+    params: {
+      swap: { registry: "0x499943e74fb0ce105688beee8ef2abec5d936d31" },
+      by: "day",
+    },
+    window: { from_day: "2026-10-25", to_day: "2026-11-02" },
+  },
+  {
+    name: "tessera-base",
+    function_slug: "tessera_v.token_volume",
+    chain_id: 8453,
+    params: {
+      swap: { swap_address: "0x55555522005bcae1c2424d474bfd5ed477749e3e" },
+      by: "day",
+    },
+    window: { from_day: "2026-10-25", to_day: "2026-11-02" },
+  },
+];
 
 const fieldsBySlug = {
   "aqua.push_volume": {
@@ -32,12 +63,12 @@ const tokens = {
     "0x4200000000000000000000000000000000000006": ["WETH", 18],
   },
 };
-export const venues = spec.binds.map((bind) => ({
+export const venues = binds.map((bind) => ({
   ...bind,
   title: venueNames[bind.name],
   fields: fieldsBySlug[bind.function_slug],
 }));
-export const reportWindow = spec.binds[0].window;
+export const reportWindow = binds[0].window;
 const integer = /^[0-9]+$/;
 
 const nextDay = (day) =>

@@ -2,10 +2,13 @@ import { createServer } from "node:http";
 import { readFile } from "node:fs/promises";
 import { extname, join, normalize } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
-import { check, shape } from "./report.mjs";
+import { binds, check, shape } from "./report.mjs";
+import { fetchRows, newRun } from "./fetch.mjs";
+import { connectTestril } from "./testril.mjs";
 
-const root = fileURLToPath(new URL("..", import.meta.url));
-const publicDir = join(root, "public");
+const demo = "dao-treasuries";
+const defaultUrl = "https://dev.testril.ai/mcp";
+const publicDir = fileURLToPath(new URL("../public", import.meta.url));
 const types = {
   ".html": "text/html",
   ".css": "text/css",
@@ -13,33 +16,41 @@ const types = {
   ".svg": "image/svg+xml",
 };
 
-export function report(recording) {
+export function report(rows) {
   let checks;
   try {
-    checks = { ok: true, passed: check(recording.rows) };
+    checks = { ok: true, passed: check(rows) };
   } catch (error) {
     checks = { ok: false, error: error.message };
   }
-  return {
-    source: recording.source,
-    recordedAt: recording.recordedAt,
-    view: shape(recording.rows),
-    checks,
-  };
+  return { view: shape(rows), checks };
 }
 
-async function readRecording(directory) {
-  try {
-    return JSON.parse(await readFile(join(directory, "recorded.json"), "utf8"));
-  } catch (error) {
-    if (error.code !== "ENOENT") throw error;
-    return JSON.parse(
-      await readFile(join(directory, "synthetic.json"), "utf8"),
-    );
+export function createApp({
+  url = process.env.TESTRIL_MCP_URL ?? defaultUrl,
+  payerKey = process.env.TESTRIL_PAYER_KEY,
+  pollMs,
+} = {}) {
+  let run = { state: payerKey ? "idle" : "unconfigured" };
+
+  async function start() {
+    run = newRun(binds);
+    const current = run;
+    let testril;
+    try {
+      testril = await connectTestril({ url, payerKey, name: demo });
+      const rows = await fetchRows({ binds, testril, run: current, pollMs });
+      current.report = report(rows);
+      current.state = "done";
+    } catch (error) {
+      current.error = error.message;
+      current.state = "failed";
+    } finally {
+      current.finishedAt = new Date().toISOString();
+      await testril?.close();
+    }
   }
-}
 
-export function createApp(recordingsDir = join(root, "recordings")) {
   return createServer(async (request, response) => {
     response.setHeader("X-Content-Type-Options", "nosniff");
     response.setHeader("Referrer-Policy", "no-referrer");
@@ -52,20 +63,26 @@ export function createApp(recordingsDir = join(root, "recordings")) {
       response.writeHead(status, { "Content-Type": type });
       response.end(body);
     };
+    const json = (status, value) =>
+      send(status, "application/json", JSON.stringify(value));
     const { pathname } = new URL(request.url, "http://127.0.0.1");
     try {
-      if (request.method !== "GET") return send(405, "text/plain", "");
-      if (pathname === "/api/report") {
-        const recording = await readRecording(recordingsDir);
-        return send(200, "application/json", JSON.stringify(report(recording)));
+      if (pathname === "/api/run") {
+        if (request.method === "GET") return json(200, run);
+        if (request.method !== "POST") return send(405, "text/plain", "");
+        if (run.state === "unconfigured" || run.state === "running")
+          return json(409, run);
+        start();
+        return json(202, run);
       }
+      if (request.method !== "GET") return send(405, "text/plain", "");
       const file = normalize(pathname === "/" ? "/index.html" : pathname);
       const type = types[extname(file)];
       if (!type || file.includes("..")) return send(404, "text/plain", "");
       return send(200, type, await readFile(join(publicDir, file)));
     } catch (error) {
       if (error.code === "ENOENT") return send(404, "text/plain", "");
-      send(500, "application/json", JSON.stringify({ error: error.message }));
+      json(500, { error: error.message });
     }
   });
 }

@@ -4,7 +4,10 @@ import { check } from "../src/check.mjs";
 import { hoursInWindow, shape, wallets } from "../src/report.mjs";
 import { fixture, hourEndBlocks } from "./fixture.mjs";
 
-const recording = () => JSON.parse(JSON.stringify(fixture()));
+const recording = () => ({
+  rows: JSON.parse(JSON.stringify(fixture())),
+  hourEndBlocks: { ...hourEndBlocks },
+});
 const rows = () => recording().rows;
 const checkRows = (corrupted) => check({ rows: corrupted, hourEndBlocks });
 const [, exploiter, walletA] = wallets;

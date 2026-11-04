@@ -8,15 +8,20 @@ compared as integers), every fee is booked in the asset its version and side
 require, every fill carries a builder word, and each resolved condition lists
 both outcomes once and pays a denominator equal to the sum of its numerators.
 
-**The shipped recording is synthetic.** `recordings/synthetic.json` is generated
-by `test/fixture.mjs` and the page says so in its banner. Record real data with
-`npm run record` (below).
-
-![Desktop screenshot](docs/screenshot-desktop.png)
+Every number on the page comes live from Testril when you press **Fetch from
+Testril**. The first fetch has Testril index the data; later fetches only read
+what Testril already indexed.
 
 ## Prerequisites
 
 - Node.js 22.13 or later
+- A private key whose address holds Testril usage credits. The demo pays with
+  vouchers against those credits, so the wallet needs no USDC.
+
+| Variable            | Purpose                                                    |
+| ------------------- | ---------------------------------------------------------- |
+| `TESTRIL_PAYER_KEY` | Hex private key that signs vouchers; required to fetch     |
+| `TESTRIL_MCP_URL`   | Testril MCP endpoint; default `https://dev.testril.ai/mcp` |
 
 ## Run
 
@@ -24,13 +29,21 @@ Working directory: `demos/polymarket-tape`
 
 ```sh
 npm ci
+export TESTRIL_PAYER_KEY=<hex private key>
 npm start
 ```
 
-Open http://127.0.0.1:4180 (set `PORT` to change it). Expected result: the
-synthetic banner, four headline numbers, a table of the 12 largest fills, an
-hourly odds line for the busiest market, a builder leaderboard, the resolved
-conditions, and four passed cross-checks.
+Open http://127.0.0.1:4180 (set `PORT` to change it) and press **Fetch from
+Testril**. For each bind the server calls `bind`, asks `materialize` for the
+whole window (Testril charges only for what it has not indexed yet), follows the
+job, then `read`s the window. The page shows a bar per bind and overall from
+Testril's own job progress and the usage credits spent. Then it draws four
+headline numbers, a table of the 12 largest fills, an hourly odds line for the
+busiest market, a builder leaderboard, the resolved conditions, and four passed
+cross-checks. Nothing is saved: a restart starts empty and the next fetch reads
+again.
+
+Without `TESTRIL_PAYER_KEY` the button is disabled and the page says what to set.
 
 ## Test
 
@@ -49,29 +62,32 @@ read twice, a fee is booked in the wrong asset, a version 1 fill carries a
 builder code, a fill has no builder word, a condition resolves outside the
 window, repeats or misses an outcome, pays nothing at all, or pays a denominator
 that is not the sum of its numerators, or a leaderboard presents truncated
-volumes as the whole; it also checks the shaped tape, odds line and server. `npm run test:browser` writes
-`docs/screenshot-desktop.png`. `npm run fixture` regenerates the recording.
+volumes as the whole; it also checks the shaped tape, odds line and server.
+`npm test` also fetches from a fake Testril: the fetch pays with the payer's
+vouchers, reports Testril's job progress and keeps every row.
+`npm run test:browser` presses the button against the fake Testril and waits
+for the report. The fixture lives in `test/` and is never shown on the page.
 
 ## Subjects and window
 
 Polygon (chain 137), 2026-11-01. Windows are half-open: the block window is
 `[96523829, 96581429)`, 57,600 blocks, the nominal Polygon blocks per day.
-**Verify before recording:** both bounds were not checked against block
+**Verify before fetching:** both bounds were not checked against block
 timestamps; to_block should be the first block of 2026-11-02. The page buckets fills into hours of 2,400 blocks.
 
-| Subject                         | Address                                      | Note                                         |
-| ------------------------------- | -------------------------------------------- | -------------------------------------------- |
-| Polymarket CTF Exchange         | `0x4bfb41d5b3570defd03c39a9a4d8de6bd8b8982e` | version 1, no builder codes                  |
-| Polymarket NegRisk CTF Exchange | `0xc5d563a36ae78145c45a50134d48a1215220f80a` | version 1, no builder codes                  |
-| Polymarket exchange (version 2) | `0xe2222d279d744050d28e00520010520000310f59` | verify before recording; emits builder codes |
-| ConditionalTokens (CTF)         | `0x4d97dcd97ec945f40cf65f87097ace5ea0476045` |                                              |
+| Subject                         | Address                                      | Note                        |
+| ------------------------------- | -------------------------------------------- | --------------------------- |
+| Polymarket CTF Exchange         | `0x4bfb41d5b3570defd03c39a9a4d8de6bd8b8982e` | version 1, no builder codes |
+| Polymarket NegRisk CTF Exchange | `0xc5d563a36ae78145c45a50134d48a1215220f80a` | version 1, no builder codes |
+| Polymarket exchange (version 2) | `0xe2222d279d744050d28e00520010520000310f59` | verify; emits builder codes |
+| ConditionalTokens (CTF)         | `0x4d97dcd97ec945f40cf65f87097ace5ea0476045` |                             |
 
 Builder codes exist only on version 2 fills, so version 1 fills appear as "No
 builder code". Payouts are read for the same day only; the page does not link a
 resolved condition to a market's token because fills carry token ids, not
 condition ids.
 
-## Binds (`testril.json`)
+## Binds (`src/report.mjs`)
 
 | Name      | Function                               | Chain | Params               | Window              |
 | --------- | -------------------------------------- | ----- | -------------------- | ------------------- |
@@ -79,32 +95,3 @@ condition ids.
 | `payouts` | `conditional_tokens.condition_payouts` | 137   | `conditional_tokens` | 96523829 → 96581429 |
 
 `fills` is read in chunks of 2,400 blocks.
-
-## Record real data
-
-The demo records itself. It needs a private key whose address holds Testril
-usage credits; it pays with vouchers against those credits, so the wallet
-needs no USDC.
-
-| Variable            | Purpose                                                    |
-| ------------------- | ---------------------------------------------------------- |
-| `TESTRIL_PAYER_KEY` | Hex private key that signs vouchers; required to record    |
-| `TESTRIL_MCP_URL`   | Testril MCP endpoint; default `https://dev.testril.ai/mcp` |
-
-Working directory: `demos/polymarket-tape`
-
-```sh
-export TESTRIL_PAYER_KEY=<hex private key>
-npm run record
-```
-
-For each bind in `testril.json`, `npm run record` calls `bind`, asks
-`materialize` for the whole window (Testril charges only for blocks not yet
-indexed), waits for the job, then `read`s the window. It writes
-`recordings/recorded.json` (git-ignored) with `source: "dev"`, the bound
-function ids, job ids, timings and the usage credits spent. The page then
-shows "Recorded from Testril on <date>". A failed run leaves the previous
-recording in place.
-
-`npm test` runs `npm run record` against a fake Testril: it pays with the
-payer's vouchers, follows each `materialize` answer and keeps every row.

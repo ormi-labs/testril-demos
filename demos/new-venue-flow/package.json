@@ -13,9 +13,7 @@
     "test:browser": "playwright test",
     "lint": "eslint .",
     "format:check": "prettier --check .",
-    "format": "prettier --write .",
-    "fixture": "node test/fixture.mjs",
-    "record": "node src/record.mjs"
+    "format": "prettier --write ."
   },
   "devDependencies": {
     "@playwright/test": "1.63.0",

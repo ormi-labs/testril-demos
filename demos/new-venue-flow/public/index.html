@@ -19,7 +19,6 @@
       ><span>Data demos / New venue flow</span>
     </header>
     <main class="measure">
-      <p id="source" class="banner">Loading…</p>
       <div class="eyebrow">ETHEREUM · BASE · EIGHT DAYS</div>
       <h1>Which tokens flow into<br />the newest venues.</h1>
       <p class="intro">
@@ -29,45 +28,56 @@
       </p>
       <section class="scope" aria-label="Report scope">
         <div>
-          <span class="label">UTC DAYS</span><strong id="window"></strong>
+          <span class="label">UTC DAYS</span
+          ><strong id="window">shown after fetch</strong>
         </div>
         <div>
           <span class="label">FUNCTIONS</span
           ><strong>aqua.push_volume · tessera_v.token_volume</strong>
         </div>
       </section>
-      <section
-        id="headline"
-        class="metrics"
-        aria-label="Headline numbers"
-      ></section>
-      <div id="venues"></div>
-      <section class="results">
-        <div class="section-heading">
-          <h2>Window totals per token</h2>
-          <span>raw amounts in each token's own units</span>
+      <section id="fetch-panel" class="fetch" aria-label="Fetch from Testril">
+        <div class="fetch-head">
+          <button id="fetch" type="button" disabled>Fetch from Testril</button>
+          <span id="fetch-status">Loading…</span>
         </div>
-        <div class="table-wrap">
-          <table>
-            <thead>
-              <tr>
-                <th>Venue</th>
-                <th>Token</th>
-                <th>Pushes or trades</th>
-                <th>Amount</th>
-              </tr>
-            </thead>
-            <tbody id="venue-table"></tbody>
-          </table>
-        </div>
+        <progress id="fetch-overall" max="1" value="0" hidden></progress>
+        <ol id="fetch-binds" class="fetch-binds" hidden></ol>
       </section>
-      <section class="method">
-        <h2>Cross-check</h2>
-        <ul id="checks"></ul>
-      </section>
+      <div id="report" hidden>
+        <section
+          id="headline"
+          class="metrics"
+          aria-label="Headline numbers"
+        ></section>
+        <div id="venues"></div>
+        <section class="results">
+          <div class="section-heading">
+            <h2>Window totals per token</h2>
+            <span>raw amounts in each token's own units</span>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Venue</th>
+                  <th>Token</th>
+                  <th>Pushes or trades</th>
+                  <th>Amount</th>
+                </tr>
+              </thead>
+              <tbody id="venue-table"></tbody>
+            </table>
+          </div>
+        </section>
+        <section class="method">
+          <h2>Cross-check</h2>
+          <ul id="checks"></ul>
+        </section>
+      </div>
     </main>
     <footer class="measure">
-      Data shaped from the recording in <code>recordings/</code>.
+      Data fetched live from Testril when you press the button.
     </footer>
   </body>
 </html>

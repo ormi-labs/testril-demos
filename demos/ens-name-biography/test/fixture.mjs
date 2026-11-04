@@ -1,18 +1,14 @@
-import { writeFile } from "node:fs/promises";
-import { pathToFileURL } from "node:url";
-import spec from "../testril.json" with { type: "json" };
 import {
+  binds,
   blockWindow,
   gracePeriodSeconds,
   interpolatedMonthBlock,
   monthsInWindow,
   subjects,
   nameWrapper,
-  windowOf,
   zeroAddress,
 } from "../src/report.mjs";
 
-const recordedAt = "2026-11-02T00:00:00.000Z";
 const yearSeconds = 365 * 86400;
 const firstBlockSeconds = Date.UTC(2020, 0, 30) / 1000;
 const lastBlockSeconds = Date.UTC(2026, 10, 2) / 1000;
@@ -20,7 +16,7 @@ const ethNode =
   "0x93cdeb708b7545dc668eb9280176169d1c33cfd8ed6f04690a0bcc88a93fc4ae";
 const publicResolver2020 = "0x4976fb03c32e5b8cfe2b6ccb31c09ba78ebaba41";
 const publicResolver2023 = "0x231b0ee14048e9dccd1d247744d114a4eb5e8e63";
-const syntheticAddress = (tag, n) =>
+const fixtureAddress = (tag, n) =>
   `0x${tag}${String(n).padStart(40 - tag.length, "0")}`;
 
 const stories = {
@@ -28,7 +24,7 @@ const stories = {
     node: "0xee6c4522aab0003e8d14cd40a6af439055fd2577951148c14b6cea9a53475835",
     labelhash:
       "0xaf2caa1c2ca1d027f1ac823b529d0a67cd144264b2789fa2ea4d63a67c7103cc",
-    owners: [syntheticAddress("a11ce", 1), syntheticAddress("b0b", 2)],
+    owners: [fixtureAddress("a11ce", 1), fixtureAddress("b0b", 2)],
     registrations: [
       { windowShare: 0.003, years: 3 },
       { windowShare: 0.17, years: 1 },
@@ -56,7 +52,7 @@ const stories = {
     node: "0x05a67c0ee82964c4f7394cdd47fee7f4d9503a23c09c38341779ea012afe6e00",
     labelhash:
       "0x5d5727cb0fb76e4944eafb88ec9a3cf0b3c9025a4b2f947729137c5d7f84f68f",
-    owners: [syntheticAddress("ca401", 3), syntheticAddress("da7e", 4)],
+    owners: [fixtureAddress("ca401", 3), fixtureAddress("da7e", 4)],
     registrations: [
       { windowShare: 0.01, years: 2 },
       { windowShare: 0.13, years: 1 },
@@ -185,25 +181,32 @@ export function fixture() {
     rows[subject.binds.address] = addressRows(story, domain);
     rows[subject.binds.wrapped] = wrappedRows(story, wrapBlocks, registration);
   }
-  return {
-    demo: spec.demo,
-    source: "synthetic",
-    recordedAt,
-    boundFunctions: Object.fromEntries(
-      spec.binds.map((bind) => [
-        bind.name,
-        { function_slug: bind.function_slug, chain_id: bind.chain_id },
-      ]),
-    ),
-    window: Object.fromEntries(
-      spec.binds.map((bind) => [bind.name, windowOf(bind.name)]),
-    ),
-    rows,
-  };
+  return rows;
 }
 
-if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href)
-  await writeFile(
-    new URL("../recordings/synthetic.json", import.meta.url),
-    `${JSON.stringify(fixture(), null, 2)}\n`,
+const sameParams = (a, b) => JSON.stringify(a) === JSON.stringify(b);
+const covers = (outer, inner) =>
+  Object.keys(inner).every((key) =>
+    key.startsWith("from_")
+      ? inner[key] >= outer[key]
+      : inner[key] <= outer[key],
   );
+
+export function fixtureRows() {
+  const rows = fixture();
+  return (bound, window) => {
+    const bind = binds.find(
+      (candidate) =>
+        candidate.function_slug === bound.function_slug &&
+        candidate.chain_id === bound.chain_id &&
+        sameParams(candidate.params, bound.params) &&
+        covers(candidate.window, window),
+    );
+    return "from_block" in window && bind.read
+      ? rows[bind.name].filter(
+          (row) =>
+            row.block >= window.from_block && row.block < window.to_block,
+        )
+      : rows[bind.name];
+  };
+}

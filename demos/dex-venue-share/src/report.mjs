@@ -1,9 +1,68 @@
-import spec from "../testril.json" with { type: "json" };
+export const binds = [
+  {
+    name: "uniswap-v2",
+    function_slug: "uniswap_v2.pool_volume",
+    chain_id: 1,
+    params: {
+      swap: {
+        pool_list: { factory: "0x5c69bee701ef814a2b6a3edd4b1652cb9cc5aa6f" },
+      },
+      by: "day",
+    },
+    window: { from_day: "2026-10-25", to_day: "2026-11-02" },
+  },
+  {
+    name: "uniswap-v3",
+    function_slug: "uniswap_v3.pool_volume",
+    chain_id: 1,
+    params: {
+      swap: {
+        pool_list: { factory: "0x1f98431c8ad98523631ae4a59f267346ea31f984" },
+      },
+      by: "day",
+    },
+    window: { from_day: "2026-10-25", to_day: "2026-11-02" },
+  },
+  {
+    name: "uniswap-v4",
+    function_slug: "uniswap_v4.pool_volume",
+    chain_id: 1,
+    params: {
+      swap: { manager: "0x000000000004444c5dc75cb358380d2e3de08a90" },
+      by: "day",
+    },
+    window: { from_day: "2026-10-25", to_day: "2026-11-02" },
+  },
+  {
+    name: "curve",
+    function_slug: "curve.pool_volume",
+    chain_id: 1,
+    params: {
+      swap: {
+        pool_list: { factory: "0x0c0e5f2ff0ff18a3be9b835635039256dc4b4963" },
+      },
+      by: "day",
+    },
+    window: { from_day: "2026-10-25", to_day: "2026-11-02" },
+  },
+  {
+    name: "fluid-dex",
+    function_slug: "fluid_dex.pool_volume",
+    chain_id: 1,
+    params: {
+      swap: {
+        pool_list: { factory: "0x91716c4eda1fb55e84bf8b4c7085f84285c19085" },
+      },
+      by: "day",
+    },
+    window: { from_day: "2026-10-25", to_day: "2026-11-02" },
+  },
+];
 import { pairs } from "./pairs.mjs";
 
 export { pairs };
 
-export const window = spec.binds[0].window;
+export const window = binds[0].window;
 const bpTotal = 10000n;
 const priceTolerancePercent = 5n;
 const ethDecimals = 18;
@@ -117,7 +176,7 @@ function checkSubjectsHaveRows(pair, rows) {
 }
 
 export function check(rows) {
-  for (const bind of spec.binds)
+  for (const bind of binds)
     if (!rows[bind.name]?.length) throw new Error(`No rows for ${bind.name}.`);
   const passed = [];
   for (const pair of pairs) {

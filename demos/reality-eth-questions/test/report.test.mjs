@@ -3,7 +3,7 @@ import assert from "node:assert/strict";
 import { check, shape } from "../src/report.mjs";
 import { fixture } from "./fixture.mjs";
 
-const rows = () => structuredClone(fixture().rows);
+const rows = () => structuredClone(fixture());
 const longestLadder = (answers) => {
   const counts = Map.groupBy(answers, (a) => a.question_id);
   return [...counts.values()].sort((a, b) => b.length - a.length)[0];

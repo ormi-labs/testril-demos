@@ -1,7 +1,45 @@
-import spec from "../testril.json" with { type: "json" };
+export const binds = [
+  {
+    name: "indexing-rewards",
+    function_slug: "graph_network.indexing_rewards",
+    chain_id: 42161,
+    params: {
+      rewards_manager: "0x971b9d3d0ae3eca029cab5ea1fb0f72c85e6a525",
+      subgraph_service: "0xb2bb92d0de618878e438b55d5846cfecd9301105",
+      staking: "0x00669a4cf01450b64e8a2a20e9b1fcb71e61ef03",
+      epoch_manager: "0x5a843145c43d328b9bb7a4401d94918f131bb281",
+    },
+    window: { from_block: 518282017, to_block: 520415225 },
+    read: { chunk_blocks: 100000 },
+  },
+  {
+    name: "delegation",
+    function_slug: "graph_network.delegation",
+    chain_id: 42161,
+    params: {
+      staking: "0x00669a4cf01450b64e8a2a20e9b1fcb71e61ef03",
+      epoch_manager: "0x5a843145c43d328b9bb7a4401d94918f131bb281",
+    },
+    window: { from_block: 518282017, to_block: 520415225 },
+    read: { chunk_blocks: 100000 },
+  },
+  {
+    name: "query-fees",
+    function_slug: "graph_network.query_fees",
+    chain_id: 42161,
+    params: {
+      staking: "0x00669a4cf01450b64e8a2a20e9b1fcb71e61ef03",
+      subgraph_service: "0xb2bb92d0de618878e438b55d5846cfecd9301105",
+      graph_payments: "0x7aae8ae011927bc36cb4d0d3e81f2e6e30dae06d",
+      epoch_manager: "0x5a843145c43d328b9bb7a4401d94918f131bb281",
+    },
+    window: { from_block: 518282017, to_block: 520415225 },
+    read: { chunk_blocks: 100000 },
+  },
+];
 
-const binds = Object.fromEntries(spec.binds.map((bind) => [bind.name, bind]));
-export const rewardWindow = binds["indexing-rewards"].window;
+const bindByName = Object.fromEntries(binds.map((bind) => [bind.name, bind]));
+export const rewardWindow = bindByName["indexing-rewards"].window;
 const topIndexerCount = 10;
 const wei = 10n ** 18n;
 
@@ -21,7 +59,7 @@ const inWindow = (row, { from_block, to_block }) =>
   row.block >= from_block && row.block < to_block;
 
 function requireInWindow(name, rows) {
-  const outside = rows.find((row) => !inWindow(row, binds[name].window));
+  const outside = rows.find((row) => !inWindow(row, bindByName[name].window));
   if (outside)
     throw new Error(
       `${name} row at block ${outside.block} is outside the window.`,

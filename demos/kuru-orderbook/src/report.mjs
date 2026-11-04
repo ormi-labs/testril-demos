@@ -1,9 +1,29 @@
-import spec from "../testril.json" with { type: "json" };
+export const binds = [
+  {
+    name: "markets",
+    function_slug: "kuru.market_list",
+    chain_id: 143,
+    params: { router: "0xd651346d7c789536ebf06dc72ae3c8502cd695cc" },
+    window: { from_block: 0, to_block: 118765043 },
+  },
+  {
+    name: "volume",
+    function_slug: "kuru.market_volume",
+    chain_id: 143,
+    params: {
+      swap: {
+        market_list: { router: "0xd651346d7c789536ebf06dc72ae3c8502cd695cc" },
+      },
+      by: "day",
+    },
+    window: { from_day: "2026-10-25", to_day: "2026-11-02" },
+  },
+];
 
 export const zeroAddress = "0x0000000000000000000000000000000000000000";
-const binds = Object.fromEntries(spec.binds.map((bind) => [bind.name, bind]));
-export const router = binds.markets.params.router;
-export const volumeWindow = binds.volume.window;
+const bindByName = Object.fromEntries(binds.map((bind) => [bind.name, bind]));
+export const router = bindByName.markets.params.router;
+export const volumeWindow = bindByName.volume.window;
 export const usdc = "0x754704bc059f8c67012fed69bc8a327a5aafb603";
 const symbols = new Map([
   [zeroAddress, "MON"],

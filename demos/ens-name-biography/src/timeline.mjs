@@ -1,9 +1,6 @@
-import spec from "../testril.json" with { type: "json" };
+import { nameWrapper } from "./report.mjs";
 
 export const zeroAddress = "0x0000000000000000000000000000000000000000";
-export const nameWrapper = spec.binds.find(
-  (bind) => bind.function_slug === "ens.wrapped_domain",
-).params.name_wrapper;
 export const kindLabels = {
   owner: "Owner",
   resolver: "Resolver",

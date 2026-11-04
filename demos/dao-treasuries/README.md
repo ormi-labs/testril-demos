@@ -7,15 +7,20 @@ numbers: for every token and day, the DAO total read over all its wallets must
 equal the sum of the same token read one wallet at a time, and no balance may be
 negative.
 
-**The shipped recording is synthetic.** `recordings/synthetic.json` is generated
-by `test/fixture.mjs` and the page says so in its banner. Record real data with
-`npm run record` (below).
-
-![Desktop screenshot](docs/screenshot-desktop.png)
+Every number on the page comes live from Testril when you press **Fetch from
+Testril**. The first fetch has Testril index the data; later fetches only read
+what Testril already indexed.
 
 ## Prerequisites
 
 - Node.js 22.13 or later
+- A private key whose address holds Testril usage credits. The demo pays with
+  vouchers against those credits, so the wallet needs no USDC.
+
+| Variable            | Purpose                                                    |
+| ------------------- | ---------------------------------------------------------- |
+| `TESTRIL_PAYER_KEY` | Hex private key that signs vouchers; required to fetch     |
+| `TESTRIL_MCP_URL`   | Testril MCP endpoint; default `https://dev.testril.ai/mcp` |
 
 ## Run
 
@@ -23,12 +28,20 @@ Working directory: `demos/dao-treasuries`
 
 ```sh
 npm ci
+export TESTRIL_PAYER_KEY=<hex private key>
 npm start
 ```
 
-Open http://127.0.0.1:4180 (set `PORT` to change it). Expected result: the
-synthetic banner, three headline numbers, three DAO cards each with a line and
-a holdings table, and six passed cross-checks.
+Open http://127.0.0.1:4180 (set `PORT` to change it) and press **Fetch from
+Testril**. For each bind the server calls `bind`, asks `materialize` for the
+whole window (Testril charges only for what it has not indexed yet), follows the
+job, then `read`s the window. The page shows a bar per bind and overall from
+Testril's own job progress and the usage credits spent. Then it draws three
+headline numbers, three DAO cards each with a line and a holdings table, and six
+passed cross-checks. Nothing is saved: a restart starts empty and the next fetch
+reads again.
+
+Without `TESTRIL_PAYER_KEY` the button is disabled and the page says what to set.
 
 ## Test
 
@@ -43,9 +56,11 @@ npm run format:check
 `npm test` checks the cross-check passes on the fixture and fails when one
 wallet is one raw unit off on one day, when a wallet's day is missing, when a
 native balance is negative, and when the governance token vanishes for a day,
-and that the server returns the shaped report. `npm run test:browser` writes
-`docs/screenshot-desktop.png`. `npm run fixture` regenerates the synthetic
-recording.
+and that the server returns the shaped report.
+`npm test` also fetches from a fake Testril: the fetch pays with the payer's
+vouchers, reports Testril's job progress and keeps every row.
+`npm run test:browser` presses the button against the fake Testril and waits
+for the report. The fixture lives in `test/` and is never shown on the page.
 
 ## Subjects and window
 
@@ -56,14 +71,14 @@ recording.
   `<dao>-tokens-<wallet>` reads them one wallet at a time, and `<dao>-native`
   reads each wallet's native ETH. A token a wallet does not hold has no row.
 
-| DAO          | Wallet              | Address                                      | Note                    |
-| ------------ | ------------------- | -------------------------------------------- | ----------------------- |
-| Uniswap      | Governance Timelock | `0x1a9c8182c09f50c8318d769245bea52c32be35bc` |                         |
-| Uniswap      | Uniswap Foundation  | `0x3d30b1ab88d487b0f3061f40de76845bec3f1e94` | verify before recording |
-| ENS DAO      | DAO Wallet          | `0xfe89cc7abb2c4183683ab71653c4cdc9b02d44b7` |                         |
-| ENS DAO      | Endowment           | `0x4f2083f5fbede34c2714affb3105539775f7fe64` | verify before recording |
-| Arbitrum DAO | DAO Treasury        | `0xf3fc178157fb3c87548baa86f9d24ba38e649b58` | verify before recording |
-| Arbitrum DAO | Core Timelock       | `0x34d45e99f7d8c45ed05b5ca72d54bbd1fb3f98f0` | verify before recording |
+| DAO          | Wallet              | Address                                      | Note   |
+| ------------ | ------------------- | -------------------------------------------- | ------ |
+| Uniswap      | Governance Timelock | `0x1a9c8182c09f50c8318d769245bea52c32be35bc` |        |
+| Uniswap      | Uniswap Foundation  | `0x3d30b1ab88d487b0f3061f40de76845bec3f1e94` | verify |
+| ENS DAO      | DAO Wallet          | `0xfe89cc7abb2c4183683ab71653c4cdc9b02d44b7` |        |
+| ENS DAO      | Endowment           | `0x4f2083f5fbede34c2714affb3105539775f7fe64` | verify |
+| Arbitrum DAO | DAO Treasury        | `0xf3fc178157fb3c87548baa86f9d24ba38e649b58` | verify |
+| Arbitrum DAO | Core Timelock       | `0x34d45e99f7d8c45ed05b5ca72d54bbd1fb3f98f0` | verify |
 
 | Token | Chain    | Address                                      | Decimals |
 | ----- | -------- | -------------------------------------------- | -------- |
@@ -75,7 +90,7 @@ recording.
 | USDC  | Arbitrum | `0xaf88d065e77c8cc2239327c5edb3a432268e5831` | 6        |
 | WETH  | Arbitrum | `0x82af49447d8a07e3bd95bd0d56f35241523fbab1` | 18       |
 
-## Binds (`testril.json`)
+## Binds (`src/report.mjs`)
 
 Windows are half-open: the end is the first day not included.
 
@@ -93,32 +108,3 @@ Windows are half-open: the end is the first day not included.
 | `arbitrum-tokens-treasury`      | `erc20.token_balance` | 42161 | 2026-10-25 → 2026-11-02 |
 | `arbitrum-tokens-core-timelock` | `erc20.token_balance` | 42161 | 2026-10-25 → 2026-11-02 |
 | `arbitrum-native`               | `native.balance`      | 42161 | 2026-10-25 → 2026-11-02 |
-
-## Record real data
-
-The demo records itself. It needs a private key whose address holds Testril
-usage credits; it pays with vouchers against those credits, so the wallet
-needs no USDC.
-
-| Variable            | Purpose                                                    |
-| ------------------- | ---------------------------------------------------------- |
-| `TESTRIL_PAYER_KEY` | Hex private key that signs vouchers; required to record    |
-| `TESTRIL_MCP_URL`   | Testril MCP endpoint; default `https://dev.testril.ai/mcp` |
-
-Working directory: `demos/dao-treasuries`
-
-```sh
-export TESTRIL_PAYER_KEY=<hex private key>
-npm run record
-```
-
-For each bind in `testril.json`, `npm run record` calls `bind`, asks
-`materialize` for the whole window (Testril charges only for blocks not yet
-indexed), waits for the job, then `read`s the window. It writes
-`recordings/recorded.json` (git-ignored) with `source: "dev"`, the bound
-function ids, job ids, timings and the usage credits spent. The page then
-shows "Recorded from Testril on <date>". A failed run leaves the previous
-recording in place.
-
-`npm test` runs `npm run record` against a fake Testril: it pays with the
-payer's vouchers, follows each `materialize` answer and keeps every row.

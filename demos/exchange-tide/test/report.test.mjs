@@ -3,7 +3,7 @@ import assert from "node:assert/strict";
 import { check, shape, usdc, usdt } from "../src/report.mjs";
 import { fixture } from "./fixture.mjs";
 
-const rows = () => structuredClone(fixture().rows);
+const rows = () => structuredClone(fixture());
 
 test("check proves every total against its owners on the fixture", () => {
   const passed = check(rows());

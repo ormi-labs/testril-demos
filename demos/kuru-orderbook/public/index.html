@@ -19,7 +19,6 @@
       ><span>Data demos / Kuru order book</span>
     </header>
     <main class="measure">
-      <p id="source" class="banner">Loading…</p>
       <div class="eyebrow">MONAD · KURU ROUTER</div>
       <h1>Which Kuru markets<br />the takers traded.</h1>
       <p class="intro">
@@ -29,10 +28,11 @@
       <section class="scope" aria-label="Report scope">
         <div>
           <span class="label">VOLUME · UTC DAYS</span
-          ><strong id="volume-window"></strong>
+          ><strong id="volume-window">shown after fetch</strong>
         </div>
         <div>
-          <span class="label">ROUTER</span><strong id="router"></strong>
+          <span class="label">ROUTER</span
+          ><strong id="router">shown after fetch</strong>
         </div>
         <div>
           <span class="label">FUNCTIONS</span
@@ -40,49 +40,59 @@
         </div>
         <div><span class="label">CHAIN</span><strong>Monad (143)</strong></div>
       </section>
-      <section
-        id="headline"
-        class="metrics"
-        aria-label="Headline numbers"
-      ></section>
-      <section class="results">
-        <div class="section-heading">
-          <h2>Taker volume by market</h2>
-          <span>USDC-quoted markets, in USDC</span>
+      <section id="fetch-panel" class="fetch" aria-label="Fetch from Testril">
+        <div class="fetch-head">
+          <button id="fetch" type="button" disabled>Fetch from Testril</button>
+          <span id="fetch-status">Loading…</span>
         </div>
-        <div id="volume-chart" class="flow"></div>
+        <progress id="fetch-overall" max="1" value="0" hidden></progress>
+        <ol id="fetch-binds" class="fetch-binds" hidden></ol>
       </section>
-      <section class="results">
-        <div class="section-heading">
-          <h2>All markets</h2>
-          <span
-            >fees and rebates in each market's own base and quote assets</span
-          >
-        </div>
-        <div class="table-wrap">
-          <table>
-            <thead>
-              <tr>
-                <th>Market</th>
-                <th>Address</th>
-                <th>Volume</th>
-                <th>Trades</th>
-                <th>Taker / maker bps</th>
-                <th>Taker fees</th>
-                <th>Maker rebates</th>
-              </tr>
-            </thead>
-            <tbody id="markets"></tbody>
-          </table>
-        </div>
-      </section>
-      <section class="method">
-        <h2>Cross-check</h2>
-        <ul id="checks"></ul>
-      </section>
+      <div id="report" hidden>
+        <section
+          id="headline"
+          class="metrics"
+          aria-label="Headline numbers"
+        ></section>
+        <section class="results">
+          <div class="section-heading">
+            <h2>Taker volume by market</h2>
+            <span>USDC-quoted markets, in USDC</span>
+          </div>
+          <div id="volume-chart" class="flow"></div>
+        </section>
+        <section class="results">
+          <div class="section-heading">
+            <h2>All markets</h2>
+            <span
+              >fees and rebates in each market's own base and quote assets</span
+            >
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Market</th>
+                  <th>Address</th>
+                  <th>Volume</th>
+                  <th>Trades</th>
+                  <th>Taker / maker bps</th>
+                  <th>Taker fees</th>
+                  <th>Maker rebates</th>
+                </tr>
+              </thead>
+              <tbody id="markets"></tbody>
+            </table>
+          </div>
+        </section>
+        <section class="method">
+          <h2>Cross-check</h2>
+          <ul id="checks"></ul>
+        </section>
+      </div>
     </main>
     <footer class="measure">
-      Data shaped from the recording in <code>recordings/</code>.
+      Data fetched live from Testril when you press the button.
     </footer>
   </body>
 </html>

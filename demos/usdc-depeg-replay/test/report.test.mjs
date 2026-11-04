@@ -9,7 +9,7 @@ import {
 } from "../src/report.mjs";
 import { fixture } from "./fixture.mjs";
 
-const rows = () => structuredClone(fixture().rows);
+const rows = () => structuredClone(fixture());
 
 test("check proves each hour's supply change from mints and burns", () => {
   assert.equal(check(rows()).length, 3);

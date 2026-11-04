@@ -9,7 +9,7 @@ import {
 } from "../src/report.mjs";
 import { fixture, usd1 } from "./fixture.mjs";
 
-const rows = () => structuredClone(fixture().rows);
+const rows = () => structuredClone(fixture());
 
 test("check proves the trade day's volume and fees", () => {
   const passed = check(rows());

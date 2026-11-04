@@ -7,16 +7,20 @@ else's swap in the same pool and block, in opposite directions). Each finding
 links its transactions on Etherscan. The page proves its numbers with three
 cross-checks (below).
 
-**The shipped recording is synthetic.** `recordings/synthetic.json` is generated
-by `test/fixture.mjs` and the page says so in its banner. Its transaction hashes
-are made up and do not resolve to real transactions. Record real data with
-`npm run record` (below).
-
-![Desktop screenshot](docs/screenshot-desktop.png)
+Every number on the page comes live from Testril when you press **Fetch from
+Testril**. The first fetch has Testril index the data; later fetches only read
+what Testril already indexed.
 
 ## Prerequisites
 
 - Node.js 22.13 or later
+- A private key whose address holds Testril usage credits. The demo pays with
+  vouchers against those credits, so the wallet needs no USDC.
+
+| Variable            | Purpose                                                    |
+| ------------------- | ---------------------------------------------------------- |
+| `TESTRIL_PAYER_KEY` | Hex private key that signs vouchers; required to fetch     |
+| `TESTRIL_MCP_URL`   | Testril MCP endpoint; default `https://dev.testril.ai/mcp` |
 
 ## Run
 
@@ -24,13 +28,20 @@ Working directory: `demos/v4-swap-forensics`
 
 ```sh
 npm ci
+export TESTRIL_PAYER_KEY=<hex private key>
 npm start
 ```
 
-Open http://127.0.0.1:4180 (set `PORT` to change it). Expected result: the
-synthetic banner, four headline counts, swaps per hour with JIT and sandwich
-marks, three tabs (biggest swaps, JIT events, sandwiches) and three passed
-cross-checks.
+Open http://127.0.0.1:4180 (set `PORT` to change it) and press **Fetch from
+Testril**. For each bind the server calls `bind`, asks `materialize` for the
+whole window (Testril charges only for what it has not indexed yet), follows the
+job, then `read`s the window. The page shows a bar per bind and overall from
+Testril's own job progress and the usage credits spent. Then it draws four
+headline counts, swaps per hour with JIT and sandwich marks, three tabs (biggest
+swaps, JIT events, sandwiches) and three passed cross-checks. Nothing is saved:
+a restart starts empty and the next fetch reads again.
+
+Without `TESTRIL_PAYER_KEY` the button is disabled and the page says what to set.
 
 ## Test
 
@@ -48,8 +59,10 @@ sign, when a swap reports less liquidity than the JIT add before it, when a row
 is outside the window or when USDC decimals are wrong. It also checks that a
 remove one unit short of the add is not JIT, that two same-direction swaps are
 not a sandwich, and that the server returns the shaped report.
-`npm run test:browser` writes `docs/screenshot-desktop.png`.
-`npm run fixture` regenerates the synthetic recording.
+`npm test` also fetches from a fake Testril: the fetch pays with the payer's
+vouchers, reports Testril's job progress and keeps every row.
+`npm run test:browser` presses the button against the fake Testril and waits
+for the report. The fixture lives in `test/` and is never shown on the page.
 
 ## Cross-checks
 
@@ -75,50 +88,21 @@ All comparisons use raw integer units (BigInt).
 
 ## Subjects and window
 
-| Subject                | Address / id                                                         | Note                    |
-| ---------------------- | -------------------------------------------------------------------- | ----------------------- |
-| Uniswap v4 PoolManager | `0x000000000004444c5dc75cb358380d2e3de08a90`                         |                         |
-| USDC                   | `0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48`                         |                         |
-| USDT                   | `0xdac17f958d2ee523a2206206994597c13d831ec7`                         |                         |
-| ETH/USDC 0.05% pool id | `0xdce6394339af00981949f5f3baf27e3610c76326a700af57e4b3e3ae4977f78d` | verify before recording |
+| Subject                | Address / id                                                         | Note   |
+| ---------------------- | -------------------------------------------------------------------- | ------ |
+| Uniswap v4 PoolManager | `0x000000000004444c5dc75cb358380d2e3de08a90`                         |        |
+| USDC                   | `0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48`                         |        |
+| USDT                   | `0xdac17f958d2ee523a2206206994597c13d831ec7`                         |        |
+| ETH/USDC 0.05% pool id | `0xdce6394339af00981949f5f3baf27e3610c76326a700af57e4b3e3ae4977f78d` | verify |
 
 - Day: 2026-11-01 UTC, blocks `[26316189, 26323365)` (half-open: the end is the
   first block of 2026-11-02), found by binary search over a public RPC.
 - Swaps and liquidity changes are read in 300-block chunks (about one hour).
 
-## Binds (`testril.json`)
+## Binds (`src/report.mjs`)
 
 | Name        | Function                      | Chain | Params         | Window                  |
 | ----------- | ----------------------------- | ----- | -------------- | ----------------------- |
 | `swaps`     | `uniswap_v4.swap`             | 1     | `manager`      | 26316189 → 26323365     |
 | `liquidity` | `uniswap_v4.modify_liquidity` | 1     | `manager`      | 26316189 → 26323365     |
 | `tokens`    | `erc20.token_metadata`        | 1     | `tokens`, `by` | 2026-11-01 → 2026-11-02 |
-
-## Record real data
-
-The demo records itself. It needs a private key whose address holds Testril
-usage credits; it pays with vouchers against those credits, so the wallet
-needs no USDC.
-
-| Variable            | Purpose                                                    |
-| ------------------- | ---------------------------------------------------------- |
-| `TESTRIL_PAYER_KEY` | Hex private key that signs vouchers; required to record    |
-| `TESTRIL_MCP_URL`   | Testril MCP endpoint; default `https://dev.testril.ai/mcp` |
-
-Working directory: `demos/v4-swap-forensics`
-
-```sh
-export TESTRIL_PAYER_KEY=<hex private key>
-npm run record
-```
-
-For each bind in `testril.json`, `npm run record` calls `bind`, asks
-`materialize` for the whole window (Testril charges only for blocks not yet
-indexed), waits for the job, then `read`s the window. It writes
-`recordings/recorded.json` (git-ignored) with `source: "dev"`, the bound
-function ids, job ids, timings and the usage credits spent. The page then
-shows "Recorded from Testril on <date>". A failed run leaves the previous
-recording in place.
-
-`npm test` runs `npm run record` against a fake Testril: it pays with the
-payer's vouchers, follows each `materialize` answer and keeps every row.

@@ -3,7 +3,7 @@ import assert from "node:assert/strict";
 import { basisPoints, check, days, shape } from "../src/report.mjs";
 import { fixture } from "./fixture.mjs";
 
-const rows = () => structuredClone(fixture().rows);
+const rows = () => structuredClone(fixture());
 const curvePool = "0x7f86bf177dd4f3494b841a37e810a34dd56c829b";
 const v4Pool =
   "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27";

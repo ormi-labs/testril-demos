@@ -9,7 +9,7 @@ import {
 } from "../src/report.mjs";
 import { fixture } from "./fixture.mjs";
 
-const rows = () => structuredClone(fixture().rows);
+const rows = () => structuredClone(fixture());
 const [vitalik, nick] = subjects;
 
 test("check passes on the fixture and names the invariants", () => {

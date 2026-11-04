@@ -19,7 +19,6 @@
       ><span>Data demos / Exchange tide</span>
     </header>
     <main class="measure">
-      <p id="source" class="banner">Loading…</p>
       <div class="eyebrow">ETHEREUM · USDT, USDC AND ETH</div>
       <h1>How much the exchanges hold,<br />hour by hour.</h1>
       <p class="intro">
@@ -28,55 +27,66 @@
       </p>
       <section class="scope" aria-label="Report scope">
         <div>
-          <span class="label">HOURS · UTC</span><strong id="window"></strong>
+          <span class="label">HOURS · UTC</span
+          ><strong id="window">shown after fetch</strong>
         </div>
         <div>
           <span class="label">FUNCTIONS</span
           ><strong>erc20.token_balance · native.balance</strong>
         </div>
       </section>
-      <section
-        id="headline"
-        class="metrics"
-        aria-label="Headline numbers"
-      ></section>
-      <section class="results">
-        <div class="section-heading">
-          <h2>Stablecoins held per exchange</h2>
-          <span>USDT plus USDC, billions of dollars, stacked</span>
+      <section id="fetch-panel" class="fetch" aria-label="Fetch from Testril">
+        <div class="fetch-head">
+          <button id="fetch" type="button" disabled>Fetch from Testril</button>
+          <span id="fetch-status">Loading…</span>
         </div>
-        <div id="tide" class="flow"></div>
-        <ul id="legend" class="legend"></ul>
+        <progress id="fetch-overall" max="1" value="0" hidden></progress>
+        <ol id="fetch-binds" class="fetch-binds" hidden></ol>
       </section>
-      <section class="results">
-        <div class="section-heading">
-          <h2>Biggest hours in and out</h2>
-          <span
-            >change in an exchange's USDT plus USDC from the hour before</span
-          >
-        </div>
-        <div class="table-wrap">
-          <table>
-            <thead>
-              <tr>
-                <th>Hour (UTC)</th>
-                <th>Exchange</th>
-                <th>Direction</th>
-                <th>Change</th>
-                <th>Balance after</th>
-              </tr>
-            </thead>
-            <tbody id="biggest"></tbody>
-          </table>
-        </div>
-      </section>
-      <section class="method">
-        <h2>Cross-check</h2>
-        <ul id="checks"></ul>
-      </section>
+      <div id="report" hidden>
+        <section
+          id="headline"
+          class="metrics"
+          aria-label="Headline numbers"
+        ></section>
+        <section class="results">
+          <div class="section-heading">
+            <h2>Stablecoins held per exchange</h2>
+            <span>USDT plus USDC, billions of dollars, stacked</span>
+          </div>
+          <div id="tide" class="flow"></div>
+          <ul id="legend" class="legend"></ul>
+        </section>
+        <section class="results">
+          <div class="section-heading">
+            <h2>Biggest hours in and out</h2>
+            <span
+              >change in an exchange's USDT plus USDC from the hour before</span
+            >
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Hour (UTC)</th>
+                  <th>Exchange</th>
+                  <th>Direction</th>
+                  <th>Change</th>
+                  <th>Balance after</th>
+                </tr>
+              </thead>
+              <tbody id="biggest"></tbody>
+            </table>
+          </div>
+        </section>
+        <section class="method">
+          <h2>Cross-check</h2>
+          <ul id="checks"></ul>
+        </section>
+      </div>
     </main>
     <footer class="measure">
-      Data shaped from the recording in <code>recordings/</code>.
+      Data fetched live from Testril when you press the button.
     </footer>
   </body>
 </html>

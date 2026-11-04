@@ -3,7 +3,7 @@ import assert from "node:assert/strict";
 import { check, formatGrt, shape } from "../src/report.mjs";
 import { fixture } from "./fixture.mjs";
 
-const rows = () => structuredClone(fixture().rows);
+const rows = () => structuredClone(fixture());
 const collected = (list) => list.find((r) => r.kind === "rewards_collected");
 
 test("check passes on the fixture with three proven sentences", () => {

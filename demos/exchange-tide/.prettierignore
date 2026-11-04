@@ -1,5 +1,3 @@
 node_modules/
 test-results/
 playwright-report/
-recordings/synthetic.json
-recordings/recorded.json

@@ -1,12 +1,41 @@
-import spec from "../testril.json" with { type: "json" };
+export const binds = [
+  {
+    name: "supply",
+    function_slug: "erc20.token_supply",
+    chain_id: 1,
+    params: {
+      tokens: ["0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"],
+      by: "hour",
+    },
+    window: { from_hour: "2023-03-10T00", to_hour: "2023-03-15T00" },
+  },
+  {
+    name: "usdc-edges",
+    function_slug: "erc20.transfer_edges",
+    chain_id: 1,
+    params: { token_address: "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48" },
+    window: { from_block: 16794062, to_block: 16829610 },
+    read: { chunk_blocks: 600 },
+  },
+  {
+    name: "usdc-usd-feed",
+    function_slug: "aggregator.latest_answer",
+    chain_id: 1,
+    params: {
+      feeds: ["0x8fffffd4afb6115b954bd326cbe7b4ba576818f6"],
+      by: "hour",
+    },
+    window: { from_hour: "2023-03-10T00", to_hour: "2023-03-15T00" },
+  },
+];
 import hourFirstBlocks from "./hour-first-blocks.json" with { type: "json" };
 
 export const zeroAddress = "0x0000000000000000000000000000000000000000";
-const binds = Object.fromEntries(spec.binds.map((bind) => [bind.name, bind]));
-export const hourWindow = binds.supply.window;
-export const edgesWindow = binds["usdc-edges"].window;
-export const usdc = binds["usdc-edges"].params.token_address;
-export const feed = binds["usdc-usd-feed"].params.feeds[0];
+const bindByName = Object.fromEntries(binds.map((bind) => [bind.name, bind]));
+export const hourWindow = bindByName.supply.window;
+export const edgesWindow = bindByName["usdc-edges"].window;
+export const usdc = bindByName["usdc-edges"].params.token_address;
+export const feed = bindByName["usdc-usd-feed"].params.feeds[0];
 const decimals = 6n;
 const feedDecimals = 8;
 const priceFloor = 80000000n;
@@ -61,7 +90,7 @@ export function check(rows) {
     hourFirstBlocks.at(-1) !== edgesWindow.to_block
   )
     throw new Error(
-      "hour-first-blocks.json does not span the usdc-edges window in testril.json.",
+      "hour-first-blocks.json does not span the usdc-edges window in src/report.mjs.",
     );
   const supply = byHour(
     rows.supply.filter((row) => row.token.toLowerCase() === usdc),

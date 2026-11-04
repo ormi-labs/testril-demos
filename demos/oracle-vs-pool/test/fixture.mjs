@@ -1,7 +1,5 @@
-import { writeFile } from "node:fs/promises";
-import { pathToFileURL } from "node:url";
-import spec from "../testril.json" with { type: "json" };
 import {
+  binds,
   btcFeed,
   ethFeed,
   sqrtFromPrice,
@@ -9,8 +7,7 @@ import {
   windowHours,
 } from "../src/report.mjs";
 
-const recordedAt = "2026-11-02T00:00:00.000Z";
-const poolId = spec.binds[0].params.pool;
+const poolId = binds[0].params.pool;
 const ethDeviationBasisPoints = 50;
 const usdcHeartbeatHours = 24;
 
@@ -64,35 +61,23 @@ export function fixture() {
     i === 100 ? price * 1.014 : price * (1 + (random() - 0.5) * 0.004),
   );
   return {
-    demo: spec.demo,
-    source: "synthetic",
-    recordedAt,
-    boundFunctions: Object.fromEntries(
-      spec.binds.map((bind) => [
-        bind.name,
-        { function_slug: bind.function_slug, chain_id: bind.chain_id },
-      ]),
-    ),
-    window: Object.fromEntries(spec.binds.map((b) => [b.name, b.window])),
-    rows: {
-      pool: hours.map((hour, i) => ({
+    pool: hours.map((hour, i) => ({
+      hour,
+      pool: poolId,
+      sqrt_price_x96: sqrtFromPrice(toScaled(poolPrices[i])).toString(),
+      tick: String(tickFromDollars(poolPrices[i])),
+      liquidity: String(71658789467938n + BigInt(i) * 1000000000n),
+      lp_fee: "500",
+      protocol_fee_zero_for_one: "0",
+      protocol_fee_one_for_zero: "0",
+    })),
+    feeds: feeds.flatMap(([feed, answers]) =>
+      hours.map((hour, i) => ({
         hour,
-        pool: poolId,
-        sqrt_price_x96: sqrtFromPrice(toScaled(poolPrices[i])).toString(),
-        tick: String(tickFromDollars(poolPrices[i])),
-        liquidity: String(71658789467938n + BigInt(i) * 1000000000n),
-        lp_fee: "500",
-        protocol_fee_zero_for_one: "0",
-        protocol_fee_one_for_zero: "0",
+        feed,
+        answer: toScaled(answers[i]).toString(),
       })),
-      feeds: feeds.flatMap(([feed, answers]) =>
-        hours.map((hour, i) => ({
-          hour,
-          feed,
-          answer: toScaled(answers[i]).toString(),
-        })),
-      ),
-    },
+    ),
   };
 }
 
@@ -104,8 +89,28 @@ function holdLast(answers) {
   return answers.map((answer) => (last = answer ?? last));
 }
 
-if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href)
-  await writeFile(
-    new URL("../recordings/synthetic.json", import.meta.url),
-    `${JSON.stringify(fixture(), null, 2)}\n`,
+const sameParams = (a, b) => JSON.stringify(a) === JSON.stringify(b);
+const covers = (outer, inner) =>
+  Object.keys(inner).every((key) =>
+    key.startsWith("from_")
+      ? inner[key] >= outer[key]
+      : inner[key] <= outer[key],
   );
+
+export function fixtureRows(rows = fixture()) {
+  return (bound, window) => {
+    const bind = binds.find(
+      (candidate) =>
+        candidate.function_slug === bound.function_slug &&
+        candidate.chain_id === bound.chain_id &&
+        sameParams(candidate.params, bound.params) &&
+        covers(candidate.window, window),
+    );
+    return "from_block" in window && bind.read
+      ? rows[bind.name].filter(
+          (row) =>
+            row.block >= window.from_block && row.block < window.to_block,
+        )
+      : rows[bind.name];
+  };
+}

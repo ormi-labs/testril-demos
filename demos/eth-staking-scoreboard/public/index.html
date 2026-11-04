@@ -19,7 +19,6 @@
       ><span>Data demos / ETH staking scoreboard</span>
     </header>
     <main class="measure">
-      <p id="source" class="banner">Loading…</p>
       <div class="eyebrow">ETHEREUM · LIDO, WBETH, EIGENLAYER, STMATIC</div>
       <h1>Where staked ether sits,<br />day by day.</h1>
       <p class="intro">
@@ -28,7 +27,8 @@
       </p>
       <section class="scope" aria-label="Report scope">
         <div>
-          <span class="label">UTC DAYS</span><strong id="window"></strong>
+          <span class="label">UTC DAYS</span
+          ><strong id="window">shown after fetch</strong>
         </div>
         <div>
           <span class="label">ETHER</span
@@ -42,47 +42,57 @@
           <span class="label">MATIC</span><strong>lido.pooled_matic</strong>
         </div>
       </section>
-      <section
-        id="headline"
-        class="metrics"
-        aria-label="Headline numbers"
-      ></section>
-      <section class="results">
-        <div class="section-heading">
-          <h2>Staked per day by venue</h2>
-          <span
-            >each on its own scale, axis from its lowest to highest day</span
-          >
+      <section id="fetch-panel" class="fetch" aria-label="Fetch from Testril">
+        <div class="fetch-head">
+          <button id="fetch" type="button" disabled>Fetch from Testril</button>
+          <span id="fetch-status">Loading…</span>
         </div>
-        <div id="lines" class="charts"></div>
+        <progress id="fetch-overall" max="1" value="0" hidden></progress>
+        <ol id="fetch-binds" class="fetch-binds" hidden></ol>
       </section>
-      <section class="results">
-        <div class="section-heading">
-          <h2>First day to latest day</h2>
-          <span>one row per venue</span>
-        </div>
-        <div class="table-wrap">
-          <table>
-            <thead>
-              <tr>
-                <th>Venue</th>
-                <th>Function</th>
-                <th>First day</th>
-                <th>Latest</th>
-                <th>Change</th>
-              </tr>
-            </thead>
-            <tbody id="venues"></tbody>
-          </table>
-        </div>
-      </section>
-      <section class="method">
-        <h2>Cross-check</h2>
-        <ul id="checks"></ul>
-      </section>
+      <div id="report" hidden>
+        <section
+          id="headline"
+          class="metrics"
+          aria-label="Headline numbers"
+        ></section>
+        <section class="results">
+          <div class="section-heading">
+            <h2>Staked per day by venue</h2>
+            <span
+              >each on its own scale, axis from its lowest to highest day</span
+            >
+          </div>
+          <div id="lines" class="charts"></div>
+        </section>
+        <section class="results">
+          <div class="section-heading">
+            <h2>First day to latest day</h2>
+            <span>one row per venue</span>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Venue</th>
+                  <th>Function</th>
+                  <th>First day</th>
+                  <th>Latest</th>
+                  <th>Change</th>
+                </tr>
+              </thead>
+              <tbody id="venues"></tbody>
+            </table>
+          </div>
+        </section>
+        <section class="method">
+          <h2>Cross-check</h2>
+          <ul id="checks"></ul>
+        </section>
+      </div>
     </main>
     <footer class="measure">
-      Data shaped from the recording in <code>recordings/</code>.
+      Data fetched live from Testril when you press the button.
     </footer>
   </body>
 </html>

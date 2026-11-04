@@ -3,7 +3,7 @@ import assert from "node:assert/strict";
 import { check, shape } from "../src/report.mjs";
 import { fixture } from "./fixture.mjs";
 
-const rows = () => structuredClone(fixture().rows);
+const rows = () => structuredClone(fixture());
 const usdcRows = (list) =>
   list.filter((row) => (row.asset ?? row.token).startsWith("0xa0b869"));
 

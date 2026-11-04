@@ -23,6 +23,25 @@ const kindOf = (window) =>
   ["hour", "day"].find((kind) => `from_${kind}` in window) ?? "block";
 const blocksIn = (window) =>
   kindOf(window) === "block" ? window.to_block - window.from_block : 7200;
+const periodMs = { hour: 3600000, day: 86400000 };
+const startMs = (kind, value) =>
+  Date.parse(kind === "hour" ? `${value}:00:00Z` : `${value}T00:00:00Z`);
+
+function jobSize(window) {
+  const kind = kindOf(window);
+  if (kind === "block") return { unit: "blocks", total: blocksIn(window) };
+  const span =
+    startMs(kind, window[`to_${kind}`]) - startMs(kind, window[`from_${kind}`]);
+  return { unit: `${kind}s`, total: span / periodMs[kind] };
+}
+
+function defaultRows(_bind, window) {
+  return kindOf(window) === "block"
+    ? Array.from({ length: blocksIn(window) }, (_, i) => ({
+        block: window.from_block + i,
+      }))
+    : [{ day: window.from_day }];
+}
 const key = (id, window) => `${id} ${JSON.stringify(window)}`;
 const windowOf = ({ bound_function_id: _, ...window }) => window;
 
@@ -51,12 +70,18 @@ function quote(amount, tool) {
   };
 }
 
-export function fakeTestril({ payer, indexed = [], busy = [] }) {
+export function fakeTestril({
+  payer,
+  rows = defaultRows,
+  indexed = [],
+  busy = [],
+}) {
+  const bound = new Map();
   const calls = [];
   const charges = [];
   const covered = new Set();
   const jobs = new Map();
-  let polls = 0;
+  const polls = new Map();
 
   async function verify(payment, amount) {
     const { voucher } = payment.payload;
@@ -78,24 +103,31 @@ export function fakeTestril({ payer, indexed = [], busy = [] }) {
 
   async function answer(tool, args, payment) {
     calls.push({ tool, args, paid: Boolean(payment) });
-    if (tool === "bind")
-      return {
-        outcome: "success",
-        bound_function_id: `sha256:${args.function_slug}`,
-      };
+    if (tool === "bind") {
+      const id = `sha256:${args.function_slug}:${JSON.stringify(args.params)}`;
+      bound.set(id, args);
+      return { outcome: "success", bound_function_id: id };
+    }
     if (tool === "inspect") {
       const job = jobs.get(args.job_id);
-      polls += 1;
-      if (polls % 2 === 1) return { outcome: "success", state: "running" };
-      covered.add(job);
-      return { outcome: "success", state: "done" };
+      const poll = (polls.get(args.job_id) ?? 0) + 1;
+      polls.set(args.job_id, poll);
+      const finished = poll > 1;
+      if (finished) covered.add(job.key);
+      return {
+        outcome: "success",
+        state: finished ? "done" : "running",
+        [`${job.unit}_done`]: finished ? job.total : Math.floor(job.total / 2),
+        [`${job.unit}_total`]: job.total,
+      };
     }
     const id = args.bound_function_id;
+    const bind = bound.get(id);
     const window = windowOf(args);
     if (tool === "materialize") {
-      const busyJob = busy.find((b) => b.id === id);
+      const busyJob = busy.find((b) => b.function_slug === bind.function_slug);
       if (busyJob) {
-        jobs.set(busyJob.job_id, key(id, window));
+        jobs.set(busyJob.job_id, { key: key(id, window), ...jobSize(window) });
         return {
           outcome: "error",
           kind: "state",
@@ -109,7 +141,7 @@ export function fakeTestril({ payer, indexed = [], busy = [] }) {
           ],
         };
       }
-      if (indexed.includes(id) || covered.has(key(id, window)))
+      if (indexed.includes(bind.function_slug) || covered.has(key(id, window)))
         return {
           outcome: "error",
           kind: "state",
@@ -129,16 +161,10 @@ export function fakeTestril({ payer, indexed = [], busy = [] }) {
     };
     if (tool === "materialize") {
       const jobId = `job:${jobs.size + 1}`;
-      jobs.set(jobId, key(id, window));
+      jobs.set(jobId, { key: key(id, window), ...jobSize(window) });
       return { outcome: "success", job: { job_id: jobId }, receipt };
     }
-    const values =
-      kindOf(window) === "block"
-        ? Array.from({ length: blocksIn(window) }, (_, i) => ({
-            block: window.from_block + i,
-          }))
-        : [{ day: window.from_day }];
-    return { outcome: "success", values, receipt };
+    return { outcome: "success", values: rows(bind, window), receipt };
   }
 
   const server = createServer(async (request, response) => {

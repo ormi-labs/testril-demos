@@ -1,6 +1,97 @@
-import spec from "../testril.json" with { type: "json" };
+export const binds = [
+  {
+    name: "ens-vitalik",
+    function_slug: "ens.primary_name",
+    chain_id: 1,
+    params: {
+      registry: "0x00000000000c2e074ec69a0dfb2997ba6c7d2e1e",
+      address: "0xd8da6bf26964af9d7eed9e03e53415d37aa96045",
+    },
+    window: { from_block: 26323364, to_block: 26323365 },
+  },
+  {
+    name: "ens-nick",
+    function_slug: "ens.primary_name",
+    chain_id: 1,
+    params: {
+      registry: "0x00000000000c2e074ec69a0dfb2997ba6c7d2e1e",
+      address: "0xb8c2c29ee19d8307cb7255e1cd9cbde883a267d5",
+    },
+    window: { from_block: 26323364, to_block: 26323365 },
+  },
+  {
+    name: "ens-brantly",
+    function_slug: "ens.primary_name",
+    chain_id: 1,
+    params: {
+      registry: "0x00000000000c2e074ec69a0dfb2997ba6c7d2e1e",
+      address: "0x983110309620d911731ac0932219af06091b6744",
+    },
+    window: { from_block: 26323364, to_block: 26323365 },
+  },
+  {
+    name: "balance",
+    function_slug: "native.balance",
+    chain_id: 1,
+    params: {
+      owners: [
+        "0xd8da6bf26964af9d7eed9e03e53415d37aa96045",
+        "0xb8c2c29ee19d8307cb7255e1cd9cbde883a267d5",
+        "0x983110309620d911731ac0932219af06091b6744",
+      ],
+    },
+    window: { from_block: 26323364, to_block: 26323365 },
+  },
+  {
+    name: "transfers-vitalik",
+    function_slug: "erc20.wallet_transfers",
+    chain_id: 1,
+    params: {
+      wallet: "0xd8da6bf26964af9d7eed9e03e53415d37aa96045",
+      tokens: [
+        "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        "0xdac17f958d2ee523a2206206994597c13d831ec7",
+        "0x6b175474e89094c44da98b954eedeac495271d0f",
+        "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+      ],
+    },
+    window: { from_block: 26272965, to_block: 26323365 },
+    read: { chunk_blocks: 7200 },
+  },
+  {
+    name: "transfers-nick",
+    function_slug: "erc20.wallet_transfers",
+    chain_id: 1,
+    params: {
+      wallet: "0xb8c2c29ee19d8307cb7255e1cd9cbde883a267d5",
+      tokens: [
+        "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        "0xdac17f958d2ee523a2206206994597c13d831ec7",
+        "0x6b175474e89094c44da98b954eedeac495271d0f",
+        "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+      ],
+    },
+    window: { from_block: 26272965, to_block: 26323365 },
+    read: { chunk_blocks: 7200 },
+  },
+  {
+    name: "transfers-brantly",
+    function_slug: "erc20.wallet_transfers",
+    chain_id: 1,
+    params: {
+      wallet: "0x983110309620d911731ac0932219af06091b6744",
+      tokens: [
+        "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        "0xdac17f958d2ee523a2206206994597c13d831ec7",
+        "0x6b175474e89094c44da98b954eedeac495271d0f",
+        "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+      ],
+    },
+    window: { from_block: 26272965, to_block: 26323365 },
+    read: { chunk_blocks: 7200 },
+  },
+];
 
-const binds = spec.binds;
 export const weekWindow = binds.find((bind) =>
   bind.name.startsWith("transfers-"),
 ).window;

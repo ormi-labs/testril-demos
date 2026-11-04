@@ -3,7 +3,7 @@ import assert from "node:assert/strict";
 import { check, shape } from "../src/report.mjs";
 import { fixture } from "./fixture.mjs";
 
-const rows = () => structuredClone(fixture().rows);
+const rows = () => structuredClone(fixture());
 const currentTick = BigInt(rows()["pool-state"][0].tick);
 
 test("check proves in-range liquidity from the ticks up to the current tick", () => {

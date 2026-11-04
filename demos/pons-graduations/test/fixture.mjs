@@ -1,15 +1,11 @@
-import { writeFile } from "node:fs/promises";
-import { pathToFileURL } from "node:url";
-import spec from "../testril.json" with { type: "json" };
-import { feeDays } from "../src/report.mjs";
+import { binds, feeDays } from "../src/report.mjs";
 
-const binds = Object.fromEntries(spec.binds.map((bind) => [bind.name, bind]));
+const bindByName = Object.fromEntries(binds.map((bind) => [bind.name, bind]));
 const blocksPerDay = 823950;
 const factoryDeploymentBlock = 26841846;
 const dayStartBlock = (dayIndex) =>
-  binds.launches.window.from_block + dayIndex * blocksPerDay;
+  bindByName.launches.window.from_block + dayIndex * blocksPerDay;
 
-const recordedAt = "2026-11-02T00:00:00.000Z";
 const launchCount = 48;
 const graduatedCount = 14;
 const nativeCoin = `0x${"0".repeat(40)}`;
@@ -38,7 +34,7 @@ const milliEth = (thousandths) =>
   (BigInt(Math.round(thousandths)) * wei) / 1000n;
 
 function launchRows(random) {
-  const { factory } = binds.launches.params;
+  const { factory } = bindByName.launches.params;
   const end = dayStartBlock(feeDays().length);
   const step = Math.floor((end - factoryDeploymentBlock) / launchCount);
   return Array.from({ length: launchCount }, (_, i) => ({
@@ -138,28 +134,37 @@ export function fixture() {
   const graduations = graduationRows(launches, random);
   const sweeps = sweepRows(graduations, random);
   return {
-    demo: spec.demo,
-    source: "synthetic",
-    recordedAt,
-    boundFunctions: Object.fromEntries(
-      spec.binds.map((bind) => [
-        bind.name,
-        { function_slug: bind.function_slug, chain_id: bind.chain_id },
-      ]),
-    ),
-    window: Object.fromEntries(spec.binds.map((b) => [b.name, b.window])),
-    rows: {
-      launches,
-      graduations,
-      "curve-volume": volumeRows(launches, random),
-      "pool-fees": feeRows(sweeps),
-      "pool-fee-sweep": sweeps.map(withoutDay),
-    },
+    launches,
+    graduations,
+    "curve-volume": volumeRows(launches, random),
+    "pool-fees": feeRows(sweeps),
+    "pool-fee-sweep": sweeps.map(withoutDay),
   };
 }
 
-if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href)
-  await writeFile(
-    new URL("../recordings/synthetic.json", import.meta.url),
-    `${JSON.stringify(fixture(), null, 2)}\n`,
+const sameParams = (a, b) => JSON.stringify(a) === JSON.stringify(b);
+const covers = (outer, inner) =>
+  Object.keys(inner).every((key) =>
+    key.startsWith("from_")
+      ? inner[key] >= outer[key]
+      : inner[key] <= outer[key],
   );
+
+export function fixtureRows() {
+  const rows = fixture();
+  return (bound, window) => {
+    const bind = binds.find(
+      (candidate) =>
+        candidate.function_slug === bound.function_slug &&
+        candidate.chain_id === bound.chain_id &&
+        sameParams(candidate.params, bound.params) &&
+        covers(candidate.window, window),
+    );
+    return "from_block" in window && bind.read
+      ? rows[bind.name].filter(
+          (row) =>
+            row.block >= window.from_block && row.block < window.to_block,
+        )
+      : rows[bind.name];
+  };
+}
