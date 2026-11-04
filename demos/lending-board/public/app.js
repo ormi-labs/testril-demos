@@ -236,7 +236,15 @@ function renderRun(run) {
 }
 
 async function poll() {
-  const run = await (await fetch("/api/run")).json();
+  let run;
+  try {
+    run = await (await fetch("/api/run")).json();
+  } catch (error) {
+    document.querySelector("#fetch-status").textContent =
+      `Cannot reach the server (${error.message}). Retrying…`;
+    setTimeout(poll, 3000);
+    return;
+  }
   renderRun(run);
   if (run.state === "running") setTimeout(poll, 1000);
 }

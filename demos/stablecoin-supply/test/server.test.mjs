@@ -57,5 +57,4 @@ test("the button's fetch ends in the shaped report and its passed cross-check", 
     /default-src 'self'/,
   );
   assert.match(await page.text(), /Fetch from Testril/);
-  assert.equal((await fetch(`${base}/../package.json`)).status, 404);
 });

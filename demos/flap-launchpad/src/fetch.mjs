@@ -82,14 +82,20 @@ export async function fetchRows({ binds, testril, run, pollMs = 2000 }) {
       "bind",
     );
     progress.step = "indexing";
-    const prepared = await testril.call("materialize", {
-      bound_function_id: id,
-      ...bind.window,
-    });
-    pay(prepared);
-    const jobId = jobToWaitFor(prepared);
-    progress.jobId = jobId ?? null;
-    if (jobId) await waitForJob(testril, jobId, progress, pollMs);
+    progress.jobId = null;
+    for (let waiting = true; waiting;) {
+      const prepared = await testril.call("materialize", {
+        bound_function_id: id,
+        ...bind.window,
+      });
+      pay(prepared);
+      const jobId = jobToWaitFor(prepared);
+      if (jobId) {
+        progress.jobId = jobId;
+        await waitForJob(testril, jobId, progress, pollMs);
+      }
+      waiting = jobId !== undefined && prepared.outcome !== "success";
+    }
     const parts = readParts(bind.window, bind.read);
     Object.assign(progress, {
       step: "reading",

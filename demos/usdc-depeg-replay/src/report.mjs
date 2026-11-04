@@ -1,3 +1,5 @@
+import hourFirstBlocks from "./hour-first-blocks.json" with { type: "json" };
+
 export const binds = [
   {
     name: "supply",
@@ -28,7 +30,6 @@ export const binds = [
     window: { from_hour: "2023-03-10T00", to_hour: "2023-03-15T00" },
   },
 ];
-import hourFirstBlocks from "./hour-first-blocks.json" with { type: "json" };
 
 export const zeroAddress = "0x0000000000000000000000000000000000000000";
 const bindByName = Object.fromEntries(binds.map((bind) => [bind.name, bind]));

@@ -36,7 +36,7 @@ whole window (Testril charges only for what it has not indexed yet), follows the
 job, then `read`s the window. The page shows a bar per bind and overall from
 Testril's own job progress and the usage credits spent. Then it draws four
 headline numbers, a buys-vs-sells bar chart of the ten largest tokens, a table
-of all ranked tokens, and three passed cross-checks. Nothing is saved: a restart
+of all ranked tokens, and three cross-checks. Nothing is saved: a restart
 starts empty and the next fetch reads again.
 
 Without `TESTRIL_PAYER_KEY` the button is disabled and the page says what to set.

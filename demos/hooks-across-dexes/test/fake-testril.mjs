@@ -20,16 +20,25 @@ const voucherTypes = {
 };
 
 const kindOf = (window) =>
-  ["hour", "day"].find((kind) => `from_${kind}` in window) ?? "block";
+  ["hour", "day", "month"].find((kind) => `from_${kind}` in window) ?? "block";
 const blocksIn = (window) =>
   kindOf(window) === "block" ? window.to_block - window.from_block : 7200;
 const periodMs = { hour: 3600000, day: 86400000 };
+const monthIndex = (value) => {
+  const [year, month] = value.split("-").map(Number);
+  return year * 12 + month;
+};
 const startMs = (kind, value) =>
   Date.parse(kind === "hour" ? `${value}:00:00Z` : `${value}T00:00:00Z`);
 
 function jobSize(window) {
   const kind = kindOf(window);
   if (kind === "block") return { unit: "blocks", total: blocksIn(window) };
+  if (kind === "month")
+    return {
+      unit: "months",
+      total: monthIndex(window.to_month) - monthIndex(window.from_month),
+    };
   const span =
     startMs(kind, window[`to_${kind}`]) - startMs(kind, window[`from_${kind}`]);
   return { unit: `${kind}s`, total: span / periodMs[kind] };
@@ -82,6 +91,7 @@ export function fakeTestril({
   const covered = new Set();
   const jobs = new Map();
   const polls = new Map();
+  const served = new Set();
 
   async function verify(payment, amount) {
     const { voucher } = payment.payload;
@@ -113,7 +123,7 @@ export function fakeTestril({
       const poll = (polls.get(args.job_id) ?? 0) + 1;
       polls.set(args.job_id, poll);
       const finished = poll > 1;
-      if (finished) covered.add(job.key);
+      if (finished && job.key) covered.add(job.key);
       return {
         outcome: "success",
         state: finished ? "done" : "running",
@@ -125,9 +135,15 @@ export function fakeTestril({
     const bind = bound.get(id);
     const window = windowOf(args);
     if (tool === "materialize") {
-      const busyJob = busy.find((b) => b.function_slug === bind.function_slug);
+      const busyJob = busy.find(
+        (b) => b.function_slug === bind.function_slug && !served.has(b),
+      );
       if (busyJob) {
-        jobs.set(busyJob.job_id, { key: key(id, window), ...jobSize(window) });
+        served.add(busyJob);
+        jobs.set(busyJob.job_id, {
+          key: busyJob.partial ? undefined : key(id, window),
+          ...jobSize(window),
+        });
         return {
           outcome: "error",
           kind: "state",

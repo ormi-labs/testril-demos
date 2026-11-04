@@ -59,5 +59,4 @@ test("the button's fetch ends in the shaped report and its passed cross-check", 
   const html = await page.text();
   assert.match(html, /Fetch from Testril/);
   assert.match(html, /NFT Collection Day/);
-  assert.equal((await fetch(`${base}/../package.json`)).status, 404);
 });

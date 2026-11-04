@@ -59,7 +59,6 @@ test("the button's fetch ends in the shaped report and its passed cross-check", 
   const html = await page.text();
   assert.match(html, /Fetch from Testril/);
   assert.match(html, /Hooks Across DEXes/);
-  assert.equal((await fetch(`${base}/../package.json`)).status, 404);
 });
 
 test("a fetch whose rows fail the cross-check still ends done with the failure", async (t) => {

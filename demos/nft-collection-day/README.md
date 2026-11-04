@@ -40,7 +40,7 @@ job, then `read`s the window. The page shows a bar per bind and overall from
 Testril's own job progress and the usage credits spent. Then it draws four
 headline numbers, a mints-vs-trades bar per approximate UTC hour (the day's
 blocks split into 24 equal parts), a top-10 holder concentration bar with a
-table, and three passed cross-checks. Nothing is saved: a restart starts empty
+table, and three cross-checks. Nothing is saved: a restart starts empty
 and the next fetch reads again.
 
 Without `TESTRIL_PAYER_KEY` the button is disabled and the page says what to set.

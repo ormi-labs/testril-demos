@@ -1,3 +1,14 @@
+import {
+  changes,
+  formatDate,
+  formatEth,
+  kindLabels,
+  nameWrapper,
+  shortAddress,
+  timeline,
+  zeroAddress,
+} from "./timeline.mjs";
+
 export const binds = [
   {
     name: "vitalik-domain",
@@ -40,7 +51,7 @@ export const binds = [
     function_slug: "ens.wrapped_domain",
     chain_id: 1,
     params: {
-      name_wrapper: "0xd4416b13d2b3a9abae7acd5d6c2bbdbe25686401",
+      name_wrapper: nameWrapper,
       name: "vitalik.eth",
     },
     window: { from_block: 16925758, to_block: 26323365 },
@@ -86,26 +97,14 @@ export const binds = [
     function_slug: "ens.wrapped_domain",
     chain_id: 1,
     params: {
-      name_wrapper: "0xd4416b13d2b3a9abae7acd5d6c2bbdbe25686401",
+      name_wrapper: nameWrapper,
       name: "nick.eth",
     },
     window: { from_block: 16925758, to_block: 26323365 },
   },
 ];
-import {
-  changes,
-  formatDate,
-  formatEth,
-  kindLabels,
-  shortAddress,
-  timeline,
-  zeroAddress,
-} from "./timeline.mjs";
 
-export { formatEth, zeroAddress };
-export const nameWrapper = binds.find(
-  (bind) => bind.function_slug === "ens.wrapped_domain",
-).params.name_wrapper;
+export { formatEth, nameWrapper, zeroAddress };
 
 export const gracePeriodSeconds = 90 * 86400;
 const basisPoints = 10000n;

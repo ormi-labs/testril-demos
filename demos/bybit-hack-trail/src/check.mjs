@@ -78,14 +78,16 @@ function checkNativeBalances(rows) {
 function hourIndexOf(block, hourEndBlocks) {
   const index = hourEndBlocks.findIndex((end) => block <= end);
   if (index === -1)
-    throw new Error(`Block ${block} is after the last recorded hour.`);
+    throw new Error(`Block ${block} is after the last fetched hour.`);
   return index;
 }
 
-function recordedHourEnds(hourEndBlocks) {
+function fetchedHourEnds(hourEndBlocks) {
   const ends = hoursInWindow().map((hour) => hourEndBlocks?.[hour]);
   if (ends.some((end, index) => !(end > (ends[index - 1] ?? -1))))
-    throw new Error("The recording lacks an increasing last block per hour.");
+    throw new Error(
+      "The fetched data lacks an increasing last block per hour.",
+    );
   return ends;
 }
 
@@ -153,7 +155,7 @@ function checkBalancesFollowTransfers(rows, hourEndBlocks) {
 export function check({ rows, hourEndBlocks }) {
   checkTransferRows(rows);
   checkBothSidesAgree(rows);
-  checkBalancesFollowTransfers(rows, recordedHourEnds(hourEndBlocks));
+  checkBalancesFollowTransfers(rows, fetchedHourEnds(hourEndBlocks));
   checkNativeBalances(rows);
   const entries = [...uniqueTransfers(rows).values()];
   const readTwice = entries.filter((entry) => entry.seenIn.size > 1).length;
