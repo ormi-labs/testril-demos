@@ -20,7 +20,7 @@ what Testril already indexed.
 | Variable            | Purpose                                                    |
 | ------------------- | ---------------------------------------------------------- |
 | `TESTRIL_PAYER_KEY` | Hex private key that signs vouchers; required to fetch     |
-| `TESTRIL_MCP_URL`   | Testril MCP endpoint; default `https://dev.testril.ai/mcp` |
+| `TESTRIL_MCP_URL`   | Testril MCP endpoint; default `https://api.testril.si/mcp` |
 
 ## Run
 
@@ -95,14 +95,15 @@ All comparisons use raw integer units (BigInt).
 | USDT                   | `0xdac17f958d2ee523a2206206994597c13d831ec7`                         |        |
 | ETH/USDC 0.05% pool id | `0xdce6394339af00981949f5f3baf27e3610c76326a700af57e4b3e3ae4977f78d` | verify |
 
-- Day: 2026-11-01 UTC, blocks `[26316189, 26323365)` (half-open: the end is the
-  first block of 2026-11-02), found by binary search over a public RPC.
-- Swaps and liquidity changes are read in 300-block chunks (about one hour).
+- Day: the UTC day before the day of the press (yesterday, 00:00 to 24:00).
+  Swaps and liquidity changes are read as 24 one-hour binds each (`swaps-HH`,
+  `liquidity-HH`), so each row's hour is the bind it was read in; the check
+  requires blocks to rise from one hour to the next.
 
 ## Binds (`src/report.mjs`)
 
-| Name        | Function                      | Chain | Params         | Window                  |
-| ----------- | ----------------------------- | ----- | -------------- | ----------------------- |
-| `swaps`     | `uniswap_v4.swap`             | 1     | `manager`      | 26316189 → 26323365     |
-| `liquidity` | `uniswap_v4.modify_liquidity` | 1     | `manager`      | 26316189 → 26323365     |
-| `tokens`    | `erc20.token_metadata`        | 1     | `tokens`, `by` | 2026-11-01 → 2026-11-02 |
+| Name           | Function                      | Chain | Params         | Window               |
+| -------------- | ----------------------------- | ----- | -------------- | -------------------- |
+| `swaps-HH`     | `uniswap_v4.swap`             | 1     | `manager`      | hour HH of yesterday |
+| `liquidity-HH` | `uniswap_v4.modify_liquidity` | 1     | `manager`      | hour HH of yesterday |
+| `tokens`       | `erc20.token_metadata`        | 1     | `tokens`, `by` | yesterday            |

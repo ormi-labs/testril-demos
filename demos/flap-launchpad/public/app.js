@@ -83,9 +83,9 @@ function barChart(tokens, count) {
 function render(report) {
   const view = report.view;
   document.querySelector("#volume-window").textContent =
-    `${view.volumeWindow.from_day} to ${view.volumeWindow.to_day} (exclusive)`;
+    `${view.volumeDays.first} to ${view.volumeDays.last}`;
   document.querySelector("#trades-window").textContent =
-    `${view.tradesDay} · blocks ${view.tradesWindow.from_block}–${view.tradesWindow.to_block - 1}`;
+    `${view.tradesDay}, 00:00 to 24:00 UTC`;
   document.querySelector("#portal").textContent = view.portal;
   document
     .querySelector("#headline")

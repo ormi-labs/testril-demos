@@ -18,7 +18,7 @@ what Testril already indexed.
 | Variable            | Purpose                                                    |
 | ------------------- | ---------------------------------------------------------- |
 | `TESTRIL_PAYER_KEY` | Hex private key that signs vouchers; required to fetch     |
-| `TESTRIL_MCP_URL`   | Testril MCP endpoint; default `https://dev.testril.ai/mcp` |
+| `TESTRIL_MCP_URL`   | Testril MCP endpoint; default `https://api.testril.si/mcp` |
 
 ## Run
 
@@ -63,33 +63,31 @@ for the report. The fixture lives in `test/` and is never shown on the page.
 
 ## Subjects and window
 
-| Subject                   | Value                                                                | Note                       |
-| ------------------------- | -------------------------------------------------------------------- | -------------------------- |
-| Uniswap v4 PoolManager    | `0x000000000004444c5dc75cb358380d2e3de08a90`                         |                            |
-| ETH/USDC 0.05% pool id    | `0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27` | hash of the pool key below |
-| Tick window start (block) | 21688329                                                             | verify                     |
-| Tick window end (block)   | 26323365                                                             | first block of 2026-11-02  |
+| Subject                | Value                                                                | Note                       |
+| ---------------------- | -------------------------------------------------------------------- | -------------------------- |
+| Uniswap v4 PoolManager | `0x000000000004444c5dc75cb358380d2e3de08a90`                         |                            |
+| ETH/USDC 0.05% pool id | `0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27` | hash of the pool key below |
+| Tick window start      | 2025-01-23T16:16:47Z (block 21688329)                                | verify                     |
 
 - Pool key (hashed to the pool id as `keccak256(abi.encode(currency0, currency1, fee, tickSpacing, hooks))`):
   currency0 native ETH (`0x0000000000000000000000000000000000000000`),
   currency1 USDC (`0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48`), fee 500
   (0.05%), tickSpacing 10, hooks `0x0000000000000000000000000000000000000000`.
-- Ticks: blocks `[21688329, 26323365)`, from the PoolManager's deployment (at
-  or before the pool's initialization) to the end of 2026-11-01; 26323365 is the first block with a timestamp on
-  2026-11-02 UTC (block 26323364 is 2026-11-01 23:59:59). Blocks before
-  the pool's initialization have no rows.
-- Pool state: UTC day 2026-11-01, read at the day's last block (26323364).
-  `to_day` is exclusive, so the window ends 2026-11-02.
+- Ticks: from the PoolManager's deployment (2025-01-23T16:16:47Z, at or before
+  the pool's initialization) to 00:00 UTC on the day of the press, read in
+  672-hour chunks. Times before the pool's initialization have no rows.
+- Pool state: the UTC day before the day of the press, read at the day's last
+  block.
 - Price is USDC per ETH: `1.0001^tick × 10^12`, as ETH has 18 decimals and
   USDC 6.
 
 ## Binds (`src/report.mjs`)
 
-Windows are half-open: the end is the first block or day not included.
+Windows end at 00:00 UTC on the day of the press; the end is not included.
 
-| Name         | Function                | Chain | Params                  | Window                  |
-| ------------ | ----------------------- | ----- | ----------------------- | ----------------------- |
-| `ticks`      | `uniswap_v4.tick`       | 1     | `manager`, `pool`       | 21688329 → 26323365     |
-| `pool-state` | `uniswap_v4.pool_state` | 1     | `manager`, `pool`, `by` | 2026-11-01 → 2026-11-02 |
+| Name         | Function                | Chain | Params                  | Window           |
+| ------------ | ----------------------- | ----- | ----------------------- | ---------------- |
+| `ticks`      | `uniswap_v4.tick`       | 1     | `manager`, `pool`       | creation → today |
+| `pool-state` | `uniswap_v4.pool_state` | 1     | `manager`, `pool`, `by` | yesterday        |
 
-`ticks` is read in chunks of 200000 blocks.
+`ticks` is read in chunks of 672 hours.

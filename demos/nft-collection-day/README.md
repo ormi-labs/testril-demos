@@ -21,7 +21,7 @@ what Testril already indexed.
 | Variable            | Purpose                                                    |
 | ------------------- | ---------------------------------------------------------- |
 | `TESTRIL_PAYER_KEY` | Hex private key that signs vouchers; required to fetch     |
-| `TESTRIL_MCP_URL`   | Testril MCP endpoint; default `https://dev.testril.ai/mcp` |
+| `TESTRIL_MCP_URL`   | Testril MCP endpoint; default `https://api.testril.si/mcp` |
 
 ## Run
 
@@ -38,8 +38,7 @@ Testril**. For each bind the server calls `bind`, asks `materialize` for the
 whole window (Testril charges only for what it has not indexed yet), follows the
 job, then `read`s the window. The page shows a bar per bind and overall from
 Testril's own job progress and the usage credits spent. Then it draws four
-headline numbers, a mints-vs-trades bar per approximate UTC hour (the day's
-blocks split into 24 equal parts), a top-10 holder concentration bar with a
+headline numbers, a mints-vs-trades bar per UTC hour (one bind per hour), a top-10 holder concentration bar with a
 table, and three cross-checks. Nothing is saved: a restart starts empty
 and the next fetch reads again.
 
@@ -69,25 +68,27 @@ for the report. The fixture lives in `test/` and is never shown on the page.
 | Subject         | Address                                      | Note                          |
 | --------------- | -------------------------------------------- | ----------------------------- |
 | Pudgy Penguins  | `0xbd3531da5cf5857e7cfaa92426877b022e612cf8` | verify                        |
-| Collection born | block 12876179                               | verify (start of owners read) |
+| Collection born | 2021-07-22T12:26:01Z (block 12876179)        | verify (start of owners read) |
 
-- Day: 2026-11-01, blocks `[26316189, 26323365)`, found by binary search over a
-  public RPC; verify.
+- Day: the UTC day before the day of the press (yesterday, 00:00 to 24:00),
+  read as 24 one-hour `transfers-HH` binds so each transfer's hour comes from
+  the bind it was read in.
 - Pudgy Penguins finished minting in 2021, so a real fetch shows 0 mints and
   the mint cross-check has nothing to test; the test fixture has 12.
 - Owners: from the collection's creation to the end of that day, so the last
-  row per token is who holds it afterwards.
-- Names: `erc721.collection_metadata` read at block 26323364.
+  row per token is who holds it afterwards. A row is "before the day" when no
+  transfer of the day sits at its token and block.
+- Names: `erc721.collection_metadata` read over the last five minutes before the
+  end of that day.
 
 ## Binds (`src/report.mjs`)
 
-Windows are half-open: the end is the first block not included.
+Windows end at 00:00 UTC on the day of the press; the end is not included.
 
-| Name        | Function                     | Chain | Params        | Window              |
-| ----------- | ---------------------------- | ----- | ------------- | ------------------- |
-| `metadata`  | `erc721.collection_metadata` | 1     | `nft_address` | 26323364 → 26323365 |
-| `transfers` | `erc721.transfer`            | 1     | `nft_address` | 26316189 → 26323365 |
-| `owners`    | `erc721.nft_owners`          | 1     | `nft_address` | 12876179 → 26323365 |
+| Name           | Function                     | Chain | Params        | Window               |
+| -------------- | ---------------------------- | ----- | ------------- | -------------------- |
+| `metadata`     | `erc721.collection_metadata` | 1     | `nft_address` | 5 minutes → today    |
+| `transfers-HH` | `erc721.transfer`            | 1     | `nft_address` | hour HH of yesterday |
+| `owners`       | `erc721.nft_owners`          | 1     | `nft_address` | creation → today     |
 
-`transfers` is read in chunks of 1,200 blocks and `owners` in chunks of
-1,000,000 blocks.
+`owners` is read in chunks of 2,400 hours.

@@ -21,7 +21,7 @@ what Testril already indexed.
 | Variable            | Purpose                                                    |
 | ------------------- | ---------------------------------------------------------- |
 | `TESTRIL_PAYER_KEY` | Hex private key that signs vouchers; required to fetch     |
-| `TESTRIL_MCP_URL`   | Testril MCP endpoint; default `https://dev.testril.ai/mcp` |
+| `TESTRIL_MCP_URL`   | Testril MCP endpoint; default `https://api.testril.si/mcp` |
 
 ## Run
 
@@ -65,8 +65,8 @@ for the report. The fixture lives in `test/` and is never shown on the page.
 
 ## Subjects and window
 
-- UTC days `[2026-10-25, 2026-11-02)`: 25 October to 1 November. The end day is
-  exclusive on the daemon.
+- The eight UTC days before the day of the press (`from_time` eight days before
+  today 00:00 UTC, `to_time` today 00:00 UTC); the end is not included.
 - Amounts are raw token units, never priced, so each token has its own scale.
   Tokens missing from the table in `src/report.mjs` show as a shortened address
   in raw units.
@@ -78,8 +78,8 @@ for the report. The fixture lives in `test/` and is never shown on the page.
 
 ## Binds (`src/report.mjs`)
 
-| Name            | Function                 | Chain | Params                    | Window                  |
-| --------------- | ------------------------ | ----- | ------------------------- | ----------------------- |
-| `aqua-ethereum` | `aqua.push_volume`       | 1     | `swap.registry`, `by`     | 2026-10-25 → 2026-11-02 |
-| `aqua-base`     | `aqua.push_volume`       | 8453  | `swap.registry`, `by`     | 2026-10-25 → 2026-11-02 |
-| `tessera-base`  | `tessera_v.token_volume` | 8453  | `swap.swap_address`, `by` | 2026-10-25 → 2026-11-02 |
+| Name            | Function                 | Chain | Params                    | Window         |
+| --------------- | ------------------------ | ----- | ------------------------- | -------------- |
+| `aqua-ethereum` | `aqua.push_volume`       | 1     | `swap.registry`, `by`     | 8 days → today |
+| `aqua-base`     | `aqua.push_volume`       | 8453  | `swap.registry`, `by`     | 8 days → today |
+| `tessera-base`  | `tessera_v.token_volume` | 8453  | `swap.swap_address`, `by` | 8 days → today |

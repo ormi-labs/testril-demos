@@ -7,13 +7,13 @@ import {
   venues,
   zeroAddress,
 } from "../src/report.mjs";
-import { fixture } from "./fixture.mjs";
+import { fixture, fixtureBinds } from "./fixture.mjs";
 
 const rows = () => structuredClone(fixture());
 const [cl] = venues;
 
 test("check proves every venue's days from its pool list", () => {
-  const passed = check(rows());
+  const passed = check(rows(), fixtureBinds);
   assert.equal(passed.length, 3);
   assert.match(passed[0], /on each day hooked plus hookless/);
   assert.match(passed[0], /zero hooks_registration/);
@@ -23,25 +23,25 @@ test("check proves every venue's days from its pool list", () => {
 test("check fails when a traded pool is missing from the pool list", () => {
   const corrupted = rows();
   corrupted[cl.poolsBind].shift();
-  assert.throws(() => check(corrupted), /not in its pool list/);
+  assert.throws(() => check(corrupted, fixtureBinds), /not in its pool list/);
 });
 
 test("check fails when a pool is listed twice", () => {
   const corrupted = rows();
   corrupted[cl.poolsBind].push({ ...corrupted[cl.poolsBind][0] });
-  assert.throws(() => check(corrupted), /lists pool .* twice/);
+  assert.throws(() => check(corrupted, fixtureBinds), /lists pool .* twice/);
 });
 
 test("check fails when a pool has two rows for one day", () => {
   const corrupted = rows();
   corrupted[cl.volumeBind].push({ ...corrupted[cl.volumeBind][0] });
-  assert.throws(() => check(corrupted), /two rows for pool/);
+  assert.throws(() => check(corrupted, fixtureBinds), /two rows for pool/);
 });
 
 test("check fails when a row falls outside the day window", () => {
   const corrupted = rows();
   corrupted[cl.volumeBind][0].day = "2026-11-02";
-  assert.throws(() => check(corrupted), /outside the window/);
+  assert.throws(() => check(corrupted, fixtureBinds), /outside the window/);
 });
 
 const stablePairRow = (corrupted, venue) => {
@@ -56,7 +56,7 @@ test("check fails when a stablecoin pair's legs are swapped by 6 decimals", () =
   const corrupted = rows();
   const row = stablePairRow(corrupted, cl);
   row.volume1 = (BigInt(row.volume1) / 10n ** 12n).toString();
-  assert.throws(() => check(corrupted), /stablecoin legs differ/);
+  assert.throws(() => check(corrupted, fixtureBinds), /stablecoin legs differ/);
 });
 
 test("check fails when a hookless pool has a non-zero registration", () => {
@@ -65,20 +65,26 @@ test("check fails when a hookless pool has a non-zero registration", () => {
     (p) => p.hooks !== zeroAddress && p.hooks_registration === "1",
   );
   pool.hooks = zeroAddress;
-  assert.throws(() => check(corrupted), /contradict hooks_registration/);
+  assert.throws(
+    () => check(corrupted, fixtureBinds),
+    /contradict hooks_registration/,
+  );
 });
 
 test("check fails when a pool's hooks fall in neither class", () => {
   const corrupted = rows();
   corrupted[cl.poolsBind][0].hooks = `0X${"0".repeat(40)}`;
-  assert.throws(() => check(corrupted), /neither hooked nor hookless/);
+  assert.throws(
+    () => check(corrupted, fixtureBinds),
+    /neither hooked nor hookless/,
+  );
 });
 
 test("check passes a hooked pool whose registration is zero", () => {
   const data = rows();
   const pool = data[cl.poolsBind].find((p) => p.hooks !== zeroAddress);
   pool.hooks_registration = "0";
-  assert.equal(check(data).length, 3);
+  assert.equal(check(data, fixtureBinds).length, 3);
 });
 
 test("shape reads the stablecoin leg and splits hooked from hookless", () => {
@@ -121,7 +127,7 @@ test("shape reads the stablecoin leg and splits hooked from hookless", () => {
       day(nonStablePool, "7", "999", "999"),
     ],
   };
-  const v4 = shape(small).venues[2];
+  const v4 = shape(small, fixtureBinds).venues[2];
   assert.equal(v4.hookedMillions, 3);
   assert.equal(v4.hooklessMillions, 1);
   assert.equal(v4.hookedShare, "75.0%");

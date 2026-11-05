@@ -1,4 +1,8 @@
-import { binds, venues, windowDays, zeroAddress } from "../src/report.mjs";
+import { bindsAt, venues, windowDays, zeroAddress } from "../src/report.mjs";
+import { blockAt } from "./fake-testril.mjs";
+
+export const fixtureNow = Date.parse("2026-11-02T12:00:00Z");
+export const fixtureBinds = bindsAt(fixtureNow);
 
 const usdt = "0x55d398326f99059ff775485246999027b3197955";
 const usdc = "0x8ac76a51cc950d9822d68b83fe1ad97b32cd580d";
@@ -84,9 +88,9 @@ function poolList(random, venue, hookAddresses) {
 
 function listRow(venue, pool, index) {
   const [currency0, currency1] = pairs[pool.pair];
-  const bounds = binds.find((bind) => bind.name === venue.poolsBind).window;
+  const { window } = fixtureBinds.find((bind) => bind.name === venue.poolsBind);
   const row = {
-    block: bounds.from_block + 1000 + index * 1000003,
+    block: blockAt(window.from_time) + 1000 + index * 1000,
     currency0,
     currency1,
     fee: "2500",
@@ -109,7 +113,7 @@ function volumeRows(random, pool) {
   const stables = [usdt, usdc, usd1];
   const stable0 = stables.includes(currency0);
   const bothStable = stables.includes(currency0) && stables.includes(currency1);
-  return windowDays().flatMap((day) => {
+  return windowDays(fixtureBinds).flatMap((day) => {
     if (!pool.active || random() < 0.15) return [];
     const stable = raw(pool.dollars * (0.5 + random()), random);
     const other = bothStable
@@ -142,26 +146,20 @@ export function fixture() {
 }
 
 const sameParams = (a, b) => JSON.stringify(a) === JSON.stringify(b);
-const covers = (outer, inner) =>
-  Object.keys(inner).every((key) =>
-    key.startsWith("from_")
-      ? inner[key] >= outer[key]
-      : inner[key] <= outer[key],
-  );
 
 export function fixtureRows(rows = fixture()) {
   return (bound, window) => {
-    const bind = binds.find(
+    const bind = fixtureBinds.find(
       (candidate) =>
         candidate.function_slug === bound.function_slug &&
         candidate.chain_id === bound.chain_id &&
-        sameParams(candidate.params, bound.params) &&
-        covers(candidate.window, window),
+        sameParams(candidate.params, bound.params),
     );
-    return "from_block" in window && bind.read
+    return bind.read
       ? rows[bind.name].filter(
           (row) =>
-            row.block >= window.from_block && row.block < window.to_block,
+            row.block >= blockAt(window.from_time) &&
+            row.block < blockAt(window.to_time),
         )
       : rows[bind.name];
   };

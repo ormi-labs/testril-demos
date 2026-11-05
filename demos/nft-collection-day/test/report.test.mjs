@@ -1,44 +1,47 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { check, shape, zeroAddress } from "../src/report.mjs";
-import { fixture } from "./fixture.mjs";
+import { fixture, fixtureBinds, transfersIn } from "./fixture.mjs";
 
 const rows = () => structuredClone(fixture());
 
 test("check passes on the fixture and states all three invariants", () => {
-  const passed = check(rows());
+  const passed = check(rows(), fixtureBinds);
   assert.equal(passed.length, 3);
   assert.match(passed[0], /All 12 mints/);
 });
 
 test("check fails when a mint comes from a holder, not the zero address", () => {
   const corrupted = rows();
-  corrupted.transfers.find((t) => t.from === zeroAddress).from =
+  transfersIn(corrupted).find((t) => t.from === zeroAddress).from =
     corrupted.owners[0].owner;
-  assert.throws(() => check(corrupted), /not the zero address|already had/);
+  assert.throws(
+    () => check(corrupted, fixtureBinds),
+    /not the zero address|already had/,
+  );
 });
 
 test("check fails when a token with an earlier owner is called a mint", () => {
   const corrupted = rows();
-  const trade = corrupted.transfers.find(
+  const trade = transfersIn(corrupted).find(
     (t) => t.from !== zeroAddress && t.to !== zeroAddress,
   );
   trade.from = zeroAddress;
-  assert.throws(() => check(corrupted), /already had an owner/);
+  assert.throws(() => check(corrupted, fixtureBinds), /already had an owner/);
 });
 
 test("check fails when a block's owner row is missing or duplicated", () => {
   const missing = rows();
   missing.owners.pop();
-  assert.throws(() => check(missing), /has 0 owner rows/);
+  assert.throws(() => check(missing, fixtureBinds), /has 0 owner rows/);
   const duplicated = rows();
   duplicated.owners.push({ ...duplicated.owners.at(-1) });
-  assert.throws(() => check(duplicated), /has 2 owner rows/);
+  assert.throws(() => check(duplicated, fixtureBinds), /has 2 owner rows/);
 });
 
 test("check fails when the owner row names the first receiver of a double hop", () => {
   const corrupted = rows();
-  const [first, second] = corrupted.transfers.filter((t, i, all) =>
+  const [first, second] = transfersIn(corrupted).filter((t, i, all) =>
     all.some(
       (o, j) => j !== i && o.token_id === t.token_id && o.block === t.block,
     ),
@@ -46,12 +49,12 @@ test("check fails when the owner row names the first receiver of a double hop", 
   corrupted.owners.find(
     (o) => o.token_id === second.token_id && o.block === second.block,
   ).owner = first.to;
-  assert.throws(() => check(corrupted), /last transfer went to/);
+  assert.throws(() => check(corrupted, fixtureBinds), /last transfer went to/);
 });
 
 test("check fails when a trade's sender was not the token's owner", () => {
   const corrupted = rows();
-  const trade = corrupted.transfers.find(
+  const trade = transfersIn(corrupted).find(
     (t, i, all) =>
       t.from !== zeroAddress &&
       t.to !== zeroAddress &&
@@ -61,22 +64,22 @@ test("check fails when a trade's sender was not the token's owner", () => {
   corrupted.owners.find(
     (o) => o.token_id === trade.token_id && o.block === trade.block,
   ).owner = trade.to;
-  assert.throws(() => check(corrupted), /but its owner was/);
+  assert.throws(() => check(corrupted, fixtureBinds), /but its owner was/);
 });
 
 test("check accepts a mint of a token burned before the day", () => {
   const remint = rows();
-  const mint = remint.transfers.find((t) => t.from === zeroAddress);
+  const mint = transfersIn(remint).find((t) => t.from === zeroAddress);
   remint.owners.push({
     block: 1,
     token_id: mint.token_id,
     owner: zeroAddress,
   });
-  assert.ok(check(remint));
+  assert.ok(check(remint, fixtureBinds));
 });
 
 test("shape splits the day into mints, trades and a burn", () => {
-  const view = shape(rows());
+  const view = shape(rows(), fixtureBinds);
   assert.equal(view.mints, 12);
   assert.equal(view.burns, 1);
   assert.equal(view.trades, 91);

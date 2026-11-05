@@ -154,9 +154,9 @@ function hopGraph({ nodes, edges }) {
 function render(report) {
   const view = report.view;
   document.querySelector("#transfer-window").textContent =
-    `${view.transferWindow.from_block}–${view.transferWindow.to_block - 1}`;
+    `${view.window.first} to ${view.window.last}`;
   document.querySelector("#hour-window").textContent =
-    `${view.hourWindow.from_hour} to ${view.hourWindow.to_hour} (exclusive)`;
+    `${view.window.first} to ${view.window.last}`;
   document.querySelector("#token-list").textContent = view.tokens
     .map((token) => token.symbol)
     .join(" · ");

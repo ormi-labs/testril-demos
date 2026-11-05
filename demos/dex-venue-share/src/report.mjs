@@ -1,69 +1,78 @@
 import { pairs } from "./pairs.mjs";
 
-export const binds = [
-  {
-    name: "uniswap-v2",
-    function_slug: "uniswap_v2.pool_volume",
-    chain_id: 1,
-    params: {
-      swap: {
-        pool_list: { factory: "0x5c69bee701ef814a2b6a3edd4b1652cb9cc5aa6f" },
+const dayMs = 86400000;
+const isoSecond = (ms) => new Date(ms).toISOString().replace(".000Z", "Z");
+
+export function bindsAt(now = Date.now()) {
+  const today = Math.floor(now / dayMs) * dayMs;
+  const untilToday = (ms) => ({
+    from_time: isoSecond(today - ms),
+    to_time: isoSecond(today),
+  });
+  return [
+    {
+      name: "uniswap-v2",
+      function_slug: "uniswap_v2.pool_volume",
+      chain_id: 1,
+      params: {
+        swap: {
+          pool_list: { factory: "0x5c69bee701ef814a2b6a3edd4b1652cb9cc5aa6f" },
+        },
+        by: "day",
       },
-      by: "day",
+      window: untilToday(8 * dayMs),
     },
-    window: { from_day: "2026-10-25", to_day: "2026-11-02" },
-  },
-  {
-    name: "uniswap-v3",
-    function_slug: "uniswap_v3.pool_volume",
-    chain_id: 1,
-    params: {
-      swap: {
-        pool_list: { factory: "0x1f98431c8ad98523631ae4a59f267346ea31f984" },
+    {
+      name: "uniswap-v3",
+      function_slug: "uniswap_v3.pool_volume",
+      chain_id: 1,
+      params: {
+        swap: {
+          pool_list: { factory: "0x1f98431c8ad98523631ae4a59f267346ea31f984" },
+        },
+        by: "day",
       },
-      by: "day",
+      window: untilToday(8 * dayMs),
     },
-    window: { from_day: "2026-10-25", to_day: "2026-11-02" },
-  },
-  {
-    name: "uniswap-v4",
-    function_slug: "uniswap_v4.pool_volume",
-    chain_id: 1,
-    params: {
-      swap: { manager: "0x000000000004444c5dc75cb358380d2e3de08a90" },
-      by: "day",
-    },
-    window: { from_day: "2026-10-25", to_day: "2026-11-02" },
-  },
-  {
-    name: "curve",
-    function_slug: "curve.pool_volume",
-    chain_id: 1,
-    params: {
-      swap: {
-        pool_list: { factory: "0x0c0e5f2ff0ff18a3be9b835635039256dc4b4963" },
+    {
+      name: "uniswap-v4",
+      function_slug: "uniswap_v4.pool_volume",
+      chain_id: 1,
+      params: {
+        swap: { manager: "0x000000000004444c5dc75cb358380d2e3de08a90" },
+        by: "day",
       },
-      by: "day",
+      window: untilToday(8 * dayMs),
     },
-    window: { from_day: "2026-10-25", to_day: "2026-11-02" },
-  },
-  {
-    name: "fluid-dex",
-    function_slug: "fluid_dex.pool_volume",
-    chain_id: 1,
-    params: {
-      swap: {
-        pool_list: { factory: "0x91716c4eda1fb55e84bf8b4c7085f84285c19085" },
+    {
+      name: "curve",
+      function_slug: "curve.pool_volume",
+      chain_id: 1,
+      params: {
+        swap: {
+          pool_list: { factory: "0x0c0e5f2ff0ff18a3be9b835635039256dc4b4963" },
+        },
+        by: "day",
       },
-      by: "day",
+      window: untilToday(8 * dayMs),
     },
-    window: { from_day: "2026-10-25", to_day: "2026-11-02" },
-  },
-];
+    {
+      name: "fluid-dex",
+      function_slug: "fluid_dex.pool_volume",
+      chain_id: 1,
+      params: {
+        swap: {
+          pool_list: { factory: "0x91716c4eda1fb55e84bf8b4c7085f84285c19085" },
+        },
+        by: "day",
+      },
+      window: untilToday(8 * dayMs),
+    },
+  ];
+}
 
 export { pairs };
 
-export const window = binds[0].window;
 const bpTotal = 10000n;
 const priceTolerancePercent = 5n;
 const ethDecimals = 18;
@@ -80,9 +89,17 @@ const nextDay = (day) =>
     .toISOString()
     .slice(0, 10);
 
-export function days() {
+const utcDay = (time) => time.slice(0, 10);
+
+export function days(binds) {
+  const { window } = binds[0];
   const list = [];
-  for (let d = window.from_day; d < window.to_day; d = nextDay(d)) list.push(d);
+  for (
+    let d = utcDay(window.from_time);
+    d < utcDay(window.to_time);
+    d = nextDay(d)
+  )
+    list.push(d);
   return list;
 }
 
@@ -176,13 +193,14 @@ function checkSubjectsHaveRows(pair, rows) {
       );
 }
 
-export function check(rows) {
+export function check(rows, binds) {
+  const window = days(binds);
   for (const bind of binds)
     if (!rows[bind.name]?.length) throw new Error(`No rows for ${bind.name}.`);
   const passed = [];
   for (const pair of pairs) {
     checkSubjectsHaveRows(pair, rows);
-    for (const day of days()) {
+    for (const day of window) {
       const volumes = dayVolumes(rows, pair, day);
       const totals = venueTotals(pair, volumes);
       if (sum(totals) === 0n)
@@ -201,9 +219,9 @@ export function check(rows) {
   return passed;
 }
 
-function pairView(rows, pair) {
+function pairView(rows, window, pair) {
   const venues = venuesOf(pair);
-  const perDay = days().map((day) => {
+  const perDay = window.map((day) => {
     const totals = venueTotals(pair, dayVolumes(rows, pair, day));
     return { day, totals, points: basisPoints(totals) };
   });
@@ -237,12 +255,12 @@ function pairView(rows, pair) {
   };
 }
 
-function v3Tiers(rows) {
+function v3Tiers(rows, window) {
   const tiers = pairById("eth-usdc").subjects.filter(
     (s) => s.venue === "Uniswap v3",
   );
   const totals = tiers.map((s) =>
-    sum(days().map((day) => sideVolume(rows, s, day, s.eth))),
+    sum(window.map((day) => sideVolume(rows, s, day, s.eth))),
   );
   const points = basisPoints(totals);
   return tiers.map((s, i) => ({
@@ -254,14 +272,15 @@ function v3Tiers(rows) {
   }));
 }
 
-export function shape(rows) {
-  const ethUsdc = pairView(rows, pairById("eth-usdc"));
-  const wsteth = pairView(rows, pairById("wsteth-eth"));
-  const tiers = v3Tiers(rows);
+export function shape(rows, binds) {
+  const window = days(binds);
+  const ethUsdc = pairView(rows, window, pairById("eth-usdc"));
+  const wsteth = pairView(rows, window, pairById("wsteth-eth"));
+  const tiers = v3Tiers(rows, window);
   const share = (view, venue) =>
     view.overall.find((o) => o.venue === venue).percent;
   return {
-    window,
+    window: { first: window[0], last: window.at(-1) },
     pairs: [ethUsdc, wsteth],
     tiers,
     headline: {

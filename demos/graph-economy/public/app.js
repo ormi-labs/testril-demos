@@ -91,7 +91,7 @@ function indexerRow(indexer) {
 function render(report) {
   const view = report.view;
   document.querySelector("#window").textContent =
-    `${view.window.from_block}–${view.window.to_block - 1}`;
+    `${view.window.first} to ${view.window.last}`;
   document.querySelector("#epochs").textContent =
     `${view.epochs.first} to ${view.epochs.last}`;
   document

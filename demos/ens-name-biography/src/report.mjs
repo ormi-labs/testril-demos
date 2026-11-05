@@ -4,113 +4,134 @@ import {
   formatEth,
   kindLabels,
   nameWrapper,
+  secondsOfBlock,
+  secondsOfMonth,
   shortAddress,
   timeline,
   zeroAddress,
 } from "./timeline.mjs";
 
-export const binds = [
-  {
-    name: "vitalik-domain",
-    function_slug: "ens.domain",
-    chain_id: 1,
-    params: {
-      registry: "0x00000000000c2e074ec69a0dfb2997ba6c7d2e1e",
-      name: "vitalik.eth",
-    },
-    window: { from_block: 9380380, to_block: 26323365 },
-  },
-  {
-    name: "vitalik-registration",
-    function_slug: "ens.registration",
-    chain_id: 1,
-    params: {
-      base_registrar: "0x57f1887a8bf19b14fc0df6fd9b2acc9af147ea85",
-      label: "vitalik",
-      controllers: [
-        "0x283af0b28c62c092c9727f1ee09c02ca627eb7f5",
-        "0x253553366da8546fc250f225fe3d25d0c782303b",
-        "0x59e16fccd424cc24e280be16e11bcd56fb0ce547",
-      ],
-    },
-    window: { from_block: 9380380, to_block: 26323365 },
-  },
-  {
-    name: "vitalik-address",
-    function_slug: "ens.address_record",
-    chain_id: 1,
-    params: {
-      registry: "0x00000000000c2e074ec69a0dfb2997ba6c7d2e1e",
-      name: "vitalik.eth",
-      by: "month",
-    },
-    window: { from_month: "2020-01", to_month: "2026-11" },
-  },
-  {
-    name: "vitalik-wrapped",
-    function_slug: "ens.wrapped_domain",
-    chain_id: 1,
-    params: {
-      name_wrapper: nameWrapper,
-      name: "vitalik.eth",
-    },
-    window: { from_block: 16925758, to_block: 26323365 },
-  },
-  {
-    name: "nick-domain",
-    function_slug: "ens.domain",
-    chain_id: 1,
-    params: {
-      registry: "0x00000000000c2e074ec69a0dfb2997ba6c7d2e1e",
-      name: "nick.eth",
-    },
-    window: { from_block: 9380380, to_block: 26323365 },
-  },
-  {
-    name: "nick-registration",
-    function_slug: "ens.registration",
-    chain_id: 1,
-    params: {
-      base_registrar: "0x57f1887a8bf19b14fc0df6fd9b2acc9af147ea85",
-      label: "nick",
-      controllers: [
-        "0x283af0b28c62c092c9727f1ee09c02ca627eb7f5",
-        "0x253553366da8546fc250f225fe3d25d0c782303b",
-        "0x59e16fccd424cc24e280be16e11bcd56fb0ce547",
-      ],
-    },
-    window: { from_block: 9380380, to_block: 26323365 },
-  },
-  {
-    name: "nick-address",
-    function_slug: "ens.address_record",
-    chain_id: 1,
-    params: {
-      registry: "0x00000000000c2e074ec69a0dfb2997ba6c7d2e1e",
-      name: "nick.eth",
-      by: "month",
-    },
-    window: { from_month: "2020-01", to_month: "2026-11" },
-  },
-  {
-    name: "nick-wrapped",
-    function_slug: "ens.wrapped_domain",
-    chain_id: 1,
-    params: {
-      name_wrapper: nameWrapper,
-      name: "nick.eth",
-    },
-    window: { from_block: 16925758, to_block: 26323365 },
-  },
-];
+const isoSecond = (ms) => new Date(ms).toISOString().replace(".000Z", "Z");
+const registryDeployedAt = "2020-01-30T00:37:12Z";
+const nameWrapperDeployedAt = "2023-03-28T12:13:11Z";
+const addressRecordsFrom = "2020-01-01T00:00:00Z";
 
-export { formatEth, nameWrapper, zeroAddress };
+export function bindsAt(now = Date.now()) {
+  const today = new Date(now);
+  const untilToday = (from_time) => ({
+    from_time,
+    to_time: isoSecond(
+      Date.UTC(today.getUTCFullYear(), today.getUTCMonth(), today.getUTCDate()),
+    ),
+  });
+  const sinceRegistry = untilToday(registryDeployedAt);
+  const sinceWrapper = untilToday(nameWrapperDeployedAt);
+  const monthsBeforeThisOne = {
+    from_time: addressRecordsFrom,
+    to_time: isoSecond(
+      Date.UTC(today.getUTCFullYear(), today.getUTCMonth(), 1),
+    ),
+  };
+  return [
+    {
+      name: "vitalik-domain",
+      function_slug: "ens.domain",
+      chain_id: 1,
+      params: {
+        registry: "0x00000000000c2e074ec69a0dfb2997ba6c7d2e1e",
+        name: "vitalik.eth",
+      },
+      window: sinceRegistry,
+    },
+    {
+      name: "vitalik-registration",
+      function_slug: "ens.registration",
+      chain_id: 1,
+      params: {
+        base_registrar: "0x57f1887a8bf19b14fc0df6fd9b2acc9af147ea85",
+        label: "vitalik",
+        controllers: [
+          "0x283af0b28c62c092c9727f1ee09c02ca627eb7f5",
+          "0x253553366da8546fc250f225fe3d25d0c782303b",
+          "0x59e16fccd424cc24e280be16e11bcd56fb0ce547",
+        ],
+      },
+      window: sinceRegistry,
+    },
+    {
+      name: "vitalik-address",
+      function_slug: "ens.address_record",
+      chain_id: 1,
+      params: {
+        registry: "0x00000000000c2e074ec69a0dfb2997ba6c7d2e1e",
+        name: "vitalik.eth",
+        by: "month",
+      },
+      window: monthsBeforeThisOne,
+    },
+    {
+      name: "vitalik-wrapped",
+      function_slug: "ens.wrapped_domain",
+      chain_id: 1,
+      params: {
+        name_wrapper: nameWrapper,
+        name: "vitalik.eth",
+      },
+      window: sinceWrapper,
+    },
+    {
+      name: "nick-domain",
+      function_slug: "ens.domain",
+      chain_id: 1,
+      params: {
+        registry: "0x00000000000c2e074ec69a0dfb2997ba6c7d2e1e",
+        name: "nick.eth",
+      },
+      window: sinceRegistry,
+    },
+    {
+      name: "nick-registration",
+      function_slug: "ens.registration",
+      chain_id: 1,
+      params: {
+        base_registrar: "0x57f1887a8bf19b14fc0df6fd9b2acc9af147ea85",
+        label: "nick",
+        controllers: [
+          "0x283af0b28c62c092c9727f1ee09c02ca627eb7f5",
+          "0x253553366da8546fc250f225fe3d25d0c782303b",
+          "0x59e16fccd424cc24e280be16e11bcd56fb0ce547",
+        ],
+      },
+      window: sinceRegistry,
+    },
+    {
+      name: "nick-address",
+      function_slug: "ens.address_record",
+      chain_id: 1,
+      params: {
+        registry: "0x00000000000c2e074ec69a0dfb2997ba6c7d2e1e",
+        name: "nick.eth",
+        by: "month",
+      },
+      window: monthsBeforeThisOne,
+    },
+    {
+      name: "nick-wrapped",
+      function_slug: "ens.wrapped_domain",
+      chain_id: 1,
+      params: {
+        name_wrapper: nameWrapper,
+        name: "nick.eth",
+      },
+      window: sinceWrapper,
+    },
+  ];
+}
+
+export { formatEth, nameWrapper, secondsOfBlock, secondsOfMonth, zeroAddress };
 
 export const gracePeriodSeconds = 90 * 86400;
 const basisPoints = 10000n;
-
-const bindByName = Object.fromEntries(binds.map((b) => [b.name, b]));
-export const windowOf = (bindName) => bindByName[bindName].window;
 
 const bindKinds = {
   "ens.domain": "domain",
@@ -118,52 +139,50 @@ const bindKinds = {
   "ens.address_record": "address",
   "ens.wrapped_domain": "wrapped",
 };
-const bindsOfName = (name) =>
+const bindsOfName = (binds, name) =>
   Object.fromEntries(
     binds
       .filter(({ params }) => (params.name ?? `${params.label}.eth`) === name)
       .map((bind) => [bindKinds[bind.function_slug], bind.name]),
   );
 
-export const subjects = binds
-  .filter((bind) => bind.function_slug === "ens.domain")
-  .map((bind) => {
-    const binds = bindsOfName(bind.params.name);
-    const missing = Object.values(bindKinds).filter((kind) => !binds[kind]);
-    if (missing.length)
-      throw new Error(
-        `src/report.mjs: ${bind.params.name} has no ${missing.join(", ")} bind (matched by params.name, or params.label plus ".eth").`,
-      );
-    return { name: bind.params.name, binds };
-  });
+export const subjectsOf = (binds) =>
+  binds
+    .filter((bind) => bind.function_slug === "ens.domain")
+    .map((bind) => {
+      const named = bindsOfName(binds, bind.params.name);
+      const missing = Object.values(bindKinds).filter((kind) => !named[kind]);
+      if (missing.length)
+        throw new Error(
+          `src/report.mjs: ${bind.params.name} has no ${missing.join(", ")} bind (matched by params.name, or params.label plus ".eth").`,
+        );
+      return { name: bind.params.name, binds: named };
+    });
 
-export const blockWindow = windowOf(subjects[0].binds.domain);
-export const monthWindow = windowOf(subjects[0].binds.address);
+const windowOf = (binds, bindName) =>
+  binds.find((bind) => bind.name === bindName).window;
+const secondsOf = (time) => Date.parse(time) / 1000;
 
 const monthNumber = (month) => {
   const [year, number] = month.split("-").map(Number);
   return year * 12 + number - 1;
 };
-export function monthsInWindow() {
+const monthName = (m) =>
+  `${Math.floor(m / 12)}-${String((m % 12) + 1).padStart(2, "0")}`;
+const monthOfTime = (time) => time.slice(0, 7);
+
+export function monthsInWindow(binds) {
+  const { window } = binds.find(
+    (bind) => bind.function_slug === "ens.address_record",
+  );
   const months = [];
   for (
-    let m = monthNumber(monthWindow.from_month);
-    m < monthNumber(monthWindow.to_month);
+    let m = monthNumber(monthOfTime(window.from_time));
+    m < monthNumber(monthOfTime(window.to_time));
     m++
   )
-    months.push(
-      `${Math.floor(m / 12)}-${String((m % 12) + 1).padStart(2, "0")}`,
-    );
+    months.push(monthName(m));
   return months;
-}
-export function interpolatedMonthBlock(month) {
-  const first = monthNumber(monthWindow.from_month);
-  const months = monthNumber(monthWindow.to_month) - first;
-  const share = (monthNumber(month) - first) / months;
-  return Math.round(
-    blockWindow.from_block +
-      share * (blockWindow.to_block - blockWindow.from_block),
-  );
 }
 
 const rowsOf = (subject, rows) =>
@@ -172,12 +191,7 @@ const rowsOf = (subject, rows) =>
   );
 
 function requireAscendingBlocks(subject, bind, list) {
-  const { from_block: from, to_block: to } = windowOf(bind);
   list.forEach((row, i) => {
-    if (row.block < from || row.block >= to)
-      throw new Error(
-        `${subject.name}: ${bind} has a row at block ${row.block}, outside [${from}, ${to}).`,
-      );
     if (i > 0 && row.block <= list[i - 1].block)
       throw new Error(
         `${subject.name}: ${bind} block ${row.block} is not after block ${list[i - 1].block}.`,
@@ -215,8 +229,8 @@ function requireLaterExpiry(subject, list) {
   });
 }
 
-function requireEveryMonth(subject, list) {
-  const months = monthsInWindow();
+function requireEveryMonth(subject, list, binds) {
+  const months = monthsInWindow(binds);
   const expected = new Set(months);
   const seen = new Set();
   const unexpected = [];
@@ -262,8 +276,8 @@ const totalCost = (list) =>
   list.reduce((sum, row) => sum + BigInt(row.cost), 0n);
 const renewalsOf = (registration) => registration.slice(1);
 
-export function check(rows) {
-  return subjects.flatMap((subject) => {
+export function check(rows, binds) {
+  return subjectsOf(binds).flatMap((subject) => {
     const { domain, registration, address, wrapped } = rowsOf(subject, rows);
     if (!domain.length || !registration.length)
       throw new Error(`${subject.name}: no registry or registrar rows.`);
@@ -273,7 +287,7 @@ export function check(rows) {
     requireLaterExpiry(subject, registration);
     requireGracePeriod(subject, registration, wrapped);
     requireWei(subject, registration);
-    requireEveryMonth(subject, address);
+    requireEveryMonth(subject, address, binds);
     requireSameName(subject, domain, [
       [subject.binds.registration, registration, "labelhash"],
       [subject.binds.address, address, "node"],
@@ -282,13 +296,27 @@ export function check(rows) {
     return [
       `${subject.name}: ${domain.length} registry rows in ascending block order, ${changes(domain, "owner").length} owner changes`,
       `${subject.name}: ${renewalsOf(registration).length} renewals, each expiring later than the one before, costs non-negative (${formatEth(totalCost(renewalsOf(registration)))} in total)`,
-      `${subject.name}: address record present for all ${monthsInWindow().length} months`,
+      `${subject.name}: address record present for all ${monthsInWindow(binds).length} months`,
     ];
   });
 }
 
-export function shape(rows) {
-  const span = blockWindow.to_block - blockWindow.from_block;
+function yearTicks(start, span) {
+  const ticks = [];
+  const firstYear = new Date(start * 1000).getUTCFullYear() + 1;
+  for (let year = firstYear; ; year++) {
+    const share = (Date.UTC(year, 0, 1) / 1000 - start) / span;
+    if (share >= 1) return ticks;
+    ticks.push({ year, share });
+  }
+}
+
+export function shape(rows, binds) {
+  const subjects = subjectsOf(binds);
+  const registryWindow = windowOf(binds, subjects[0].binds.domain);
+  const addressWindow = windowOf(binds, subjects[0].binds.address);
+  const start = secondsOf(registryWindow.from_time);
+  const span = secondsOf(registryWindow.to_time) - start;
   const maxCost = subjects
     .flatMap((subject) => rowsOf(subject, rows).registration)
     .reduce(
@@ -297,11 +325,7 @@ export function shape(rows) {
     );
   const named = subjects.map((subject) => {
     const { domain, address, registration } = rowsOf(subject, rows);
-    const events = timeline(
-      subject,
-      rowsOf(subject, rows),
-      interpolatedMonthBlock,
-    );
+    const events = timeline(subject, rowsOf(subject, rows));
     return {
       name: subject.name,
       events,
@@ -314,14 +338,18 @@ export function shape(rows) {
     };
   });
   return {
-    blockWindow,
-    monthWindow,
+    registryWindow,
+    monthWindow: {
+      first: monthOfTime(addressWindow.from_time),
+      last: monthName(monthNumber(monthOfTime(addressWindow.to_time)) - 1),
+    },
+    yearTicks: yearTicks(start, span),
     kinds: Object.entries(kindLabels).map(([kind, label]) => ({ kind, label })),
     subjects: named.map(({ events, ...headline }) => ({
       ...headline,
       marks: events.map((event) => ({
         kind: event.kind,
-        position: (event.block - blockWindow.from_block) / span,
+        position: (event.seconds - start) / span,
         costBasisPoints:
           event.cost === undefined
             ? 0
@@ -330,7 +358,7 @@ export function shape(rows) {
     })),
     timeline: named
       .flatMap((subject) => subject.events)
-      .sort((a, b) => a.block - b.block)
+      .sort((a, b) => a.seconds - b.seconds)
       .map(({ subject, kind, when, text }) => ({
         subject,
         kind: kindLabels[kind],

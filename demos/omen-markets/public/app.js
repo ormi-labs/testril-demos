@@ -77,7 +77,7 @@ function fillTable(selector, rows, fields) {
 function render(report) {
   const view = report.view;
   document.querySelector("#window").textContent =
-    `${view.window.from_block}–${view.window.to_block - 1}`;
+    `${view.window.first} to ${view.window.last}`;
   document
     .querySelector("#headline")
     .replaceChildren(

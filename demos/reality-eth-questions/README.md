@@ -28,7 +28,7 @@ page then shows the failure instead of the passed checks, when:
 | Variable            | Purpose                                                    |
 | ------------------- | ---------------------------------------------------------- |
 | `TESTRIL_PAYER_KEY` | Hex private key that signs vouchers; required to fetch     |
-| `TESTRIL_MCP_URL`   | Testril MCP endpoint; default `https://dev.testril.ai/mcp` |
+| `TESTRIL_MCP_URL`   | Testril MCP endpoint; default `https://api.testril.si/mcp` |
 
 ## Run
 
@@ -81,23 +81,19 @@ Both addresses hold contract code on their chain's public RPC; confirm they are
 the v3 native-token deployments before fetching. Bonds are in raw wei: ETH on
 Ethereum and xDAI on Gnosis, both 18 decimals.
 
-The window is 30 UTC days ending 2026-11-01, as a block window (half-open),
-found by binary search over public RPCs, not through Testril:
-
-- Ethereum: `[26108082, 26323365)`, the first block of 2026-10-03 to the first
-  block of 2026-11-02.
-- Gnosis: `[48558286, 49062480)`, the same days.
+The window is the 30 UTC days before the day of the press (`from_time` 30 days
+before today 00:00 UTC, `to_time` today 00:00 UTC), the same for both chains.
 
 Gnosis is not yet served by Testril, so its binds are declared but cannot be
 fetched until it is.
 
 ## Binds (`src/report.mjs`)
 
-| Name                 | Function                     | Chain | Params     | Window              |
-| -------------------- | ---------------------------- | ----- | ---------- | ------------------- |
-| `ethereum-questions` | `realitio.question`          | 1     | `realitio` | 26108082 → 26323365 |
-| `ethereum-answers`   | `realitio.answer`            | 1     | `realitio` | 26108082 → 26323365 |
-| `ethereum-outcomes`  | `realitio.question_outcomes` | 1     | `realitio` | 26108082 → 26323365 |
-| `gnosis-questions`   | `realitio.question`          | 100   | `realitio` | 48558286 → 49062480 |
-| `gnosis-answers`     | `realitio.answer`            | 100   | `realitio` | 48558286 → 49062480 |
-| `gnosis-outcomes`    | `realitio.question_outcomes` | 100   | `realitio` | 48558286 → 49062480 |
+| Name                 | Function                     | Chain | Params     | Window          |
+| -------------------- | ---------------------------- | ----- | ---------- | --------------- |
+| `ethereum-questions` | `realitio.question`          | 1     | `realitio` | 30 days → today |
+| `ethereum-answers`   | `realitio.answer`            | 1     | `realitio` | 30 days → today |
+| `ethereum-outcomes`  | `realitio.question_outcomes` | 1     | `realitio` | 30 days → today |
+| `gnosis-questions`   | `realitio.question`          | 100   | `realitio` | 30 days → today |
+| `gnosis-answers`     | `realitio.answer`            | 100   | `realitio` | 30 days → today |
+| `gnosis-outcomes`    | `realitio.question_outcomes` | 100   | `realitio` | 30 days → today |

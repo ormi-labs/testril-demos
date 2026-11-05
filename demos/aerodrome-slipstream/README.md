@@ -19,7 +19,7 @@ what Testril already indexed.
 | Variable            | Purpose                                                    |
 | ------------------- | ---------------------------------------------------------- |
 | `TESTRIL_PAYER_KEY` | Hex private key that signs vouchers; required to fetch     |
-| `TESTRIL_MCP_URL`   | Testril MCP endpoint; default `https://dev.testril.ai/mcp` |
+| `TESTRIL_MCP_URL`   | Testril MCP endpoint; default `https://api.testril.si/mcp` |
 
 ## Run
 
@@ -69,8 +69,8 @@ for the report. The fixture lives in `test/` and is never shown on the page.
 
 - Factory: Aerodrome Slipstream CL factory on Base,
   `0x5e7bb104d84c7cb9b682aac2f3d509f5f406809a` (verify).
-- Window: UTC days `[2026-10-25, 2026-11-02)`, eight days. `to_day` is
-  exclusive.
+- Window: the eight UTC days before the day of the press, from
+  `from_time` eight days before today 00:00 UTC to `to_time` today 00:00 UTC.
 - Volume is a pool's tokens paid in plus paid out, in raw units. Pools of
   different token pairs can only be compared in dollars, so the ranking uses
   the dollar side of the pools listed in `knownPools` in `src/report.mjs`. Any

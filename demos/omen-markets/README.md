@@ -35,7 +35,7 @@ what Testril already indexed.
 | Variable            | Purpose                                                    |
 | ------------------- | ---------------------------------------------------------- |
 | `TESTRIL_PAYER_KEY` | Hex private key that signs vouchers; required to fetch     |
-| `TESTRIL_MCP_URL`   | Testril MCP endpoint; default `https://dev.testril.ai/mcp` |
+| `TESTRIL_MCP_URL`   | Testril MCP endpoint; default `https://api.testril.si/mcp` |
 
 ## Run
 
@@ -81,10 +81,11 @@ for the report. The fixture lives in `test/` and is never shown on the page.
 
 ## Subjects and window
 
-Window: Gnosis blocks `[48558286, 49062480)`, the first block at or after
-2026-10-03T00:00Z up to the first block of 2026-11-02 (30 days ending
-2026-11-01), found by binary search over the public RPC
-gnosis-rpc.publicnode.com.
+Window: the 30 UTC days before the day of the press (`from_time` 30 days before
+today 00:00 UTC, `to_time` today 00:00 UTC). `markets-created` reads the factory
+list over that window to count the markets created in it; `markets` reads it
+from the start of the chain (`from_time` 1970-01-01T00:00:00Z, the timestamp of
+Gnosis block 0) so every market that can trade in the window is listed.
 
 | Subject                              | Address                                      | Note   |
 | ------------------------------------ | -------------------------------------------- | ------ |
@@ -99,18 +100,19 @@ unconfirmed as the instance Omen uses.
 
 ## Binds (`src/report.mjs`)
 
-Windows are half-open: the end is the first block not included.
+Windows end at 00:00 UTC on the day of the press; the end is not included.
 
-| Name           | Function            | Chain | Params                          | Window              |
-| -------------- | ------------------- | ----- | ------------------------------- | ------------------- |
-| `markets`      | `omen.market_list`  | 100   | `factory`, `conditional_tokens` | 0 → 49062480        |
-| `trades`       | `omen.trade`        | 100   | `market_list`                   | 48558286 → 49062480 |
-| `liquidity`    | `omen.liquidity`    | 100   | `market_list`                   | 48558286 → 49062480 |
-| `market_state` | `omen.market_state` | 100   | `market_list`                   | 48558286 → 49062480 |
-| `answers`      | `realitio.answer`   | 100   | `realitio`                      | 48558286 → 49062480 |
+| Name              | Function            | Chain | Params                          | Window              |
+| ----------------- | ------------------- | ----- | ------------------------------- | ------------------- |
+| `markets`         | `omen.market_list`  | 100   | `factory`, `conditional_tokens` | chain start → today |
+| `markets-created` | `omen.market_list`  | 100   | `factory`, `conditional_tokens` | 30 days → today     |
+| `trades`          | `omen.trade`        | 100   | `market_list`                   | 30 days → today     |
+| `liquidity`       | `omen.liquidity`    | 100   | `market_list`                   | 30 days → today     |
+| `market_state`    | `omen.market_state` | 100   | `market_list`                   | 30 days → today     |
+| `answers`         | `realitio.answer`   | 100   | `realitio`                      | 30 days → today     |
 
 `market_state` is a bind the first plan did not list; the check that no pool
 holds negative or too few outcome tokens needs it, at the cost of its credits.
-`markets` starts at block 0 so it lists every market that can trade in the
+`markets` starts at the chain start so it lists every market that can trade in the
 window, not only those created in it. `trades`, `liquidity`, `market_state` and
-`answers` are read in chunks of 20,000 blocks.
+`answers` are read in chunks of 24 hours.

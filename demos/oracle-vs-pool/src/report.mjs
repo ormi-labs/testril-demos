@@ -1,34 +1,40 @@
-export const binds = [
-  {
-    name: "pool",
-    function_slug: "uniswap_v4.pool_state",
-    chain_id: 1,
-    params: {
-      manager: "0x000000000004444c5dc75cb358380d2e3de08a90",
-      pool: "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
-      by: "hour",
-    },
-    window: { from_hour: "2026-10-25T00", to_hour: "2026-11-01T00" },
-  },
-  {
-    name: "feeds",
-    function_slug: "aggregator.latest_answer",
-    chain_id: 1,
-    params: {
-      feeds: [
-        "0x5f4ec3df9cbd43714fe2740f5e3616155c5b8419",
-        "0xf4030086522a5beea4988f8ca5b36dbc97bee88c",
-        "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6",
-      ],
-      by: "hour",
-    },
-    window: { from_hour: "2026-10-25T00", to_hour: "2026-11-01T00" },
-  },
-];
+const hourMs = 3600000;
+const isoSecond = (ms) => new Date(ms).toISOString().replace(".000Z", "Z");
 
-const bindByName = Object.fromEntries(binds.map((bind) => [bind.name, bind]));
-const poolWindow = bindByName.pool.window;
-export const [ethFeed, btcFeed, usdcFeed] = bindByName.feeds.params.feeds;
+export function bindsAt(now = Date.now()) {
+  const thisHour = Math.floor(now / hourMs) * hourMs;
+  const lastHours = (count) => ({
+    from_time: isoSecond(thisHour - count * hourMs),
+    to_time: isoSecond(thisHour),
+  });
+  return [
+    {
+      name: "pool",
+      function_slug: "uniswap_v4.pool_state",
+      chain_id: 1,
+      params: {
+        manager: "0x000000000004444c5dc75cb358380d2e3de08a90",
+        pool: "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
+        by: "hour",
+      },
+      window: lastHours(168),
+    },
+    {
+      name: "feeds",
+      function_slug: "aggregator.latest_answer",
+      chain_id: 1,
+      params: {
+        feeds: [ethFeed, btcFeed, usdcFeed],
+        by: "hour",
+      },
+      window: lastHours(168),
+    },
+  ];
+}
+
+export const ethFeed = "0x5f4ec3df9cbd43714fe2740f5e3616155c5b8419";
+export const btcFeed = "0xf4030086522a5beea4988f8ca5b36dbc97bee88c";
+export const usdcFeed = "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6";
 const feedNames = new Map([
   [ethFeed, "ETH / USD"],
   [btcFeed, "BTC / USD"],
@@ -42,11 +48,12 @@ const q192 = 2n ** 192n;
 
 const hourStamp = (ms) => new Date(ms).toISOString().slice(0, 13);
 
-export function windowHours() {
-  const start = Date.parse(`${poolWindow.from_hour}:00:00Z`);
-  const end = Date.parse(`${poolWindow.to_hour}:00:00Z`);
-  return Array.from({ length: (end - start) / 3600000 }, (_, i) =>
-    hourStamp(start + i * 3600000),
+export function windowHours(binds) {
+  const { window } = binds.find((bind) => bind.name === "pool");
+  const start = Date.parse(window.from_time);
+  const end = Date.parse(window.to_time);
+  return Array.from({ length: (end - start) / hourMs }, (_, i) =>
+    hourStamp(start + i * hourMs),
   );
 }
 
@@ -90,8 +97,8 @@ const abs = (n) => (n < 0n ? -n : n);
 const exceedsMaxGap = (pool, oracle) =>
   abs(pool - oracle) * 10000n > maxGapBasisPoints * oracle;
 
-export function check(rows) {
-  const hours = windowHours();
+export function check(rows, binds) {
+  const hours = windowHours(binds);
   const pool = poolByHour(rows);
   const oracle = answersByHour(rows, ethFeed);
   const required = [
@@ -142,9 +149,9 @@ const formatDollars = (value) =>
 
 const toNumber = (scaled) => Number(scaled) / 10 ** Number(feedDecimals);
 
-function heartbeat(rows, feed) {
+function heartbeat(rows, hours, feed) {
   const answers = answersByHour(rows, feed);
-  const series = windowHours().map((hour) => answers.get(hour));
+  const series = hours.map((hour) => answers.get(hour));
   let updates = 0;
   let flat = 0;
   let longestFlat = 0;
@@ -170,8 +177,8 @@ function heartbeat(rows, feed) {
   };
 }
 
-export function shape(rows) {
-  const hours = windowHours();
+export function shape(rows, binds) {
+  const hours = windowHours(binds);
   const pool = poolByHour(rows);
   const oracle = answersByHour(rows, ethFeed);
   const gaps = hours.map((hour) =>
@@ -187,7 +194,7 @@ export function shape(rows) {
   }));
   const prices = series.flatMap((point) => [point.pool, point.oracle]);
   return {
-    poolWindow,
+    poolWindow: { first: hours[0], last: hours.at(-1) },
     latestPool: formatPrice(pool.get(hours.at(-1))),
     latestOracle: formatPrice(oracle.get(hours.at(-1))),
     widestGap: formatPercent(widest),
@@ -196,6 +203,8 @@ export function shape(rows) {
     low: formatDollars(Math.min(...prices)),
     high: formatDollars(Math.max(...prices)),
     series,
-    feeds: [ethFeed, btcFeed, usdcFeed].map((feed) => heartbeat(rows, feed)),
+    feeds: [ethFeed, btcFeed, usdcFeed].map((feed) =>
+      heartbeat(rows, hours, feed),
+    ),
   };
 }

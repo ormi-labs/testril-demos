@@ -3,12 +3,12 @@ import { readFile } from "node:fs/promises";
 import { extname, join, normalize } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import { check } from "./check.mjs";
-import { binds, shape } from "./report.mjs";
+import { bindsAt, shape } from "./report.mjs";
 import { fetchRows, newRun } from "./fetch.mjs";
 import { connectTestril } from "./testril.mjs";
 
 const demo = "bybit-hack-trail";
-const defaultUrl = "https://dev.testril.ai/mcp";
+const defaultUrl = "https://api.testril.si/mcp";
 const publicDir = fileURLToPath(new URL("../public", import.meta.url));
 const types = {
   ".html": "text/html",
@@ -17,31 +17,33 @@ const types = {
   ".svg": "image/svg+xml",
 };
 
-export function report(rows) {
+export function report(rows, binds) {
   let checks;
   try {
-    checks = { ok: true, passed: check({ rows }) };
+    checks = { ok: true, passed: check({ rows, binds }) };
   } catch (error) {
     checks = { ok: false, error: error.message };
   }
-  return { view: shape(rows), checks };
+  return { view: shape(rows, binds), checks };
 }
 
 export function createApp({
   url = process.env.TESTRIL_MCP_URL ?? defaultUrl,
   payerKey = process.env.TESTRIL_PAYER_KEY,
   pollMs,
+  now = Date.now,
 } = {}) {
   let run = { state: payerKey ? "idle" : "unconfigured" };
 
   async function start() {
+    const binds = bindsAt(now());
     run = newRun(binds);
     const current = run;
     let testril;
     try {
       testril = await connectTestril({ url, payerKey, name: demo });
       const rows = await fetchRows({ binds, testril, run: current, pollMs });
-      current.report = report(rows);
+      current.report = report(rows, binds);
       current.state = "done";
     } catch (error) {
       current.error = error.message;

@@ -1,4 +1,13 @@
-import { binds, window } from "../src/report.mjs";
+import { bindsAt, factory } from "../src/report.mjs";
+import { blockAt as chainBlockAt } from "./fake-testril.mjs";
+
+export const fixtureNow = Date.parse("2026-11-02T12:00:00Z");
+export const fixtureBinds = bindsAt(fixtureNow);
+const tradesWindow = fixtureBinds.find((bind) => bind.name === "trades").window;
+const window = {
+  from_block: chainBlockAt(tradesWindow.from_time),
+  to_block: chainBlockAt(tradesWindow.to_time),
+};
 
 const marketCount = 12;
 const randomTradeCount = 120;
@@ -6,8 +15,7 @@ const secondsPerBlock = 5;
 const firstBlockTime = 1790985600;
 const answerTimeout = 3 * 86400;
 const collateralToken = "0xe91d153e0b41518a2ce8dd3d7944fa863463a97d";
-const conditionalTokens = binds[0].params.conditional_tokens;
-const factory = binds[0].params.factory;
+const conditionalTokens = fixtureBinds[0].params.conditional_tokens;
 
 function seeded(seed) {
   let state = seed;
@@ -196,6 +204,9 @@ export function fixture() {
   const liquidity = liquidityRows(random, markets, [factory, ...creators]);
   return {
     markets: marketList,
+    "markets-created": marketList.filter(
+      (m) => m.block >= window.from_block && m.block < window.to_block,
+    ),
     trades,
     liquidity,
     market_state: marketStateRows(markets, trades, liquidity),
@@ -204,27 +215,27 @@ export function fixture() {
 }
 
 const sameParams = (a, b) => JSON.stringify(a) === JSON.stringify(b);
-const covers = (outer, inner) =>
-  Object.keys(inner).every((key) =>
-    key.startsWith("from_")
-      ? inner[key] >= outer[key]
-      : inner[key] <= outer[key],
-  );
 
 export function fixtureRows() {
   const rows = fixture();
-  return (bound, window) => {
-    const bind = binds.find(
+  return (bound, requested) => {
+    const candidates = fixtureBinds.filter(
       (candidate) =>
         candidate.function_slug === bound.function_slug &&
         candidate.chain_id === bound.chain_id &&
-        sameParams(candidate.params, bound.params) &&
-        covers(candidate.window, window),
+        sameParams(candidate.params, bound.params),
     );
-    return "from_block" in window && bind.read
+    const bind =
+      candidates.find(
+        (candidate) =>
+          candidate.window.from_time === requested.from_time &&
+          candidate.window.to_time === requested.to_time,
+      ) ?? candidates[0];
+    return bind.read
       ? rows[bind.name].filter(
           (row) =>
-            row.block >= window.from_block && row.block < window.to_block,
+            row.block >= chainBlockAt(requested.from_time) &&
+            row.block < chainBlockAt(requested.to_time),
         )
       : rows[bind.name];
   };

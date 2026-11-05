@@ -1,68 +1,53 @@
-import hourFirstBlocks from "./hour-first-blocks.json" with { type: "json" };
+export const usdc = "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48";
+export const feed = "0x8fffffd4afb6115b954bd326cbe7b4ba576818f6";
+export const zeroAddress = "0x0000000000000000000000000000000000000000";
+const hourMs = 3600000;
+const replayStart = "2023-03-10T00:00:00Z";
+const replayEnd = "2023-03-15T00:00:00Z";
+const isoSecond = (ms) => new Date(ms).toISOString().replace(".000Z", "Z");
+const hourKey = (ms) => new Date(ms).toISOString().slice(0, 13);
+
+export const hours = [];
+for (let t = Date.parse(replayStart); t < Date.parse(replayEnd); t += hourMs)
+  hours.push(hourKey(t));
+
+export const edgesBind = (hour) => `usdc-edges-${hour}`;
+const edgeBinds = hours.map((hour) => {
+  const from = Date.parse(`${hour}:00:00Z`);
+  return {
+    name: edgesBind(hour),
+    function_slug: "erc20.transfer_edges",
+    chain_id: 1,
+    params: { token_address: usdc },
+    window: { from_time: isoSecond(from), to_time: isoSecond(from + hourMs) },
+  };
+});
 
 export const binds = [
   {
     name: "supply",
     function_slug: "erc20.token_supply",
     chain_id: 1,
-    params: {
-      tokens: ["0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"],
-      by: "hour",
-    },
-    window: { from_hour: "2023-03-10T00", to_hour: "2023-03-15T00" },
+    params: { tokens: [usdc], by: "hour" },
+    window: { from_time: replayStart, to_time: replayEnd },
   },
-  {
-    name: "usdc-edges",
-    function_slug: "erc20.transfer_edges",
-    chain_id: 1,
-    params: { token_address: "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48" },
-    window: { from_block: 16794062, to_block: 16829610 },
-    read: { chunk_blocks: 600 },
-  },
+  ...edgeBinds,
   {
     name: "usdc-usd-feed",
     function_slug: "aggregator.latest_answer",
     chain_id: 1,
-    params: {
-      feeds: ["0x8fffffd4afb6115b954bd326cbe7b4ba576818f6"],
-      by: "hour",
-    },
-    window: { from_hour: "2023-03-10T00", to_hour: "2023-03-15T00" },
+    params: { feeds: [feed], by: "hour" },
+    window: { from_time: replayStart, to_time: replayEnd },
   },
 ];
 
-export const zeroAddress = "0x0000000000000000000000000000000000000000";
-const bindByName = Object.fromEntries(binds.map((bind) => [bind.name, bind]));
-export const hourWindow = bindByName.supply.window;
-export const edgesWindow = bindByName["usdc-edges"].window;
-export const usdc = bindByName["usdc-edges"].params.token_address;
-export const feed = bindByName["usdc-usd-feed"].params.feeds[0];
+export const bindsAt = () => binds;
+
 const decimals = 6n;
 const feedDecimals = 8;
 const priceFloor = 80000000n;
 const priceCeiling = 102000000n;
 const topBurners = 10;
-
-const addHours = (hour, step) =>
-  new Date(Date.parse(`${hour}:00:00Z`) + step * 3600000)
-    .toISOString()
-    .slice(0, 13);
-
-export const hours = [];
-for (let h = hourWindow.from_hour; h < hourWindow.to_hour; h = addHours(h, 1))
-  hours.push(h);
-
-export const hourBlocks = (index) => ({
-  from: hourFirstBlocks[index],
-  to: hourFirstBlocks[index + 1],
-});
-
-function hourIndexOf(block) {
-  if (block < hourFirstBlocks[0] || block >= hourFirstBlocks.at(-1)) return -1;
-  let index = 0;
-  while (hourFirstBlocks[index + 1] <= block) index++;
-  return index;
-}
 
 const byHour = (rows, field) =>
   new Map(rows.map((row) => [row.hour, BigInt(row[field])]));
@@ -74,25 +59,20 @@ const lowercased = (edges) =>
     to: edge.to.toLowerCase(),
   }));
 
-export function mintsAndBurns(edges) {
-  const net = hours.map(() => ({ minted: 0n, burned: 0n }));
-  for (const edge of lowercased(edges)) {
-    const hour = net[hourIndexOf(edge.block)];
-    if (!hour) continue;
-    if (edge.from === zeroAddress) hour.minted += BigInt(edge.amount);
-    if (edge.to === zeroAddress) hour.burned += BigInt(edge.amount);
-  }
-  return net;
+export function mintsAndBurns(rows) {
+  return hours.map((hour) => {
+    const net = { minted: 0n, burned: 0n };
+    for (const edge of lowercased(rows[edgesBind(hour)])) {
+      if (edge.from === zeroAddress) net.minted += BigInt(edge.amount);
+      if (edge.to === zeroAddress) net.burned += BigInt(edge.amount);
+    }
+    return net;
+  });
 }
 
+const allEdges = (rows) => hours.flatMap((hour) => rows[edgesBind(hour)]);
+
 export function check(rows) {
-  if (
-    hourFirstBlocks[0] !== edgesWindow.from_block ||
-    hourFirstBlocks.at(-1) !== edgesWindow.to_block
-  )
-    throw new Error(
-      "hour-first-blocks.json does not span the usdc-edges window in src/report.mjs.",
-    );
   const supply = byHour(
     rows.supply.filter((row) => row.token.toLowerCase() === usdc),
     "total_supply",
@@ -106,20 +86,14 @@ export function check(rows) {
     if (missing.length)
       throw new Error(`${name} is missing ${missing.join(", ")}.`);
   }
-  const outside = rows["usdc-edges"].filter(
-    (edge) =>
-      edge.block < edgesWindow.from_block || edge.block >= edgesWindow.to_block,
-  );
-  if (outside.length)
-    throw new Error(`Edge at block ${outside[0].block} is outside the window.`);
-  const flows = mintsAndBurns(rows["usdc-edges"]);
+  const flows = mintsAndBurns(rows);
   hours.forEach((hour, index) => {
     if (index === 0) return;
     const change = supply.get(hour) - supply.get(hours[index - 1]);
     const { minted, burned } = flows[index];
     if (change !== minted - burned)
       throw new Error(
-        `USDC supply changed by ${change} in ${hour}, but mints minus burns in blocks ${hourBlocks(index).from}–${hourBlocks(index).to - 1} is ${minted - burned}.`,
+        `USDC supply changed by ${change} in ${hour}, but mints minus burns in that hour is ${minted - burned}.`,
       );
   });
   const outOfRange = hours.filter(
@@ -186,7 +160,7 @@ function burners(edges) {
 
 export function shape(rows) {
   const prices = byHour(rows["usdc-usd-feed"], "answer");
-  const flows = mintsAndBurns(rows["usdc-edges"]);
+  const flows = mintsAndBurns(rows);
   const timeline = hours.map((hour, index) => {
     const { minted, burned } = flows[index];
     return {
@@ -207,14 +181,13 @@ export function shape(rows) {
   const minted = flows.reduce((sum, f) => sum + f.minted, 0n);
   const burned = flows.reduce((sum, f) => sum + f.burned, 0n);
   return {
-    hourWindow,
-    edgesWindow,
+    hourWindow: { first: hours[0], last: hours.at(-1) },
     lowest: { price: lowest.price, hour: lowest.label },
     peakBurn: { amount: peak.netBurn, hour: peak.label },
     minted: formatCompact(minted),
     burned: formatCompact(burned),
     net: formatCompact(burned - minted, true),
     timeline,
-    burners: burners(rows["usdc-edges"]),
+    burners: burners(allEdges(rows)),
   };
 }

@@ -19,7 +19,7 @@ what Testril already indexed.
 | Variable            | Purpose                                                    |
 | ------------------- | ---------------------------------------------------------- |
 | `TESTRIL_PAYER_KEY` | Hex private key that signs vouchers; required to fetch     |
-| `TESTRIL_MCP_URL`   | Testril MCP endpoint; default `https://dev.testril.ai/mcp` |
+| `TESTRIL_MCP_URL`   | Testril MCP endpoint; default `https://api.testril.si/mcp` |
 
 ## Run
 
@@ -66,13 +66,12 @@ for the report. The fixture lives in `test/` and is never shown on the page.
 - USDC `0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48`, 6 decimals.
 - Chainlink USDC/USD aggregator `0x8fffffd4afb6115b954bd326cbe7b4ba576818f6`,
   8 decimals. Verify before fetching.
-- Hours: UTC hours `[2023-03-10T00, 2023-03-15T00)`, read at each hour's last
-  block.
-- Transfers: blocks `[16794062, 16829610)`, the first block of 2023-03-10T00 up
-  to the first block of 2023-03-15T00, so they cover the same 120 hours.
-- `src/hour-first-blocks.json` holds the first block of each hour, found by
-  binary search over the public RPC ethereum-rpc.publicnode.com. `check` uses
-  it to put each transfer edge in its hour.
+- Hours: the fixed UTC hours `[2023-03-10T00:00:00Z, 2023-03-15T00:00:00Z)`,
+  read at each hour's last block. The replay is history, so its windows do not
+  follow the press.
+- Transfers: one `usdc-edges-<hour>` bind per hour (120 binds), each over that
+  hour's `from_time` and `to_time`. A transfer edge carries only its block, so
+  the hour it was read in is what `check` uses to put it in its hour.
 
 The first hour has no earlier supply row, so 119 hours are cross-checked.
 
@@ -84,12 +83,12 @@ before fetching.
 
 ## Binds (`src/report.mjs`)
 
-Windows are half-open: the end is the first block or hour not included.
+Windows are fixed; the end is not included.
 
-| Name            | Function                   | Chain | Params          | Window                        |
-| --------------- | -------------------------- | ----- | --------------- | ----------------------------- |
-| `supply`        | `erc20.token_supply`       | 1     | `tokens`, `by`  | 2023-03-10T00 → 2023-03-15T00 |
-| `usdc-edges`    | `erc20.transfer_edges`     | 1     | `token_address` | 16794062 → 16829610           |
-| `usdc-usd-feed` | `aggregator.latest_answer` | 1     | `feeds`, `by`   | 2023-03-10T00 → 2023-03-15T00 |
+| Name                | Function                   | Chain | Params          | Window                        |
+| ------------------- | -------------------------- | ----- | --------------- | ----------------------------- |
+| `supply`            | `erc20.token_supply`       | 1     | `tokens`, `by`  | 2023-03-10T00 → 2023-03-15T00 |
+| `usdc-edges-<hour>` | `erc20.transfer_edges`     | 1     | `token_address` | one hour of the span          |
+| `usdc-usd-feed`     | `aggregator.latest_answer` | 1     | `feeds`, `by`   | 2023-03-10T00 → 2023-03-15T00 |
 
-`usdc-edges` is read in chunks of 600 blocks.
+Each `usdc-edges-<hour>` bind is read in one piece.

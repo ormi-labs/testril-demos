@@ -1,13 +1,20 @@
 import {
-  binds,
   addDays,
   assets,
+  bindsAt,
   holdingDays,
   lastStateHour,
-  reservesWindow,
-  stateWindow,
-  totalsWindow,
+  stateHours,
 } from "../src/report.mjs";
+import { blockAt } from "./fake-testril.mjs";
+
+export const fixtureNow = Date.parse("2026-11-01T12:00:00Z");
+export const fixtureBinds = bindsAt(fixtureNow);
+const windowOf = (name) =>
+  fixtureBinds.find((bind) => bind.name === name).window;
+const reservesFromBlock = blockAt(windowOf("reserves").from_time);
+const totalsFromBlock = blockAt(windowOf("reserve-totals").from_time);
+const totalsToBlock = blockAt(windowOf("reserve-totals").to_time);
 
 const reserveFactorPercent = 10n;
 const zeroAddress = `0x${"0".repeat(40)}`;
@@ -79,7 +86,7 @@ const hex = (n) => `0x${n.toString(16).padStart(40, "0")}`;
 
 function reserveRows() {
   return assets.map(({ address }, i) => ({
-    block: reservesWindow.from_block + 127 + i * 40000 + (i > 4 ? 9000000 : 0),
+    block: reservesFromBlock + 127 + i * 40000 + (i > 4 ? 9000000 : 0),
     asset: address,
     a_token: hex(0xa000 + i),
     variable_debt_token: hex(0xd000 + i),
@@ -92,12 +99,12 @@ function reserveRows() {
 function sampleHours() {
   const hours = [];
   for (
-    let d = stateWindow.from_hour.slice(0, 10);
-    d < stateWindow.to_hour.slice(0, 10);
+    let d = stateHours(fixtureBinds)[0].slice(0, 10);
+    d < lastStateHour(fixtureBinds).slice(0, 10);
     d = addDays(d, 1)
   )
     hours.push(`${d}T00`, `${d}T12`);
-  return [...hours, lastStateHour];
+  return [...hours, lastStateHour(fixtureBinds)];
 }
 
 function stateRows(random) {
@@ -155,9 +162,9 @@ function totalsRows(random) {
       minted_to_treasury: m.supply * 0.004,
     };
     const blocks = [
-      totalsWindow.from_block - 90000 - i * 700,
-      totalsWindow.from_block + 1800 + i * 90,
-      totalsWindow.to_block - 400 - i * 50,
+      totalsFromBlock - 90000 - i * 700,
+      totalsFromBlock + 1800 + i * 90,
+      totalsToBlock - 400 - i * 50,
     ];
     return blocks.map((block, step) => ({
       block,
@@ -176,7 +183,7 @@ function totalsRows(random) {
 }
 
 function holdingRows(random) {
-  return holdingDays().flatMap((day, i) =>
+  return holdingDays(fixtureBinds).flatMap((day, i) =>
     assets
       .filter(({ symbol }) => market[symbol].morpho > 0)
       .map(({ symbol, decimals, address }) => ({
@@ -205,28 +212,16 @@ export function fixture() {
 }
 
 const sameParams = (a, b) => JSON.stringify(a) === JSON.stringify(b);
-const covers = (outer, inner) =>
-  Object.keys(inner).every((key) =>
-    key.startsWith("from_")
-      ? inner[key] >= outer[key]
-      : inner[key] <= outer[key],
-  );
 
 export function fixtureRows() {
   const rows = fixture();
-  return (bound, window) => {
-    const bind = binds.find(
-      (candidate) =>
-        candidate.function_slug === bound.function_slug &&
-        candidate.chain_id === bound.chain_id &&
-        sameParams(candidate.params, bound.params) &&
-        covers(candidate.window, window),
-    );
-    return "from_block" in window && bind.read
-      ? rows[bind.name].filter(
-          (row) =>
-            row.block >= window.from_block && row.block < window.to_block,
-        )
-      : rows[bind.name];
-  };
+  return (bound) =>
+    rows[
+      fixtureBinds.find(
+        (candidate) =>
+          candidate.function_slug === bound.function_slug &&
+          candidate.chain_id === bound.chain_id &&
+          sameParams(candidate.params, bound.params),
+      ).name
+    ];
 }

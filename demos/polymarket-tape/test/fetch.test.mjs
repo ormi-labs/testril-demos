@@ -13,22 +13,31 @@ const binds = [
     function_slug: "erc20.transfer_edges",
     chain_id: 1,
     params: { token_address: `0x${"a".repeat(40)}` },
-    window: { from_block: 100, to_block: 250 },
-    read: { chunk_blocks: 100 },
+    window: {
+      from_time: "2026-11-01T00:00:00Z",
+      to_time: "2026-11-01T02:30:00Z",
+    },
+    read: { chunk_hours: 1 },
   },
   {
     name: "supply",
     function_slug: "erc20.token_supply",
     chain_id: 1,
     params: { tokens: [`0x${"b".repeat(40)}`], by: "day" },
-    window: { from_day: "2026-10-02", to_day: "2026-11-02" },
+    window: {
+      from_time: "2026-10-02T00:00:00Z",
+      to_time: "2026-11-02T00:00:00Z",
+    },
   },
   {
     name: "ens-vitalik",
     function_slug: "ens.primary_name",
     chain_id: 1,
     params: { address: `0x${"c".repeat(40)}` },
-    window: { from_block: 249, to_block: 250 },
+    window: {
+      from_time: "2026-11-01T23:55:00Z",
+      to_time: "2026-11-02T00:00:00Z",
+    },
   },
 ];
 
@@ -61,24 +70,24 @@ test("a fetch pays with the payer's vouchers, reports Testril's job progress and
 
   assert.deepEqual(
     rows["usdc-edges"].map((row) => row.block),
-    Array.from({ length: 150 }, (_, i) => 100 + i),
+    Array.from({ length: 750 }, (_, i) => 26316189 + i),
   );
   assert.deepEqual(rows.supply, [{ day: "2026-10-02" }]);
-  assert.deepEqual(rows["ens-vitalik"], [{ block: 249 }]);
+  assert.equal(rows["ens-vitalik"].length, 25);
 
   assert.ok(
     seen.some(
       (p) =>
         p.step === "indexing" &&
-        p.done === 75 &&
-        p.total === 150 &&
+        p.done === 375 &&
+        p.total === 750 &&
         p.unit === "blocks",
     ),
   );
   assert.deepEqual(
     run.binds.map((p) => [p.name, p.step, p.jobId, p.done, p.total]),
     [
-      ["usdc-edges", "done", "job:1", 2, 2],
+      ["usdc-edges", "done", "job:1", 3, 3],
       ["supply", "done", null, 1, 1],
       ["ens-vitalik", "done", "job:7", 1, 1],
     ],
@@ -91,23 +100,28 @@ test("a fetch pays with the payer's vouchers, reports Testril's job progress and
       c.args.bound_function_id.startsWith("sha256:erc20.transfer_edges"),
   );
   assert.deepEqual(
-    edgeReads.map((c) => [c.args.from_block, c.args.to_block]),
+    edgeReads.map((c) => [c.args.from_time, c.args.to_time]),
     [
-      [100, 200],
-      [200, 250],
+      ["2026-11-01T00:00:00Z", "2026-11-01T01:00:00Z"],
+      ["2026-11-01T01:00:00Z", "2026-11-01T02:00:00Z"],
+      ["2026-11-01T02:00:00Z", "2026-11-01T02:30:00Z"],
     ],
   );
   assert.deepEqual(
     fake.charges.map((c) => [c.tool, c.amount]),
     [
-      ["materialize", 150 * 120],
-      ["read", 120],
-      ["read", 70],
-      ["read", 7220],
-      ["read", 21],
+      ["materialize", 750 * 120],
+      ["read", 20 + 300],
+      ["read", 20 + 300],
+      ["read", 20 + 150],
+      ["read", 20 + 31 * 7200],
+      ["read", 20 + 25],
     ],
   );
-  assert.equal(run.spentAtoms, String(150 * 120 + 120 + 70 + 7220 + 21));
+  assert.equal(
+    run.spentAtoms,
+    String(750 * 120 + 320 + 320 + 170 + 20 + 31 * 7200 + 45),
+  );
 });
 
 test("after another job's refusal the window is asked for again before reading", async () => {

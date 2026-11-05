@@ -1,4 +1,7 @@
-import { binds, days, pairs } from "../src/report.mjs";
+import { bindsAt, days, pairs } from "../src/report.mjs";
+
+export const fixtureNow = Date.parse("2026-11-02T12:00:00Z");
+export const fixtureBinds = bindsAt(fixtureNow);
 
 const wbtcSide = 25n * 10n ** 8n;
 const wstethPerEth = 0.82;
@@ -89,9 +92,9 @@ function noiseRows(bind, day, random) {
 
 export function fixture() {
   const random = seeded(11);
-  const rows = Object.fromEntries(binds.map((bind) => [bind.name, []]));
+  const rows = Object.fromEntries(fixtureBinds.map((bind) => [bind.name, []]));
   let usdcPerEth = 2640;
-  for (const [index, day] of days().entries()) {
+  for (const [index, day] of days(fixtureBinds).entries()) {
     usdcPerEth *= 1 + (random() - 0.5) * 0.03;
     for (const pair of pairs)
       for (const s of pair.subjects) {
@@ -120,28 +123,16 @@ export function fixture() {
 }
 
 const sameParams = (a, b) => JSON.stringify(a) === JSON.stringify(b);
-const covers = (outer, inner) =>
-  Object.keys(inner).every((key) =>
-    key.startsWith("from_")
-      ? inner[key] >= outer[key]
-      : inner[key] <= outer[key],
-  );
 
 export function fixtureRows() {
   const rows = fixture();
-  return (bound, window) => {
-    const bind = binds.find(
-      (candidate) =>
-        candidate.function_slug === bound.function_slug &&
-        candidate.chain_id === bound.chain_id &&
-        sameParams(candidate.params, bound.params) &&
-        covers(candidate.window, window),
-    );
-    return "from_block" in window && bind.read
-      ? rows[bind.name].filter(
-          (row) =>
-            row.block >= window.from_block && row.block < window.to_block,
-        )
-      : rows[bind.name];
-  };
+  return (bound) =>
+    rows[
+      fixtureBinds.find(
+        (candidate) =>
+          candidate.function_slug === bound.function_slug &&
+          candidate.chain_id === bound.chain_id &&
+          sameParams(candidate.params, bound.params),
+      ).name
+    ];
 }

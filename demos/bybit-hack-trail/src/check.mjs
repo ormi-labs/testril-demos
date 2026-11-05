@@ -3,41 +3,37 @@ import {
   formatAmount,
   hoursInWindow,
   label,
+  segments,
   symbolOf,
   tokenBalanceBinds,
   tokens,
   transferBinds,
   transferKey,
-  transferWindow,
+  transfersOfWallet,
   uniqueTransfers,
+  walletKeys,
   wallets,
 } from "./report.mjs";
 
 const stEth = "0xae7ab96520de3a18e5e111b5eaab095312d7fe84";
-const rebaseHoursUtc = new Set(["12", "13"]);
 const rebaseDriftDivisor = 5000n;
 const roundingWeiPerTransfer = 2n;
 
 function checkTransferRows(rows) {
-  for (const bind of transferBinds) {
-    const { wallet } = bind.params;
+  walletKeys.forEach((key, index) => {
+    const wallet = wallets[index];
     const seen = new Set();
-    for (const row of rows[bind.name]) {
+    for (const row of transfersOfWallet(rows, key)) {
       const where = `${label(wallet)} transfer ${transferKey(row)}`;
       if (row.from !== wallet && row.to !== wallet)
         throw new Error(`${where} does not involve the wallet.`);
-      if (
-        row.block < transferWindow.from_block ||
-        row.block >= transferWindow.to_block
-      )
-        throw new Error(`${where} is outside the block window.`);
       if (!tokens.includes(row.token))
         throw new Error(`${where} is a token outside the trail.`);
       if (seen.has(transferKey(row)))
         throw new Error(`${where} is listed twice.`);
       seen.add(transferKey(row));
     }
-  }
+  });
 }
 
 function checkBothSidesAgree(rows) {
@@ -75,51 +71,32 @@ function checkNativeBalances(rows) {
     checkHourRows(rows, bind, bind.params.owners[0]);
 }
 
-function hourIndexOf(block, hourEndBlocks) {
-  const index = hourEndBlocks.findIndex((end) => block <= end);
-  if (index === -1)
-    throw new Error(`Block ${block} is after the last fetched hour.`);
-  return index;
-}
-
-function fetchedHourEnds(hourEndBlocks) {
-  const ends = hoursInWindow().map((hour) => hourEndBlocks?.[hour]);
-  if (ends.some((end, index) => !(end > (ends[index - 1] ?? -1))))
-    throw new Error(
-      "The fetched data lacks an increasing last block per hour.",
-    );
-  return ends;
-}
-
-function hourlyTransferChanges(rows, hourEndBlocks) {
+function segmentTransferChanges(rows) {
   const changes = new Map();
-  for (const { row } of uniqueTransfers(rows).values()) {
-    const hour = hourIndexOf(row.block, hourEndBlocks);
-    for (const [wallet, sign] of [
-      [row.to, 1n],
-      [row.from, -1n],
-    ]) {
-      const key = `${wallet}:${row.token}:${hour}`;
+  transferBinds.forEach((bind) => {
+    const segment = segments.findIndex((s) => bind.name.endsWith(s.key));
+    for (const row of rows[bind.name]) {
+      const wallet = bind.params.wallet;
+      const sign = row.to === wallet ? 1n : row.from === wallet ? -1n : 0n;
+      if (row.from === row.to) continue;
+      const key = `${wallet}:${row.token}:${segment}`;
       const change = changes.get(key) ?? { amount: 0n, count: 0n };
       change.amount += sign * BigInt(row.value);
       change.count += 1n;
       changes.set(key, change);
     }
-  }
+  });
   return changes;
 }
 
-function allowedDrift(token, hour, balance, transfers) {
+function allowedDrift(token, segment, balance, transfers) {
   if (token !== stEth) return 0n;
-  const rebase = rebaseHoursUtc.has(hour.slice(11))
-    ? balance / rebaseDriftDivisor
-    : 0n;
+  const rebase = segment.holdsRebase ? balance / rebaseDriftDivisor : 0n;
   return rebase + roundingWeiPerTransfer * transfers;
 }
 
-function checkBalancesFollowTransfers(rows, hourEndBlocks) {
-  const changes = hourlyTransferChanges(rows, hourEndBlocks);
-  const hours = hoursInWindow();
+function checkBalancesFollowTransfers(rows) {
+  const changes = segmentTransferChanges(rows);
   for (const bind of tokenBalanceBinds) {
     const [wallet] = bind.params.reads.owners;
     checkHourRows(rows, bind, wallet);
@@ -130,9 +107,11 @@ function checkBalancesFollowTransfers(rows, hourEndBlocks) {
       ]),
     );
     for (const token of tokens)
-      for (let index = 1; index < hours.length; index++) {
-        const before = balances.get(`${token}:${hours[index - 1]}`) ?? 0n;
-        const after = balances.get(`${token}:${hours[index]}`) ?? 0n;
+      for (let index = 1; index < segments.length; index++) {
+        const before =
+          balances.get(`${token}:${segments[index - 1].lastHour}`) ?? 0n;
+        const after =
+          balances.get(`${token}:${segments[index].lastHour}`) ?? 0n;
         const change = changes.get(`${wallet}:${token}:${index}`) ?? {
           amount: 0n,
           count: 0n,
@@ -140,29 +119,29 @@ function checkBalancesFollowTransfers(rows, hourEndBlocks) {
         const drift = after - before - change.amount;
         const allowed = allowedDrift(
           token,
-          hours[index],
+          segments[index],
           before > after ? before : after,
           change.count,
         );
         if (drift > allowed || -drift > allowed)
           throw new Error(
-            `${label(wallet)} ${symbolOf(token)} balance moved by ${formatAmount(after - before, true)} in ${hours[index]}, but its transfers moved ${formatAmount(change.amount, true)}.`,
+            `${label(wallet)} ${symbolOf(token)} balance moved by ${formatAmount(after - before, true)} to ${segments[index].lastHour}, but its transfers moved ${formatAmount(change.amount, true)}.`,
           );
       }
   }
 }
 
-export function check({ rows, hourEndBlocks }) {
+export function check({ rows }) {
   checkTransferRows(rows);
   checkBothSidesAgree(rows);
-  checkBalancesFollowTransfers(rows, fetchedHourEnds(hourEndBlocks));
+  checkBalancesFollowTransfers(rows);
   checkNativeBalances(rows);
   const entries = [...uniqueTransfers(rows).values()];
   const readTwice = entries.filter((entry) => entry.seenIn.size > 1).length;
   return [
     `${entries.length} transfers counted once each, ${readTwice} of them read from both wallets`,
     "Every transfer between two trail wallets appears, identical, on both sides",
-    "Every wallet's hourly token balance changes by exactly its transfers in that hour (stETH rebase drift of up to 0.02% only in the daily report hours)",
+    "Every wallet's token balance changes between the ends of consecutive transfer segments by exactly its transfers in the segment (stETH rebase drift of up to 0.02% only in the segment holding the 12:00 and 13:00 UTC hours)",
     `Balance rows sit only in the ${hoursInWindow().length} hours of the window`,
   ];
 }

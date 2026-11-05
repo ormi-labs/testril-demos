@@ -1,208 +1,217 @@
-export const binds = [
-  {
-    name: "uniswap-tokens",
-    function_slug: "erc20.token_balance",
-    chain_id: 1,
-    params: {
-      reads: {
-        tokens: [
-          "0x1f9840a85d5af5bf1d1762f925bdaddc4201f984",
-          "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
-          "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
-        ],
+const dayMs = 86400000;
+const isoSecond = (ms) => new Date(ms).toISOString().replace(".000Z", "Z");
+
+export function bindsAt(now = Date.now()) {
+  const today = Math.floor(now / dayMs) * dayMs;
+  const untilToday = (ms) => ({
+    from_time: isoSecond(today - ms),
+    to_time: isoSecond(today),
+  });
+  return [
+    {
+      name: "uniswap-tokens",
+      function_slug: "erc20.token_balance",
+      chain_id: 1,
+      params: {
+        reads: {
+          tokens: [
+            "0x1f9840a85d5af5bf1d1762f925bdaddc4201f984",
+            "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+            "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+          ],
+          owners: [
+            "0x1a9c8182c09f50c8318d769245bea52c32be35bc",
+            "0x3d30b1ab88d487b0f3061f40de76845bec3f1e94",
+          ],
+        },
+        by: "day",
+      },
+      window: untilToday(91 * dayMs),
+    },
+    {
+      name: "uniswap-tokens-timelock",
+      function_slug: "erc20.token_balance",
+      chain_id: 1,
+      params: {
+        reads: {
+          tokens: [
+            "0x1f9840a85d5af5bf1d1762f925bdaddc4201f984",
+            "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+            "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+          ],
+          owners: ["0x1a9c8182c09f50c8318d769245bea52c32be35bc"],
+        },
+        by: "day",
+      },
+      window: untilToday(91 * dayMs),
+    },
+    {
+      name: "uniswap-tokens-foundation",
+      function_slug: "erc20.token_balance",
+      chain_id: 1,
+      params: {
+        reads: {
+          tokens: [
+            "0x1f9840a85d5af5bf1d1762f925bdaddc4201f984",
+            "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+            "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+          ],
+          owners: ["0x3d30b1ab88d487b0f3061f40de76845bec3f1e94"],
+        },
+        by: "day",
+      },
+      window: untilToday(91 * dayMs),
+    },
+    {
+      name: "uniswap-native",
+      function_slug: "native.balance",
+      chain_id: 1,
+      params: {
         owners: [
           "0x1a9c8182c09f50c8318d769245bea52c32be35bc",
           "0x3d30b1ab88d487b0f3061f40de76845bec3f1e94",
         ],
+        by: "day",
       },
-      by: "day",
+      window: untilToday(91 * dayMs),
     },
-    window: { from_day: "2026-08-03", to_day: "2026-11-02" },
-  },
-  {
-    name: "uniswap-tokens-timelock",
-    function_slug: "erc20.token_balance",
-    chain_id: 1,
-    params: {
-      reads: {
-        tokens: [
-          "0x1f9840a85d5af5bf1d1762f925bdaddc4201f984",
-          "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
-          "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
-        ],
-        owners: ["0x1a9c8182c09f50c8318d769245bea52c32be35bc"],
+    {
+      name: "ens-tokens",
+      function_slug: "erc20.token_balance",
+      chain_id: 1,
+      params: {
+        reads: {
+          tokens: [
+            "0xc18360217d8f7ab5e7c516566761ea12ce7f9d72",
+            "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+            "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+          ],
+          owners: [
+            "0xfe89cc7abb2c4183683ab71653c4cdc9b02d44b7",
+            "0x4f2083f5fbede34c2714affb3105539775f7fe64",
+          ],
+        },
+        by: "day",
       },
-      by: "day",
+      window: untilToday(91 * dayMs),
     },
-    window: { from_day: "2026-08-03", to_day: "2026-11-02" },
-  },
-  {
-    name: "uniswap-tokens-foundation",
-    function_slug: "erc20.token_balance",
-    chain_id: 1,
-    params: {
-      reads: {
-        tokens: [
-          "0x1f9840a85d5af5bf1d1762f925bdaddc4201f984",
-          "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
-          "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
-        ],
-        owners: ["0x3d30b1ab88d487b0f3061f40de76845bec3f1e94"],
+    {
+      name: "ens-tokens-dao-wallet",
+      function_slug: "erc20.token_balance",
+      chain_id: 1,
+      params: {
+        reads: {
+          tokens: [
+            "0xc18360217d8f7ab5e7c516566761ea12ce7f9d72",
+            "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+            "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+          ],
+          owners: ["0xfe89cc7abb2c4183683ab71653c4cdc9b02d44b7"],
+        },
+        by: "day",
       },
-      by: "day",
+      window: untilToday(91 * dayMs),
     },
-    window: { from_day: "2026-08-03", to_day: "2026-11-02" },
-  },
-  {
-    name: "uniswap-native",
-    function_slug: "native.balance",
-    chain_id: 1,
-    params: {
-      owners: [
-        "0x1a9c8182c09f50c8318d769245bea52c32be35bc",
-        "0x3d30b1ab88d487b0f3061f40de76845bec3f1e94",
-      ],
-      by: "day",
+    {
+      name: "ens-tokens-endowment",
+      function_slug: "erc20.token_balance",
+      chain_id: 1,
+      params: {
+        reads: {
+          tokens: [
+            "0xc18360217d8f7ab5e7c516566761ea12ce7f9d72",
+            "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+            "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+          ],
+          owners: ["0x4f2083f5fbede34c2714affb3105539775f7fe64"],
+        },
+        by: "day",
+      },
+      window: untilToday(91 * dayMs),
     },
-    window: { from_day: "2026-08-03", to_day: "2026-11-02" },
-  },
-  {
-    name: "ens-tokens",
-    function_slug: "erc20.token_balance",
-    chain_id: 1,
-    params: {
-      reads: {
-        tokens: [
-          "0xc18360217d8f7ab5e7c516566761ea12ce7f9d72",
-          "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
-          "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
-        ],
+    {
+      name: "ens-native",
+      function_slug: "native.balance",
+      chain_id: 1,
+      params: {
         owners: [
           "0xfe89cc7abb2c4183683ab71653c4cdc9b02d44b7",
           "0x4f2083f5fbede34c2714affb3105539775f7fe64",
         ],
+        by: "day",
       },
-      by: "day",
+      window: untilToday(91 * dayMs),
     },
-    window: { from_day: "2026-08-03", to_day: "2026-11-02" },
-  },
-  {
-    name: "ens-tokens-dao-wallet",
-    function_slug: "erc20.token_balance",
-    chain_id: 1,
-    params: {
-      reads: {
-        tokens: [
-          "0xc18360217d8f7ab5e7c516566761ea12ce7f9d72",
-          "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
-          "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
-        ],
-        owners: ["0xfe89cc7abb2c4183683ab71653c4cdc9b02d44b7"],
+    {
+      name: "arbitrum-tokens",
+      function_slug: "erc20.token_balance",
+      chain_id: 42161,
+      params: {
+        reads: {
+          tokens: [
+            "0x912ce59144191c1204e64559fe8253a0e49e6548",
+            "0xaf88d065e77c8cc2239327c5edb3a432268e5831",
+            "0x82af49447d8a07e3bd95bd0d56f35241523fbab1",
+          ],
+          owners: [
+            "0xf3fc178157fb3c87548baa86f9d24ba38e649b58",
+            "0x34d45e99f7d8c45ed05b5ca72d54bbd1fb3f98f0",
+          ],
+        },
+        by: "day",
       },
-      by: "day",
+      window: untilToday(8 * dayMs),
     },
-    window: { from_day: "2026-08-03", to_day: "2026-11-02" },
-  },
-  {
-    name: "ens-tokens-endowment",
-    function_slug: "erc20.token_balance",
-    chain_id: 1,
-    params: {
-      reads: {
-        tokens: [
-          "0xc18360217d8f7ab5e7c516566761ea12ce7f9d72",
-          "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
-          "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
-        ],
-        owners: ["0x4f2083f5fbede34c2714affb3105539775f7fe64"],
+    {
+      name: "arbitrum-tokens-treasury",
+      function_slug: "erc20.token_balance",
+      chain_id: 42161,
+      params: {
+        reads: {
+          tokens: [
+            "0x912ce59144191c1204e64559fe8253a0e49e6548",
+            "0xaf88d065e77c8cc2239327c5edb3a432268e5831",
+            "0x82af49447d8a07e3bd95bd0d56f35241523fbab1",
+          ],
+          owners: ["0xf3fc178157fb3c87548baa86f9d24ba38e649b58"],
+        },
+        by: "day",
       },
-      by: "day",
+      window: untilToday(8 * dayMs),
     },
-    window: { from_day: "2026-08-03", to_day: "2026-11-02" },
-  },
-  {
-    name: "ens-native",
-    function_slug: "native.balance",
-    chain_id: 1,
-    params: {
-      owners: [
-        "0xfe89cc7abb2c4183683ab71653c4cdc9b02d44b7",
-        "0x4f2083f5fbede34c2714affb3105539775f7fe64",
-      ],
-      by: "day",
+    {
+      name: "arbitrum-tokens-core-timelock",
+      function_slug: "erc20.token_balance",
+      chain_id: 42161,
+      params: {
+        reads: {
+          tokens: [
+            "0x912ce59144191c1204e64559fe8253a0e49e6548",
+            "0xaf88d065e77c8cc2239327c5edb3a432268e5831",
+            "0x82af49447d8a07e3bd95bd0d56f35241523fbab1",
+          ],
+          owners: ["0x34d45e99f7d8c45ed05b5ca72d54bbd1fb3f98f0"],
+        },
+        by: "day",
+      },
+      window: untilToday(8 * dayMs),
     },
-    window: { from_day: "2026-08-03", to_day: "2026-11-02" },
-  },
-  {
-    name: "arbitrum-tokens",
-    function_slug: "erc20.token_balance",
-    chain_id: 42161,
-    params: {
-      reads: {
-        tokens: [
-          "0x912ce59144191c1204e64559fe8253a0e49e6548",
-          "0xaf88d065e77c8cc2239327c5edb3a432268e5831",
-          "0x82af49447d8a07e3bd95bd0d56f35241523fbab1",
-        ],
+    {
+      name: "arbitrum-native",
+      function_slug: "native.balance",
+      chain_id: 42161,
+      params: {
         owners: [
           "0xf3fc178157fb3c87548baa86f9d24ba38e649b58",
           "0x34d45e99f7d8c45ed05b5ca72d54bbd1fb3f98f0",
         ],
+        by: "day",
       },
-      by: "day",
+      window: untilToday(8 * dayMs),
     },
-    window: { from_day: "2026-10-25", to_day: "2026-11-02" },
-  },
-  {
-    name: "arbitrum-tokens-treasury",
-    function_slug: "erc20.token_balance",
-    chain_id: 42161,
-    params: {
-      reads: {
-        tokens: [
-          "0x912ce59144191c1204e64559fe8253a0e49e6548",
-          "0xaf88d065e77c8cc2239327c5edb3a432268e5831",
-          "0x82af49447d8a07e3bd95bd0d56f35241523fbab1",
-        ],
-        owners: ["0xf3fc178157fb3c87548baa86f9d24ba38e649b58"],
-      },
-      by: "day",
-    },
-    window: { from_day: "2026-10-25", to_day: "2026-11-02" },
-  },
-  {
-    name: "arbitrum-tokens-core-timelock",
-    function_slug: "erc20.token_balance",
-    chain_id: 42161,
-    params: {
-      reads: {
-        tokens: [
-          "0x912ce59144191c1204e64559fe8253a0e49e6548",
-          "0xaf88d065e77c8cc2239327c5edb3a432268e5831",
-          "0x82af49447d8a07e3bd95bd0d56f35241523fbab1",
-        ],
-        owners: ["0x34d45e99f7d8c45ed05b5ca72d54bbd1fb3f98f0"],
-      },
-      by: "day",
-    },
-    window: { from_day: "2026-10-25", to_day: "2026-11-02" },
-  },
-  {
-    name: "arbitrum-native",
-    function_slug: "native.balance",
-    chain_id: 42161,
-    params: {
-      owners: [
-        "0xf3fc178157fb3c87548baa86f9d24ba38e649b58",
-        "0x34d45e99f7d8c45ed05b5ca72d54bbd1fb3f98f0",
-      ],
-      by: "day",
-    },
-    window: { from_day: "2026-10-25", to_day: "2026-11-02" },
-  },
-];
+  ];
+}
 
-const bindByName = Object.fromEntries(binds.map((bind) => [bind.name, bind]));
 const chainNames = { 1: "Ethereum", 42161: "Arbitrum" };
 const daoNames = {
   uniswap: "Uniswap",
@@ -240,34 +249,40 @@ const nextDay = (day, step) =>
     .toISOString()
     .slice(0, 10);
 
-export function daysOf(window) {
+const utcDay = (time) => time.slice(0, 10);
+
+function daysOf(window) {
   const days = [];
-  for (let d = window.from_day; d < window.to_day; d = nextDay(d, 1))
+  for (
+    let d = utcDay(window.from_time);
+    d < utcDay(window.to_time);
+    d = nextDay(d, 1)
+  )
     days.push(d);
   return days;
 }
 
-export const daos = Object.entries(daoNames).map(([id, name]) => {
-  const total = bindByName[`${id}-tokens`];
-  const walletBinds = binds.filter((bind) =>
-    bind.name.startsWith(`${id}-tokens-`),
-  );
-  return {
-    id,
-    name,
-    chain: chainNames[total.chain_id],
-    window: total.window,
-    days: daysOf(total.window),
-    tokens: total.params.reads.tokens,
-    wallets: walletBinds.map((bind) => ({
-      address: bind.params.reads.owners[0],
-      label: walletNames[bind.params.reads.owners[0]],
-      bind: bind.name,
-    })),
-    totalBind: total.name,
-    nativeBind: `${id}-native`,
-  };
-});
+export const daosOf = (binds) =>
+  Object.entries(daoNames).map(([id, name]) => {
+    const total = binds.find((bind) => bind.name === `${id}-tokens`);
+    const walletBinds = binds.filter((bind) =>
+      bind.name.startsWith(`${id}-tokens-`),
+    );
+    return {
+      id,
+      name,
+      chain: chainNames[total.chain_id],
+      days: daysOf(total.window),
+      tokens: total.params.reads.tokens,
+      wallets: walletBinds.map((bind) => ({
+        address: bind.params.reads.owners[0],
+        label: walletNames[bind.params.reads.owners[0]],
+        bind: bind.name,
+      })),
+      totalBind: total.name,
+      nativeBind: `${id}-native`,
+    };
+  });
 
 const series = (rows, key, id) =>
   new Map(
@@ -287,9 +302,9 @@ function daoRows(rows, dao) {
   ];
 }
 
-export function check(rows) {
+export function check(rows, binds) {
   const passed = [];
-  for (const dao of daos) {
+  for (const dao of daosOf(binds)) {
     const governance = tokenInfo[dao.tokens[0]].symbol;
     const held = series(rows[dao.totalBind], "token", dao.tokens[0]);
     const idle = dao.days.filter((day) => !held.has(day));
@@ -407,7 +422,8 @@ function cardView(dao, rows) {
   };
 }
 
-export function shape(rows) {
+export function shape(rows, binds) {
+  const daos = daosOf(binds);
   const cards = daos.map((dao) => cardView(dao, rows));
   return {
     cards,
@@ -418,7 +434,7 @@ export function shape(rows) {
     })),
     scope: daos.map((dao) => ({
       label: `${dao.name.toUpperCase()} · UTC DAYS`,
-      value: `${dao.window.from_day} to ${dao.window.to_day} (exclusive)`,
+      value: `${dao.days[0]} to ${dao.days.at(-1)}`,
     })),
   };
 }

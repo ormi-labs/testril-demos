@@ -1,13 +1,14 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { check, daos, formatAmount, shape } from "../src/report.mjs";
-import { fixture } from "./fixture.mjs";
+import { check, daosOf, formatAmount, shape } from "../src/report.mjs";
+import { fixture, fixtureBinds } from "./fixture.mjs";
 
 const rows = () => structuredClone(fixture());
+const daos = daosOf(fixtureBinds);
 const uniswap = daos.find((dao) => dao.id === "uniswap");
 
 test("check proves every DAO total equals the sum of its wallets", () => {
-  const passed = check(rows());
+  const passed = check(rows(), fixtureBinds);
   assert.equal(passed.length, daos.length * 2);
   assert.match(passed[0], /Uniswap: 3 tokens over 91 days, each total equals/);
 });
@@ -18,7 +19,10 @@ test("check fails when one wallet is a single raw unit off on one day", () => {
     (r) => r.day === "2026-09-15" && r.token === uniswap.tokens[1],
   );
   row.balance = (BigInt(row.balance) + 1n).toString();
-  assert.throws(() => check(corrupted), /Uniswap USDC on 2026-09-15/);
+  assert.throws(
+    () => check(corrupted, fixtureBinds),
+    /Uniswap USDC on 2026-09-15/,
+  );
 });
 
 test("check fails when a wallet's day is missing from its own read", () => {
@@ -27,22 +31,34 @@ test("check fails when a wallet's day is missing from its own read", () => {
   corrupted[bind] = corrupted[bind].filter(
     (r) => !(r.day === "2026-10-01" && r.token === uniswap.tokens[2]),
   );
-  assert.throws(() => check(corrupted), /Uniswap WETH on 2026-10-01/);
+  assert.throws(
+    () => check(corrupted, fixtureBinds),
+    /Uniswap WETH on 2026-10-01/,
+  );
 });
 
 test("check fails on a negative native balance", () => {
   const corrupted = rows();
   corrupted["ens-native"][0].balance = "-5";
-  assert.throws(() => check(corrupted), /ENS DAO has a negative balance: -5/);
+  assert.throws(
+    () => check(corrupted, fixtureBinds),
+    /ENS DAO has a negative balance: -5/,
+  );
 });
 
 test("check fails on a native row from a foreign owner or outside the window", () => {
   const foreign = rows();
   foreign["ens-native"][0].owner = "0x0000000000000000000000000000000000000001";
-  assert.throws(() => check(foreign), /ENS DAO native balance row is outside/);
+  assert.throws(
+    () => check(foreign, fixtureBinds),
+    /ENS DAO native balance row is outside/,
+  );
   const late = rows();
   late["ens-native"][0].day = "2027-01-01";
-  assert.throws(() => check(late), /ENS DAO native balance row is outside/);
+  assert.throws(
+    () => check(late, fixtureBinds),
+    /ENS DAO native balance row is outside/,
+  );
 });
 
 test("check fails when the governance token vanishes for a day", () => {
@@ -56,7 +72,10 @@ test("check fails when the governance token vanishes for a day", () => {
     corrupted[bind] = corrupted[bind].filter(
       (r) => !(r.day === day && r.token === arbitrum.tokens[0]),
     );
-  assert.throws(() => check(corrupted), new RegExp(`no ARB on ${day}`));
+  assert.throws(
+    () => check(corrupted, fixtureBinds),
+    new RegExp(`no ARB on ${day}`),
+  );
 });
 
 test("formatAmount scales by the token's decimals", () => {
@@ -69,7 +88,7 @@ test("formatAmount scales by the token's decimals", () => {
 });
 
 test("shape lists holdings with the wallet split and the governance line", () => {
-  const view = shape(rows());
+  const view = shape(rows(), fixtureBinds);
   const card = view.cards[0];
   assert.equal(card.name, "Uniswap");
   assert.equal(card.line.points.length, 91);

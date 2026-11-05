@@ -1,11 +1,18 @@
 import {
-  binds,
-  poolsWindow,
+  bindsAt,
   usdc,
   usdt,
   volumeDays,
   zeroAddress,
 } from "../src/report.mjs";
+
+import { blockAt } from "./fake-testril.mjs";
+
+export const fixtureNow = Date.parse("2026-11-02T12:00:00Z");
+export const fixtureBinds = bindsAt(fixtureNow);
+const poolsWindow = fixtureBinds.find((bind) => bind.name === "pools").window;
+const poolsFromBlock = blockAt(poolsWindow.from_time);
+const poolsToBlock = blockAt(poolsWindow.to_time);
 
 const weth = "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2";
 const wbtc = "0x2260fac5e5542a773aa44fbcfedf7c193bc2c599";
@@ -22,7 +29,7 @@ const pairs = [
 ];
 const poolCount = 90;
 const activePools = 34;
-const days = volumeDays();
+const days = volumeDays(fixtureBinds);
 
 function seeded(seed) {
   let state = seed;
@@ -43,11 +50,11 @@ function poolRows(random, hooks) {
     ...hooks.arrakis,
     ...hooks.other,
   ];
-  const span = poolsWindow.to_block - poolsWindow.from_block;
+  const span = poolsToBlock - poolsFromBlock;
   return Array.from({ length: poolCount }, (_, index) => {
     const [currency0, currency1] = [...pairs[index % pairs.length]].sort();
     return {
-      block: poolsWindow.from_block + Math.floor((index / poolCount) * span),
+      block: poolsFromBlock + Math.floor((index / poolCount) * span),
       pool: `0x${hex(random, 64)}`,
       currency0,
       currency1,
@@ -88,7 +95,7 @@ export function fixture() {
     pools,
     volume: volumeRows(random, pools),
     "arrakis-hooks": hooks.arrakis.map((hook, index) => ({
-      block: poolsWindow.from_block + 1000 * (index + 1),
+      block: poolsFromBlock + 1000 * (index + 1),
       hook,
       module: address(random),
       salt: `0x${hex(random, 64)}`,
@@ -98,27 +105,21 @@ export function fixture() {
 }
 
 const sameParams = (a, b) => JSON.stringify(a) === JSON.stringify(b);
-const covers = (outer, inner) =>
-  Object.keys(inner).every((key) =>
-    key.startsWith("from_")
-      ? inner[key] >= outer[key]
-      : inner[key] <= outer[key],
-  );
 
 export function fixtureRows() {
   const rows = fixture();
   return (bound, window) => {
-    const bind = binds.find(
+    const bind = fixtureBinds.find(
       (candidate) =>
         candidate.function_slug === bound.function_slug &&
         candidate.chain_id === bound.chain_id &&
-        sameParams(candidate.params, bound.params) &&
-        covers(candidate.window, window),
+        sameParams(candidate.params, bound.params),
     );
-    return "from_block" in window && bind.read
+    return bind.read
       ? rows[bind.name].filter(
           (row) =>
-            row.block >= window.from_block && row.block < window.to_block,
+            row.block >= blockAt(window.from_time) &&
+            row.block < blockAt(window.to_time),
         )
       : rows[bind.name];
   };

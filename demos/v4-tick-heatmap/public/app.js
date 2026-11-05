@@ -83,7 +83,7 @@ function render(report) {
   document.querySelector("#pool-id").textContent =
     `${view.pool.pair} ${view.pool.fee} · ${view.pool.id.slice(0, 10)}…`;
   document.querySelector("#tick-window").textContent =
-    `${view.tickWindow.from_block}–${view.tickWindow.to_block - 1}`;
+    `${view.ticksSince} to ${view.stateDay}`;
   document.querySelector("#state-day").textContent =
     `${view.stateDay}, end of day`;
   document

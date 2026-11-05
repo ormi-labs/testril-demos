@@ -21,7 +21,7 @@ what Testril already indexed.
 | Variable            | Purpose                                                    |
 | ------------------- | ---------------------------------------------------------- |
 | `TESTRIL_PAYER_KEY` | Hex private key that signs vouchers; required to fetch     |
-| `TESTRIL_MCP_URL`   | Testril MCP endpoint; default `https://dev.testril.ai/mcp` |
+| `TESTRIL_MCP_URL`   | Testril MCP endpoint; default `https://api.testril.si/mcp` |
 
 ## Run
 
@@ -64,8 +64,9 @@ for the report (it needs port 4181 free). The fixture lives in `test/` and is ne
 
 ## Subjects and window
 
-Window: UTC days `[2026-08-03, 2026-11-02)`, each read at its last block, so the
-last day is 2026-11-01. EigenLayer's `eigenlayer.strategy_underlying` is sparse:
+Window: the 91 UTC days before the day of the press (`from_time` 91 days before
+today 00:00 UTC, `to_time` today 00:00 UTC), each read at its last block, so
+the last day is yesterday. EigenLayer's `eigenlayer.strategy_underlying` is sparse:
 a strategy has no row before it is whitelisted or while its shares are zero.
 EigenLayer amounts are in each strategy's own token units and cannot be added,
 so the page validates them and shows only the number of strategies in the
@@ -90,9 +91,9 @@ fetch reads them from `eigenlayer.strategy_list`.
 
 Windows are half-open: the end day is not included.
 
-| Name         | Function                         | Chain | Params                                             | Window                  |
-| ------------ | -------------------------------- | ----- | -------------------------------------------------- | ----------------------- |
-| `lido`       | `lido.pooled_ether`              | 1     | `steth`, `vault_hub`, `vault_hub_from_block`, `by` | 2026-08-03 → 2026-11-02 |
-| `wbeth`      | `wbeth.staked_ether`             | 1     | `wbeth`, `by`                                      | 2026-08-03 → 2026-11-02 |
-| `stmatic`    | `lido.pooled_matic`              | 1     | `st_matic`, `by`                                   | 2026-08-03 → 2026-11-02 |
-| `eigenlayer` | `eigenlayer.strategy_underlying` | 1     | `strategy_list`, `by`                              | 2026-08-03 → 2026-11-02 |
+| Name         | Function                         | Chain | Params                                             | Window          |
+| ------------ | -------------------------------- | ----- | -------------------------------------------------- | --------------- |
+| `lido`       | `lido.pooled_ether`              | 1     | `steth`, `vault_hub`, `vault_hub_from_block`, `by` | 91 days → today |
+| `wbeth`      | `wbeth.staked_ether`             | 1     | `wbeth`, `by`                                      | 91 days → today |
+| `stmatic`    | `lido.pooled_matic`              | 1     | `st_matic`, `by`                                   | 91 days → today |
+| `eigenlayer` | `eigenlayer.strategy_underlying` | 1     | `strategy_list`, `by`                              | 91 days → today |

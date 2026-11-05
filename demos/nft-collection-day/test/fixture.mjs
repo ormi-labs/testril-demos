@@ -1,11 +1,18 @@
 import {
-  binds,
+  bindsAt,
   collection,
-  dayWindow,
-  metadataWindow,
-  ownersWindow,
+  transferBinds,
   zeroAddress,
 } from "../src/report.mjs";
+import { blockAt as chainBlockAt } from "./fake-testril.mjs";
+
+export const fixtureNow = Date.parse("2026-11-02T12:00:00Z");
+export const fixtureBinds = bindsAt(fixtureNow);
+const windowOf = (name) =>
+  fixtureBinds.find((bind) => bind.name === name).window;
+const dayFromBlock = chainBlockAt(windowOf("transfers-00").from_time);
+const ownersFromBlock = chainBlockAt(windowOf("owners").from_time);
+const metadataFromBlock = chainBlockAt(windowOf("metadata").from_time);
 
 const existingTokens = 150;
 const holderCount = 36;
@@ -24,7 +31,7 @@ function seeded(seed) {
 
 const address = (n) => `0x${(n + 1).toString(16).padStart(40, "a")}`;
 const txHash = (n) => `0x${n.toString(16).padStart(64, "0")}`;
-const blockAt = (n) => dayWindow.from_block + 40 + n * blockSpacing;
+const blockAt = (n) => dayFromBlock + 40 + n * blockSpacing;
 
 function dayEvents(random) {
   const events = [];
@@ -54,7 +61,7 @@ export function fixture() {
   for (let id = 0; id < existingTokens; id++) {
     owner.set(String(id), pickHolder(2.2));
     owners.push({
-      block: ownersWindow.from_block + 1000 + id * 90000,
+      block: ownersFromBlock + 1000 + id * 90000,
       token_id: String(id),
       owner: owner.get(String(id)),
     });
@@ -93,39 +100,47 @@ export function fixture() {
   return {
     metadata: [
       {
-        block: metadataWindow.from_block,
+        block: metadataFromBlock,
         nft: collection,
         name: "Pudgy Penguins",
         symbol: "PPG",
       },
     ],
-    transfers,
+    ...Object.fromEntries(
+      transferBinds(fixtureBinds).map(({ name, window }) => [
+        name,
+        transfers.filter(
+          (t) =>
+            t.block >= chainBlockAt(window.from_time) &&
+            t.block < chainBlockAt(window.to_time),
+        ),
+      ]),
+    ),
     owners,
   };
 }
 
+export const transfersIn = (rows) =>
+  transferBinds(fixtureBinds).flatMap((bind) => rows[bind.name]);
+
 const sameParams = (a, b) => JSON.stringify(a) === JSON.stringify(b);
-const covers = (outer, inner) =>
-  Object.keys(inner).every((key) =>
-    key.startsWith("from_")
-      ? inner[key] >= outer[key]
-      : inner[key] <= outer[key],
-  );
 
 export function fixtureRows() {
   const rows = fixture();
   return (bound, window) => {
-    const bind = binds.find(
+    const bind = fixtureBinds.find(
       (candidate) =>
         candidate.function_slug === bound.function_slug &&
         candidate.chain_id === bound.chain_id &&
         sameParams(candidate.params, bound.params) &&
-        covers(candidate.window, window),
+        candidate.window.from_time <= window.from_time &&
+        candidate.window.to_time >= window.to_time,
     );
-    return "from_block" in window && bind.read
+    return bind.read
       ? rows[bind.name].filter(
           (row) =>
-            row.block >= window.from_block && row.block < window.to_block,
+            row.block >= chainBlockAt(window.from_time) &&
+            row.block < chainBlockAt(window.to_time),
         )
       : rows[bind.name];
   };

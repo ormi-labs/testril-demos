@@ -20,7 +20,7 @@ what Testril already indexed.
 | Variable            | Purpose                                                    |
 | ------------------- | ---------------------------------------------------------- |
 | `TESTRIL_PAYER_KEY` | Hex private key that signs vouchers; required to fetch     |
-| `TESTRIL_MCP_URL`   | Testril MCP endpoint; default `https://dev.testril.ai/mcp` |
+| `TESTRIL_MCP_URL`   | Testril MCP endpoint; default `https://api.testril.si/mcp` |
 
 ## Run
 
@@ -81,24 +81,25 @@ for the report. The fixture lives in `test/` and is never shown on the page.
 
 The page shows the seven assets above; a real read returns every Aave reserve.
 
-- Aave state: UTC hours `[2026-10-25T00, 2026-11-01T00)`, read at each hour's
-  last block. Rates are APR (the daemon's per-year ray), shown to 0.01%.
-- Aave totals: lifetime sums since the pool's creation. A one-day block window
-  `[26316189, 26323365)` (about Ethereum 2026-11-01, estimated at 7,200 blocks a day: verify) is enough, because a read carries
-  each reserve's last row from before its window.
-- Aave reserve list: from block 16291000 (verify: the
-  provider's creation block).
-- Morpho: UTC days `[2026-10-25, 2026-11-01)`. "Vault balances" are the
-  vaults' idle balance of the token, not their deposits in markets, and cover
-  MetaMorpho v1 vaults only (no Vault V2 factory is bound).
+- Aave state: the 168 UTC hours before 00:00 UTC on the day of the press, read at
+  each hour's last block. Rates are APR (the daemon's per-year ray), shown to
+  0.01%.
+- Aave totals: lifetime sums since the pool's creation. A one-day window (the
+  day before the press) is enough, because a read carries each reserve's last
+  row from before its window.
+- Aave reserve list: from 2022-12-29T14:25:47Z (verify: the timestamp of the
+  provider's creation block, 16291000) to 00:00 UTC on the day of the press.
+- Morpho: the seven UTC days before the day of the press. "Vault balances" are
+  the vaults' idle balance of the token, not their deposits in markets, and
+  cover MetaMorpho v1 vaults only (no Vault V2 factory is bound).
 
 ## Binds (`src/report.mjs`)
 
-Windows are half-open: the end is the first block, hour or day not included.
+Windows end at 00:00 UTC on the day of the press; the end is not included.
 
-| Name              | Function                     | Chain | Params                                           | Window                        |
-| ----------------- | ---------------------------- | ----- | ------------------------------------------------ | ----------------------------- |
-| `reserves`        | `aave_v3.reserve_list`       | 1     | `proxy_list`                                     | 16291000 → 26323365           |
-| `reserve-state`   | `aave_v3.reserve_state`      | 1     | `proxy_list`, `reserve_list`, `by`               | 2026-10-25T00 → 2026-11-01T00 |
-| `reserve-totals`  | `aave_v3.reserve_totals`     | 1     | `proxy_list`                                     | 26316189 → 26323365           |
-| `morpho-holdings` | `morpho_blue.token_holdings` | 1     | `morpho_blue`, `market_list`, `vault_list`, `by` | 2026-10-25 → 2026-11-01       |
+| Name              | Function                     | Chain | Params                                           | Window            |
+| ----------------- | ---------------------------- | ----- | ------------------------------------------------ | ----------------- |
+| `reserves`        | `aave_v3.reserve_list`       | 1     | `proxy_list`                                     | creation → today  |
+| `reserve-state`   | `aave_v3.reserve_state`      | 1     | `proxy_list`, `reserve_list`, `by`               | 168 hours → today |
+| `reserve-totals`  | `aave_v3.reserve_totals`     | 1     | `proxy_list`                                     | 1 day → today     |
+| `morpho-holdings` | `morpho_blue.token_holdings` | 1     | `morpho_blue`, `market_list`, `vault_list`, `by` | 7 days → today    |

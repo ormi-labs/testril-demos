@@ -2,19 +2,15 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { check } from "../src/check.mjs";
 import { hoursInWindow, shape, wallets } from "../src/report.mjs";
-import { fixture, hourEndBlocks } from "./fixture.mjs";
+import { fixture, hourOfBlock, toBindRows } from "./fixture.mjs";
 
-const recording = () => ({
-  rows: JSON.parse(JSON.stringify(fixture())),
-  hourEndBlocks: { ...hourEndBlocks },
-});
-const rows = () => recording().rows;
-const checkRows = (corrupted) => check({ rows: corrupted, hourEndBlocks });
+const rows = () => JSON.parse(JSON.stringify(fixture()));
+const checkRows = (corrupted) => check({ rows: toBindRows(corrupted) });
 const [, exploiter, walletA] = wallets;
 const exploiterBind = "transfers-exploiter";
 
 test("check passes on the fixture and says what it proved", () => {
-  assert.match(check(recording())[0], /counted once each/);
+  assert.match(checkRows(rows())[0], /counted once each/);
 });
 
 test("check fails when a transfer is listed twice in one wallet", () => {
@@ -52,20 +48,18 @@ const balanceRow = (corrupted, bind, hourIndex, token) =>
     (row) => row.hour === hoursInWindow()[hourIndex] && row.token === token,
   );
 const stEth = "0xae7ab96520de3a18e5e111b5eaab095312d7fe84";
-const hourOf = (block) =>
-  Object.values(hourEndBlocks).findIndex((end) => block <= end);
 
 test("check fails when one balance is off by a factor of 1e9", () => {
   const corrupted = rows();
-  const row = balanceRow(corrupted, "token-balance-hop-a4b2", 30, stEth);
+  const row = balanceRow(corrupted, "token-balance-hop-a4b2", 35, stEth);
   row.balance = (BigInt(row.balance) * 10n ** 9n).toString();
   assert.throws(() => checkRows(corrupted), /balance moved/);
 });
 
-test("check fails when one hour's balance change has the wrong sign", () => {
+test("check fails when one segment's balance change has the wrong sign", () => {
   const corrupted = rows();
-  const before = balanceRow(corrupted, "token-balance-hop-a4b2", 21, stEth);
-  const after = balanceRow(corrupted, "token-balance-hop-a4b2", 22, stEth);
+  const before = balanceRow(corrupted, "token-balance-hop-a4b2", 23, stEth);
+  const after = balanceRow(corrupted, "token-balance-hop-a4b2", 35, stEth);
   after.balance = (
     2n * BigInt(before.balance) -
     BigInt(after.balance)
@@ -80,33 +74,12 @@ test("check fails when one small stETH transfer is dropped outside the rebase ho
     (row) =>
       row.token === stEth &&
       row.value.length <= 20 &&
-      !["12", "13"].includes(hours[hourOf(row.block)].slice(11)),
+      !["12", "13"].includes(hours[hourOfBlock(row.block)].slice(11)),
   );
   corrupted["transfers-hop-a4b2"] = corrupted["transfers-hop-a4b2"].filter(
     (row) => row !== small,
   );
   assert.throws(() => checkRows(corrupted), /balance moved/);
-});
-
-test("check places a transfer by the recorded hour end, not by an even 300 blocks", () => {
-  const ends = Object.values(hourEndBlocks);
-  const lastOfHour29 = rows()["transfers-hop-a4b2"].find(
-    (row) => row.block === ends[29],
-  );
-  assert.ok(
-    lastOfHour29,
-    "fixture has a transfer on the last block of an hour",
-  );
-  const shifted = recording();
-  shifted.hourEndBlocks[hoursInWindow()[29]] = ends[29] - 1;
-  assert.throws(() => check(shifted), /balance moved/);
-});
-
-test("check fails when the recording lacks the hour end blocks", () => {
-  assert.throws(
-    () => check({ rows: rows() }),
-    /lacks an increasing last block per hour/,
-  );
 });
 
 test("check fails when a balance row falls outside the window", () => {
@@ -116,7 +89,7 @@ test("check fails when a balance row falls outside the window", () => {
 });
 
 test("shape keeps each token separate and counts a transfer once", () => {
-  const view = shape(rows());
+  const view = shape(toBindRows(rows()));
   const byLabel = Object.fromEntries(view.wallets.map((w) => [w.label, w]));
   assert.deepEqual(view.headline.intoExploiter, [
     { symbol: "stETH", amount: "90,000" },
@@ -134,7 +107,7 @@ test("shape keeps each token separate and counts a transfer once", () => {
 });
 
 test("shape puts outside destinations after the deepest tracked hop", () => {
-  const { nodes } = shape(rows());
+  const { nodes } = shape(toBindRows(rows()));
   const deepest = Math.max(...nodes.filter((n) => n.tracked).map((n) => n.hop));
   for (const node of nodes.filter((n) => !n.tracked))
     assert.equal(node.hop, deepest + 1);

@@ -1,39 +1,58 @@
-export const binds = [
-  {
-    name: "metadata",
-    function_slug: "erc721.collection_metadata",
-    chain_id: 1,
-    params: { nft_address: "0xbd3531da5cf5857e7cfaa92426877b022e612cf8" },
-    window: { from_block: 26323364, to_block: 26323365 },
-  },
-  {
-    name: "transfers",
-    function_slug: "erc721.transfer",
-    chain_id: 1,
-    params: { nft_address: "0xbd3531da5cf5857e7cfaa92426877b022e612cf8" },
-    window: { from_block: 26316189, to_block: 26323365 },
-    read: { chunk_blocks: 1200 },
-  },
-  {
-    name: "owners",
-    function_slug: "erc721.nft_owners",
-    chain_id: 1,
-    params: { nft_address: "0xbd3531da5cf5857e7cfaa92426877b022e612cf8" },
-    window: { from_block: 12876179, to_block: 26323365 },
-    read: { chunk_blocks: 1000000 },
-  },
-];
-
-export const zeroAddress = "0x0000000000000000000000000000000000000000";
-const bindByName = Object.fromEntries(binds.map((bind) => [bind.name, bind]));
-export const collection = bindByName.transfers.params.nft_address;
-export const dayWindow = bindByName.transfers.window;
-export const ownersWindow = bindByName.owners.window;
-export const metadataWindow = bindByName.metadata.window;
-export const day = "2026-11-01";
+const dayMs = 86400000;
+const hourMs = 3600000;
 const hoursPerDay = 24;
+const metadataLookbackMs = 5 * 60000;
+const collectionBornAt = "2021-07-22T12:26:01Z";
+const ownersChunkHours = 2400;
+const isoSecond = (ms) => new Date(ms).toISOString().replace(".000Z", "Z");
+export const collection = "0xbd3531da5cf5857e7cfaa92426877b022e612cf8";
+export const zeroAddress = "0x0000000000000000000000000000000000000000";
+
+export function bindsAt(now = Date.now()) {
+  const today = Math.floor(now / dayMs) * dayMs;
+  const between = (from, to) => ({
+    from_time: isoSecond(from),
+    to_time: isoSecond(to),
+  });
+  const yesterday = today - dayMs;
+  return [
+    {
+      name: "metadata",
+      function_slug: "erc721.collection_metadata",
+      chain_id: 1,
+      params: { nft_address: collection },
+      window: between(today - metadataLookbackMs, today),
+    },
+    ...Array.from({ length: hoursPerDay }, (_, hour) => ({
+      name: `transfers-${String(hour).padStart(2, "0")}`,
+      function_slug: "erc721.transfer",
+      chain_id: 1,
+      params: { nft_address: collection },
+      window: between(
+        yesterday + hour * hourMs,
+        yesterday + (hour + 1) * hourMs,
+      ),
+    })),
+    {
+      name: "owners",
+      function_slug: "erc721.nft_owners",
+      chain_id: 1,
+      params: { nft_address: collection },
+      window: { from_time: collectionBornAt, to_time: isoSecond(today) },
+      read: { chunk_hours: ownersChunkHours },
+    },
+  ];
+}
+
 const topHolders = 10;
 const basisPoints = 10000n;
+
+export const transferBinds = (binds) =>
+  binds.filter((bind) => bind.name.startsWith("transfers-"));
+export const dayOf = (binds) =>
+  transferBinds(binds)[0].window.from_time.slice(0, 10);
+const transfersOf = (rows, binds) =>
+  transferBinds(binds).flatMap((bind) => rows[bind.name]);
 
 const isMint = (transfer) => transfer.from === zeroAddress;
 const isBurn = (transfer) => transfer.to === zeroAddress;
@@ -60,14 +79,17 @@ export function holdings(owners) {
   return balances;
 }
 
-function ownersBeforeDay(owners) {
-  const before = owners.filter((o) => o.block < dayWindow.from_block);
+function ownersBeforeDay(owners, transfers) {
+  const onTheDay = new Set(transfers.map((t) => `${t.token_id}@${t.block}`));
+  const before = owners.filter(
+    (o) => !onTheDay.has(`${o.token_id}@${o.block}`),
+  );
   return new Map([...latestOwners(before)].map(([id, row]) => [id, row.owner]));
 }
 
 function checkMints(transfers, owners) {
   const heldBefore = new Set(
-    [...ownersBeforeDay(owners)]
+    [...ownersBeforeDay(owners, transfers)]
       .filter(([, owner]) => owner !== zeroAddress)
       .map(([id]) => id),
   );
@@ -111,7 +133,7 @@ function checkOwnersAtTransfers(transfers, owners) {
 }
 
 function replayHoldings(transfers, owners) {
-  const current = ownersBeforeDay(owners);
+  const current = ownersBeforeDay(owners, transfers);
   for (const transfer of inLogOrder(transfers)) {
     const owner = current.get(transfer.token_id) ?? zeroAddress;
     if (transfer.from !== owner)
@@ -141,13 +163,10 @@ function checkHolders(transfers, owners) {
   return { holders: balances.size, held };
 }
 
-export function check(rows) {
-  const { transfers, owners } = rows;
-  const outside = transfers.find(
-    (t) => t.block < dayWindow.from_block || t.block >= dayWindow.to_block,
-  );
-  if (outside)
-    throw new Error(`Transfer at block ${outside.block} is outside the day.`);
+export function check(rows, binds) {
+  const { owners } = rows;
+  const transfers = transfersOf(rows, binds);
+  const day = dayOf(binds);
   const mints = checkMints(transfers, owners);
   const tokenBlocks = checkOwnersAtTransfers(transfers, owners);
   const { holders, held } = checkHolders(transfers, owners);
@@ -166,21 +185,15 @@ function percent(hundredths) {
   return `${hundredths / 100n}.${String(hundredths % 100n).padStart(2, "0")}%`;
 }
 
-function hourly(transfers) {
-  const hours = Array.from({ length: hoursPerDay }, (_, hour) => ({
-    hour,
-    mints: 0,
-    trades: 0,
-  }));
-  for (const transfer of transfers) {
-    const hour = Math.floor(
-      ((transfer.block - dayWindow.from_block) * hoursPerDay) /
-        (dayWindow.to_block - dayWindow.from_block),
-    );
-    if (isMint(transfer)) hours[hour].mints += 1;
-    else if (!isBurn(transfer)) hours[hour].trades += 1;
-  }
-  return hours;
+function hourly(rows, binds) {
+  return transferBinds(binds).map((bind, hour) => {
+    const transfers = rows[bind.name];
+    return {
+      hour,
+      mints: transfers.filter(isMint).length,
+      trades: transfers.filter((t) => !isMint(t) && !isBurn(t)).length,
+    };
+  });
 }
 
 function concentration(balances) {
@@ -204,16 +217,16 @@ function concentration(balances) {
   };
 }
 
-export function shape(rows) {
-  const { transfers, owners, metadata } = rows;
+export function shape(rows, binds) {
+  const { owners, metadata } = rows;
+  const transfers = transfersOf(rows, binds);
   const balances = holdings(owners);
   const live = [...balances.values()].reduce((sum, n) => sum + n, 0n);
   const mints = transfers.filter(isMint).length;
   const burns = transfers.filter(isBurn).length;
   return {
-    day,
-    dayWindow,
-    ownersWindow,
+    day: dayOf(binds),
+    ownersSince: collectionBornAt.slice(0, 10),
     collection,
     name: metadata[0].name,
     symbol: metadata[0].symbol,
@@ -222,7 +235,7 @@ export function shape(rows) {
     trades: transfers.length - mints - burns,
     holders: balances.size.toString(),
     liveTokens: live.toString(),
-    hours: hourly(transfers),
+    hours: hourly(rows, binds),
     concentration: concentration(balances),
   };
 }

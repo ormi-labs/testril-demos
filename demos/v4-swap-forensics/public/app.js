@@ -131,8 +131,7 @@ function setupTabs() {
 function render(report) {
   const view = report.view;
   document.querySelector("#day").textContent = view.day;
-  document.querySelector("#blocks").textContent =
-    `${view.blockWindow.from_block}–${view.blockWindow.to_block - 1}`;
+  document.querySelector("#blocks").textContent = "00:00 to 24:00 UTC";
   document.querySelector("#tokens").textContent = view.tokens
     .map((t) => t.symbol)
     .join(" · ");

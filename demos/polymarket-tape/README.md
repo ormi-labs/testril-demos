@@ -21,7 +21,7 @@ what Testril already indexed.
 | Variable            | Purpose                                                    |
 | ------------------- | ---------------------------------------------------------- |
 | `TESTRIL_PAYER_KEY` | Hex private key that signs vouchers; required to fetch     |
-| `TESTRIL_MCP_URL`   | Testril MCP endpoint; default `https://dev.testril.ai/mcp` |
+| `TESTRIL_MCP_URL`   | Testril MCP endpoint; default `https://api.testril.si/mcp` |
 
 ## Run
 
@@ -69,10 +69,10 @@ for the report. The fixture lives in `test/` and is never shown on the page.
 
 ## Subjects and window
 
-Polygon (chain 137), 2026-11-01. Windows are half-open: the block window is
-`[96523829, 96581429)`, 57,600 blocks, the nominal Polygon blocks per day.
-**Verify before fetching:** both bounds were not checked against block
-timestamps; to_block should be the first block of 2026-11-02. The page buckets fills into hours of 2,400 blocks.
+Polygon (chain 137), the UTC day before the day of the press (yesterday, 00:00
+to 24:00, as `from_time` and `to_time`). Fills are read as 24 one-hour
+`fills-HH` binds, so the hour of each fill is the bind it was read in; the
+check requires the fills' blocks to rise from one hour to the next.
 
 | Subject                         | Address                                      | Note                        |
 | ------------------------------- | -------------------------------------------- | --------------------------- |
@@ -88,9 +88,7 @@ condition ids.
 
 ## Binds (`src/report.mjs`)
 
-| Name      | Function                               | Chain | Params               | Window              |
-| --------- | -------------------------------------- | ----- | -------------------- | ------------------- |
-| `fills`   | `polymarket_clob.order_fill`           | 137   | `exchanges` (3)      | 96523829 → 96581429 |
-| `payouts` | `conditional_tokens.condition_payouts` | 137   | `conditional_tokens` | 96523829 → 96581429 |
-
-`fills` is read in chunks of 2,400 blocks.
+| Name       | Function                               | Chain | Params               | Window               |
+| ---------- | -------------------------------------- | ----- | -------------------- | -------------------- |
+| `fills-HH` | `polymarket_clob.order_fill`           | 137   | `exchanges` (3)      | hour HH of yesterday |
+| `payouts`  | `conditional_tokens.condition_payouts` | 137   | `conditional_tokens` | yesterday            |

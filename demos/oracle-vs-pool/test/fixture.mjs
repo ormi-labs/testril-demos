@@ -1,5 +1,5 @@
 import {
-  binds,
+  bindsAt,
   btcFeed,
   ethFeed,
   sqrtFromPrice,
@@ -7,7 +7,9 @@ import {
   windowHours,
 } from "../src/report.mjs";
 
-const poolId = binds[0].params.pool;
+export const fixtureNow = Date.parse("2026-11-01T00:30:00Z");
+export const fixtureBinds = bindsAt(fixtureNow);
+const poolId = fixtureBinds[0].params.pool;
 const ethDeviationBasisPoints = 50;
 const usdcHeartbeatHours = 24;
 
@@ -44,7 +46,7 @@ function followMarket(market, thresholdBasisPoints, heartbeatHours) {
 
 export function fixture() {
   const random = seeded(11);
-  const hours = windowHours();
+  const hours = windowHours(fixtureBinds);
   const ethMarket = marketWalk(random, 3180, 0.008, hours);
   const btcMarket = marketWalk(random, 98400, 0.006, hours);
   const feeds = [
@@ -90,27 +92,15 @@ function holdLast(answers) {
 }
 
 const sameParams = (a, b) => JSON.stringify(a) === JSON.stringify(b);
-const covers = (outer, inner) =>
-  Object.keys(inner).every((key) =>
-    key.startsWith("from_")
-      ? inner[key] >= outer[key]
-      : inner[key] <= outer[key],
-  );
 
 export function fixtureRows(rows = fixture()) {
-  return (bound, window) => {
-    const bind = binds.find(
-      (candidate) =>
-        candidate.function_slug === bound.function_slug &&
-        candidate.chain_id === bound.chain_id &&
-        sameParams(candidate.params, bound.params) &&
-        covers(candidate.window, window),
-    );
-    return "from_block" in window && bind.read
-      ? rows[bind.name].filter(
-          (row) =>
-            row.block >= window.from_block && row.block < window.to_block,
-        )
-      : rows[bind.name];
-  };
+  return (bound) =>
+    rows[
+      fixtureBinds.find(
+        (candidate) =>
+          candidate.function_slug === bound.function_slug &&
+          candidate.chain_id === bound.chain_id &&
+          sameParams(candidate.params, bound.params),
+      ).name
+    ];
 }

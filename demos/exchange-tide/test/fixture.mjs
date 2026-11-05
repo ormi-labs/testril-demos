@@ -1,4 +1,8 @@
-import { binds, exchanges, hours, usdc, usdt } from "../src/report.mjs";
+import { bindsAt, exchangesOf, hours, usdc, usdt } from "../src/report.mjs";
+
+export const fixtureNow = Date.parse("2026-11-01T00:30:00Z");
+export const fixtureBinds = bindsAt(fixtureNow);
+const exchanges = exchangesOf(fixtureBinds);
 
 const walkDollars = 5e6;
 const walkEth = 200;
@@ -56,7 +60,7 @@ function walk(start, step, count, quietHours, toRaw, random) {
 function ownerSeries(exchange, ownerIndex, random) {
   const [usdtStart, usdcStart, ethStart] =
     startingBalances[exchange.id][ownerIndex];
-  const count = hours().length;
+  const count = hours(fixtureBinds).length;
   const quiet = new Set(
     events.filter((e) => e.exchange === exchange.id).map((e) => e.hour),
   );
@@ -80,7 +84,7 @@ function ownerSeries(exchange, ownerIndex, random) {
 }
 
 const tokenRows = (series) =>
-  hours().flatMap((hour, i) =>
+  hours(fixtureBinds).flatMap((hour, i) =>
     [usdt, usdc].map((token) => ({
       hour,
       token,
@@ -102,7 +106,7 @@ export function fixture() {
       rows[name] = tokenRows((token, hour) => owners[i][token][hour]);
     });
     rows[`${exchange.id}-native`] = exchange.owners.flatMap((owner, i) =>
-      hours().map((hour, h) => ({
+      hours(fixtureBinds).map((hour, h) => ({
         hour,
         owner,
         balance: owners[i].eth[h].toString(),
@@ -113,28 +117,16 @@ export function fixture() {
 }
 
 const sameParams = (a, b) => JSON.stringify(a) === JSON.stringify(b);
-const covers = (outer, inner) =>
-  Object.keys(inner).every((key) =>
-    key.startsWith("from_")
-      ? inner[key] >= outer[key]
-      : inner[key] <= outer[key],
-  );
 
 export function fixtureRows() {
   const rows = fixture();
-  return (bound, window) => {
-    const bind = binds.find(
-      (candidate) =>
-        candidate.function_slug === bound.function_slug &&
-        candidate.chain_id === bound.chain_id &&
-        sameParams(candidate.params, bound.params) &&
-        covers(candidate.window, window),
-    );
-    return "from_block" in window && bind.read
-      ? rows[bind.name].filter(
-          (row) =>
-            row.block >= window.from_block && row.block < window.to_block,
-        )
-      : rows[bind.name];
-  };
+  return (bound) =>
+    rows[
+      fixtureBinds.find(
+        (candidate) =>
+          candidate.function_slug === bound.function_slug &&
+          candidate.chain_id === bound.chain_id &&
+          sameParams(candidate.params, bound.params),
+      ).name
+    ];
 }

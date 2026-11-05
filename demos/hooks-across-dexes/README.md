@@ -21,7 +21,7 @@ what Testril already indexed.
 | Variable            | Purpose                                                    |
 | ------------------- | ---------------------------------------------------------- |
 | `TESTRIL_PAYER_KEY` | Hex private key that signs vouchers; required to fetch     |
-| `TESTRIL_MCP_URL`   | Testril MCP endpoint; default `https://dev.testril.ai/mcp` |
+| `TESTRIL_MCP_URL`   | Testril MCP endpoint; default `https://api.testril.si/mcp` |
 
 ## Run
 
@@ -84,36 +84,37 @@ WBNB/CAKE) add to swap counts but not to dollars.
 
 ## Subjects and window
 
-- Volume: UTC days `[2026-10-25, 2026-11-02)`.
-- Pool lists: from each manager's creation block to block 131141195, the first
-  block of 2026-11-02, so every pool that traded in the window is listed.
-  Creation blocks and the day boundary were found by binary search over public
-  BSC RPC endpoints, not through Testril; verify them before fetching.
+- Volume: the eight UTC days before the day of the press.
+- Pool lists: from each manager's creation (CL 2025-03-06T01:28:31Z, Bin
+  2025-03-06T01:29:55Z, Uniswap v4 2025-01-21T20:58:44Z, each the timestamp of
+  its creation block) to 00:00 UTC on the day of the press, so every pool that
+  traded in the window is listed. The creation instants were read off public BSC
+  RPC endpoints, not through Testril; verify them before fetching.
 
-| Subject                             | Address                                      | Note                        |
-| ----------------------------------- | -------------------------------------------- | --------------------------- |
-| PancakeSwap Infinity CLPoolManager  | `0xa0ffb9c1ce1fe56963b0321b32e7a0302114058b` | verify; created at 47214308 |
-| PancakeSwap Infinity BinPoolManager | `0xc697d2898e0d09264376196696c51d7abbbaa4a9` | verify; created at 47214336 |
-| Uniswap v4 PoolManager (BSC)        | `0x28e2ea090877bf75740558f6bfb36a5ffee9e9df` | verify; created at 45970610 |
-| USDT (BSC)                          | `0x55d398326f99059ff775485246999027b3197955` |                             |
-| USDC (BSC)                          | `0x8ac76a51cc950d9822d68b83fe1ad97b32cd580d` |                             |
-| USD1                                | `0x8d0d000ee44948fc98c9b98a4fa4921476f08b0d` | verify                      |
-| FDUSD                               | `0xc5f0f7b66764f6ec8c8dff7ba683102295e16409` | verify                      |
+| Subject | Address | Note |
+| -------------------------------------------- | --------------------------- |
+| PancakeSwap Infinity CLPoolManager | `0xa0ffb9c1ce1fe56963b0321b32e7a0302114058b` | verify; created 2025-03-06 |
+| PancakeSwap Infinity BinPoolManager | `0xc697d2898e0d09264376196696c51d7abbbaa4a9` | verify; created 2025-03-06 |
+| Uniswap v4 PoolManager (BSC) | `0x28e2ea090877bf75740558f6bfb36a5ffee9e9df` | verify; created 2025-01-21 |
+| USDT (BSC) | `0x55d398326f99059ff775485246999027b3197955` | |
+| USDC (BSC) | `0x8ac76a51cc950d9822d68b83fe1ad97b32cd580d` | |
+| USD1 | `0x8d0d000ee44948fc98c9b98a4fa4921476f08b0d` | verify |
+| FDUSD | `0xc5f0f7b66764f6ec8c8dff7ba683102295e16409` | verify |
 
 The managers hold bytecode at those addresses on BSC; that they are the
 PancakeSwap and Uniswap deployments is not confirmed.
 
 ## Binds (`src/report.mjs`)
 
-Windows are half-open: the end is the first block or day not included.
+Windows end at 00:00 UTC on the day of the press; the end is not included.
 
-| Name         | Function                               | Chain | Params       | Window                  |
-| ------------ | -------------------------------------- | ----- | ------------ | ----------------------- |
-| `cl-volume`  | `pancakeswap_infinity.cl_pool_volume`  | 56    | `swap`, `by` | 2026-10-25 → 2026-11-02 |
-| `cl-pools`   | `pancakeswap_infinity.cl_pool_list`    | 56    | `manager`    | 47214308 → 131141195    |
-| `bin-volume` | `pancakeswap_infinity.bin_pool_volume` | 56    | `swap`, `by` | 2026-10-25 → 2026-11-02 |
-| `bin-pools`  | `pancakeswap_infinity.bin_pool_list`   | 56    | `manager`    | 47214336 → 131141195    |
-| `v4-volume`  | `uniswap_v4.pool_volume`               | 56    | `swap`, `by` | 2026-10-25 → 2026-11-02 |
-| `v4-pools`   | `uniswap_v4.pool_list`                 | 56    | `manager`    | 45970610 → 131141195    |
+| Name         | Function                               | Chain | Params       | Window           |
+| ------------ | -------------------------------------- | ----- | ------------ | ---------------- |
+| `cl-volume`  | `pancakeswap_infinity.cl_pool_volume`  | 56    | `swap`, `by` | 8 days → today   |
+| `cl-pools`   | `pancakeswap_infinity.cl_pool_list`    | 56    | `manager`    | creation → today |
+| `bin-volume` | `pancakeswap_infinity.bin_pool_volume` | 56    | `swap`, `by` | 8 days → today   |
+| `bin-pools`  | `pancakeswap_infinity.bin_pool_list`   | 56    | `manager`    | creation → today |
+| `v4-volume`  | `uniswap_v4.pool_volume`               | 56    | `swap`, `by` | 8 days → today   |
+| `v4-pools`   | `uniswap_v4.pool_list`                 | 56    | `manager`    | creation → today |
 
-Pool lists are read in chunks of 10,000,000 blocks.
+Pool lists are read in chunks of 1,440 hours.

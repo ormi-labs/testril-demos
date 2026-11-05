@@ -88,7 +88,7 @@ function venueSection(venue) {
 function render(report) {
   const view = report.view;
   document.querySelector("#window").textContent =
-    `${view.window.from_day} to ${view.window.to_day} (exclusive)`;
+    `${view.window.first} to ${view.window.last}`;
   document
     .querySelector("#headline")
     .replaceChildren(

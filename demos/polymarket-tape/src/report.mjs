@@ -1,48 +1,60 @@
-export const binds = [
-  {
-    name: "fills",
-    function_slug: "polymarket_clob.order_fill",
-    chain_id: 137,
-    params: {
-      exchanges: [
-        "0x4bfb41d5b3570defd03c39a9a4d8de6bd8b8982e",
-        "0xc5d563a36ae78145c45a50134d48a1215220f80a",
-        "0xe2222d279d744050d28e00520010520000310f59",
-      ],
-    },
-    window: { from_block: 96523829, to_block: 96581429 },
-    read: { chunk_blocks: 2400 },
-  },
-  {
-    name: "payouts",
-    function_slug: "conditional_tokens.condition_payouts",
-    chain_id: 137,
-    params: {
-      conditional_tokens: "0x4d97dcd97ec945f40cf65f87097ace5ea0476045",
-    },
-    window: { from_block: 96523829, to_block: 96581429 },
-  },
-];
-
+const dayMs = 86400000;
+const hourMs = 3600000;
+const hoursPerDay = 24;
+const isoSecond = (ms) => new Date(ms).toISOString().replace(".000Z", "Z");
 export const zeroWord = `0x${"0".repeat(64)}`;
-const bindByName = Object.fromEntries(binds.map((bind) => [bind.name, bind]));
-export const fillWindow = bindByName.fills.window;
-export const payoutWindow = bindByName.payouts.window;
-export const exchanges = bindByName.fills.params.exchanges;
-export const conditionalTokens = bindByName.payouts.params.conditional_tokens;
-export const day = "2026-11-01";
-export const blocksPerHour = 2400;
+export const exchanges = [
+  "0x4bfb41d5b3570defd03c39a9a4d8de6bd8b8982e",
+  "0xc5d563a36ae78145c45a50134d48a1215220f80a",
+  "0xe2222d279d744050d28e00520010520000310f59",
+];
+export const conditionalTokens = "0x4d97dcd97ec945f40cf65f87097ace5ea0476045";
+
+export function bindsAt(now = Date.now()) {
+  const yesterday = Math.floor(now / dayMs) * dayMs - dayMs;
+  const between = (from, to) => ({
+    from_time: isoSecond(from),
+    to_time: isoSecond(to),
+  });
+  return [
+    ...Array.from({ length: hoursPerDay }, (_, hour) => ({
+      name: `fills-${String(hour).padStart(2, "0")}`,
+      function_slug: "polymarket_clob.order_fill",
+      chain_id: 137,
+      params: { exchanges },
+      window: between(
+        yesterday + hour * hourMs,
+        yesterday + (hour + 1) * hourMs,
+      ),
+    })),
+    {
+      name: "payouts",
+      function_slug: "conditional_tokens.condition_payouts",
+      chain_id: 137,
+      params: { conditional_tokens: conditionalTokens },
+      window: between(yesterday, yesterday + dayMs),
+    },
+  ];
+}
+
+export const fillBinds = (binds) =>
+  binds.filter((bind) => bind.name.startsWith("fills-"));
+export const dayOf = (binds) =>
+  fillBinds(binds)[0].window.from_time.slice(0, 10);
+
+export function fillsOf(rows, binds) {
+  return fillBinds(binds).flatMap((bind, hour) =>
+    rows[bind.name].map((fill) => ({ ...fill, hour })),
+  );
+}
+
 const outcomesPerCondition = 2;
 const tapeSize = 12;
 const leaderboardSize = 8;
 const priceScale = 10000n;
 
-const inWindow = (row, window) =>
-  row.block >= window.from_block && row.block < window.to_block;
 const byVolumeDescending = (a, b) =>
   b.volume > a.volume ? 1 : b.volume < a.volume ? -1 : 0;
-const hourOf = (block) =>
-  Math.floor((block - fillWindow.from_block) / blocksPerHour);
 const shortHex = (hex) => `${hex.slice(0, 8)}…${hex.slice(-4)}`;
 
 const volumeOf = (fill) => BigInt(fill.collateral_amount);
@@ -83,11 +95,27 @@ const feeIsInRequiredAsset = (fill) => {
   return BigInt(unpaid) === 0n;
 };
 
-export function check(rows) {
-  const { fills, payouts } = rows;
-  const outside = fills.find((fill) => !inWindow(fill, fillWindow));
-  if (outside)
-    throw new Error(`Fill at block ${outside.block} is outside the window.`);
+function requireBlocksInHourOrder(fills) {
+  let earlierHours = -1;
+  let thisHour = -1;
+  let hour = 0;
+  for (const fill of fills) {
+    if (fill.hour !== hour) {
+      earlierHours = Math.max(earlierHours, thisHour);
+      hour = fill.hour;
+    }
+    if (fill.block <= earlierHours)
+      throw new Error(
+        `Fill at block ${fill.block} is in hour ${hour} but an earlier hour already reached block ${earlierHours}.`,
+      );
+    thisHour = Math.max(thisHour, fill.block);
+  }
+}
+
+export function check(rows, binds) {
+  const { payouts } = rows;
+  const fills = fillsOf(rows, binds);
+  requireBlocksInHourOrder(fills);
   const stranger = fills.find((fill) => !exchanges.includes(fill.exchange));
   if (stranger)
     throw new Error(`Fill from ${stranger.exchange} is not a named exchange.`);
@@ -124,11 +152,6 @@ export function check(rows) {
   assertLeaderboardAddsUp(leaderboardEntries(fills), total);
   const conditions = conditionsOf(payouts);
   for (const condition of conditions) {
-    const outside = condition.rows.find((row) => !inWindow(row, payoutWindow));
-    if (outside)
-      throw new Error(
-        `Condition ${shortHex(condition.id)} resolved at block ${outside.block}, outside the window.`,
-      );
     const indices = condition.rows.map((r) => Number(r.outcome_index));
     const complete = Array.from(
       { length: outcomesPerCondition },
@@ -184,7 +207,7 @@ function tape(fills) {
     .sort(byVolumeDescending)
     .slice(0, tapeSize)
     .map(({ fill, volume }) => ({
-      hour: hourOf(fill.block),
+      hour: fill.hour,
       block: fill.block,
       side: fill.is_buy ? "Maker buys" : "Maker sells",
       maker: shortHex(fill.maker),
@@ -212,7 +235,7 @@ function oddsLine(fills) {
   const tokenId = busiestMarket(fills);
   const hourly = new Map();
   for (const fill of fills.filter((f) => f.token_id === tokenId)) {
-    const hour = hourOf(fill.block);
+    const hour = fill.hour;
     const bucket = hourly.get(hour) ?? { collateral: 0n, tokens: 0n, fills: 0 };
     bucket.collateral += BigInt(fill.collateral_amount);
     bucket.tokens += BigInt(fill.token_amount);
@@ -282,15 +305,15 @@ function resolved(payouts) {
   }));
 }
 
-export function shape(rows) {
-  const { fills, payouts } = rows;
+export function shape(rows, binds) {
+  const { payouts } = rows;
+  const fills = fillsOf(rows, binds);
   const total = totalVolume(fills);
   const largest = fills.reduce((a, b) => (volumeOf(b) > volumeOf(a) ? b : a));
   const builders = builderVolumes(fills);
   builders.delete(zeroWord);
   return {
-    day,
-    fillWindow,
+    day: dayOf(binds),
     exchanges,
     fills: String(fills.length),
     volume: formatCompact(total),

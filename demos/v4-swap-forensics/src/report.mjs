@@ -1,40 +1,59 @@
-export const binds = [
-  {
-    name: "swaps",
-    function_slug: "uniswap_v4.swap",
-    chain_id: 1,
-    params: { manager: "0x000000000004444c5dc75cb358380d2e3de08a90" },
-    window: { from_block: 26316189, to_block: 26323365 },
-    read: { chunk_blocks: 300 },
-  },
-  {
-    name: "liquidity",
-    function_slug: "uniswap_v4.modify_liquidity",
-    chain_id: 1,
-    params: { manager: "0x000000000004444c5dc75cb358380d2e3de08a90" },
-    window: { from_block: 26316189, to_block: 26323365 },
-    read: { chunk_blocks: 300 },
-  },
-  {
-    name: "tokens",
-    function_slug: "erc20.token_metadata",
-    chain_id: 1,
-    params: {
-      tokens: [
-        "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
-        "0xdac17f958d2ee523a2206206994597c13d831ec7",
-      ],
-      by: "day",
-    },
-    window: { from_day: "2026-11-01", to_day: "2026-11-02" },
-  },
-];
+const dayMs = 86400000;
+const hourMs = 3600000;
+const hoursPerDay = 24;
+const isoSecond = (ms) => new Date(ms).toISOString().replace(".000Z", "Z");
+export const manager = "0x000000000004444c5dc75cb358380d2e3de08a90";
+export const usdc = "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48";
+export const usdt = "0xdac17f958d2ee523a2206206994597c13d831ec7";
+const hourName = (hour) => String(hour).padStart(2, "0");
 
-const bindByName = Object.fromEntries(binds.map((bind) => [bind.name, bind]));
-export const blockWindow = bindByName.swaps.window;
-export const [usdc, usdt] = bindByName.tokens.params.tokens;
-export const day = bindByName.tokens.window.from_day;
-export const blocksPerHour = bindByName.swaps.read.chunk_blocks;
+export function bindsAt(now = Date.now()) {
+  const yesterday = Math.floor(now / dayMs) * dayMs - dayMs;
+  const between = (from, to) => ({
+    from_time: isoSecond(from),
+    to_time: isoSecond(to),
+  });
+  const hourly = (prefix, function_slug) =>
+    Array.from({ length: hoursPerDay }, (_, hour) => ({
+      name: `${prefix}-${hourName(hour)}`,
+      function_slug,
+      chain_id: 1,
+      params: { manager },
+      window: between(
+        yesterday + hour * hourMs,
+        yesterday + (hour + 1) * hourMs,
+      ),
+    }));
+  return [
+    ...hourly("swaps", "uniswap_v4.swap"),
+    ...hourly("liquidity", "uniswap_v4.modify_liquidity"),
+    {
+      name: "tokens",
+      function_slug: "erc20.token_metadata",
+      chain_id: 1,
+      params: { tokens: [usdc, usdt], by: "day" },
+      window: between(yesterday, yesterday + dayMs),
+    },
+  ];
+}
+
+export const dayOf = (binds) =>
+  binds.find((bind) => bind.name === "tokens").window.from_time.slice(0, 10);
+
+export function unpack(rows, binds) {
+  const hourly = (prefix) =>
+    binds
+      .filter((bind) => bind.name.startsWith(`${prefix}-`))
+      .flatMap((bind, hour) =>
+        rows[bind.name].map((row) => ({ ...row, hour })),
+      );
+  return {
+    swaps: hourly("swaps"),
+    liquidity: hourly("liquidity"),
+    tokens: rows.tokens,
+  };
+}
+
 export const knownPools = [
   {
     id: "0xdce6394339af00981949f5f3baf27e3610c76326a700af57e4b3e3ae4977f78d",
@@ -53,8 +72,6 @@ const sign = (raw) => {
   return value > 0n ? 1 : value < 0n ? -1 : 0;
 };
 const sells0 = (swap) => sign(swap.amount0) > 0;
-const inWindow = (row) =>
-  row.block >= blockWindow.from_block && row.block < blockWindow.to_block;
 const sameBlockPool = (a, b) => a.block === b.block && a.pool === b.pool;
 
 export function jitEvents({ swaps, liquidity }) {
@@ -135,11 +152,25 @@ function checkJitLiquidity(events) {
   }
 }
 
-export function check(rows) {
+function requireBlocksInHourOrder(rows) {
+  const latestByHour = [];
+  for (const row of rows)
+    latestByHour[row.hour] = Math.max(latestByHour[row.hour] ?? 0, row.block);
+  for (const row of rows) {
+    const earlier = latestByHour
+      .slice(0, row.hour)
+      .reduce((most, block) => Math.max(most, block ?? 0), 0);
+    if (row.block <= earlier)
+      throw new Error(
+        `Row at block ${row.block} is in hour ${row.hour} but an earlier hour already reached block ${earlier}.`,
+      );
+  }
+}
+
+export function check(fetched, binds) {
+  const rows = unpack(fetched, binds);
   const { swaps, liquidity } = rows;
-  const outside = [...swaps, ...liquidity].find((row) => !inWindow(row));
-  if (outside)
-    throw new Error(`Row at block ${outside.block} is outside the window.`);
+  requireBlocksInHourOrder([...swaps, ...liquidity]);
   const positions = new Set(
     [...swaps, ...liquidity].map((row) => `${row.block}:${row.log_index}`),
   );
@@ -204,23 +235,22 @@ function hourly(rows, jit, sandwichList) {
     jit: 0,
     sandwiches: 0,
   }));
-  const bucket = (row) =>
-    hours[Math.floor((row.block - blockWindow.from_block) / blocksPerHour)];
+  const bucket = (row) => hours[row.hour];
   rows.swaps.forEach((swap) => bucket(swap).swaps++);
   jit.forEach(({ swap }) => bucket(swap).jit++);
   sandwichList.forEach(({ victim }) => bucket(victim).sandwiches++);
   return hours;
 }
 
-export function shape(rows) {
+export function shape(fetched, binds) {
+  const rows = unpack(fetched, binds);
   const quoteDecimals = Number(
     rows.tokens.find((t) => t.token === usdc).decimals,
   );
   const jit = jitEvents(rows);
   const sandwichList = sandwiches(rows);
   return {
-    day,
-    blockWindow,
+    day: dayOf(binds),
     tokens: rows.tokens.map(({ token, symbol, name }) => ({
       token,
       symbol,

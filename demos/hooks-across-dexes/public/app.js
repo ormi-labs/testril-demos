@@ -106,7 +106,7 @@ function render(report) {
   renderChecks(report.checks);
   if (!view) return;
   document.querySelector("#day-window").textContent =
-    `${view.dayWindow.from_day} to ${view.dayWindow.to_day} (exclusive)`;
+    `${view.dayWindow.first} to ${view.dayWindow.last}`;
   document
     .querySelector("#headline")
     .replaceChildren(

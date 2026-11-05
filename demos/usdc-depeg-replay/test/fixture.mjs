@@ -1,12 +1,17 @@
 import {
   binds,
+  edgesBind,
   feed,
-  hourBlocks,
   hours,
   mintsAndBurns,
   usdc,
   zeroAddress,
 } from "../src/report.mjs";
+import { blockAt } from "./fake-testril.mjs";
+
+export const fixtureNow = Date.parse("2026-11-02T12:00:00Z");
+export const fixtureBinds = binds;
+const hourStartBlock = (hour) => blockAt(`${hours[hour]}:00:00Z`);
 
 const circle = "0x55fe002aeff02f77364de339a1292923a15844b8";
 const minters = Array.from(
@@ -56,10 +61,10 @@ function feedRows(random) {
 
 function edgeRows(random) {
   const pickMinter = () => minters[Math.floor(random() ** 2 * minters.length)];
-  const edges = [];
+  const byHour = Object.fromEntries(hours.map((hour) => [edgesBind(hour), []]));
   const add = (hour, slot, from, to, dollars) =>
-    edges.push({
-      block: hourBlocks(hour).from + 40 + slot * 37,
+    byHour[edgesBind(hours[hour])].push({
+      block: hourStartBlock(hour) + 40 + slot * 37,
       from,
       to,
       amount: raw(dollars, random).toString(),
@@ -81,7 +86,7 @@ function edgeRows(random) {
         1e6 + random() * 5e7,
       );
   });
-  return edges;
+  return byHour;
 }
 
 function supplyRows(edges, random) {
@@ -100,18 +105,12 @@ export function fixture() {
   const edges = edgeRows(random);
   return {
     supply: supplyRows(edges, random),
-    "usdc-edges": edges,
+    ...edges,
     "usdc-usd-feed": feedRows(random),
   };
 }
 
 const sameParams = (a, b) => JSON.stringify(a) === JSON.stringify(b);
-const covers = (outer, inner) =>
-  Object.keys(inner).every((key) =>
-    key.startsWith("from_")
-      ? inner[key] >= outer[key]
-      : inner[key] <= outer[key],
-  );
 
 export function fixtureRows() {
   const rows = fixture();
@@ -121,13 +120,9 @@ export function fixtureRows() {
         candidate.function_slug === bound.function_slug &&
         candidate.chain_id === bound.chain_id &&
         sameParams(candidate.params, bound.params) &&
-        covers(candidate.window, window),
+        candidate.window.from_time <= window.from_time &&
+        candidate.window.to_time >= window.to_time,
     );
-    return "from_block" in window && bind.read
-      ? rows[bind.name].filter(
-          (row) =>
-            row.block >= window.from_block && row.block < window.to_block,
-        )
-      : rows[bind.name];
+    return rows[bind.name];
   };
 }

@@ -1,279 +1,288 @@
-export const binds = [
-  {
-    name: "binance-total",
-    function_slug: "erc20.token_balance",
-    chain_id: 1,
-    params: {
-      reads: {
-        tokens: [
-          "0xdac17f958d2ee523a2206206994597c13d831ec7",
-          "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
-        ],
+const hourMs = 3600000;
+const isoSecond = (ms) => new Date(ms).toISOString().replace(".000Z", "Z");
+
+export function bindsAt(now = Date.now()) {
+  const thisHour = Math.floor(now / hourMs) * hourMs;
+  const lastHours = (count) => ({
+    from_time: isoSecond(thisHour - count * hourMs),
+    to_time: isoSecond(thisHour),
+  });
+  return [
+    {
+      name: "binance-total",
+      function_slug: "erc20.token_balance",
+      chain_id: 1,
+      params: {
+        reads: {
+          tokens: [
+            "0xdac17f958d2ee523a2206206994597c13d831ec7",
+            "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+          ],
+          owners: [
+            "0x28c6c06298d514db089934071355e5743bf21d60",
+            "0xf977814e90da44bfa03b6295a0616a897441acec",
+          ],
+        },
+        by: "hour",
+      },
+      window: lastHours(168),
+    },
+    {
+      name: "binance-owner-1",
+      function_slug: "erc20.token_balance",
+      chain_id: 1,
+      params: {
+        reads: {
+          tokens: [
+            "0xdac17f958d2ee523a2206206994597c13d831ec7",
+            "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+          ],
+          owners: ["0x28c6c06298d514db089934071355e5743bf21d60"],
+        },
+        by: "hour",
+      },
+      window: lastHours(168),
+    },
+    {
+      name: "binance-owner-2",
+      function_slug: "erc20.token_balance",
+      chain_id: 1,
+      params: {
+        reads: {
+          tokens: [
+            "0xdac17f958d2ee523a2206206994597c13d831ec7",
+            "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+          ],
+          owners: ["0xf977814e90da44bfa03b6295a0616a897441acec"],
+        },
+        by: "hour",
+      },
+      window: lastHours(168),
+    },
+    {
+      name: "binance-native",
+      function_slug: "native.balance",
+      chain_id: 1,
+      params: {
         owners: [
           "0x28c6c06298d514db089934071355e5743bf21d60",
           "0xf977814e90da44bfa03b6295a0616a897441acec",
         ],
+        by: "hour",
       },
-      by: "hour",
+      window: lastHours(168),
     },
-    window: { from_hour: "2026-10-25T00", to_hour: "2026-11-01T00" },
-  },
-  {
-    name: "binance-owner-1",
-    function_slug: "erc20.token_balance",
-    chain_id: 1,
-    params: {
-      reads: {
-        tokens: [
-          "0xdac17f958d2ee523a2206206994597c13d831ec7",
-          "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
-        ],
-        owners: ["0x28c6c06298d514db089934071355e5743bf21d60"],
+    {
+      name: "coinbase-total",
+      function_slug: "erc20.token_balance",
+      chain_id: 1,
+      params: {
+        reads: {
+          tokens: [
+            "0xdac17f958d2ee523a2206206994597c13d831ec7",
+            "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+          ],
+          owners: [
+            "0xa9d1e08c7793af67e9d92fe308d5697fb81d3e43",
+            "0x3cd751e6b0078be393132286c442345e5dc49699",
+          ],
+        },
+        by: "hour",
       },
-      by: "hour",
+      window: lastHours(168),
     },
-    window: { from_hour: "2026-10-25T00", to_hour: "2026-11-01T00" },
-  },
-  {
-    name: "binance-owner-2",
-    function_slug: "erc20.token_balance",
-    chain_id: 1,
-    params: {
-      reads: {
-        tokens: [
-          "0xdac17f958d2ee523a2206206994597c13d831ec7",
-          "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
-        ],
-        owners: ["0xf977814e90da44bfa03b6295a0616a897441acec"],
+    {
+      name: "coinbase-owner-1",
+      function_slug: "erc20.token_balance",
+      chain_id: 1,
+      params: {
+        reads: {
+          tokens: [
+            "0xdac17f958d2ee523a2206206994597c13d831ec7",
+            "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+          ],
+          owners: ["0xa9d1e08c7793af67e9d92fe308d5697fb81d3e43"],
+        },
+        by: "hour",
       },
-      by: "hour",
+      window: lastHours(168),
     },
-    window: { from_hour: "2026-10-25T00", to_hour: "2026-11-01T00" },
-  },
-  {
-    name: "binance-native",
-    function_slug: "native.balance",
-    chain_id: 1,
-    params: {
-      owners: [
-        "0x28c6c06298d514db089934071355e5743bf21d60",
-        "0xf977814e90da44bfa03b6295a0616a897441acec",
-      ],
-      by: "hour",
+    {
+      name: "coinbase-owner-2",
+      function_slug: "erc20.token_balance",
+      chain_id: 1,
+      params: {
+        reads: {
+          tokens: [
+            "0xdac17f958d2ee523a2206206994597c13d831ec7",
+            "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+          ],
+          owners: ["0x3cd751e6b0078be393132286c442345e5dc49699"],
+        },
+        by: "hour",
+      },
+      window: lastHours(168),
     },
-    window: { from_hour: "2026-10-25T00", to_hour: "2026-11-01T00" },
-  },
-  {
-    name: "coinbase-total",
-    function_slug: "erc20.token_balance",
-    chain_id: 1,
-    params: {
-      reads: {
-        tokens: [
-          "0xdac17f958d2ee523a2206206994597c13d831ec7",
-          "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
-        ],
+    {
+      name: "coinbase-native",
+      function_slug: "native.balance",
+      chain_id: 1,
+      params: {
         owners: [
           "0xa9d1e08c7793af67e9d92fe308d5697fb81d3e43",
           "0x3cd751e6b0078be393132286c442345e5dc49699",
         ],
+        by: "hour",
       },
-      by: "hour",
+      window: lastHours(168),
     },
-    window: { from_hour: "2026-10-25T00", to_hour: "2026-11-01T00" },
-  },
-  {
-    name: "coinbase-owner-1",
-    function_slug: "erc20.token_balance",
-    chain_id: 1,
-    params: {
-      reads: {
-        tokens: [
-          "0xdac17f958d2ee523a2206206994597c13d831ec7",
-          "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
-        ],
-        owners: ["0xa9d1e08c7793af67e9d92fe308d5697fb81d3e43"],
+    {
+      name: "kraken-total",
+      function_slug: "erc20.token_balance",
+      chain_id: 1,
+      params: {
+        reads: {
+          tokens: [
+            "0xdac17f958d2ee523a2206206994597c13d831ec7",
+            "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+          ],
+          owners: [
+            "0x267be1c1d684f78cb4f6a176c4911b741e4ffdc0",
+            "0x2910543af39aba0cd09dbb2d50200b3e800a63d2",
+          ],
+        },
+        by: "hour",
       },
-      by: "hour",
+      window: lastHours(168),
     },
-    window: { from_hour: "2026-10-25T00", to_hour: "2026-11-01T00" },
-  },
-  {
-    name: "coinbase-owner-2",
-    function_slug: "erc20.token_balance",
-    chain_id: 1,
-    params: {
-      reads: {
-        tokens: [
-          "0xdac17f958d2ee523a2206206994597c13d831ec7",
-          "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
-        ],
-        owners: ["0x3cd751e6b0078be393132286c442345e5dc49699"],
+    {
+      name: "kraken-owner-1",
+      function_slug: "erc20.token_balance",
+      chain_id: 1,
+      params: {
+        reads: {
+          tokens: [
+            "0xdac17f958d2ee523a2206206994597c13d831ec7",
+            "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+          ],
+          owners: ["0x267be1c1d684f78cb4f6a176c4911b741e4ffdc0"],
+        },
+        by: "hour",
       },
-      by: "hour",
+      window: lastHours(168),
     },
-    window: { from_hour: "2026-10-25T00", to_hour: "2026-11-01T00" },
-  },
-  {
-    name: "coinbase-native",
-    function_slug: "native.balance",
-    chain_id: 1,
-    params: {
-      owners: [
-        "0xa9d1e08c7793af67e9d92fe308d5697fb81d3e43",
-        "0x3cd751e6b0078be393132286c442345e5dc49699",
-      ],
-      by: "hour",
+    {
+      name: "kraken-owner-2",
+      function_slug: "erc20.token_balance",
+      chain_id: 1,
+      params: {
+        reads: {
+          tokens: [
+            "0xdac17f958d2ee523a2206206994597c13d831ec7",
+            "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+          ],
+          owners: ["0x2910543af39aba0cd09dbb2d50200b3e800a63d2"],
+        },
+        by: "hour",
+      },
+      window: lastHours(168),
     },
-    window: { from_hour: "2026-10-25T00", to_hour: "2026-11-01T00" },
-  },
-  {
-    name: "kraken-total",
-    function_slug: "erc20.token_balance",
-    chain_id: 1,
-    params: {
-      reads: {
-        tokens: [
-          "0xdac17f958d2ee523a2206206994597c13d831ec7",
-          "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
-        ],
+    {
+      name: "kraken-native",
+      function_slug: "native.balance",
+      chain_id: 1,
+      params: {
         owners: [
           "0x267be1c1d684f78cb4f6a176c4911b741e4ffdc0",
           "0x2910543af39aba0cd09dbb2d50200b3e800a63d2",
         ],
+        by: "hour",
       },
-      by: "hour",
+      window: lastHours(168),
     },
-    window: { from_hour: "2026-10-25T00", to_hour: "2026-11-01T00" },
-  },
-  {
-    name: "kraken-owner-1",
-    function_slug: "erc20.token_balance",
-    chain_id: 1,
-    params: {
-      reads: {
-        tokens: [
-          "0xdac17f958d2ee523a2206206994597c13d831ec7",
-          "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
-        ],
-        owners: ["0x267be1c1d684f78cb4f6a176c4911b741e4ffdc0"],
+    {
+      name: "okx-total",
+      function_slug: "erc20.token_balance",
+      chain_id: 1,
+      params: {
+        reads: {
+          tokens: [
+            "0xdac17f958d2ee523a2206206994597c13d831ec7",
+            "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+          ],
+          owners: ["0x6cc5f688a315f3dc28a7781717a9a798a59fda7b"],
+        },
+        by: "hour",
       },
-      by: "hour",
+      window: lastHours(168),
     },
-    window: { from_hour: "2026-10-25T00", to_hour: "2026-11-01T00" },
-  },
-  {
-    name: "kraken-owner-2",
-    function_slug: "erc20.token_balance",
-    chain_id: 1,
-    params: {
-      reads: {
-        tokens: [
-          "0xdac17f958d2ee523a2206206994597c13d831ec7",
-          "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
-        ],
-        owners: ["0x2910543af39aba0cd09dbb2d50200b3e800a63d2"],
-      },
-      by: "hour",
-    },
-    window: { from_hour: "2026-10-25T00", to_hour: "2026-11-01T00" },
-  },
-  {
-    name: "kraken-native",
-    function_slug: "native.balance",
-    chain_id: 1,
-    params: {
-      owners: [
-        "0x267be1c1d684f78cb4f6a176c4911b741e4ffdc0",
-        "0x2910543af39aba0cd09dbb2d50200b3e800a63d2",
-      ],
-      by: "hour",
-    },
-    window: { from_hour: "2026-10-25T00", to_hour: "2026-11-01T00" },
-  },
-  {
-    name: "okx-total",
-    function_slug: "erc20.token_balance",
-    chain_id: 1,
-    params: {
-      reads: {
-        tokens: [
-          "0xdac17f958d2ee523a2206206994597c13d831ec7",
-          "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
-        ],
+    {
+      name: "okx-native",
+      function_slug: "native.balance",
+      chain_id: 1,
+      params: {
         owners: ["0x6cc5f688a315f3dc28a7781717a9a798a59fda7b"],
+        by: "hour",
       },
-      by: "hour",
+      window: lastHours(168),
     },
-    window: { from_hour: "2026-10-25T00", to_hour: "2026-11-01T00" },
-  },
-  {
-    name: "okx-native",
-    function_slug: "native.balance",
-    chain_id: 1,
-    params: {
-      owners: ["0x6cc5f688a315f3dc28a7781717a9a798a59fda7b"],
-      by: "hour",
+    {
+      name: "bitfinex-total",
+      function_slug: "erc20.token_balance",
+      chain_id: 1,
+      params: {
+        reads: {
+          tokens: [
+            "0xdac17f958d2ee523a2206206994597c13d831ec7",
+            "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+          ],
+          owners: ["0x77134cbc06cb00b66f4c7e623d5fdbf6777635ec"],
+        },
+        by: "hour",
+      },
+      window: lastHours(168),
     },
-    window: { from_hour: "2026-10-25T00", to_hour: "2026-11-01T00" },
-  },
-  {
-    name: "bitfinex-total",
-    function_slug: "erc20.token_balance",
-    chain_id: 1,
-    params: {
-      reads: {
-        tokens: [
-          "0xdac17f958d2ee523a2206206994597c13d831ec7",
-          "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
-        ],
+    {
+      name: "bitfinex-native",
+      function_slug: "native.balance",
+      chain_id: 1,
+      params: {
         owners: ["0x77134cbc06cb00b66f4c7e623d5fdbf6777635ec"],
+        by: "hour",
       },
-      by: "hour",
+      window: lastHours(168),
     },
-    window: { from_hour: "2026-10-25T00", to_hour: "2026-11-01T00" },
-  },
-  {
-    name: "bitfinex-native",
-    function_slug: "native.balance",
-    chain_id: 1,
-    params: {
-      owners: ["0x77134cbc06cb00b66f4c7e623d5fdbf6777635ec"],
-      by: "hour",
+    {
+      name: "gemini-total",
+      function_slug: "erc20.token_balance",
+      chain_id: 1,
+      params: {
+        reads: {
+          tokens: [
+            "0xdac17f958d2ee523a2206206994597c13d831ec7",
+            "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+          ],
+          owners: ["0xd24400ae8bfebb18ca49be86258a3c749cf46853"],
+        },
+        by: "hour",
+      },
+      window: lastHours(168),
     },
-    window: { from_hour: "2026-10-25T00", to_hour: "2026-11-01T00" },
-  },
-  {
-    name: "gemini-total",
-    function_slug: "erc20.token_balance",
-    chain_id: 1,
-    params: {
-      reads: {
-        tokens: [
-          "0xdac17f958d2ee523a2206206994597c13d831ec7",
-          "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
-        ],
+    {
+      name: "gemini-native",
+      function_slug: "native.balance",
+      chain_id: 1,
+      params: {
         owners: ["0xd24400ae8bfebb18ca49be86258a3c749cf46853"],
+        by: "hour",
       },
-      by: "hour",
+      window: lastHours(168),
     },
-    window: { from_hour: "2026-10-25T00", to_hour: "2026-11-01T00" },
-  },
-  {
-    name: "gemini-native",
-    function_slug: "native.balance",
-    chain_id: 1,
-    params: {
-      owners: ["0xd24400ae8bfebb18ca49be86258a3c749cf46853"],
-      by: "hour",
-    },
-    window: { from_hour: "2026-10-25T00", to_hour: "2026-11-01T00" },
-  },
-];
+  ];
+}
 
-const bindByName = Object.fromEntries(binds.map((bind) => [bind.name, bind]));
-export const tideWindow = bindByName["binance-total"].window;
-export const [usdt, usdc] = bindByName["binance-total"].params.reads.tokens;
+export const usdt = "0xdac17f958d2ee523a2206206994597c13d831ec7";
+export const usdc = "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48";
 const symbols = { [usdt]: "USDT", [usdc]: "USDC" };
 const decimals = 6n;
 const wei = 10n ** 18n;
@@ -287,33 +296,34 @@ const displayNames = {
   gemini: "Gemini",
 };
 
-export const exchanges = binds
-  .filter((bind) => bind.name.endsWith("-total"))
-  .map((bind) => {
-    const id = bind.name.slice(0, -"-total".length);
-    return {
-      id,
-      name: displayNames[id],
-      owners: bind.params.reads.owners,
-      ownerBinds: binds
-        .filter((other) => other.name.startsWith(`${id}-owner-`))
-        .map((other) => other.name),
-    };
-  });
+export const exchangesOf = (binds) =>
+  binds
+    .filter((bind) => bind.name.endsWith("-total"))
+    .map((bind) => {
+      const id = bind.name.slice(0, -"-total".length);
+      return {
+        id,
+        name: displayNames[id],
+        owners: bind.params.reads.owners,
+        ownerBinds: binds
+          .filter((other) => other.name.startsWith(`${id}-owner-`))
+          .map((other) => other.name),
+      };
+    });
 
-export function hours() {
+export function hours(binds) {
+  const { window } = binds.find((bind) => bind.name === "binance-total");
   const result = [];
   for (
-    let t = Date.parse(`${tideWindow.from_hour}:00:00Z`);
-    t < Date.parse(`${tideWindow.to_hour}:00:00Z`);
-    t += 3600000
+    let t = Date.parse(window.from_time);
+    t < Date.parse(window.to_time);
+    t += hourMs
   )
     result.push(new Date(t).toISOString().slice(0, 13));
   return result;
 }
 
-function balancesByHour(rows, bindName, keyField, keys) {
-  const expected = hours();
+function balancesByHour(rows, expected, bindName, keyField, keys) {
   const bind = rows[bindName];
   const outside = bind.filter((row) => !expected.includes(row.hour));
   if (outside.length)
@@ -346,21 +356,30 @@ function balancesByHour(rows, bindName, keyField, keys) {
   );
 }
 
-const tokenBalances = (rows, bindName) =>
-  balancesByHour(rows, bindName, "token", [usdt, usdc]);
-const nativeBalances = (rows, exchange) =>
-  balancesByHour(rows, `${exchange.id}-native`, "owner", exchange.owners);
+const tokenBalances = (rows, expected, bindName) =>
+  balancesByHour(rows, expected, bindName, "token", [usdt, usdc]);
+const nativeBalances = (rows, expected, exchange) =>
+  balancesByHour(
+    rows,
+    expected,
+    `${exchange.id}-native`,
+    "owner",
+    exchange.owners,
+  );
 
-export function check(rows) {
-  const expected = hours();
+export function check(rows, binds) {
+  const expected = hours(binds);
+  const exchanges = exchangesOf(binds);
   for (const exchange of exchanges) {
-    tokenBalances(rows, `${exchange.id}-total`);
-    nativeBalances(rows, exchange);
+    tokenBalances(rows, expected, `${exchange.id}-total`);
+    nativeBalances(rows, expected, exchange);
   }
   const split = exchanges.filter((exchange) => exchange.ownerBinds.length);
   for (const exchange of split) {
-    const total = tokenBalances(rows, `${exchange.id}-total`);
-    const owners = exchange.ownerBinds.map((name) => tokenBalances(rows, name));
+    const total = tokenBalances(rows, expected, `${exchange.id}-total`);
+    const owners = exchange.ownerBinds.map((name) =>
+      tokenBalances(rows, expected, name),
+    );
     for (const token of [usdt, usdc])
       for (const hour of expected) {
         const sum = owners.reduce(
@@ -392,9 +411,9 @@ export function formatUsd(raw, signed = false) {
 
 export const formatEth = (raw) => `${(raw / wei).toLocaleString("en-US")} ETH`;
 
-function stableTotals(rows, exchange) {
-  const total = tokenBalances(rows, `${exchange.id}-total`);
-  return hours().map(
+function stableTotals(rows, expected, exchange) {
+  const total = tokenBalances(rows, expected, `${exchange.id}-total`);
+  return expected.map(
     (hour) => total.get(usdt).get(hour) + total.get(usdc).get(hour),
   );
 }
@@ -406,8 +425,7 @@ const bySizeDescending = (a, b) => {
   return sizeA === sizeB ? 0 : sizeB > sizeA ? 1 : -1;
 };
 
-function hourlyChanges(exchange, totals) {
-  const expected = hours();
+function hourlyChanges(expected, exchange, totals) {
   return totals.slice(1).map((balance, i) => ({
     hour: expected[i + 1],
     exchange: exchange.name,
@@ -416,17 +434,20 @@ function hourlyChanges(exchange, totals) {
   }));
 }
 
-export function shape(rows) {
-  const expected = hours();
-  const totals = exchanges.map((exchange) => stableTotals(rows, exchange));
+export function shape(rows, binds) {
+  const expected = hours(binds);
+  const exchanges = exchangesOf(binds);
+  const totals = exchanges.map((exchange) =>
+    stableTotals(rows, expected, exchange),
+  );
   const changes = exchanges
-    .flatMap((exchange, i) => hourlyChanges(exchange, totals[i]))
+    .flatMap((exchange, i) => hourlyChanges(expected, exchange, totals[i]))
     .sort(bySizeDescending);
   const sumLast = (list) =>
     list.reduce((acc, series) => acc + series.at(-1), 0n);
   const sumFirst = (list) => list.reduce((acc, series) => acc + series[0], 0n);
   const eth = exchanges.map((exchange) => {
-    const balances = nativeBalances(rows, exchange);
+    const balances = nativeBalances(rows, expected, exchange);
     return exchange.owners.reduce(
       (acc, owner) => acc + balances.get(owner).get(expected.at(-1)),
       0n,
@@ -436,7 +457,7 @@ export function shape(rows) {
   const outflow = changes.find((c) => c.change < 0n);
   const describe = (c) => `${c.exchange} · ${c.hour}:00 UTC`;
   return {
-    tideWindow,
+    tideWindow: { first: expected[0], last: expected.at(-1) },
     hours: expected,
     stablecoins: formatUsd(sumLast(totals)),
     stablecoinChange: formatUsd(sumLast(totals) - sumFirst(totals), true),

@@ -1,47 +1,57 @@
-export const binds = [
-  {
-    name: "ethereum-questions",
-    function_slug: "realitio.question",
-    chain_id: 1,
-    params: { realitio: "0x5b7dd1e86623548af054a4985f7fc8ccbb554e2c" },
-    window: { from_block: 26108082, to_block: 26323365 },
-  },
-  {
-    name: "ethereum-answers",
-    function_slug: "realitio.answer",
-    chain_id: 1,
-    params: { realitio: "0x5b7dd1e86623548af054a4985f7fc8ccbb554e2c" },
-    window: { from_block: 26108082, to_block: 26323365 },
-  },
-  {
-    name: "ethereum-outcomes",
-    function_slug: "realitio.question_outcomes",
-    chain_id: 1,
-    params: { realitio: "0x5b7dd1e86623548af054a4985f7fc8ccbb554e2c" },
-    window: { from_block: 26108082, to_block: 26323365 },
-  },
-  {
-    name: "gnosis-questions",
-    function_slug: "realitio.question",
-    chain_id: 100,
-    params: { realitio: "0xe78996a233895be74a66f451f1019ca9734205cc" },
-    window: { from_block: 48558286, to_block: 49062480 },
-  },
-  {
-    name: "gnosis-answers",
-    function_slug: "realitio.answer",
-    chain_id: 100,
-    params: { realitio: "0xe78996a233895be74a66f451f1019ca9734205cc" },
-    window: { from_block: 48558286, to_block: 49062480 },
-  },
-  {
-    name: "gnosis-outcomes",
-    function_slug: "realitio.question_outcomes",
-    chain_id: 100,
-    params: { realitio: "0xe78996a233895be74a66f451f1019ca9734205cc" },
-    window: { from_block: 48558286, to_block: 49062480 },
-  },
-];
+const dayMs = 86400000;
+const isoSecond = (ms) => new Date(ms).toISOString().replace(".000Z", "Z");
+
+export function bindsAt(now = Date.now()) {
+  const today = Math.floor(now / dayMs) * dayMs;
+  const untilToday = (ms) => ({
+    from_time: isoSecond(today - ms),
+    to_time: isoSecond(today),
+  });
+  return [
+    {
+      name: "ethereum-questions",
+      function_slug: "realitio.question",
+      chain_id: 1,
+      params: { realitio: "0x5b7dd1e86623548af054a4985f7fc8ccbb554e2c" },
+      window: untilToday(30 * dayMs),
+    },
+    {
+      name: "ethereum-answers",
+      function_slug: "realitio.answer",
+      chain_id: 1,
+      params: { realitio: "0x5b7dd1e86623548af054a4985f7fc8ccbb554e2c" },
+      window: untilToday(30 * dayMs),
+    },
+    {
+      name: "ethereum-outcomes",
+      function_slug: "realitio.question_outcomes",
+      chain_id: 1,
+      params: { realitio: "0x5b7dd1e86623548af054a4985f7fc8ccbb554e2c" },
+      window: untilToday(30 * dayMs),
+    },
+    {
+      name: "gnosis-questions",
+      function_slug: "realitio.question",
+      chain_id: 100,
+      params: { realitio: "0xe78996a233895be74a66f451f1019ca9734205cc" },
+      window: untilToday(30 * dayMs),
+    },
+    {
+      name: "gnosis-answers",
+      function_slug: "realitio.answer",
+      chain_id: 100,
+      params: { realitio: "0xe78996a233895be74a66f451f1019ca9734205cc" },
+      window: untilToday(30 * dayMs),
+    },
+    {
+      name: "gnosis-outcomes",
+      function_slug: "realitio.question_outcomes",
+      chain_id: 100,
+      params: { realitio: "0xe78996a233895be74a66f451f1019ca9734205cc" },
+      window: untilToday(30 * dayMs),
+    },
+  ];
+}
 
 const invalidAnswer = `0x${"f".repeat(64)}`;
 const topQuestions = 20;
@@ -51,8 +61,8 @@ export const chains = [
   { key: "ethereum", name: "Ethereum", token: "ETH" },
   { key: "gnosis", name: "Gnosis", token: "xDAI" },
 ];
-const bindByName = Object.fromEntries(binds.map((bind) => [bind.name, bind]));
-export const windowOf = (chain) => bindByName[`${chain.key}-questions`].window;
+export const windowOf = (binds, chain) =>
+  binds.find((bind) => bind.name === `${chain.key}-questions`).window;
 
 const answerOrder = (a, b) =>
   a.block - b.block || Number(BigInt(a.log_index) - BigInt(b.log_index));
@@ -153,7 +163,7 @@ function chainQuestions(rows, chain) {
 
 const compareBigInt = (a, b) => (a < b ? -1 : a > b ? 1 : 0);
 
-export function shape(rows) {
+export function shape(rows, binds) {
   const entries = chains
     .flatMap((chain, chainIndex) =>
       chainQuestions(rows, chain).map((entry) => ({ ...entry, chainIndex })),
@@ -169,10 +179,14 @@ export function shape(rows) {
   const count = (key) =>
     chains.reduce((sum, chain) => sum + rows[`${chain.key}-${key}`].length, 0);
   return {
-    windows: chains.map((chain) => ({
-      chain: chain.name,
-      ...windowOf(chain),
-    })),
+    windows: chains.map((chain) => {
+      const { from_time, to_time } = windowOf(binds, chain);
+      return {
+        chain: chain.name,
+        first: from_time.slice(0, 10),
+        last: new Date(Date.parse(to_time) - dayMs).toISOString().slice(0, 10),
+      };
+    }),
     asked: String(count("questions")),
     answered: String(questions.filter((q) => q.answers > 0).length),
     answers: String(count("answers")),
