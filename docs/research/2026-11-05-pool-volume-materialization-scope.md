@@ -64,6 +64,8 @@ The pool list itself is an event-list function, not a lifetime accumulator. The 
 
 ## Recommended change and ownership
 
+The [proposal for Vineet](../proposals/2026-11-05-explicit-pool-volume-scope.md) develops this recommendation for a fixed set of known pools, including a proposed interface, implementation options, and acceptance tests.
+
 **Testril should support a caller naming the pool before preparation.** For a fixed pool, the required Swap events are in the requested whole-hour window. Discovering every pool the factory has ever created is unnecessary for that question. The Testril team should choose how that scope is represented in the catalog, while retaining the existing factory-discovery behavior for callers asking about all pools.
 
 Reuse the existing swap decoding and period aggregation where practical. Define how the service validates the named pool, chain, factory membership if claimed, and token ordering; do not accept a caller's label as proof. The quote must price the work that will actually execute. No specific replacement function name or argument spelling is assumed here.
