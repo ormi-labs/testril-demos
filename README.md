@@ -2,7 +2,7 @@
 
 Small, runnable demos showcasing [Testril](https://testril.ai).
 
-MCP server: `https://dev.testril.ai/mcp`
+MCP server: `https://api.testril.si/mcp`
 
 ## Demos
 

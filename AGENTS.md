@@ -2,7 +2,7 @@
 
 ## Purpose & Audience
 
-This repository contains demos showcasing [Testril](https://testril.ai), using its MCP server at `https://dev.testril.ai/mcp`. It starts private under `ormi-labs` and is intended to become public. Write every contribution for someone encountering Testril and this code for the first time.
+This repository contains demos showcasing [Testril](https://testril.ai), using its MCP server at `https://api.testril.si/mcp`. It starts private under `ormi-labs` and is intended to become public. Write every contribution for someone encountering Testril and this code for the first time.
 
 **Readability and simplicity are primary requirements here.** Prefer a small, obvious example over a clever abstraction or an exhaustive feature showcase.
 

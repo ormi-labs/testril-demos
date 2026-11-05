@@ -162,9 +162,9 @@ function flowChart(pairs) {
 function render(report) {
   const view = report.view;
   document.querySelector("#supply-window").textContent =
-    `${view.supplyWindow.from_day} to ${view.supplyWindow.to_day} (exclusive)`;
+    `${view.supplyDays.first} to ${view.supplyDays.last}`;
   document.querySelector("#edges-window").textContent =
-    `${view.edgesDay} · blocks ${view.edgesWindow.from_block}–${view.edgesWindow.to_block - 1}`;
+    `${view.edgesDay}, 00:00 to 24:00 UTC`;
   document
     .querySelector("#headline")
     .replaceChildren(
