@@ -19,9 +19,9 @@ Open `http://127.0.0.1:4176`. Paul starts and stops this process; use Ctrl+C to 
 
 The demo is self-contained: its package, assets, source, and tests do not import sibling demos or root tooling. In an extracted source directory, omit the initial `cd` command.
 
-## Payment network to enable
+## Payment network
 
-Enable **Base mainnet (`eip155:8453`) with native USDC** on Testril:
+The demo uses **Base mainnet (`eip155:8453`) with native USDC**:
 
 ```text
 Network: eip155:8453
@@ -55,13 +55,21 @@ An unpaid live check on **20 October 2026** found:
 
 The first report therefore needs operator-prepared coverage, existing shared coverage, or a narrower supported scope before it is suitable for visitor-funded reads. **Do not increase the visitor spending cap to buy the initial factory history.** Show operator preparation costs alongside recordings, even when visitors subsequently pay only for reads.
 
+## Production discovery: 5 November 2026
+
+The default Testril endpoint is now `https://api.testril.si/mcp`. Unpaid discovery confirmed Base mainnet native-USDC offers with signing domain `USD Coin`, version `2`, for both exact and batch settlement. Completed settlement remains unverified by this demo.
+
+The current API uses RFC 3339 `from_time` / `to_time` windows. The demo workflow and preflight still send the older `from_hour` / `to_hour` fields and need migration before fresh runs can work. A separate unpaid request with the current fields confirmed that the configured report has no materialized coverage. Its preparation quote remains **$1,661.2092 for 13,843,410 blocks**. This is a quote, with no payment or materialization started; prepare shared coverage or choose a narrower supported scope rather than raising the visitor cap.
+
+Allium's unpaid SQL submission request returned **HTTP 503**, with `This endpoint is currently unavailable.` This observation does not establish whether accountless SQL has been removed or is temporarily unavailable. Recheck it before enabling fresh runs.
+
 ## Enable fresh wallet runs
 
 After enabling and verifying the payment rail, checking accountless Allium results, and preparing suitable report coverage, set these values in `.env` and restart the demo:
 
 ```dotenv
 LIVE_ENABLED=true
-TESTRIL_MCP_URL=https://dev.testril.ai/mcp
+TESTRIL_MCP_URL=https://api.testril.si/mcp
 ALLIUM_URL=https://agents.allium.so
 REPORT_FROM_HOUR=2026-10-17T12
 ```

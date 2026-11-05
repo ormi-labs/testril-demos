@@ -49,7 +49,7 @@ export async function loadRecordings(directory = join(root, "recordings")) {
 export function createApp({
   env = process.env,
   testrilFactory = () =>
-    connectTestril(env.TESTRIL_MCP_URL ?? "https://dev.testril.ai/mcp"),
+    connectTestril(env.TESTRIL_MCP_URL ?? "https://api.testril.si/mcp"),
   allium = createAllium(env.ALLIUM_URL ?? "https://agents.allium.so"),
   recordings = [],
 } = {}) {
