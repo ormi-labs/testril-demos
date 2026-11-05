@@ -63,6 +63,8 @@ The current API uses RFC 3339 `from_time` / `to_time` windows. The demo workflow
 
 Allium's unpaid SQL submission request returned **HTTP 503**, with `This endpoint is currently unavailable.` This observation does not establish whether accountless SQL has been removed or is temporarily unavailable. Recheck it before enabling fresh runs.
 
+The [materialization scope investigation](../../docs/research/2026-11-05-pool-volume-materialization-scope.md) traces the quote to the factory's pool-creation history, with live quotes, pinned source references, and acceptance criteria for a named-pool scope. Historical pool discovery, rather than years of swap replay, dominates this preparation charge.
+
 ## Enable fresh wallet runs
 
 After enabling and verifying the payment rail, checking accountless Allium results, and preparing suitable report coverage, set these values in `.env` and restart the demo:
