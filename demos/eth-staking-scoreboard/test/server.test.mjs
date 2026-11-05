@@ -69,7 +69,7 @@ test("the button's fetch ends in the shaped report and its passed cross-check", 
 test("report shows the failed cross-check when a day is missing", () => {
   const rows = fixture();
   rows.stmatic.splice(30, 1);
-  const result = report(rows, fixtureBinds);
+  const result = report({ rows }, fixtureBinds);
   assert.equal(result.checks.ok, false);
   assert.match(result.checks.error, /stmatic is missing/);
   assert.equal(result.view, null);

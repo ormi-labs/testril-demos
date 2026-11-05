@@ -63,6 +63,19 @@ const splitAmount = (row) =>
   row.kind === "rewards_collected" ? BigInt(row.amount) : 0n;
 const byLog = (a, b) =>
   a.block - b.block || Number(a.log_index) - Number(b.log_index);
+function requireInReads(name, rows, reads) {
+  const outside = rows.find(
+    (row) =>
+      !reads.some(
+        (read) => row.block >= read.from_block && row.block < read.to_block,
+      ),
+  );
+  if (outside)
+    throw new Error(
+      `${name} row at block ${outside.block} is outside the window.`,
+    );
+}
+
 function requireUniqueLogs(name, rows) {
   const seen = new Set();
   for (const row of rows) {
@@ -102,9 +115,10 @@ function requirePerIndexerTotals(rewards) {
   return amounts.size;
 }
 
-export function check(rows) {
+export function check({ rows, reads }) {
   const { "indexing-rewards": rewards, delegation } = rows;
   for (const [name, list] of Object.entries(rows)) {
+    requireInReads(name, list, reads[name]);
     requireUniqueLogs(name, list);
   }
   requireRewardSplit(rewards);
@@ -210,7 +224,7 @@ function windowDays(binds) {
   };
 }
 
-export function shape(rows, binds) {
+export function shape({ rows }, binds) {
   const { "indexing-rewards": rewards, delegation, "query-fees": fees } = rows;
   const total = sum(rewards.map((row) => BigInt(row.amount)));
   const delegatorTotal = sum(

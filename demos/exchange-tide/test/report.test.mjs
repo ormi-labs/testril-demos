@@ -6,7 +6,7 @@ import { fixture, fixtureBinds } from "./fixture.mjs";
 const rows = () => structuredClone(fixture());
 
 test("check proves every total against its owners on the fixture", () => {
-  const passed = check(rows(), fixtureBinds);
+  const passed = check({ rows: rows() }, fixtureBinds);
   assert.equal(passed.length, 3);
   assert.match(
     passed[1],
@@ -18,7 +18,7 @@ test("check fails when a total is only the first owner", () => {
   const corrupted = rows();
   corrupted["binance-total"] = corrupted["binance-owner-1"];
   assert.throws(
-    () => check(corrupted, fixtureBinds),
+    () => check({ rows: corrupted }, fixtureBinds),
     /Binance USDT total at .* owners hold/,
   );
 });
@@ -27,7 +27,10 @@ test("check fails when the two tokens are swapped in a total", () => {
   const corrupted = rows();
   for (const row of corrupted["coinbase-total"])
     row.token = row.token === usdt ? usdc : usdt;
-  assert.throws(() => check(corrupted, fixtureBinds), /Coinbase USDT total/);
+  assert.throws(
+    () => check({ rows: corrupted }, fixtureBinds),
+    /Coinbase USDT total/,
+  );
 });
 
 test("check fails when an hour is missing", () => {
@@ -36,7 +39,7 @@ test("check fails when an hour is missing", () => {
     (row) => row.hour !== "2026-10-28T09",
   );
   assert.throws(
-    () => check(corrupted, fixtureBinds),
+    () => check({ rows: corrupted }, fixtureBinds),
     /okx-total is missing .* at 2026-10-28T09/,
   );
 });
@@ -46,7 +49,7 @@ test("check fails when a bind returns an unknown token", () => {
   corrupted["okx-total"][0].token =
     "0x0000000000000000000000000000000000000001";
   assert.throws(
-    () => check(corrupted, fixtureBinds),
+    () => check({ rows: corrupted }, fixtureBinds),
     /okx-total has an unexpected token/,
   );
 });
@@ -55,7 +58,7 @@ test("check fails when a bind returns two rows for one hour", () => {
   const corrupted = rows();
   corrupted["okx-total"].push({ ...corrupted["okx-total"][0] });
   assert.throws(
-    () => check(corrupted, fixtureBinds),
+    () => check({ rows: corrupted }, fixtureBinds),
     /okx-total has two rows for .* at /,
   );
 });
@@ -64,7 +67,7 @@ test("check fails when a gap is filled with zero", () => {
   const corrupted = rows();
   corrupted["kraken-native"][5].balance = "0";
   assert.throws(
-    () => check(corrupted, fixtureBinds),
+    () => check({ rows: corrupted }, fixtureBinds),
     /kraken-native has a zero or negative balance/,
   );
 });
@@ -76,11 +79,14 @@ test("check fails when an hour falls outside the window", () => {
     token: usdt,
     balance: "1",
   });
-  assert.throws(() => check(corrupted, fixtureBinds), /outside the window/);
+  assert.throws(
+    () => check({ rows: corrupted }, fixtureBinds),
+    /outside the window/,
+  );
 });
 
 test("shape ranks the biggest hours by size and direction", () => {
-  const view = shape(rows(), fixtureBinds);
+  const view = shape({ rows: rows() }, fixtureBinds);
   assert.deepEqual(
     view.biggestHours
       .slice(0, 2)

@@ -111,7 +111,7 @@ export function mintsAndBurns(edges) {
   return { minted, burned };
 }
 
-export function check(rows, binds) {
+export function check({ rows }, binds) {
   const days = supplyDays(binds);
   const day = edgesDay(binds);
   for (const token of [usdt, usdc]) {
@@ -212,7 +212,7 @@ function pairs(edges, label) {
     }));
 }
 
-export function shape(rows, binds) {
+export function shape({ rows }, binds) {
   const edges = rows["usdc-edges"];
   const { minted, burned } = mintsAndBurns(edges);
   const days = supplyDays(binds);

@@ -69,12 +69,22 @@ function poolStateRow(rows, stateDay) {
   return row;
 }
 
-export function check(rows, binds) {
+export function check({ rows, reads }, binds) {
   const stateDay = stateDayOf(binds);
   const stray = [...rows.ticks, ...rows["pool-state"]].find(
     (row) => row.pool !== pool,
   );
   if (stray) throw new Error(`Row for pool ${stray.pool} is not ${pool}.`);
+  const outside = rows.ticks.find(
+    (row) =>
+      !reads.ticks.some(
+        (read) => row.block >= read.from_block && row.block < read.to_block,
+      ),
+  );
+  if (outside)
+    throw new Error(
+      `Tick row at block ${outside.block} is outside the window.`,
+    );
   const ticks = finalTicks(rows.ticks);
   const overdrawn = ticks.find(
     (entry) => (entry.net < 0n ? -entry.net : entry.net) > entry.gross,
@@ -153,7 +163,7 @@ function side(tick, currentTick) {
   return tick < currentTick ? "below price" : "above price";
 }
 
-export function shape(rows, binds) {
+export function shape({ rows }, binds) {
   const stateDay = stateDayOf(binds);
   const state = poolStateRow(rows, stateDay);
   const ticks = finalTicks(rows.ticks);

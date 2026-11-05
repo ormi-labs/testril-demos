@@ -16,14 +16,14 @@ const types = {
   ".svg": "image/svg+xml",
 };
 
-export function report(rows, binds) {
+export function report(fetched, binds) {
   let checks;
   try {
-    checks = { ok: true, passed: check(rows, binds) };
+    checks = { ok: true, passed: check(fetched, binds) };
   } catch (error) {
     checks = { ok: false, error: error.message };
   }
-  return { view: shape(rows, binds), checks };
+  return { view: shape(fetched, binds), checks };
 }
 
 export function createApp({
@@ -41,8 +41,8 @@ export function createApp({
     let testril;
     try {
       testril = await connectTestril({ url, payerKey, name: demo });
-      const rows = await fetchRows({ binds, testril, run: current, pollMs });
-      current.report = report(rows, binds);
+      const fetched = await fetchRows({ binds, testril, run: current, pollMs });
+      current.report = report(fetched, binds);
       current.state = "done";
     } catch (error) {
       current.error = error.message;

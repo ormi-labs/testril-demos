@@ -84,8 +84,8 @@ Ethereum and xDAI on Gnosis, both 18 decimals.
 The window is the 30 UTC days before the day of the press (`from_time` 30 days
 before today 00:00 UTC, `to_time` today 00:00 UTC), the same for both chains.
 
-Gnosis is not yet served by Testril, so its binds are declared but cannot be
-fetched until it is.
+Production (`https://api.testril.si/mcp`) serves Gnosis (chain 100) and binds
+`realitio.question` there.
 
 ## Binds (`src/report.mjs`)
 

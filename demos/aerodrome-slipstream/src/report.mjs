@@ -41,9 +41,7 @@ export const knownPools = {
 };
 
 const nextDay = (day) =>
-  new Date(Date.parse(`${day}T00:00:00Z`) + 86400000)
-    .toISOString()
-    .slice(0, 10);
+  new Date(Date.parse(`${day}T00:00:00Z`) + dayMs).toISOString().slice(0, 10);
 
 const utcDay = (time) => time.slice(0, 10);
 
@@ -127,7 +125,7 @@ export function checkLeaderboard(poolRows, ranked) {
   });
 }
 
-export function check(rows, binds) {
+export function check({ rows }, binds) {
   const window = days(binds);
   const poolRows = rows["pool-volume"];
   if (!poolRows.length) throw new Error("No pool volume rows.");
@@ -188,7 +186,7 @@ function series(rows, days, pool) {
   }));
 }
 
-export function shape(rows, binds) {
+export function shape({ rows }, binds) {
   const window = days(binds);
   const poolRows = rows["pool-volume"];
   const { ranked, unranked } = leaderboard(poolRows);

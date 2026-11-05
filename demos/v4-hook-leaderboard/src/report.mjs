@@ -129,7 +129,7 @@ export function hookTotals(rows) {
   );
 }
 
-export function check(listed, binds) {
+export function check({ rows: listed }, binds) {
   const rows = lowercased(listed);
   const known = new Set(rows.pools.map((pool) => pool.pool));
   const unknown = rows.volume.find((row) => !known.has(row.pool));
@@ -177,7 +177,7 @@ function hookLabel(hook, arrakisHooks) {
   return arrakisHooks.has(hook) ? "Arrakis" : "Unlabelled";
 }
 
-export function shape(listed, binds) {
+export function shape({ rows: listed }, binds) {
   const days = volumeDays(binds);
   const rows = lowercased(listed);
   const arrakisHooks = arrakisHookSet(rows);

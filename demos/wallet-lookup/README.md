@@ -62,9 +62,9 @@ for the report. The fixture lives in `test/` and is never shown on the page.
 ## Subjects and window
 
 - Transfers: the seven UTC days before the day of the press, one
-  `transfers-<wallet>-<day>` bind per wallet and day, so each transfer's day is
-  the bind it was read in (the check requires blocks to rise from one day to
-  the next).
+  `transfers-<wallet>` bind per wallet read one day at a time; a transfer's day
+  is the read whose resolved block range holds its block, and the check fails
+  on a transfer outside the seven reads.
 - Balance and ENS name: read over the five minutes before 00:00 UTC on the day
   of the press; the last row is the end of the last day.
 - ENS registry `0x00000000000c2e074ec69a0dfb2997ba6c7d2e1e`.
@@ -83,8 +83,8 @@ for the report. The fixture lives in `test/` and is never shown on the page.
 
 Windows end at 00:00 UTC on the day of the press; the end is not included.
 
-| Name                            | Function                 | Chain | Params              | Window               |
-| ------------------------------- | ------------------------ | ----- | ------------------- | -------------------- |
-| `ens-<wallet>` (3)              | `ens.primary_name`       | 1     | `registry, address` | 5 minutes → today    |
-| `balance`                       | `native.balance`         | 1     | `owners`            | 5 minutes → today    |
-| `transfers-<wallet>-<day>` (21) | `erc20.wallet_transfers` | 1     | `wallet, tokens`    | one day of 7 → today |
+| Name                     | Function                 | Chain | Params              | Window            |
+| ------------------------ | ------------------------ | ----- | ------------------- | ----------------- |
+| `ens-<wallet>` (3)       | `ens.primary_name`       | 1     | `registry, address` | 5 minutes → today |
+| `balance`                | `native.balance`         | 1     | `owners`            | 5 minutes → today |
+| `transfers-<wallet>` (3) | `erc20.wallet_transfers` | 1     | `wallet, tokens`    | 7 days → today    |

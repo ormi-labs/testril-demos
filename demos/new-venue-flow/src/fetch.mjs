@@ -16,18 +16,7 @@ export function readParts(window, read = {}) {
       });
     return parts;
   }
-  if (!read.chunk_blocks) return [window];
-  const parts = [];
-  for (
-    let from = window.from_block;
-    from < window.to_block;
-    from += read.chunk_blocks
-  )
-    parts.push({
-      from_block: from,
-      to_block: Math.min(from + read.chunk_blocks, window.to_block),
-    });
-  return parts;
+  return [window];
 }
 
 export function newRun(binds) {
@@ -81,6 +70,7 @@ const charge = (answer) =>
 
 export async function fetchRows({ binds, testril, run, pollMs = 2000 }) {
   const rows = {};
+  const reads = {};
   const pay = (answer) => {
     run.spentAtoms = (BigInt(run.spentAtoms) + charge(answer)).toString();
   };
@@ -118,6 +108,7 @@ export async function fetchRows({ binds, testril, run, pollMs = 2000 }) {
       unit: "reads",
     });
     rows[bind.name] = [];
+    reads[bind.name] = [];
     for (const part of parts) {
       const answer = succeeded(
         await testril.call("read", { bound_function_id: id, ...part }),
@@ -125,9 +116,15 @@ export async function fetchRows({ binds, testril, run, pollMs = 2000 }) {
       );
       pay(answer);
       rows[bind.name].push(...answer.values);
+      reads[bind.name].push({
+        ...part,
+        from_block: answer.from_block,
+        to_block: answer.to_block,
+        count: answer.values.length,
+      });
       progress.done += 1;
     }
     progress.step = "done";
   }
-  return rows;
+  return { rows, reads };
 }

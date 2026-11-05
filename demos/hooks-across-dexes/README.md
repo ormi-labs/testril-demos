@@ -1,6 +1,6 @@
 # Hooks across DEXes
 
-Daily pool volume on BSC for 2026-10-25 to 2026-11-01 on three pool managers:
+Daily pool volume on BSC for the 8 UTC days before the day of the press on three pool managers:
 PancakeSwap Infinity CL, PancakeSwap Infinity Bin and Uniswap v4. Each pool is
 read from its manager's pool list, called hooked when its `hooks` address is
 not the zero address, and its volume is split into hooked and hookless. The page

@@ -72,9 +72,7 @@ export function bindsAt(now = Date.now()) {
 const topTokens = 12;
 
 const nextDay = (day) =>
-  new Date(Date.parse(`${day}T00:00:00Z`) + 86400000)
-    .toISOString()
-    .slice(0, 10);
+  new Date(Date.parse(`${day}T00:00:00Z`) + dayMs).toISOString().slice(0, 10);
 
 export function feeDays(binds) {
   const { window } = binds.find((bind) => bind.name === "pool-fees");
@@ -133,7 +131,7 @@ function firstMissing(tokens, known) {
   return [...tokens].find((token) => !known.has(token));
 }
 
-export function check(rows) {
+export function check({ rows }) {
   const launched = tokensOf(rows.launches);
   const graduated = tokensOf(rows.graduations);
   const orphan = firstMissing(graduated, launched);
@@ -200,7 +198,7 @@ const eth = (wei) => Number(wei / 10n ** 12n) / 1e6;
 const tokenFees = (feeRows) =>
   [...feeTotals(feeRows).values()].sort(byTotalDesc);
 
-export function shape(rows, binds) {
+export function shape({ rows }, binds) {
   const days = feeDays(binds);
   const launched = rows.launches.length;
   const graduated = tokensOf(rows.graduations).size;

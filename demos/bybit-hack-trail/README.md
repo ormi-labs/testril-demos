@@ -71,15 +71,15 @@ Token addresses (verify): stETH `0xae7ab96520de3a18e5e111b5eaab095312d7fe84`, mE
 
 ## Binds
 
-Declared in `src/report.mjs`, one trio per wallet.
+Declared in `src/report.mjs`, one trio per wallet (18 binds).
 
-| Bind                                    | Function                                        | Window                                                                           |
-| --------------------------------------- | ----------------------------------------------- | -------------------------------------------------------------------------------- |
-| `transfers-<wallet>-<day>-<hour>` (144) | `erc20.wallet_transfers`, the three tokens      | one segment: 00:00-12:00, 12:00-14:00, 14:00-24:00 UTC of each of the eight days |
-| `token-balance-<wallet>` (6)            | `erc20.token_balance` by hour, the three tokens | 2025-02-21T00:00:00Z to 2025-03-01T00:00:00Z                                     |
-| `balance-<wallet>` (6)                  | `native.balance` by hour                        | 2025-02-21T00:00:00Z to 2025-03-01T00:00:00Z                                     |
+| Bind                         | Function                                        | Window                                                                           |
+| ---------------------------- | ----------------------------------------------- | -------------------------------------------------------------------------------- |
+| `transfers-<wallet>` (6)     | `erc20.wallet_transfers`, the three tokens      | 2025-02-21T00:00:00Z to 2025-03-01T00:00:00Z, read hour by hour (192 reads each) |
+| `token-balance-<wallet>` (6) | `erc20.token_balance` by hour, the three tokens | 2025-02-21T00:00:00Z to 2025-03-01T00:00:00Z                                     |
+| `balance-<wallet>` (6)       | `native.balance` by hour                        | 2025-02-21T00:00:00Z to 2025-03-01T00:00:00Z                                     |
 
-A transfer row carries its block, not a time, so a transfer's place in time is the bind it was read in. The segment from 12:00 to 14:00 UTC stands alone because it holds Lido's daily stETH rebase.
+A transfer row carries its block, not a time, so a transfer's hour is the hourly read whose resolved block range holds its block.
 
 ## Cross-check
 
@@ -87,7 +87,8 @@ A transfer row carries its block, not a time, so a transfer's place in time is t
 
 - A transfer is keyed by transaction and log index, so one read from both its sender's and recipient's wallet counts once; a repeat inside one wallet fails.
 - A transfer between two trail wallets must appear, identical, on both sides.
-- A wallet's token balance, read at the last block of the last hour of each segment, changes from one segment to the next by exactly the wallet's transfers in the later segment (inflows minus outflows, per token). stETH may differ by 2 wei per transfer for share rounding, plus up to 0.02% of the balance in the 12:00 to 14:00 UTC segment, which holds the rebase. The first segment's balance is the starting point.
+- A wallet's token balance, read at the last block of each hour, changes from one hour to the next by exactly the wallet's transfers in the later hour (inflows minus outflows, per token). stETH may differ by 2 wei per transfer for share rounding, plus up to 0.02% of the balance in the 12:00 and 13:00 UTC hours, which hold the rebase. The first hour's balance is the starting point.
+- A transfer's block must lie in one of its wallet's hourly reads.
 - Balance rows must lie inside the hour window, once per hour and token.
 
 Native ETH moves emit no ERC-20 transfer, so hourly ETH balances are only charted and window-checked, not reconciled. The roughly 401,000 ETH taken in the hack was native ETH and is not in the transfers; the headline counts stETH, mETH and cmETH separately.

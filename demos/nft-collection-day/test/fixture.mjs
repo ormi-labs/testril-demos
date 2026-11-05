@@ -1,16 +1,12 @@
-import {
-  bindsAt,
-  collection,
-  transferBinds,
-  zeroAddress,
-} from "../src/report.mjs";
-import { blockAt as chainBlockAt } from "./fake-testril.mjs";
+import { readParts } from "../src/fetch.mjs";
+import { bindsAt, collection, zeroAddress } from "../src/report.mjs";
+import { blockAt as chainBlockAt, resolveWindow } from "./fake-testril.mjs";
 
 export const fixtureNow = Date.parse("2026-11-02T12:00:00Z");
 export const fixtureBinds = bindsAt(fixtureNow);
 const windowOf = (name) =>
   fixtureBinds.find((bind) => bind.name === name).window;
-const dayFromBlock = chainBlockAt(windowOf("transfers-00").from_time);
+const dayFromBlock = chainBlockAt(windowOf("transfers").from_time);
 const ownersFromBlock = chainBlockAt(windowOf("owners").from_time);
 const metadataFromBlock = chainBlockAt(windowOf("metadata").from_time);
 
@@ -106,22 +102,31 @@ export function fixture() {
         symbol: "PPG",
       },
     ],
-    ...Object.fromEntries(
-      transferBinds(fixtureBinds).map(({ name, window }) => [
-        name,
-        transfers.filter(
-          (t) =>
-            t.block >= chainBlockAt(window.from_time) &&
-            t.block < chainBlockAt(window.to_time),
-        ),
-      ]),
-    ),
+    transfers,
     owners,
   };
 }
 
-export const transfersIn = (rows) =>
-  transferBinds(fixtureBinds).flatMap((bind) => rows[bind.name]);
+export const transfersIn = (rows) => rows.transfers;
+
+const within = (rows, window) => {
+  const { from_block, to_block } = resolveWindow(window);
+  return rows.filter((row) => row.block >= from_block && row.block < to_block);
+};
+
+export function fixtureFetched(rows = fixture()) {
+  const reads = Object.fromEntries(
+    fixtureBinds.map((bind) => [
+      bind.name,
+      readParts(bind.window, bind.read).map((part) => ({
+        ...part,
+        ...resolveWindow(part),
+        count: within(rows[bind.name], part).length,
+      })),
+    ]),
+  );
+  return { rows, reads };
+}
 
 const sameParams = (a, b) => JSON.stringify(a) === JSON.stringify(b);
 
@@ -136,12 +141,6 @@ export function fixtureRows() {
         candidate.window.from_time <= window.from_time &&
         candidate.window.to_time >= window.to_time,
     );
-    return bind.read
-      ? rows[bind.name].filter(
-          (row) =>
-            row.block >= chainBlockAt(window.from_time) &&
-            row.block < chainBlockAt(window.to_time),
-        )
-      : rows[bind.name];
+    return within(rows[bind.name], window);
   };
 }

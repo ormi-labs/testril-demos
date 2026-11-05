@@ -4,7 +4,6 @@ import {
   formatEth,
   kindLabels,
   nameWrapper,
-  secondsOfBlock,
   secondsOfMonth,
   shortAddress,
   timeline,
@@ -15,6 +14,7 @@ const isoSecond = (ms) => new Date(ms).toISOString().replace(".000Z", "Z");
 const registryDeployedAt = "2020-01-30T00:37:12Z";
 const nameWrapperDeployedAt = "2023-03-28T12:13:11Z";
 const addressRecordsFrom = "2020-01-01T00:00:00Z";
+const monthHours = 30 * 24;
 
 export function bindsAt(now = Date.now()) {
   const today = new Date(now);
@@ -42,6 +42,7 @@ export function bindsAt(now = Date.now()) {
         name: "vitalik.eth",
       },
       window: sinceRegistry,
+      read: { chunk_hours: monthHours },
     },
     {
       name: "vitalik-registration",
@@ -57,6 +58,7 @@ export function bindsAt(now = Date.now()) {
         ],
       },
       window: sinceRegistry,
+      read: { chunk_hours: monthHours },
     },
     {
       name: "vitalik-address",
@@ -78,6 +80,7 @@ export function bindsAt(now = Date.now()) {
         name: "vitalik.eth",
       },
       window: sinceWrapper,
+      read: { chunk_hours: monthHours },
     },
     {
       name: "nick-domain",
@@ -88,6 +91,7 @@ export function bindsAt(now = Date.now()) {
         name: "nick.eth",
       },
       window: sinceRegistry,
+      read: { chunk_hours: monthHours },
     },
     {
       name: "nick-registration",
@@ -103,6 +107,7 @@ export function bindsAt(now = Date.now()) {
         ],
       },
       window: sinceRegistry,
+      read: { chunk_hours: monthHours },
     },
     {
       name: "nick-address",
@@ -124,11 +129,12 @@ export function bindsAt(now = Date.now()) {
         name: "nick.eth",
       },
       window: sinceWrapper,
+      read: { chunk_hours: monthHours },
     },
   ];
 }
 
-export { formatEth, nameWrapper, secondsOfBlock, secondsOfMonth, zeroAddress };
+export { formatEth, nameWrapper, secondsOfMonth, zeroAddress };
 
 export const gracePeriodSeconds = 90 * 86400;
 const basisPoints = 10000n;
@@ -189,6 +195,22 @@ const rowsOf = (subject, rows) =>
   Object.fromEntries(
     Object.entries(subject.binds).map(([kind, bind]) => [kind, rows[bind]]),
   );
+
+const readsOf = (subject, reads) => rowsOf(subject, reads);
+
+function requireInReads(subject, bind, list, reads) {
+  const row = list.find(
+    (candidate) =>
+      !reads.some(
+        (read) =>
+          candidate.block >= read.from_block && candidate.block < read.to_block,
+      ),
+  );
+  if (row)
+    throw new Error(
+      `${subject.name}: ${bind} has a row at block ${row.block}, outside [${reads[0].from_block}, ${reads.at(-1).to_block}).`,
+    );
+}
 
 function requireAscendingBlocks(subject, bind, list) {
   list.forEach((row, i) => {
@@ -276,11 +298,18 @@ const totalCost = (list) =>
   list.reduce((sum, row) => sum + BigInt(row.cost), 0n);
 const renewalsOf = (registration) => registration.slice(1);
 
-export function check(rows, binds) {
+export function check({ rows, reads }, binds) {
   return subjectsOf(binds).flatMap((subject) => {
     const { domain, registration, address, wrapped } = rowsOf(subject, rows);
     if (!domain.length || !registration.length)
       throw new Error(`${subject.name}: no registry or registrar rows.`);
+    for (const kind of ["domain", "registration", "wrapped"])
+      requireInReads(
+        subject,
+        subject.binds[kind],
+        rowsOf(subject, rows)[kind],
+        reads[subject.binds[kind]],
+      );
     requireAscendingBlocks(subject, subject.binds.domain, domain);
     requireAscendingBlocks(subject, subject.binds.registration, registration);
     requireAscendingBlocks(subject, subject.binds.wrapped, wrapped);
@@ -311,7 +340,7 @@ function yearTicks(start, span) {
   }
 }
 
-export function shape(rows, binds) {
+export function shape({ rows, reads }, binds) {
   const subjects = subjectsOf(binds);
   const registryWindow = windowOf(binds, subjects[0].binds.domain);
   const addressWindow = windowOf(binds, subjects[0].binds.address);
@@ -325,7 +354,11 @@ export function shape(rows, binds) {
     );
   const named = subjects.map((subject) => {
     const { domain, address, registration } = rowsOf(subject, rows);
-    const events = timeline(subject, rowsOf(subject, rows));
+    const events = timeline(
+      subject,
+      rowsOf(subject, rows),
+      readsOf(subject, reads),
+    );
     return {
       name: subject.name,
       events,

@@ -245,7 +245,7 @@ const walletNames = {
 };
 
 const nextDay = (day, step) =>
-  new Date(Date.parse(`${day}T00:00:00Z`) + step * 86400000)
+  new Date(Date.parse(`${day}T00:00:00Z`) + step * dayMs)
     .toISOString()
     .slice(0, 10);
 
@@ -302,7 +302,7 @@ function daoRows(rows, dao) {
   ];
 }
 
-export function check(rows, binds) {
+export function check({ rows }, binds) {
   const passed = [];
   for (const dao of daosOf(binds)) {
     const governance = tokenInfo[dao.tokens[0]].symbol;
@@ -422,7 +422,7 @@ function cardView(dao, rows) {
   };
 }
 
-export function shape(rows, binds) {
+export function shape({ rows }, binds) {
   const daos = daosOf(binds);
   const cards = daos.map((dao) => cardView(dao, rows));
   return {

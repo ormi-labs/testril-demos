@@ -1,23 +1,29 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { check, shape } from "../src/report.mjs";
-import { fixture, fixtureBinds } from "./fixture.mjs";
+import { fixture, fixtureBinds, fixtureFetched } from "./fixture.mjs";
 
 const rows = () => structuredClone(fixture());
 const currentTick = BigInt(rows()["pool-state"][0].tick);
 
 test("check proves in-range liquidity from the ticks up to the current tick", () => {
   assert.match(
-    check(rows(), fixtureBinds)[2],
+    check(fixtureFetched(rows()), fixtureBinds)[2],
     /equals the pool's in-range liquidity/,
   );
+});
+
+test("check fails when a tick row sits outside the window", () => {
+  const input = fixtureFetched(rows());
+  input.rows.ticks[0].block = input.reads.ticks.at(-1).to_block;
+  assert.throws(() => check(input, fixtureBinds), /outside the window/);
 });
 
 test("check fails when an upper edge counts as added liquidity", () => {
   const corrupted = rows();
   const upper = corrupted.ticks.find((row) => row.tick === "887270");
   upper.liquidity_net = upper.liquidity_net.replace("-", "");
-  assert.throws(() => check(corrupted, fixtureBinds), /not 0/);
+  assert.throws(() => check(fixtureFetched(corrupted), fixtureBinds), /not 0/);
 });
 
 test("check fails when a tick's latest row is dropped and its stale row is read", () => {
@@ -29,23 +35,29 @@ test("check fails when a tick's latest row is dropped and its stale row is read"
   ).tick;
   const latest = corrupted.ticks.findLast((row) => row.tick === tick);
   corrupted.ticks = corrupted.ticks.filter((row) => row !== latest);
-  assert.throws(() => check(corrupted, fixtureBinds), /not 0/);
+  assert.throws(() => check(fixtureFetched(corrupted), fixtureBinds), /not 0/);
 });
 
 test("check fails when the pool's tick sits below the edge that holds its range", () => {
   const corrupted = rows();
   corrupted["pool-state"][0].tick = (currentTick - 10n).toString();
-  assert.throws(() => check(corrupted, fixtureBinds), /in-range liquidity/);
+  assert.throws(
+    () => check(fixtureFetched(corrupted), fixtureBinds),
+    /in-range liquidity/,
+  );
 });
 
 test("check fails when a row belongs to another pool", () => {
   const corrupted = rows();
   corrupted.ticks[0].pool = `0x${"1".repeat(64)}`;
-  assert.throws(() => check(corrupted, fixtureBinds), /is not 0x/);
+  assert.throws(
+    () => check(fixtureFetched(corrupted), fixtureBinds),
+    /is not 0x/,
+  );
 });
 
 test("shape marks the current price inside a 60-bucket histogram", () => {
-  const view = shape(rows(), fixtureBinds);
+  const view = shape(fixtureFetched(rows()), fixtureBinds);
   assert.equal(view.bars.length, 60);
   assert.equal(view.currentTick, "-196310");
   assert.equal(view.price, "$2,984.06");

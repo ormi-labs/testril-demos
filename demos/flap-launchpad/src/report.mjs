@@ -36,7 +36,7 @@ const topTokens = 20;
 const chartTokens = 10;
 
 const nextDay = (day, step) =>
-  new Date(Date.parse(`${day}T00:00:00Z`) + step * 86400000)
+  new Date(Date.parse(`${day}T00:00:00Z`) + step * dayMs)
     .toISOString()
     .slice(0, 10);
 
@@ -85,7 +85,7 @@ function mismatch(volume, sum) {
     return `sums sells to ${volume.sell_quote_amount} but the trade rows sum to ${sum.sell_quote_amount}`;
 }
 
-export function check(rows, binds) {
+export function check({ rows, reads }, binds) {
   const days = volumeDays(binds);
   const tradesDay = tradesDayOf(binds);
   const missing = days.filter((day) => !rows.volume.some((r) => r.day === day));
@@ -94,6 +94,14 @@ export function check(rows, binds) {
   const strayDay = rows.volume.find((r) => !days.includes(r.day));
   if (strayDay)
     throw new Error(`Volume row for ${strayDay.day} is outside the window.`);
+  const outside = rows.trades.find(
+    (t) =>
+      !reads.trades.some(
+        (read) => t.block >= read.from_block && t.block < read.to_block,
+      ),
+  );
+  if (outside)
+    throw new Error(`Trade at block ${outside.block} is outside the window.`);
   const badFee = rows.trades.find((t) => {
     const fee = BigInt(t.fee_amount);
     return fee < 0n || fee > BigInt(t.quote_amount);
@@ -156,7 +164,7 @@ function leaderboard(rows) {
     }));
 }
 
-export function shape(rows, binds) {
+export function shape({ rows }, binds) {
   const days = volumeDays(binds);
   const native = rows.volume.filter((r) => r.quote_token === zeroAddress);
   const sum = (key) => native.reduce((s, r) => s + BigInt(r[key]), 0n);

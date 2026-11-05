@@ -69,9 +69,9 @@ for the report. The fixture lives in `test/` and is never shown on the page.
 - Hours: the fixed UTC hours `[2023-03-10T00:00:00Z, 2023-03-15T00:00:00Z)`,
   read at each hour's last block. The replay is history, so its windows do not
   follow the press.
-- Transfers: one `usdc-edges-<hour>` bind per hour (120 binds), each over that
-  hour's `from_time` and `to_time`. A transfer edge carries only its block, so
-  the hour it was read in is what `check` uses to put it in its hour.
+- Transfers: one `usdc-edges` bind over the whole span, read hour by hour (120
+  reads). A transfer edge carries only its block, so `check` puts it in the
+  hour whose read resolved to a block range holding it.
 
 The first hour has no earlier supply row, so 119 hours are cross-checked.
 
@@ -85,10 +85,10 @@ before fetching.
 
 Windows are fixed; the end is not included.
 
-| Name                | Function                   | Chain | Params          | Window                        |
-| ------------------- | -------------------------- | ----- | --------------- | ----------------------------- |
-| `supply`            | `erc20.token_supply`       | 1     | `tokens`, `by`  | 2023-03-10T00 → 2023-03-15T00 |
-| `usdc-edges-<hour>` | `erc20.transfer_edges`     | 1     | `token_address` | one hour of the span          |
-| `usdc-usd-feed`     | `aggregator.latest_answer` | 1     | `feeds`, `by`   | 2023-03-10T00 → 2023-03-15T00 |
+| Name            | Function                   | Chain | Params          | Window                        |
+| --------------- | -------------------------- | ----- | --------------- | ----------------------------- |
+| `supply`        | `erc20.token_supply`       | 1     | `tokens`, `by`  | 2023-03-10T00 → 2023-03-15T00 |
+| `usdc-edges`    | `erc20.transfer_edges`     | 1     | `token_address` | 2023-03-10T00 → 2023-03-15T00 |
+| `usdc-usd-feed` | `aggregator.latest_answer` | 1     | `feeds`, `by`   | 2023-03-10T00 → 2023-03-15T00 |
 
-Each `usdc-edges-<hour>` bind is read in one piece.
+`usdc-edges` is read in one-hour chunks.

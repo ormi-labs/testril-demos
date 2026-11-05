@@ -1,5 +1,6 @@
+import { readParts } from "../src/fetch.mjs";
 import { bindsAt, factory } from "../src/report.mjs";
-import { blockAt as chainBlockAt } from "./fake-testril.mjs";
+import { blockAt as chainBlockAt, resolveWindow } from "./fake-testril.mjs";
 
 export const fixtureNow = Date.parse("2026-11-02T12:00:00Z");
 export const fixtureBinds = bindsAt(fixtureNow);
@@ -204,9 +205,6 @@ export function fixture() {
   const liquidity = liquidityRows(random, markets, [factory, ...creators]);
   return {
     markets: marketList,
-    "markets-created": marketList.filter(
-      (m) => m.block >= window.from_block && m.block < window.to_block,
-    ),
     trades,
     liquidity,
     market_state: marketStateRows(markets, trades, liquidity),
@@ -216,27 +214,35 @@ export function fixture() {
 
 const sameParams = (a, b) => JSON.stringify(a) === JSON.stringify(b);
 
+const within = (rows, window) => {
+  const { from_block, to_block } = resolveWindow(window);
+  return rows.filter((row) => row.block >= from_block && row.block < to_block);
+};
+
+export function fixtureFetched(rows = fixture()) {
+  const reads = Object.fromEntries(
+    fixtureBinds.map((bind) => [
+      bind.name,
+      readParts(bind.window, bind.read).map((part) => ({
+        ...part,
+        ...resolveWindow(part),
+        count: (bind.read ? within(rows[bind.name], part) : rows[bind.name])
+          .length,
+      })),
+    ]),
+  );
+  return { rows, reads };
+}
+
 export function fixtureRows() {
   const rows = fixture();
   return (bound, requested) => {
-    const candidates = fixtureBinds.filter(
+    const bind = fixtureBinds.find(
       (candidate) =>
         candidate.function_slug === bound.function_slug &&
         candidate.chain_id === bound.chain_id &&
         sameParams(candidate.params, bound.params),
     );
-    const bind =
-      candidates.find(
-        (candidate) =>
-          candidate.window.from_time === requested.from_time &&
-          candidate.window.to_time === requested.to_time,
-      ) ?? candidates[0];
-    return bind.read
-      ? rows[bind.name].filter(
-          (row) =>
-            row.block >= chainBlockAt(requested.from_time) &&
-            row.block < chainBlockAt(requested.to_time),
-        )
-      : rows[bind.name];
+    return bind.read ? within(rows[bind.name], requested) : rows[bind.name];
   };
 }

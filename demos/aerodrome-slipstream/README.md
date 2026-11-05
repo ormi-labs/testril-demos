@@ -85,6 +85,6 @@ USDC on Base is `0x833589fcd6edb6e08f4c7c32d4f71b54bda02913` with 6 decimals.
 
 ## Binds (`src/report.mjs`)
 
-| Name          | Function                 | Chain | Params                         | Window                  |
-| ------------- | ------------------------ | ----- | ------------------------------ | ----------------------- |
-| `pool-volume` | `uniswap_v3.pool_volume` | 8453  | `swap.pool_list.factory`, `by` | 2026-10-25 → 2026-11-02 |
+| Name          | Function                 | Chain | Params                         | Window         |
+| ------------- | ------------------------ | ----- | ------------------------------ | -------------- |
+| `pool-volume` | `uniswap_v3.pool_volume` | 8453  | `swap.pool_list.factory`, `by` | 8 days → today |

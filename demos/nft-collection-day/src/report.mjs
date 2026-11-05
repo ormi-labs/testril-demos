@@ -1,6 +1,4 @@
 const dayMs = 86400000;
-const hourMs = 3600000;
-const hoursPerDay = 24;
 const metadataLookbackMs = 5 * 60000;
 const collectionBornAt = "2021-07-22T12:26:01Z";
 const ownersChunkHours = 2400;
@@ -14,7 +12,6 @@ export function bindsAt(now = Date.now()) {
     from_time: isoSecond(from),
     to_time: isoSecond(to),
   });
-  const yesterday = today - dayMs;
   return [
     {
       name: "metadata",
@@ -23,16 +20,14 @@ export function bindsAt(now = Date.now()) {
       params: { nft_address: collection },
       window: between(today - metadataLookbackMs, today),
     },
-    ...Array.from({ length: hoursPerDay }, (_, hour) => ({
-      name: `transfers-${String(hour).padStart(2, "0")}`,
+    {
+      name: "transfers",
       function_slug: "erc721.transfer",
       chain_id: 1,
       params: { nft_address: collection },
-      window: between(
-        yesterday + hour * hourMs,
-        yesterday + (hour + 1) * hourMs,
-      ),
-    })),
+      window: between(today - dayMs, today),
+      read: { chunk_hours: 1 },
+    },
     {
       name: "owners",
       function_slug: "erc721.nft_owners",
@@ -47,12 +42,12 @@ export function bindsAt(now = Date.now()) {
 const topHolders = 10;
 const basisPoints = 10000n;
 
-export const transferBinds = (binds) =>
-  binds.filter((bind) => bind.name.startsWith("transfers-"));
 export const dayOf = (binds) =>
-  transferBinds(binds)[0].window.from_time.slice(0, 10);
-const transfersOf = (rows, binds) =>
-  transferBinds(binds).flatMap((bind) => rows[bind.name]);
+  binds.find((bind) => bind.name === "transfers").window.from_time.slice(0, 10);
+
+const holdsBlock = (block) => (read) =>
+  block >= read.from_block && block < read.to_block;
+const dayStartBlock = (reads) => reads.transfers[0].from_block;
 
 const isMint = (transfer) => transfer.from === zeroAddress;
 const isBurn = (transfer) => transfer.to === zeroAddress;
@@ -79,17 +74,14 @@ export function holdings(owners) {
   return balances;
 }
 
-function ownersBeforeDay(owners, transfers) {
-  const onTheDay = new Set(transfers.map((t) => `${t.token_id}@${t.block}`));
-  const before = owners.filter(
-    (o) => !onTheDay.has(`${o.token_id}@${o.block}`),
-  );
+function ownersBeforeDay(owners, reads) {
+  const before = owners.filter((o) => o.block < dayStartBlock(reads));
   return new Map([...latestOwners(before)].map(([id, row]) => [id, row.owner]));
 }
 
-function checkMints(transfers, owners) {
+function checkMints(transfers, owners, reads) {
   const heldBefore = new Set(
-    [...ownersBeforeDay(owners, transfers)]
+    [...ownersBeforeDay(owners, reads)]
       .filter(([, owner]) => owner !== zeroAddress)
       .map(([id]) => id),
   );
@@ -132,8 +124,8 @@ function checkOwnersAtTransfers(transfers, owners) {
   return lastTransfers.size;
 }
 
-function replayHoldings(transfers, owners) {
-  const current = ownersBeforeDay(owners, transfers);
+function replayHoldings(transfers, owners, reads) {
+  const current = ownersBeforeDay(owners, reads);
   for (const transfer of inLogOrder(transfers)) {
     const owner = current.get(transfer.token_id) ?? zeroAddress;
     if (transfer.from !== owner)
@@ -149,8 +141,8 @@ function replayHoldings(transfers, owners) {
   return balances;
 }
 
-function checkHolders(transfers, owners) {
-  const replayed = replayHoldings(transfers, owners);
+function checkHolders(transfers, owners, reads) {
+  const replayed = replayHoldings(transfers, owners, reads);
   const balances = holdings(owners);
   const held = [...balances.values()].reduce((sum, n) => sum + n, 0n);
   const differs =
@@ -163,13 +155,17 @@ function checkHolders(transfers, owners) {
   return { holders: balances.size, held };
 }
 
-export function check(rows, binds) {
-  const { owners } = rows;
-  const transfers = transfersOf(rows, binds);
+export function check({ rows, reads }, binds) {
+  const { owners, transfers } = rows;
   const day = dayOf(binds);
-  const mints = checkMints(transfers, owners);
+  const outside = transfers.find(
+    (transfer) => !reads.transfers.some(holdsBlock(transfer.block)),
+  );
+  if (outside)
+    throw new Error(`Transfer at block ${outside.block} is outside the day.`);
+  const mints = checkMints(transfers, owners, reads);
   const tokenBlocks = checkOwnersAtTransfers(transfers, owners);
-  const { holders, held } = checkHolders(transfers, owners);
+  const { holders, held } = checkHolders(transfers, owners, reads);
   return [
     `All ${mints} mints on ${day} come from the zero address, and only for tokens with no earlier owner`,
     `${tokenBlocks} transferred token-blocks each have exactly one owner row naming the receiver of the block's last transfer`,
@@ -185,13 +181,13 @@ function percent(hundredths) {
   return `${hundredths / 100n}.${String(hundredths % 100n).padStart(2, "0")}%`;
 }
 
-function hourly(rows, binds) {
-  return transferBinds(binds).map((bind, hour) => {
-    const transfers = rows[bind.name];
+function hourly({ transfers }, reads) {
+  return reads.transfers.map((read, hour) => {
+    const inHour = transfers.filter((t) => holdsBlock(t.block)(read));
     return {
       hour,
-      mints: transfers.filter(isMint).length,
-      trades: transfers.filter((t) => !isMint(t) && !isBurn(t)).length,
+      mints: inHour.filter(isMint).length,
+      trades: inHour.filter((t) => !isMint(t) && !isBurn(t)).length,
     };
   });
 }
@@ -217,9 +213,8 @@ function concentration(balances) {
   };
 }
 
-export function shape(rows, binds) {
-  const { owners, metadata } = rows;
-  const transfers = transfersOf(rows, binds);
+export function shape({ rows, reads }, binds) {
+  const { owners, metadata, transfers } = rows;
   const balances = holdings(owners);
   const live = [...balances.values()].reduce((sum, n) => sum + n, 0n);
   const mints = transfers.filter(isMint).length;
@@ -235,7 +230,7 @@ export function shape(rows, binds) {
     trades: transfers.length - mints - burns,
     holders: balances.size.toString(),
     liveTokens: live.toString(),
-    hours: hourly(rows, binds),
+    hours: hourly(rows, reads),
     concentration: concentration(balances),
   };
 }

@@ -16,10 +16,10 @@ const types = {
   ".svg": "image/svg+xml",
 };
 
-export function report(rows, binds) {
+export function report(fetched, binds) {
   try {
-    const passed = check(rows, binds);
-    return { view: shape(rows, binds), checks: { ok: true, passed } };
+    const passed = check(fetched, binds);
+    return { view: shape(fetched, binds), checks: { ok: true, passed } };
   } catch (error) {
     return { view: null, checks: { ok: false, error: error.message } };
   }
@@ -40,8 +40,8 @@ export function createApp({
     let testril;
     try {
       testril = await connectTestril({ url, payerKey, name: demo });
-      const rows = await fetchRows({ binds, testril, run: current, pollMs });
-      current.report = report(rows, binds);
+      const fetched = await fetchRows({ binds, testril, run: current, pollMs });
+      current.report = report(fetched, binds);
       current.state = "done";
     } catch (error) {
       current.error = error.message;

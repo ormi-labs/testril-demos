@@ -99,7 +99,7 @@ function checkChain(rows, chain) {
   };
 }
 
-export function check(rows) {
+export function check({ rows }) {
   return chains.flatMap((chain) => {
     const { answers, questions } = checkChain(rows, chain);
     return [
@@ -163,7 +163,7 @@ function chainQuestions(rows, chain) {
 
 const compareBigInt = (a, b) => (a < b ? -1 : a > b ? 1 : 0);
 
-export function shape(rows, binds) {
+export function shape({ rows }, binds) {
   const entries = chains
     .flatMap((chain, chainIndex) =>
       chainQuestions(rows, chain).map((entry) => ({ ...entry, chainIndex })),

@@ -6,7 +6,8 @@ import {
   lastStateHour,
   stateHours,
 } from "../src/report.mjs";
-import { blockAt } from "./fake-testril.mjs";
+import { readParts } from "../src/fetch.mjs";
+import { blockAt, resolveWindow } from "./fake-testril.mjs";
 
 export const fixtureNow = Date.parse("2026-11-01T12:00:00Z");
 export const fixtureBinds = bindsAt(fixtureNow);
@@ -212,6 +213,20 @@ export function fixture() {
 }
 
 const sameParams = (a, b) => JSON.stringify(a) === JSON.stringify(b);
+
+export function fixtureFetched(rows = fixture()) {
+  const reads = Object.fromEntries(
+    fixtureBinds.map((bind) => [
+      bind.name,
+      readParts(bind.window, bind.read).map((part) => ({
+        ...part,
+        ...resolveWindow(part),
+        count: rows[bind.name].length,
+      })),
+    ]),
+  );
+  return { rows, reads };
+}
 
 export function fixtureRows() {
   const rows = fixture();

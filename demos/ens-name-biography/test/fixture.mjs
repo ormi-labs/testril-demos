@@ -1,13 +1,14 @@
+import { readParts } from "../src/fetch.mjs";
 import {
   bindsAt,
   gracePeriodSeconds,
   monthsInWindow,
   nameWrapper,
-  secondsOfBlock,
   secondsOfMonth,
   subjectsOf,
   zeroAddress,
 } from "../src/report.mjs";
+import { blockAt as chainBlockAt, resolveWindow } from "./fake-testril.mjs";
 
 export const fixtureNow = Date.parse("2026-11-02T12:00:00Z");
 export const fixtureBinds = bindsAt(fixtureNow);
@@ -17,19 +18,12 @@ const registryWindow = fixtureBinds.find(
 ).window;
 const firstBlockSeconds = Date.parse(registryWindow.from_time) / 1000;
 const lastBlockSeconds = Date.parse(registryWindow.to_time) / 1000;
-const firstBlock = 9380380;
-const mergeBlock = 15537394;
-const mergeSeconds = secondsOfBlock(mergeBlock);
-
-function blockOfSeconds(seconds) {
-  return seconds >= mergeSeconds
-    ? mergeBlock + Math.round((seconds - mergeSeconds) / 12)
-    : Math.round(
-        firstBlock +
-          ((seconds - firstBlockSeconds) * (mergeBlock - firstBlock)) /
-            (mergeSeconds - firstBlockSeconds),
-      );
-}
+const firstBlock = chainBlockAt(registryWindow.from_time);
+const fakeBlockSeconds = 12;
+const secondsAt = (block) =>
+  firstBlockSeconds + (block - firstBlock) * fakeBlockSeconds;
+const blockOfSeconds = (seconds) =>
+  chainBlockAt(new Date(seconds * 1000).toISOString());
 
 const yearSeconds = 365 * 86400;
 const ethNode =
@@ -107,13 +101,12 @@ const blockAt = (windowShare, random) =>
   blockOfSeconds(
     firstBlockSeconds + windowShare * (lastBlockSeconds - firstBlockSeconds),
   ) + Math.floor(random() * 5000);
-const secondsAt = (block) => Math.round(secondsOfBlock(block));
 
 function registrationRows(story, random) {
   let expires = 0;
   return story.registrations.map(({ windowShare, years }) => {
     const block = blockAt(windowShare, random);
-    expires = (expires || secondsAt(block)) + years * yearSeconds;
+    expires = (expires || Math.round(secondsAt(block))) + years * yearSeconds;
     const cost =
       BigInt(years) *
       (3_000_000_000_000_000n + BigInt(Math.floor(random() * 4e15)));
@@ -170,7 +163,7 @@ function addressRows(story, domain) {
   return monthsInWindow(fixtureBinds).map((month, index) => {
     const resolver =
       domain
-        .filter((row) => secondsOfBlock(row.block) <= secondsOfMonth(month))
+        .filter((row) => secondsAt(row.block) <= secondsOfMonth(month))
         .at(-1)?.resolver ?? zeroAddress;
     const step = story.addresses.filter((s) => s.month <= index).at(-1);
     const address =
@@ -199,17 +192,38 @@ export function fixture() {
   return rows;
 }
 
+const within = (rows, window) => {
+  const { from_block, to_block } = resolveWindow(window);
+  return rows.filter((row) => row.block >= from_block && row.block < to_block);
+};
+
+export function fixtureFetched(rows = fixture()) {
+  const reads = Object.fromEntries(
+    fixtureBinds.map((bind) => [
+      bind.name,
+      readParts(bind.window, bind.read).map((part) => ({
+        ...part,
+        ...resolveWindow(part),
+        count: bind.read
+          ? within(rows[bind.name], part).length
+          : rows[bind.name].length,
+      })),
+    ]),
+  );
+  return { rows, reads };
+}
+
 const sameParams = (a, b) => JSON.stringify(a) === JSON.stringify(b);
 
 export function fixtureRows() {
   const rows = fixture();
-  return (bound) =>
-    rows[
-      fixtureBinds.find(
-        (candidate) =>
-          candidate.function_slug === bound.function_slug &&
-          candidate.chain_id === bound.chain_id &&
-          sameParams(candidate.params, bound.params),
-      ).name
-    ];
+  return (bound, window) => {
+    const bind = fixtureBinds.find(
+      (candidate) =>
+        candidate.function_slug === bound.function_slug &&
+        candidate.chain_id === bound.chain_id &&
+        sameParams(candidate.params, bound.params),
+    );
+    return bind.read ? within(rows[bind.name], window) : rows[bind.name];
+  };
 }

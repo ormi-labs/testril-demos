@@ -1,12 +1,13 @@
+import { readParts } from "../src/fetch.mjs";
 import {
   binds,
   hoursInWindow,
-  segments,
   tokens,
+  transferBinds,
   walletKeys,
   wallets,
 } from "../src/report.mjs";
-import { blockAt } from "./fake-testril.mjs";
+import { blockAt, resolveWindow } from "./fake-testril.mjs";
 
 export const fixtureNow = Date.parse("2026-11-02T12:00:00Z");
 export const fixtureBinds = binds;
@@ -101,20 +102,6 @@ function transferRows(events) {
   );
 }
 
-export function toBindRows(recording) {
-  const rows = { ...recording };
-  for (const key of walletKeys)
-    for (const segment of segments)
-      rows[`transfers-${key}-${segment.key}`] = recording[
-        `transfers-${key}`
-      ].filter(
-        (event) =>
-          event.block >= blockAt(segment.from_time) &&
-          event.block < blockAt(segment.to_time),
-      );
-  return rows;
-}
-
 function tokenBalanceRows(events) {
   const held = new Map();
   const add = (wallet, token, amount) =>
@@ -199,9 +186,27 @@ export function fixture() {
 }
 
 const sameParams = (a, b) => JSON.stringify(a) === JSON.stringify(b);
+const within = (rows, window) => {
+  const { from_block, to_block } = resolveWindow(window);
+  return rows.filter((row) => row.block >= from_block && row.block < to_block);
+};
+
+export function fixtureFetched(rows = fixture()) {
+  const reads = Object.fromEntries(
+    transferBinds.map((bind) => [
+      bind.name,
+      readParts(bind.window, bind.read).map((part) => ({
+        ...part,
+        ...resolveWindow(part),
+        count: within(rows[bind.name], part).length,
+      })),
+    ]),
+  );
+  return { rows, reads };
+}
 
 export function fixtureRows() {
-  const rows = toBindRows(fixture());
+  const rows = fixture();
   return (bound, window) => {
     const bind = binds.find(
       (candidate) =>
@@ -211,6 +216,6 @@ export function fixtureRows() {
         candidate.window.from_time <= window.from_time &&
         candidate.window.to_time >= window.to_time,
     );
-    return rows[bind.name];
+    return bind.read ? within(rows[bind.name], window) : rows[bind.name];
   };
 }

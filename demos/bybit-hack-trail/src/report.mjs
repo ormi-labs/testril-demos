@@ -18,43 +18,17 @@ const trail = [
 ];
 export const wallets = trail.map(([, address]) => address);
 
-// A transfer row carries a block, not a time, so transfers are read in
-// segments of a day; the segment holding Lido's daily rebase hours stands alone.
-const rebaseStartHour = 12;
-const segmentStartHours = [0, rebaseStartHour, 14];
-const hoursPerDay = 24;
-
-export const segments = [];
-for (
-  let day = Date.parse(windowStart);
-  day < Date.parse(windowEnd);
-  day += hoursPerDay * hourMs
-)
-  segmentStartHours.forEach((startHour, index) => {
-    const endHour = segmentStartHours[index + 1] ?? hoursPerDay;
-    segments.push({
-      key: `${isoSecond(day).slice(0, 10)}-${String(startHour).padStart(2, "0")}`,
-      from_time: isoSecond(day + startHour * hourMs),
-      to_time: isoSecond(day + endHour * hourMs),
-      lastHour: new Date(day + (endHour - 1) * hourMs)
-        .toISOString()
-        .slice(0, 13),
-      holdsRebase: startHour === rebaseStartHour,
-    });
-  });
-
 const hourlyWindow = { from_time: windowStart, to_time: windowEnd };
 
 export const binds = [
-  ...trail.flatMap(([key, wallet]) =>
-    segments.map((segment) => ({
-      name: `transfers-${key}-${segment.key}`,
-      function_slug: "erc20.wallet_transfers",
-      chain_id: 1,
-      params: { wallet, tokens },
-      window: { from_time: segment.from_time, to_time: segment.to_time },
-    })),
-  ),
+  ...trail.map(([key, wallet]) => ({
+    name: `transfers-${key}`,
+    function_slug: "erc20.wallet_transfers",
+    chain_id: 1,
+    params: { wallet, tokens },
+    window: hourlyWindow,
+    read: { chunk_hours: 1 },
+  })),
   ...trail.map(([key, owner]) => ({
     name: `balance-${key}`,
     function_slug: "native.balance",
@@ -83,8 +57,7 @@ export const balanceBinds = binds.filter(
 export const tokenBalanceBinds = binds.filter(
   (bind) => bind.function_slug === "erc20.token_balance",
 );
-export const transfersOfWallet = (rows, key) =>
-  segments.flatMap((segment) => rows[`transfers-${key}-${segment.key}`]);
+export const transfersOfWallet = (rows, key) => rows[`transfers-${key}`];
 const walletOf = (key) => trail.find(([name]) => name === key)[1];
 const source = walletOf("bybit-cold-wallet");
 const exploiter = walletOf("exploiter");
@@ -208,7 +181,7 @@ function walletTokens(entries, address) {
 
 const lastDay = isoSecond(Date.parse(windowEnd) - 1).slice(0, 10);
 
-export function shape(rows) {
+export function shape({ rows }) {
   const entries = [...uniqueTransfers(rows).values()].map((e) => e.row);
   const edges = sumEdges(entries);
   const hops = hopsFrom(source, edges);

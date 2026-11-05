@@ -95,17 +95,17 @@ for the report. The fixture lives in `test/` and is never shown on the page.
 
 Windows are half-open: the end is the first day not included.
 
-| Name                            | Function              | Chain | Window                  |
-| ------------------------------- | --------------------- | ----- | ----------------------- |
-| `uniswap-tokens`                | `erc20.token_balance` | 1     | 2026-08-03 → 2026-11-02 |
-| `uniswap-tokens-timelock`       | `erc20.token_balance` | 1     | 2026-08-03 → 2026-11-02 |
-| `uniswap-tokens-foundation`     | `erc20.token_balance` | 1     | 2026-08-03 → 2026-11-02 |
-| `uniswap-native`                | `native.balance`      | 1     | 2026-08-03 → 2026-11-02 |
-| `ens-tokens`                    | `erc20.token_balance` | 1     | 2026-08-03 → 2026-11-02 |
-| `ens-tokens-dao-wallet`         | `erc20.token_balance` | 1     | 2026-08-03 → 2026-11-02 |
-| `ens-tokens-endowment`          | `erc20.token_balance` | 1     | 2026-08-03 → 2026-11-02 |
-| `ens-native`                    | `native.balance`      | 1     | 2026-08-03 → 2026-11-02 |
-| `arbitrum-tokens`               | `erc20.token_balance` | 42161 | 2026-10-25 → 2026-11-02 |
-| `arbitrum-tokens-treasury`      | `erc20.token_balance` | 42161 | 2026-10-25 → 2026-11-02 |
-| `arbitrum-tokens-core-timelock` | `erc20.token_balance` | 42161 | 2026-10-25 → 2026-11-02 |
-| `arbitrum-native`               | `native.balance`      | 42161 | 2026-10-25 → 2026-11-02 |
+| Name                            | Function              | Chain | Window          |
+| ------------------------------- | --------------------- | ----- | --------------- |
+| `uniswap-tokens`                | `erc20.token_balance` | 1     | 91 days → today |
+| `uniswap-tokens-timelock`       | `erc20.token_balance` | 1     | 91 days → today |
+| `uniswap-tokens-foundation`     | `erc20.token_balance` | 1     | 91 days → today |
+| `uniswap-native`                | `native.balance`      | 1     | 91 days → today |
+| `ens-tokens`                    | `erc20.token_balance` | 1     | 91 days → today |
+| `ens-tokens-dao-wallet`         | `erc20.token_balance` | 1     | 91 days → today |
+| `ens-tokens-endowment`          | `erc20.token_balance` | 1     | 91 days → today |
+| `ens-native`                    | `native.balance`      | 1     | 91 days → today |
+| `arbitrum-tokens`               | `erc20.token_balance` | 42161 | 8 days → today  |
+| `arbitrum-tokens-treasury`      | `erc20.token_balance` | 42161 | 8 days → today  |
+| `arbitrum-tokens-core-timelock` | `erc20.token_balance` | 42161 | 8 days → today  |
+| `arbitrum-native`               | `native.balance`      | 42161 | 8 days → today  |

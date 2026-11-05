@@ -122,12 +122,12 @@ cross-check fails on a wrong side.
 
 Windows are half-open: the end is the first day not included.
 
-| Name         | Function                 | Chain | Params                         | Window                  |
-| ------------ | ------------------------ | ----- | ------------------------------ | ----------------------- |
-| `uniswap-v2` | `uniswap_v2.pool_volume` | 1     | `swap.pool_list.factory`, `by` | 2026-10-25 → 2026-11-02 |
-| `uniswap-v3` | `uniswap_v3.pool_volume` | 1     | `swap.pool_list.factory`, `by` | 2026-10-25 → 2026-11-02 |
-| `uniswap-v4` | `uniswap_v4.pool_volume` | 1     | `swap.manager`, `by`           | 2026-10-25 → 2026-11-02 |
-| `curve`      | `curve.pool_volume`      | 1     | `swap.pool_list.factory`, `by` | 2026-10-25 → 2026-11-02 |
-| `fluid-dex`  | `fluid_dex.pool_volume`  | 1     | `swap.pool_list.factory`, `by` | 2026-10-25 → 2026-11-02 |
+| Name         | Function                 | Chain | Params                         | Window         |
+| ------------ | ------------------------ | ----- | ------------------------------ | -------------- |
+| `uniswap-v2` | `uniswap_v2.pool_volume` | 1     | `swap.pool_list.factory`, `by` | 8 days → today |
+| `uniswap-v3` | `uniswap_v3.pool_volume` | 1     | `swap.pool_list.factory`, `by` | 8 days → today |
+| `uniswap-v4` | `uniswap_v4.pool_volume` | 1     | `swap.manager`, `by`           | 8 days → today |
+| `curve`      | `curve.pool_volume`      | 1     | `swap.pool_list.factory`, `by` | 8 days → today |
+| `fluid-dex`  | `fluid_dex.pool_volume`  | 1     | `swap.pool_list.factory`, `by` | 8 days → today |
 
 Each read returns every pool of the factory for each day.
