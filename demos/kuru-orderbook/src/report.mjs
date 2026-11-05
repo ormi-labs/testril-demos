@@ -45,7 +45,7 @@ const symbols = new Map([
 const chartMarkets = 8;
 
 const nextDay = (day, step) =>
-  new Date(Date.parse(`${day}T00:00:00Z`) + step * 86400000)
+  new Date(Date.parse(`${day}T00:00:00Z`) + step * dayMs)
     .toISOString()
     .slice(0, 10);
 
@@ -86,7 +86,7 @@ function checkFees(row, market) {
       throw feeError(row, `${side}_rebate exceeds ${side}_fee`);
 }
 
-export function check(rows, binds) {
+export function check({ rows }, binds) {
   const registered = new Map(
     rows.markets.map((market) => [market.market.toLowerCase(), market]),
   );
@@ -200,7 +200,7 @@ function share(part, whole) {
   return `${tenths / 10n}.${tenths % 10n}%`;
 }
 
-export function shape(rows, binds) {
+export function shape({ rows }, binds) {
   const days = volumeDays(binds);
   const totals = totalsByMarket(rows.volume);
   const entries = rows.markets

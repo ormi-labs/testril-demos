@@ -97,7 +97,7 @@ const abs = (n) => (n < 0n ? -n : n);
 const exceedsMaxGap = (pool, oracle) =>
   abs(pool - oracle) * 10000n > maxGapBasisPoints * oracle;
 
-export function check(rows, binds) {
+export function check({ rows }, binds) {
   const hours = windowHours(binds);
   const pool = poolByHour(rows);
   const oracle = answersByHour(rows, ethFeed);
@@ -177,7 +177,7 @@ function heartbeat(rows, hours, feed) {
   };
 }
 
-export function shape(rows, binds) {
+export function shape({ rows }, binds) {
   const hours = windowHours(binds);
   const pool = poolByHour(rows);
   const oracle = answersByHour(rows, ethFeed);

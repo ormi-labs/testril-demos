@@ -82,10 +82,11 @@ for the report. The fixture lives in `test/` and is never shown on the page.
 ## Subjects and window
 
 Window: the 30 UTC days before the day of the press (`from_time` 30 days before
-today 00:00 UTC, `to_time` today 00:00 UTC). `markets-created` reads the factory
-list over that window to count the markets created in it; `markets` reads it
-from the start of the chain (`from_time` 1970-01-01T00:00:00Z, the timestamp of
-Gnosis block 0) so every market that can trade in the window is listed.
+today 00:00 UTC, `to_time` today 00:00 UTC). `markets` reads the factory
+list from the start of the chain (`from_time` 1970-01-01T00:00:00Z, the timestamp of
+Gnosis block 0) so every market that can trade in the window is listed. The
+markets created in the window are the listed ones whose block lies inside the
+resolved block range of the `trades` reads.
 
 | Subject                              | Address                                      | Note   |
 | ------------------------------------ | -------------------------------------------- | ------ |
@@ -102,14 +103,13 @@ unconfirmed as the instance Omen uses.
 
 Windows end at 00:00 UTC on the day of the press; the end is not included.
 
-| Name              | Function            | Chain | Params                          | Window              |
-| ----------------- | ------------------- | ----- | ------------------------------- | ------------------- |
-| `markets`         | `omen.market_list`  | 100   | `factory`, `conditional_tokens` | chain start → today |
-| `markets-created` | `omen.market_list`  | 100   | `factory`, `conditional_tokens` | 30 days → today     |
-| `trades`          | `omen.trade`        | 100   | `market_list`                   | 30 days → today     |
-| `liquidity`       | `omen.liquidity`    | 100   | `market_list`                   | 30 days → today     |
-| `market_state`    | `omen.market_state` | 100   | `market_list`                   | 30 days → today     |
-| `answers`         | `realitio.answer`   | 100   | `realitio`                      | 30 days → today     |
+| Name           | Function            | Chain | Params                          | Window              |
+| -------------- | ------------------- | ----- | ------------------------------- | ------------------- |
+| `markets`      | `omen.market_list`  | 100   | `factory`, `conditional_tokens` | chain start → today |
+| `trades`       | `omen.trade`        | 100   | `market_list`                   | 30 days → today     |
+| `liquidity`    | `omen.liquidity`    | 100   | `market_list`                   | 30 days → today     |
+| `market_state` | `omen.market_state` | 100   | `market_list`                   | 30 days → today     |
+| `answers`      | `realitio.answer`   | 100   | `realitio`                      | 30 days → today     |
 
 `market_state` is a bind the first plan did not list; the check that no pool
 holds negative or too few outcome tokens needs it, at the cost of its credits.

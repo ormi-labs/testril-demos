@@ -70,9 +70,9 @@ for the report. The fixture lives in `test/` and is never shown on the page.
 ## Subjects and window
 
 Polygon (chain 137), the UTC day before the day of the press (yesterday, 00:00
-to 24:00, as `from_time` and `to_time`). Fills are read as 24 one-hour
-`fills-HH` binds, so the hour of each fill is the bind it was read in; the
-check requires the fills' blocks to rise from one hour to the next.
+to 24:00, as `from_time` and `to_time`). Fills are read in 24 one-hour chunks,
+and a fill's hour is the chunk whose resolved block range holds its block; the
+check fails on a fill or a payout outside the day's block range.
 
 | Subject                         | Address                                      | Note                        |
 | ------------------------------- | -------------------------------------------- | --------------------------- |
@@ -88,7 +88,7 @@ condition ids.
 
 ## Binds (`src/report.mjs`)
 
-| Name       | Function                               | Chain | Params               | Window               |
-| ---------- | -------------------------------------- | ----- | -------------------- | -------------------- |
-| `fills-HH` | `polymarket_clob.order_fill`           | 137   | `exchanges` (3)      | hour HH of yesterday |
-| `payouts`  | `conditional_tokens.condition_payouts` | 137   | `conditional_tokens` | yesterday            |
+| Name      | Function                               | Chain | Params               | Window    |
+| --------- | -------------------------------------- | ----- | -------------------- | --------- |
+| `fills`   | `polymarket_clob.order_fill`           | 137   | `exchanges` (3)      | yesterday |
+| `payouts` | `conditional_tokens.condition_payouts` | 137   | `conditional_tokens` | yesterday |

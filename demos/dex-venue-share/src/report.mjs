@@ -85,9 +85,7 @@ const label = (s) => (s.tier ? `${s.venue} ${s.tier}` : s.venue);
 const sum = (values) => values.reduce((a, b) => a + b, 0n);
 
 const nextDay = (day) =>
-  new Date(Date.parse(`${day}T00:00:00Z`) + 86400000)
-    .toISOString()
-    .slice(0, 10);
+  new Date(Date.parse(`${day}T00:00:00Z`) + dayMs).toISOString().slice(0, 10);
 
 const utcDay = (time) => time.slice(0, 10);
 
@@ -193,7 +191,7 @@ function checkSubjectsHaveRows(pair, rows) {
       );
 }
 
-export function check(rows, binds) {
+export function check({ rows }, binds) {
   const window = days(binds);
   for (const bind of binds)
     if (!rows[bind.name]?.length) throw new Error(`No rows for ${bind.name}.`);
@@ -272,7 +270,7 @@ function v3Tiers(rows, window) {
   }));
 }
 
-export function shape(rows, binds) {
+export function shape({ rows }, binds) {
   const window = days(binds);
   const ethUsdc = pairView(rows, window, pairById("eth-usdc"));
   const wsteth = pairView(rows, window, pairById("wsteth-eth"));

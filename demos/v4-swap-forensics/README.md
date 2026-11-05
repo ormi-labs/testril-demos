@@ -96,14 +96,14 @@ All comparisons use raw integer units (BigInt).
 | ETH/USDC 0.05% pool id | `0xdce6394339af00981949f5f3baf27e3610c76326a700af57e4b3e3ae4977f78d` | verify |
 
 - Day: the UTC day before the day of the press (yesterday, 00:00 to 24:00).
-  Swaps and liquidity changes are read as 24 one-hour binds each (`swaps-HH`,
-  `liquidity-HH`), so each row's hour is the bind it was read in; the check
-  requires blocks to rise from one hour to the next.
+  Swaps and liquidity changes are read in 24 one-hour chunks each, and a
+  row's hour is the chunk whose resolved block range holds its block; the check
+  fails on a row outside every chunk.
 
 ## Binds (`src/report.mjs`)
 
-| Name           | Function                      | Chain | Params         | Window               |
-| -------------- | ----------------------------- | ----- | -------------- | -------------------- |
-| `swaps-HH`     | `uniswap_v4.swap`             | 1     | `manager`      | hour HH of yesterday |
-| `liquidity-HH` | `uniswap_v4.modify_liquidity` | 1     | `manager`      | hour HH of yesterday |
-| `tokens`       | `erc20.token_metadata`        | 1     | `tokens`, `by` | yesterday            |
+| Name        | Function                      | Chain | Params         | Window    |
+| ----------- | ----------------------------- | ----- | -------------- | --------- |
+| `swaps`     | `uniswap_v4.swap`             | 1     | `manager`      | yesterday |
+| `liquidity` | `uniswap_v4.modify_liquidity` | 1     | `manager`      | yesterday |
+| `tokens`    | `erc20.token_metadata`        | 1     | `tokens`, `by` | yesterday |

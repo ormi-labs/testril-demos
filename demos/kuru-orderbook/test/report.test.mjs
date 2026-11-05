@@ -6,20 +6,23 @@ import { fixture, fixtureBinds } from "./fixture.mjs";
 const rows = () => structuredClone(fixture());
 
 test("check passes on the fixture", () => {
-  assert.equal(check(rows(), fixtureBinds).length, 3);
+  assert.equal(check({ rows: rows() }, fixtureBinds).length, 3);
 });
 
 test("check fails when a volume row's market was never registered", () => {
   const corrupted = rows();
   corrupted.volume[0].market = "0x" + "ab".repeat(20);
-  assert.throws(() => check(corrupted, fixtureBinds), /no market_list row/);
+  assert.throws(
+    () => check({ rows: corrupted }, fixtureBinds),
+    /no market_list row/,
+  );
 });
 
 test("check fails when a rebate is negative", () => {
   const corrupted = rows();
   corrupted.volume[3].quote_rebate = "-1";
   assert.throws(
-    () => check(corrupted, fixtureBinds),
+    () => check({ rows: corrupted }, fixtureBinds),
     /quote_rebate is negative/,
   );
 });
@@ -29,7 +32,7 @@ test("check fails when a fee and a rebate are swapped", () => {
   const row = corrupted.volume.find((r) => r.quote_fee !== r.quote_rebate);
   [row.quote_fee, row.quote_rebate] = [row.quote_rebate, row.quote_fee];
   assert.throws(
-    () => check(corrupted, fixtureBinds),
+    () => check({ rows: corrupted }, fixtureBinds),
     /quote_rebate exceeds quote_fee/,
   );
 });
@@ -41,7 +44,7 @@ test("check fails when a fee is read in 6-decimal USDC instead of 18", () => {
     10n ** 12n
   ).toString();
   assert.throws(
-    () => check(corrupted, fixtureBinds),
+    () => check({ rows: corrupted }, fixtureBinds),
     /quote_fee exceeds .* bps/,
   );
 });
@@ -51,12 +54,15 @@ test("check matches market addresses regardless of case", () => {
   mixed.markets[0].market = mixed.markets[0].market
     .toUpperCase()
     .replace("0X", "0x");
-  assert.equal(check(mixed, fixtureBinds).length, 3);
-  assert.equal(shape(mixed, fixtureBinds).active, 6);
+  assert.equal(check({ rows: mixed }, fixtureBinds).length, 3);
+  assert.equal(shape({ rows: mixed }, fixtureBinds).active, 6);
 });
 
 test("shape survives a recording with no USDC-quoted volume", () => {
-  const view = shape({ markets: rows().markets, volume: [] }, fixtureBinds);
+  const view = shape(
+    { rows: { markets: rows().markets, volume: [] } },
+    fixtureBinds,
+  );
   assert.equal(view.topMarket, "none");
   assert.equal(view.topShare, "0.0%");
 });
@@ -64,17 +70,20 @@ test("shape survives a recording with no USDC-quoted volume", () => {
 test("check fails when a market has two rows for one day", () => {
   const corrupted = rows();
   corrupted.volume.push({ ...corrupted.volume[0] });
-  assert.throws(() => check(corrupted, fixtureBinds), /two rows/);
+  assert.throws(() => check({ rows: corrupted }, fixtureBinds), /two rows/);
 });
 
 test("check fails when a row falls outside the window", () => {
   const corrupted = rows();
   corrupted.volume[0].day = "2026-11-02";
-  assert.throws(() => check(corrupted, fixtureBinds), /outside the window/);
+  assert.throws(
+    () => check({ rows: corrupted }, fixtureBinds),
+    /outside the window/,
+  );
 });
 
 test("shape ranks USDC-quoted markets by volume and splits fees by asset", () => {
-  const view = shape(rows(), fixtureBinds);
+  const view = shape({ rows: rows() }, fixtureBinds);
   assert.equal(view.registered, 7);
   assert.equal(view.active, 6);
   assert.equal(view.markets[0].pair, "MON/USDC");
@@ -94,8 +103,9 @@ test("shape sums volume of a market over all its days", () => {
     .filter((row) => row.market === market.market)
     .reduce((sum, row) => sum + BigInt(row.trades), 0n);
   assert.equal(
-    shape(data, fixtureBinds).markets.find((m) => m.market === market.market)
-      .trades,
+    shape({ rows: data }, fixtureBinds).markets.find(
+      (m) => m.market === market.market,
+    ).trades,
     total.toLocaleString("en-US"),
   );
 });

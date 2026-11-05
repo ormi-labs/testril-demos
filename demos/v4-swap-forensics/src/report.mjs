@@ -1,38 +1,32 @@
 const dayMs = 86400000;
-const hourMs = 3600000;
-const hoursPerDay = 24;
 const isoSecond = (ms) => new Date(ms).toISOString().replace(".000Z", "Z");
 export const manager = "0x000000000004444c5dc75cb358380d2e3de08a90";
 export const usdc = "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48";
 export const usdt = "0xdac17f958d2ee523a2206206994597c13d831ec7";
-const hourName = (hour) => String(hour).padStart(2, "0");
 
 export function bindsAt(now = Date.now()) {
   const yesterday = Math.floor(now / dayMs) * dayMs - dayMs;
-  const between = (from, to) => ({
-    from_time: isoSecond(from),
-    to_time: isoSecond(to),
+  const window = {
+    from_time: isoSecond(yesterday),
+    to_time: isoSecond(yesterday + dayMs),
+  };
+  const perHour = (name, function_slug) => ({
+    name,
+    function_slug,
+    chain_id: 1,
+    params: { manager },
+    window,
+    read: { chunk_hours: 1 },
   });
-  const hourly = (prefix, function_slug) =>
-    Array.from({ length: hoursPerDay }, (_, hour) => ({
-      name: `${prefix}-${hourName(hour)}`,
-      function_slug,
-      chain_id: 1,
-      params: { manager },
-      window: between(
-        yesterday + hour * hourMs,
-        yesterday + (hour + 1) * hourMs,
-      ),
-    }));
   return [
-    ...hourly("swaps", "uniswap_v4.swap"),
-    ...hourly("liquidity", "uniswap_v4.modify_liquidity"),
+    perHour("swaps", "uniswap_v4.swap"),
+    perHour("liquidity", "uniswap_v4.modify_liquidity"),
     {
       name: "tokens",
       function_slug: "erc20.token_metadata",
       chain_id: 1,
       params: { tokens: [usdc, usdt], by: "day" },
-      window: between(yesterday, yesterday + dayMs),
+      window,
     },
   ];
 }
@@ -40,16 +34,17 @@ export function bindsAt(now = Date.now()) {
 export const dayOf = (binds) =>
   binds.find((bind) => bind.name === "tokens").window.from_time.slice(0, 10);
 
-export function unpack(rows, binds) {
-  const hourly = (prefix) =>
-    binds
-      .filter((bind) => bind.name.startsWith(`${prefix}-`))
-      .flatMap((bind, hour) =>
-        rows[bind.name].map((row) => ({ ...row, hour })),
-      );
+export function unpack({ rows, reads }) {
+  const placed = (name) =>
+    rows[name].map((row) => ({
+      ...row,
+      hour: reads[name].findIndex(
+        (read) => row.block >= read.from_block && row.block < read.to_block,
+      ),
+    }));
   return {
-    swaps: hourly("swaps"),
-    liquidity: hourly("liquidity"),
+    swaps: placed("swaps"),
+    liquidity: placed("liquidity"),
     tokens: rows.tokens,
   };
 }
@@ -152,25 +147,12 @@ function checkJitLiquidity(events) {
   }
 }
 
-function requireBlocksInHourOrder(rows) {
-  const latestByHour = [];
-  for (const row of rows)
-    latestByHour[row.hour] = Math.max(latestByHour[row.hour] ?? 0, row.block);
-  for (const row of rows) {
-    const earlier = latestByHour
-      .slice(0, row.hour)
-      .reduce((most, block) => Math.max(most, block ?? 0), 0);
-    if (row.block <= earlier)
-      throw new Error(
-        `Row at block ${row.block} is in hour ${row.hour} but an earlier hour already reached block ${earlier}.`,
-      );
-  }
-}
-
-export function check(fetched, binds) {
-  const rows = unpack(fetched, binds);
+export function check(fetched) {
+  const rows = unpack(fetched);
   const { swaps, liquidity } = rows;
-  requireBlocksInHourOrder([...swaps, ...liquidity]);
+  const outside = [...swaps, ...liquidity].find((row) => row.hour < 0);
+  if (outside)
+    throw new Error(`Row at block ${outside.block} is outside the window.`);
   const positions = new Set(
     [...swaps, ...liquidity].map((row) => `${row.block}:${row.log_index}`),
   );
@@ -236,14 +218,19 @@ function hourly(rows, jit, sandwichList) {
     sandwiches: 0,
   }));
   const bucket = (row) => hours[row.hour];
-  rows.swaps.forEach((swap) => bucket(swap).swaps++);
-  jit.forEach(({ swap }) => bucket(swap).jit++);
-  sandwichList.forEach(({ victim }) => bucket(victim).sandwiches++);
+  const placed = (row) => row.hour >= 0;
+  rows.swaps.filter(placed).forEach((swap) => bucket(swap).swaps++);
+  jit
+    .filter(({ swap }) => placed(swap))
+    .forEach(({ swap }) => bucket(swap).jit++);
+  sandwichList
+    .filter(({ victim }) => placed(victim))
+    .forEach(({ victim }) => bucket(victim).sandwiches++);
   return hours;
 }
 
 export function shape(fetched, binds) {
-  const rows = unpack(fetched, binds);
+  const rows = unpack(fetched);
   const quoteDecimals = Number(
     rows.tokens.find((t) => t.token === usdc).decimals,
   );

@@ -65,8 +65,8 @@ for the report. The fixture lives in `test/` and is never shown on the page.
 
 ## Subjects and window
 
-Registry history starts at the registry deployment (2020-01-30T00:37:12Z, block
-9380380); earlier history lives in the pre-2020 registry and is not covered.
+Registry history starts at the registry deployment (2020-01-30T00:37:12Z);
+earlier history lives in the pre-2020 registry and is not covered.
 Every window ends at 00:00 UTC on the day of the press (the address record at
 the start of that month), so it follows the press. The end is not included.
 
@@ -99,8 +99,9 @@ follows the first row.
 | `vitalik-address`, `nick-address`           | `ens.address_record` | 1     | `registry`, `name`, `by` (`month`)       | 2020-01 → this month |
 | `vitalik-wrapped`, `nick-wrapped`           | `ens.wrapped_domain` | 1     | `name_wrapper`, `name`                   | 2023-03-28 → today   |
 
-Rows carry a block, address-record rows a month. The timeline places both on
-one time axis: a month at its first instant, a block by an approximate clock
-(linear between the registry deployment block and the Merge, then 12 s a block).
-The positions are approximate; the order of the registry, registrar and wrapper
-events is exact.
+The registry, registrar and wrapper binds are read in 30-day chunks. Their rows
+carry a block, address-record rows a month. The timeline places both on one time
+axis: a month at its first instant, a block by linear interpolation inside the
+read whose resolved block range holds it. The positions are approximate within
+a 30-day read; the order of the registry, registrar and wrapper events is
+exact. `check` fails on a row whose block lies outside every read of its bind.

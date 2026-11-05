@@ -7,13 +7,13 @@ import {
   shape,
   subjectsOf,
 } from "../src/report.mjs";
-import { fixture, fixtureBinds } from "./fixture.mjs";
+import { fixture, fixtureBinds, fixtureFetched } from "./fixture.mjs";
 
 const rows = () => structuredClone(fixture());
 const [vitalik, nick] = subjectsOf(fixtureBinds);
 
 test("check passes on the fixture and names the invariants", () => {
-  const passed = check(rows(), fixtureBinds);
+  const passed = check(fixtureFetched(rows()), fixtureBinds);
   assert.equal(passed.length, 6);
   assert.match(passed[1], /5 renewals, each expiring later/);
 });
@@ -26,7 +26,7 @@ test("check fails when a renewal expires before the previous one", () => {
     renewals[2].expires,
   ];
   assert.throws(
-    () => check(corrupted, fixtureBinds),
+    () => check(fixtureFetched(corrupted), fixtureBinds),
     /not later than the previous/,
   );
 });
@@ -35,7 +35,7 @@ test("check fails when a cost is in ETH instead of wei", () => {
   const corrupted = rows();
   corrupted[nick.binds.registration][1].cost = "0.0059";
   assert.throws(
-    () => check(corrupted, fixtureBinds),
+    () => check(fixtureFetched(corrupted), fixtureBinds),
     /non-negative integer of wei/,
   );
 });
@@ -44,7 +44,10 @@ test("check fails when a cost is in gwei or 1000x too large", () => {
   for (const cost of ["5900000", "5900000000000000000000"]) {
     const corrupted = rows();
     corrupted[nick.binds.registration][1].cost = cost;
-    assert.throws(() => check(corrupted, fixtureBinds), /per year, outside/);
+    assert.throws(
+      () => check(fixtureFetched(corrupted), fixtureBinds),
+      /per year, outside/,
+    );
   }
 });
 
@@ -56,7 +59,7 @@ test("check accepts a free renewal and a four-letter name priced at 1.2 ETH a ye
     (BigInt(registration[2].expires) - BigInt(registration[1].expires)) /
     (365n * 86400n);
   registration[2].cost = String(years * 1_200_000_000_000_000_000n);
-  assert.equal(check(data, fixtureBinds).length, 6);
+  assert.equal(check(fixtureFetched(data), fixtureBinds).length, 6);
 });
 
 test("check fails when a wrapped expiry lacks the 90-day grace period", () => {
@@ -64,7 +67,7 @@ test("check fails when a wrapped expiry lacks the 90-day grace period", () => {
   const [first] = corrupted[vitalik.binds.wrapped];
   first.expiry = String(BigInt(first.expiry) - BigInt(gracePeriodSeconds));
   assert.throws(
-    () => check(corrupted, fixtureBinds),
+    () => check(fixtureFetched(corrupted), fixtureBinds),
     /plus the 90-day grace period/,
   );
 });
@@ -74,7 +77,7 @@ test("check fails when registrar expiry is in milliseconds", () => {
   for (const row of corrupted[nick.binds.registration])
     row.expires = String(BigInt(row.expires) * 1000n);
   assert.throws(
-    () => check(corrupted, fixtureBinds),
+    () => check(fixtureFetched(corrupted), fixtureBinds),
     /plus the 90-day grace period/,
   );
 });
@@ -82,27 +85,68 @@ test("check fails when registrar expiry is in milliseconds", () => {
 test("check fails when owner changes are out of block order", () => {
   const corrupted = rows();
   corrupted[vitalik.binds.domain].reverse();
-  assert.throws(() => check(corrupted, fixtureBinds), /is not after block/);
+  assert.throws(
+    () => check(fixtureFetched(corrupted), fixtureBinds),
+    /is not after block/,
+  );
+});
+
+test("check fails when a row sits outside the window", () => {
+  const corrupted = rows();
+  corrupted[vitalik.binds.domain][0].block = 1;
+  assert.throws(
+    () => check(fixtureFetched(corrupted), fixtureBinds),
+    /has a row at block 1, outside \[/,
+  );
+});
+
+test("check fails when a wrapped row sits past the last read", () => {
+  const input = fixtureFetched(rows());
+  const reads = input.reads[nick.binds.wrapped];
+  input.rows[nick.binds.wrapped][0].block = reads.at(-1).to_block;
+  assert.throws(() => check(input, fixtureBinds), /outside \[/);
+});
+
+test("an event is dated inside its read, not by a block clock", () => {
+  const input = fixtureFetched(rows());
+  const reads = input.reads[vitalik.binds.domain];
+  const before = shape(input, fixtureBinds).subjects[0].marks;
+  for (const read of reads) {
+    read.from_time = new Date(Date.parse(read.from_time) + 86400000)
+      .toISOString()
+      .replace(".000Z", "Z");
+    read.to_time = new Date(Date.parse(read.to_time) + 86400000)
+      .toISOString()
+      .replace(".000Z", "Z");
+  }
+  const after = shape(input, fixtureBinds).subjects[0].marks;
+  assert.notDeepEqual(
+    after.map((m) => m.position),
+    before.map((m) => m.position),
+  );
 });
 
 test("check fails when a month of the address record is missing", () => {
   const corrupted = rows();
   corrupted[nick.binds.address].splice(11, 1);
-  assert.throws(() => check(corrupted, fixtureBinds), /missing 2020-12/);
+  assert.throws(
+    () => check(fixtureFetched(corrupted), fixtureBinds),
+    /missing 2020-12/,
+  );
 });
 
 test("check fails when a month of the address record is duplicated", () => {
   const corrupted = rows();
   corrupted[nick.binds.address][5] = { ...corrupted[nick.binds.address][4] };
   assert.throws(
-    () => check(corrupted, fixtureBinds),
+    () => check(fixtureFetched(corrupted), fixtureBinds),
     /extra or duplicate rows for 2020-05/,
   );
 });
 
 test("shape lists events in block order and counts only real changes", () => {
   const data = rows();
-  const view = shape(data, fixtureBinds);
+  const view = shape(fixtureFetched(data), fixtureBinds);
   const blocks = view.timeline.map((event) => Number(event.when.slice(6)));
   const numbered = blocks.filter((block) => !Number.isNaN(block));
   assert.ok(numbered.length > 0);

@@ -71,13 +71,13 @@ for the report. The fixture lives in `test/` and is never shown on the page.
 | Collection born | 2021-07-22T12:26:01Z (block 12876179)        | verify (start of owners read) |
 
 - Day: the UTC day before the day of the press (yesterday, 00:00 to 24:00),
-  read as 24 one-hour `transfers-HH` binds so each transfer's hour comes from
-  the bind it was read in.
+  read in 24 one-hour chunks; a transfer's hour is the chunk whose resolved
+  block range holds its block, and the check fails on a transfer outside them.
 - Pudgy Penguins finished minting in 2021, so a real fetch shows 0 mints and
   the mint cross-check has nothing to test; the test fixture has 12.
 - Owners: from the collection's creation to the end of that day, so the last
-  row per token is who holds it afterwards. A row is "before the day" when no
-  transfer of the day sits at its token and block.
+  row per token is who holds it afterwards. A row is "before the day" when its
+  block is below the first block of the day's transfers read.
 - Names: `erc721.collection_metadata` read over the last five minutes before the
   end of that day.
 
@@ -85,10 +85,10 @@ for the report. The fixture lives in `test/` and is never shown on the page.
 
 Windows end at 00:00 UTC on the day of the press; the end is not included.
 
-| Name           | Function                     | Chain | Params        | Window               |
-| -------------- | ---------------------------- | ----- | ------------- | -------------------- |
-| `metadata`     | `erc721.collection_metadata` | 1     | `nft_address` | 5 minutes → today    |
-| `transfers-HH` | `erc721.transfer`            | 1     | `nft_address` | hour HH of yesterday |
-| `owners`       | `erc721.nft_owners`          | 1     | `nft_address` | creation → today     |
+| Name        | Function                     | Chain | Params        | Window            |
+| ----------- | ---------------------------- | ----- | ------------- | ----------------- |
+| `metadata`  | `erc721.collection_metadata` | 1     | `nft_address` | 5 minutes → today |
+| `transfers` | `erc721.transfer`            | 1     | `nft_address` | yesterday         |
+| `owners`    | `erc721.nft_owners`          | 1     | `nft_address` | creation → today  |
 
 `owners` is read in chunks of 2,400 hours.

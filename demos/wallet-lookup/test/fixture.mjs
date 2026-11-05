@@ -1,11 +1,12 @@
+import { readParts } from "../src/fetch.mjs";
 import { bindsAt, tokens, wallets } from "../src/report.mjs";
-import { blockAt } from "./fake-testril.mjs";
+import { blockAt, resolveWindow } from "./fake-testril.mjs";
 
 export const fixtureNow = Date.parse("2026-11-02T12:00:00Z");
 export const fixtureBinds = bindsAt(fixtureNow);
 const weekWindow = {
   from_block: blockAt(
-    fixtureBinds.find((b) => b.name.startsWith("transfers-")).window.from_time,
+    fixtureBinds.find((b) => b.name === "transfers-vitalik").window.from_time,
   ),
   to_block: blockAt(
     fixtureBinds.find((b) => b.name === "ens-vitalik").window.to_time,
@@ -97,26 +98,29 @@ export function fixture() {
 
 const sameParams = (a, b) => JSON.stringify(a) === JSON.stringify(b);
 
-export function toBindRows(recording) {
-  return Object.fromEntries(
-    fixtureBinds.map((bind) => {
-      const key = bind.name.split("-")[1];
-      return [
+const within = (rows, window) => {
+  const { from_block, to_block } = resolveWindow(window);
+  return rows.filter((row) => row.block >= from_block && row.block < to_block);
+};
+
+export function fixtureFetched(rows = fixture()) {
+  const reads = Object.fromEntries(
+    fixtureBinds
+      .filter((bind) => bind.read)
+      .map((bind) => [
         bind.name,
-        bind.function_slug === "erc20.wallet_transfers"
-          ? recording[`transfers-${key}`].filter(
-              (row) =>
-                row.block >= blockAt(bind.window.from_time) &&
-                row.block < blockAt(bind.window.to_time),
-            )
-          : recording[bind.name],
-      ];
-    }),
+        readParts(bind.window, bind.read).map((part) => ({
+          ...part,
+          ...resolveWindow(part),
+          count: within(rows[bind.name], part).length,
+        })),
+      ]),
   );
+  return { rows, reads };
 }
 
 export function fixtureRows() {
-  const rows = toBindRows(fixture());
+  const rows = fixture();
   return (bound, window) => {
     const bind = fixtureBinds.find(
       (candidate) =>
@@ -126,6 +130,6 @@ export function fixtureRows() {
         candidate.window.from_time <= window.from_time &&
         candidate.window.to_time >= window.to_time,
     );
-    return rows[bind.name];
+    return bind.read ? within(rows[bind.name], window) : rows[bind.name];
   };
 }

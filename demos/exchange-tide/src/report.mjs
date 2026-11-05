@@ -367,7 +367,7 @@ const nativeBalances = (rows, expected, exchange) =>
     exchange.owners,
   );
 
-export function check(rows, binds) {
+export function check({ rows }, binds) {
   const expected = hours(binds);
   const exchanges = exchangesOf(binds);
   for (const exchange of exchanges) {
@@ -434,7 +434,7 @@ function hourlyChanges(expected, exchange, totals) {
   }));
 }
 
-export function shape(rows, binds) {
+export function shape({ rows }, binds) {
   const expected = hours(binds);
   const exchanges = exchangesOf(binds);
   const totals = exchanges.map((exchange) =>

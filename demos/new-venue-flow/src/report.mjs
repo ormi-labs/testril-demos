@@ -82,9 +82,7 @@ export const venuesOf = (binds) =>
 const integer = /^[0-9]+$/;
 
 const nextDay = (day) =>
-  new Date(Date.parse(`${day}T00:00:00Z`) + 86400000)
-    .toISOString()
-    .slice(0, 10);
+  new Date(Date.parse(`${day}T00:00:00Z`) + dayMs).toISOString().slice(0, 10);
 
 export function windowDays({ from_time, to_time }) {
   const days = [];
@@ -129,7 +127,7 @@ function checkVenue(venue, rows) {
   return `${venue.title}: ${seen.size} token-days in ${days.length} days, every row has a positive count and amount, no day counted twice`;
 }
 
-export function check(rows, binds) {
+export function check({ rows }, binds) {
   return venuesOf(binds).map((venue) => checkVenue(venue, rows[venue.name]));
 }
 
@@ -168,7 +166,7 @@ function tokenSummary(venue, rows, address, days) {
   };
 }
 
-export function shape(rows, binds) {
+export function shape({ rows }, binds) {
   const reportDays = windowDays(binds[0].window);
   return {
     window: { first: reportDays[0], last: reportDays.at(-1) },

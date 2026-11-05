@@ -60,9 +60,7 @@ const rawAmount = /^[0-9]+$/;
 const minimumWholeUnits = 1000n * weiPerEther;
 
 const nextDay = (day) =>
-  new Date(Date.parse(`${day}T00:00:00Z`) + 86400000)
-    .toISOString()
-    .slice(0, 10);
+  new Date(Date.parse(`${day}T00:00:00Z`) + dayMs).toISOString().slice(0, 10);
 
 const utcDay = (time) => time.slice(0, 10);
 
@@ -141,7 +139,7 @@ function requireWeiScale(record, name, field) {
   }
 }
 
-export function check(rows, binds) {
+export function check({ rows }, binds) {
   const record = parse(rows, binds);
   const windowDays = [...record.keys()];
   requireWeiScale(record, "lido", "pooled_ether");
@@ -219,7 +217,7 @@ function strategyCount(record) {
   };
 }
 
-export function shape(rows, binds) {
+export function shape({ rows }, binds) {
   const record = parse(rows, binds);
   const windowDays = [...record.keys()];
   const latest = record.get(windowDays.at(-1));

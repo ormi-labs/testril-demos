@@ -4,24 +4,13 @@ export const zeroAddress = "0x0000000000000000000000000000000000000000";
 const hourMs = 3600000;
 const replayStart = "2023-03-10T00:00:00Z";
 const replayEnd = "2023-03-15T00:00:00Z";
-const isoSecond = (ms) => new Date(ms).toISOString().replace(".000Z", "Z");
 const hourKey = (ms) => new Date(ms).toISOString().slice(0, 13);
 
 export const hours = [];
 for (let t = Date.parse(replayStart); t < Date.parse(replayEnd); t += hourMs)
   hours.push(hourKey(t));
 
-export const edgesBind = (hour) => `usdc-edges-${hour}`;
-const edgeBinds = hours.map((hour) => {
-  const from = Date.parse(`${hour}:00:00Z`);
-  return {
-    name: edgesBind(hour),
-    function_slug: "erc20.transfer_edges",
-    chain_id: 1,
-    params: { token_address: usdc },
-    window: { from_time: isoSecond(from), to_time: isoSecond(from + hourMs) },
-  };
-});
+const edgesBind = "usdc-edges";
 
 export const binds = [
   {
@@ -31,7 +20,14 @@ export const binds = [
     params: { tokens: [usdc], by: "hour" },
     window: { from_time: replayStart, to_time: replayEnd },
   },
-  ...edgeBinds,
+  {
+    name: edgesBind,
+    function_slug: "erc20.transfer_edges",
+    chain_id: 1,
+    params: { token_address: usdc },
+    window: { from_time: replayStart, to_time: replayEnd },
+    read: { chunk_hours: 1 },
+  },
   {
     name: "usdc-usd-feed",
     function_slug: "aggregator.latest_answer",
@@ -59,10 +55,28 @@ const lowercased = (edges) =>
     to: edge.to.toLowerCase(),
   }));
 
-export function mintsAndBurns(rows) {
+export function edgesByHour({ rows, reads }) {
+  const byHour = new Map(hours.map((hour) => [hour, []]));
+  for (const edge of lowercased(rows[edgesBind])) {
+    const read = reads[edgesBind].find(
+      (candidate) =>
+        edge.block >= candidate.from_block && edge.block < candidate.to_block,
+    );
+    const hour = read?.from_time.slice(0, 13);
+    if (!byHour.has(hour))
+      throw new Error(
+        `Transfer edge at block ${edge.block} is outside the replay hours.`,
+      );
+    byHour.get(hour).push(edge);
+  }
+  return byHour;
+}
+
+export function mintsAndBurns(fetched) {
+  const byHour = edgesByHour(fetched);
   return hours.map((hour) => {
     const net = { minted: 0n, burned: 0n };
-    for (const edge of lowercased(rows[edgesBind(hour)])) {
+    for (const edge of byHour.get(hour)) {
       if (edge.from === zeroAddress) net.minted += BigInt(edge.amount);
       if (edge.to === zeroAddress) net.burned += BigInt(edge.amount);
     }
@@ -70,9 +84,7 @@ export function mintsAndBurns(rows) {
   });
 }
 
-const allEdges = (rows) => hours.flatMap((hour) => rows[edgesBind(hour)]);
-
-export function check(rows) {
+export function check({ rows, reads }) {
   const supply = byHour(
     rows.supply.filter((row) => row.token.toLowerCase() === usdc),
     "total_supply",
@@ -86,7 +98,7 @@ export function check(rows) {
     if (missing.length)
       throw new Error(`${name} is missing ${missing.join(", ")}.`);
   }
-  const flows = mintsAndBurns(rows);
+  const flows = mintsAndBurns({ rows, reads });
   hours.forEach((hour, index) => {
     if (index === 0) return;
     const change = supply.get(hour) - supply.get(hours[index - 1]);
@@ -158,9 +170,9 @@ function burners(edges) {
     }));
 }
 
-export function shape(rows) {
+export function shape({ rows, reads }) {
   const prices = byHour(rows["usdc-usd-feed"], "answer");
-  const flows = mintsAndBurns(rows);
+  const flows = mintsAndBurns({ rows, reads });
   const timeline = hours.map((hour, index) => {
     const { minted, burned } = flows[index];
     return {
@@ -188,6 +200,6 @@ export function shape(rows) {
     burned: formatCompact(burned),
     net: formatCompact(burned - minted, true),
     timeline,
-    burners: burners(allEdges(rows)),
+    burners: burners(rows[edgesBind]),
   };
 }

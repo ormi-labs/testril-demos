@@ -117,9 +117,7 @@ export const venues = [
 }));
 
 const nextDay = (day) =>
-  new Date(Date.parse(`${day}T00:00:00Z`) + 86400000)
-    .toISOString()
-    .slice(0, 10);
+  new Date(Date.parse(`${day}T00:00:00Z`) + dayMs).toISOString().slice(0, 10);
 
 const utcDay = (time) => time.slice(0, 10);
 
@@ -221,7 +219,7 @@ function checkVenue(rows, pools, venue, days) {
   return seen.size;
 }
 
-export function check(rows, binds) {
+export function check({ rows }, binds) {
   const days = windowDays(binds);
   const pools = poolMaps(rows);
   return venues.map((venue) => {
@@ -317,7 +315,7 @@ function topHooked(rows, poolMaps) {
     }));
 }
 
-export function shape(rows, binds) {
+export function shape({ rows }, binds) {
   const days = windowDays(binds);
   const pools = poolMaps(rows);
   const summaries = venues.map((venue) =>

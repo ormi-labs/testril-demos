@@ -1,14 +1,14 @@
-const blockClock = [
-  [9380380, 1580344632],
-  [15537394, 1663224179],
-];
-const postMergeBlockSeconds = 12;
-
-export function secondsOfBlock(block) {
-  const [[block0, seconds0], [block1, seconds1]] = blockClock;
-  return block >= block1
-    ? seconds1 + (block - block1) * postMergeBlockSeconds
-    : seconds0 + ((block - block0) * (seconds1 - seconds0)) / (block1 - block0);
+export function secondsOfBlock(reads, block) {
+  const read =
+    reads.find((r) => block >= r.from_block && block < r.to_block) ??
+    (block < reads[0].from_block ? reads[0] : reads.at(-1));
+  const from = Date.parse(read.from_time) / 1000;
+  const to = Date.parse(read.to_time) / 1000;
+  return (
+    from +
+    ((block - read.from_block) * (to - from)) /
+      (read.to_block - read.from_block)
+  );
 }
 
 export const secondsOfMonth = (month) =>
@@ -43,11 +43,11 @@ export const shortAddress = (address) =>
       ? "NameWrapper"
       : `${address.slice(0, 6)}…${address.slice(-4)}`;
 
-function registryEvents(subject, domain) {
+function registryEvents(subject, domain, reads) {
   const event = (field, row, verb) => ({
     subject: subject.name,
     kind: field,
-    seconds: secondsOfBlock(row.block),
+    seconds: secondsOfBlock(reads, row.block),
     when: `block ${row.block}`,
     text: `${kindLabels[field]} ${verb} ${shortAddress(row[field])}`,
   });
@@ -59,11 +59,11 @@ function registryEvents(subject, domain) {
   ]);
 }
 
-function renewalEvents(subject, registration) {
+function renewalEvents(subject, registration, reads) {
   return registration.map((row, i) => ({
     subject: subject.name,
     kind: i === 0 ? "registration" : "renewal",
-    seconds: secondsOfBlock(row.block),
+    seconds: secondsOfBlock(reads, row.block),
     when: `block ${row.block}`,
     text: `${i === 0 ? "First in window: paid" : "Renewed"} until ${formatDate(row.expires)} for ${formatEth(BigInt(row.cost))}`,
     cost: BigInt(row.cost),
@@ -80,7 +80,7 @@ function addressEvents(subject, address) {
   }));
 }
 
-function wrapperEvents(subject, wrapped) {
+function wrapperEvents(subject, wrapped, reads) {
   return wrapped.map((row, i) => {
     const previous = wrapped[i - 1];
     const parts = [
@@ -96,18 +96,22 @@ function wrapperEvents(subject, wrapped) {
     return {
       subject: subject.name,
       kind: "wrapper",
-      seconds: secondsOfBlock(row.block),
+      seconds: secondsOfBlock(reads, row.block),
       when: `block ${row.block}`,
       text,
     };
   });
 }
 
-export function timeline(subject, { domain, registration, address, wrapped }) {
+export function timeline(
+  subject,
+  { domain, registration, address, wrapped },
+  reads,
+) {
   return [
-    ...registryEvents(subject, domain),
-    ...renewalEvents(subject, registration),
+    ...registryEvents(subject, domain, reads.domain),
+    ...renewalEvents(subject, registration, reads.registration),
     ...addressEvents(subject, address),
-    ...wrapperEvents(subject, wrapped),
+    ...wrapperEvents(subject, wrapped, reads.wrapped),
   ].sort((a, b) => a.seconds - b.seconds);
 }

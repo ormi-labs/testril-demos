@@ -21,13 +21,6 @@ export function bindsAt(now = Date.now()) {
       window: { from_time: chainStart, to_time: isoSecond(today) },
     },
     {
-      name: "markets-created",
-      function_slug: "omen.market_list",
-      chain_id: 100,
-      params: marketList,
-      window,
-    },
-    {
       name: "trades",
       function_slug: "omen.trade",
       chain_id: 100,
@@ -150,17 +143,18 @@ function checkPoolReconciles(market, states, trades, funding) {
   }
 }
 
-export function check(rows) {
+export const createdInWindow = (markets, reads) => {
+  const { from_block } = reads.trades[0];
+  const { to_block } = reads.trades.at(-1);
+  return markets.filter(
+    (market) => market.block >= from_block && market.block < to_block,
+  );
+};
+
+export function check({ rows }) {
   const markets = new Map(
     rows.markets.map((market) => [market.market, market]),
   );
-  const unknownCreation = rows["markets-created"].find(
-    (market) => !markets.has(market.market),
-  );
-  if (unknownCreation)
-    throw new Error(
-      `Market ${unknownCreation.market} was created in the window but is not in market_list.`,
-    );
   const unlisted = [
     ...rows.trades,
     ...rows.liquidity,
@@ -292,7 +286,7 @@ function settlingAnswers(answers) {
 const utcDay = (time) => time.slice(0, 10);
 const lastDay = (time) => utcDay(isoSecond(Date.parse(time) - dayMs));
 
-export function shape(rows, binds) {
+export function shape({ rows, reads }, binds) {
   const { window } = binds.find((bind) => bind.name === "trades");
   const summaries = wxdaiSummaries(rows);
   const volume = summaries.reduce((sum, market) => sum + market.volume, 0n);
@@ -302,7 +296,7 @@ export function shape(rows, binds) {
     window: { first: utcDay(window.from_time), last: lastDay(window.to_time) },
     factory,
     realitio,
-    marketCount: String(rows["markets-created"].length),
+    marketCount: String(createdInWindow(rows.markets, reads).length),
     tradeCount: String(rows.trades.length),
     volume: formatAmount(volume, "wxDAI"),
     otherCollateral: others,

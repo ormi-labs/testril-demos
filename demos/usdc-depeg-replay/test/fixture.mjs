@@ -1,17 +1,17 @@
+import { readParts } from "../src/fetch.mjs";
 import {
   binds,
-  edgesBind,
   feed,
   hours,
   mintsAndBurns,
   usdc,
   zeroAddress,
 } from "../src/report.mjs";
-import { blockAt } from "./fake-testril.mjs";
+import { blockAt, resolveWindow } from "./fake-testril.mjs";
 
 export const fixtureNow = Date.parse("2026-11-02T12:00:00Z");
 export const fixtureBinds = binds;
-const hourStartBlock = (hour) => blockAt(`${hours[hour]}:00:00Z`);
+export const hourStartBlock = (hour) => blockAt(`${hours[hour]}:00:00Z`);
 
 const circle = "0x55fe002aeff02f77364de339a1292923a15844b8";
 const minters = Array.from(
@@ -61,9 +61,9 @@ function feedRows(random) {
 
 function edgeRows(random) {
   const pickMinter = () => minters[Math.floor(random() ** 2 * minters.length)];
-  const byHour = Object.fromEntries(hours.map((hour) => [edgesBind(hour), []]));
+  const edges = [];
   const add = (hour, slot, from, to, dollars) =>
-    byHour[edgesBind(hours[hour])].push({
+    edges.push({
       block: hourStartBlock(hour) + 40 + slot * 37,
       from,
       to,
@@ -86,12 +86,12 @@ function edgeRows(random) {
         1e6 + random() * 5e7,
       );
   });
-  return byHour;
+  return edges;
 }
 
-function supplyRows(edges, random) {
+function supplyRows(fetched, random) {
   let supply = raw(Number(startingSupply), random);
-  const netByHour = mintsAndBurns(edges).map(
+  const netByHour = mintsAndBurns(fetched).map(
     ({ minted, burned }) => minted - burned,
   );
   return hours.map((hour, index) => {
@@ -104,10 +104,29 @@ export function fixture() {
   const random = seeded(7);
   const edges = edgeRows(random);
   return {
-    supply: supplyRows(edges, random),
-    ...edges,
+    supply: supplyRows(fixtureFetched({ "usdc-edges": edges }), random),
+    "usdc-edges": edges,
     "usdc-usd-feed": feedRows(random),
   };
+}
+
+const within = (rows, window) => {
+  const { from_block, to_block } = resolveWindow(window);
+  return rows.filter((row) => row.block >= from_block && row.block < to_block);
+};
+const edgesBind = binds.find((bind) => bind.read);
+
+export function fixtureFetched(rows = fixture()) {
+  const reads = {
+    [edgesBind.name]: readParts(edgesBind.window, edgesBind.read).map(
+      (part) => ({
+        ...part,
+        ...resolveWindow(part),
+        count: within(rows[edgesBind.name], part).length,
+      }),
+    ),
+  };
+  return { rows, reads };
 }
 
 const sameParams = (a, b) => JSON.stringify(a) === JSON.stringify(b);
@@ -123,6 +142,6 @@ export function fixtureRows() {
         candidate.window.from_time <= window.from_time &&
         candidate.window.to_time >= window.to_time,
     );
-    return rows[bind.name];
+    return bind.read ? within(rows[bind.name], window) : rows[bind.name];
   };
 }

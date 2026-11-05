@@ -1,5 +1,6 @@
 const dayMs = 86400000;
 const weekDays = 7;
+const hoursPerDay = 24;
 const nameLookbackMs = 5 * 60000;
 const isoSecond = (ms) => new Date(ms).toISOString().replace(".000Z", "Z");
 const ensRegistry = "0x00000000000c2e074ec69a0dfb2997ba6c7d2e1e";
@@ -37,34 +38,34 @@ export function bindsAt(now = Date.now()) {
       params: { owners: wallets.map(({ address }) => address) },
       window: lastBlocks,
     },
-    ...wallets.flatMap(({ key, address }) =>
-      Array.from({ length: weekDays }, (_, day) => {
-        const from = today - (weekDays - day) * dayMs;
-        return {
-          name: `transfers-${key}-${isoSecond(from).slice(0, 10)}`,
-          function_slug: "erc20.wallet_transfers",
-          chain_id: 1,
-          params: { wallet: address, tokens: trackedTokens },
-          window: between(from, from + dayMs),
-        };
-      }),
-    ),
+    ...wallets.map(({ key, address }) => ({
+      name: `transfers-${key}`,
+      function_slug: "erc20.wallet_transfers",
+      chain_id: 1,
+      params: { wallet: address, tokens: trackedTokens },
+      window: between(today - weekDays * dayMs, today),
+      read: { chunk_hours: hoursPerDay },
+    })),
   ];
 }
 
 export const weekOf = (binds) => {
-  const days = binds
-    .filter((bind) => bind.name.startsWith(`transfers-${wallets[0].key}-`))
-    .map((bind) => bind.window.from_time.slice(0, 10));
+  const { window } = binds.find((bind) => bind.name === "transfers-vitalik");
+  const days = Array.from({ length: weekDays }, (_, day) =>
+    isoSecond(Date.parse(window.from_time) + day * dayMs).slice(0, 10),
+  );
   return { first: days[0], last: days.at(-1), days };
 };
 
-function transfersOf(rows, binds, wallet) {
-  return binds
-    .filter((bind) => bind.name.startsWith(`transfers-${wallet.key}-`))
-    .flatMap((bind, day) =>
-      rows[bind.name].map((transfer) => ({ ...transfer, day })),
-    );
+const holdsBlock = (block) => (read) =>
+  block >= read.from_block && block < read.to_block;
+
+function transfersOf({ rows, reads }, wallet) {
+  const name = `transfers-${wallet.key}`;
+  return rows[name].map((transfer) => ({
+    ...transfer,
+    day: reads[name].findIndex(holdsBlock(transfer.block)),
+  }));
 }
 
 export const tokens = {
@@ -94,36 +95,23 @@ const directionOf = (transfer, address) =>
       ? "out"
       : "in";
 
-function requireBlocksInDayOrder(transfers, label) {
-  let earlierDays = 0;
-  let thisDay = 0;
-  let day = 0;
-  for (const transfer of transfers) {
-    if (transfer.day !== day) {
-      earlierDays = Math.max(earlierDays, thisDay);
-      day = transfer.day;
-    }
-    if (transfer.block <= earlierDays)
-      throw new Error(
-        `${label} has a transfer at block ${transfer.block} in day ${day} but an earlier day already reached block ${earlierDays}.`,
-      );
-    thisDay = Math.max(thisDay, transfer.block);
-  }
-}
-
-export function check(rows, binds) {
+export function check({ rows, reads }) {
   const passed = [];
   for (const wallet of wallets) {
     const label = ensName(rows, wallet) || wallet.address;
     if (!ensName(rows, wallet))
       throw new Error(`No ENS name recorded for ${wallet.address}.`);
-    const transfers = transfersOf(rows, binds, wallet);
+    const transfers = transfersOf({ rows, reads }, wallet);
+    const outside = transfers.find((t) => t.day < 0);
+    if (outside)
+      throw new Error(
+        `${label} has a transfer at block ${outside.block} outside the window.`,
+      );
     const stranger = transfers.find((t) => !involves(t, wallet.address));
     if (stranger)
       throw new Error(
         `Transfer ${stranger.tx} in ${label}'s list names neither ${wallet.address} as sender nor as recipient.`,
       );
-    requireBlocksInDayOrder(transfers, label);
     passed.push(
       `${label}: ${transfers.length} transfers, each with the wallet as sender or recipient; ENS name present`,
     );
@@ -162,17 +150,17 @@ function dailyCounts(transfers, wallet, dayCount) {
     out: 0,
     self: 0,
   }));
-  for (const transfer of transfers)
+  for (const transfer of transfers.filter((t) => t.day >= 0))
     days[transfer.day][directionOf(transfer, wallet.address)] += 1;
   return days;
 }
 
-export function shape(rows, binds) {
+export function shape({ rows, reads }, binds) {
   const week = weekOf(binds);
   return {
     week: { first: week.first, last: week.last },
     wallets: wallets.map((wallet) => {
-      const transfers = transfersOf(rows, binds, wallet);
+      const transfers = transfersOf({ rows, reads }, wallet);
       return {
         address: wallet.address,
         name: ensName(rows, wallet),

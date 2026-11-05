@@ -60,20 +60,54 @@ test("a fetch pays with the payer's vouchers, reports Testril's job progress and
       return testril.call(tool, args);
     },
   };
-  let rows;
+  let fetched;
   try {
-    rows = await fetchRows({ binds, testril: watched, run, pollMs: 1 });
+    fetched = await fetchRows({ binds, testril: watched, run, pollMs: 1 });
   } finally {
     await testril.close();
     await fake.close();
   }
 
+  const { rows, reads } = fetched;
   assert.deepEqual(
     rows["usdc-edges"].map((row) => row.block),
     Array.from({ length: 750 }, (_, i) => 26316189 + i),
   );
   assert.deepEqual(rows.supply, [{ day: "2026-10-02" }]);
   assert.equal(rows["ens-vitalik"].length, 25);
+
+  assert.deepEqual(reads["usdc-edges"], [
+    {
+      from_time: "2026-11-01T00:00:00Z",
+      to_time: "2026-11-01T01:00:00Z",
+      from_block: 26316189,
+      to_block: 26316489,
+      count: 300,
+    },
+    {
+      from_time: "2026-11-01T01:00:00Z",
+      to_time: "2026-11-01T02:00:00Z",
+      from_block: 26316489,
+      to_block: 26316789,
+      count: 300,
+    },
+    {
+      from_time: "2026-11-01T02:00:00Z",
+      to_time: "2026-11-01T02:30:00Z",
+      from_block: 26316789,
+      to_block: 26316939,
+      count: 150,
+    },
+  ]);
+  assert.deepEqual(reads.supply, [
+    {
+      from_time: "2026-10-02T00:00:00Z",
+      to_time: "2026-11-02T00:00:00Z",
+      from_block: 26316189 - 30 * 7200,
+      to_block: 26316189 + 7200,
+      count: 1,
+    },
+  ]);
 
   assert.ok(
     seen.some(
@@ -138,15 +172,18 @@ test("after another job's refusal the window is asked for again before reading",
   });
   const bind = { ...binds[2], window: { from_block: 100, to_block: 160 } };
   const run = newRun([bind]);
-  let rows;
+  let fetched;
   try {
-    rows = await fetchRows({ binds: [bind], testril, run, pollMs: 1 });
+    fetched = await fetchRows({ binds: [bind], testril, run, pollMs: 1 });
   } finally {
     await testril.close();
     await fake.close();
   }
 
-  assert.equal(rows["ens-vitalik"].length, 60);
+  assert.equal(fetched.rows["ens-vitalik"].length, 60);
+  assert.deepEqual(fetched.reads["ens-vitalik"], [
+    { from_block: 100, to_block: 160, count: 60 },
+  ]);
   assert.equal(run.binds[0].jobId, "job:2");
   assert.deepEqual(
     fake.charges.map((c) => [c.tool, c.amount]),
@@ -155,4 +192,29 @@ test("after another job's refusal the window is asked for again before reading",
       ["read", 20 + 60],
     ],
   );
+});
+
+test("a window over a day-bound function must start and end on a UTC day start", async () => {
+  const fake = fakeTestril({ payer: payerAccount(payerKey).address });
+  const testril = await connectTestril({
+    url: await fake.listen(),
+    payerKey,
+    name: "fetch-test",
+  });
+  const bind = {
+    ...binds[1],
+    window: {
+      from_time: "2026-10-02T00:30:00Z",
+      to_time: "2026-11-02T00:00:00Z",
+    },
+  };
+  try {
+    await assert.rejects(
+      fetchRows({ binds: [bind], testril, run: newRun([bind]), pollMs: 1 }),
+      /must start and end on a UTC day start/,
+    );
+  } finally {
+    await testril.close();
+    await fake.close();
+  }
 });

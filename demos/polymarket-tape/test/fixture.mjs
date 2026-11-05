@@ -1,5 +1,6 @@
-import { bindsAt, exchanges, fillBinds, zeroWord } from "../src/report.mjs";
-import { blockAt as chainBlockAt } from "./fake-testril.mjs";
+import { readParts } from "../src/fetch.mjs";
+import { bindsAt, exchanges, zeroWord } from "../src/report.mjs";
+import { blockAt as chainBlockAt, resolveWindow } from "./fake-testril.mjs";
 
 export const fixtureNow = Date.parse("2026-11-02T12:00:00Z");
 export const fixtureBinds = bindsAt(fixtureNow);
@@ -121,7 +122,7 @@ function payoutRows() {
     [1n, 1n],
   ];
   return resolutions.flatMap((numerators, index) => {
-    const block = payoutWindow.from_block + 9000 + index * 15000;
+    const block = payoutWindow.from_block + 900 + index * 1500;
     const conditionId = `0x${hex(32)}`;
     return numerators.map((numerator, outcome) => ({
       block,
@@ -133,10 +134,7 @@ function payoutRows() {
   });
 }
 
-export const fillsIn = (rows) =>
-  fillBinds(fixtureBinds).flatMap((bind) => rows[bind.name]);
-export const firstFillBind = (rows) =>
-  fillBinds(fixtureBinds).find((bind) => rows[bind.name].length).name;
+export const fillsIn = (rows) => rows.fills;
 
 export function fixture() {
   startFromSeed();
@@ -145,18 +143,28 @@ export function fixture() {
     ...whaleFills(),
   ].sort((a, b) => a.block - b.block || a.log_index - b.log_index);
   return {
-    ...Object.fromEntries(
-      fillBinds(fixtureBinds).map(({ name, window }) => [
-        name,
-        fills.filter(
-          (f) =>
-            f.block >= chainBlockAt(window.from_time) &&
-            f.block < chainBlockAt(window.to_time),
-        ),
-      ]),
-    ),
+    fills,
     payouts: payoutRows(),
   };
+}
+
+const within = (rows, window) => {
+  const { from_block, to_block } = resolveWindow(window);
+  return rows.filter((row) => row.block >= from_block && row.block < to_block);
+};
+
+export function fixtureFetched(rows = fixture()) {
+  const reads = Object.fromEntries(
+    fixtureBinds.map((bind) => [
+      bind.name,
+      readParts(bind.window, bind.read).map((part) => ({
+        ...part,
+        ...resolveWindow(part),
+        count: within(rows[bind.name], part).length,
+      })),
+    ]),
+  );
+  return { rows, reads };
 }
 
 const sameParams = (a, b) => JSON.stringify(a) === JSON.stringify(b);
@@ -172,6 +180,6 @@ export function fixtureRows() {
         candidate.window.from_time <= window.from_time &&
         candidate.window.to_time >= window.to_time,
     );
-    return rows[bind.name];
+    return within(rows[bind.name], window);
   };
 }

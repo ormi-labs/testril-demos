@@ -19,7 +19,6 @@ const voucherTypes = {
   ],
 };
 
-// A fake chain: one block every 12 s, block 26316189 at 2026-11-01T00:00:00Z.
 const anchorBlock = 26316189;
 const anchorMs = Date.parse("2026-11-01T00:00:00Z");
 const blockMs = 12000;
@@ -34,6 +33,18 @@ function blockRange(window) {
   return "from_time" in window
     ? [blockAt(window.from_time), blockAt(window.to_time)]
     : [window.from_block, window.to_block];
+}
+
+export function resolveWindow(window) {
+  const [from_block, to_block] = blockRange(window);
+  return { from_block, to_block };
+}
+
+function startsPeriod(time, by) {
+  const ms = Date.parse(time);
+  return by === "month"
+    ? new Date(ms).getUTCDate() === 1 && ms % periodMs.day === 0
+    : ms % periodMs[by] === 0;
 }
 
 const blocksIn = (window) => {
@@ -154,6 +165,17 @@ export function fakeTestril({
         kind: "invalid_params",
         message: `\`${tool}\` takes no field \`${retired}\``,
       };
+    const by = bind.params.by;
+    if (
+      by &&
+      "from_time" in window &&
+      !(startsPeriod(window.from_time, by) && startsPeriod(window.to_time, by))
+    )
+      return {
+        outcome: "error",
+        kind: "invalid_params",
+        message: `a window over a function bound by ${by} must start and end on a UTC ${by} start`,
+      };
     if (tool === "materialize") {
       const busyJob = busy.find(
         (b) => b.function_slug === bind.function_slug && !served.has(b),
@@ -200,7 +222,12 @@ export function fakeTestril({
       jobs.set(jobId, { key: key(id, window), ...jobSize(bind, window) });
       return { outcome: "success", job: { job_id: jobId }, receipt };
     }
-    return { outcome: "success", values: rows(bind, window), receipt };
+    return {
+      outcome: "success",
+      values: rows(bind, window),
+      ...resolveWindow(window),
+      receipt,
+    };
   }
 
   const server = createServer(async (request, response) => {

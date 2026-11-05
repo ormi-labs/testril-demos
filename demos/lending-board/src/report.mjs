@@ -211,7 +211,8 @@ function checkState(rows, binds) {
       throw new Error(`${symbol} has no state at ${lastHour}.`);
 }
 
-function checkTotals(rows) {
+function checkTotals(rows, reads) {
+  const lastBlock = reads["reserve-totals"].at(-1).to_block;
   const history = Map.groupBy(rows["reserve-totals"], (row) =>
     row.asset.toLowerCase(),
   );
@@ -219,6 +220,10 @@ function checkTotals(rows) {
     const name = assetByAddress(asset)?.symbol ?? asset;
     const sorted = list.toSorted((a, b) => a.block - b.block);
     sorted.forEach((row, i) => {
+      if (row.block >= lastBlock)
+        throw new Error(
+          `${name} totals at block ${row.block} are after the window.`,
+        );
       if (BigInt(row.flash_premium) > BigInt(row.flash_loaned))
         throw new Error(
           `${name} flash-loan premiums exceed the amount flash-loaned at block ${row.block}.`,
@@ -252,9 +257,9 @@ function checkHoldings(rows, binds) {
   }
 }
 
-export function check(rows, binds) {
+export function check({ rows, reads }, binds) {
   checkState(rows, binds);
-  checkTotals(rows);
+  checkTotals(rows, reads);
   checkHoldings(rows, binds);
   const days = holdingDays(binds).length;
   return [
@@ -337,7 +342,7 @@ function lifetimeTotals(rows) {
   });
 }
 
-export function shape(rows, binds) {
+export function shape({ rows }, binds) {
   const hours = stateHours(binds);
   const days = holdingDays(binds);
   const byVenue = days.map((day) => usdcByVenue(rows, day));

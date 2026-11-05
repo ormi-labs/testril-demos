@@ -1,30 +1,39 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { check, formatGrt, shape } from "../src/report.mjs";
-import { fixture, fixtureBinds } from "./fixture.mjs";
+import { fixture, fixtureBinds, fixtureFetched } from "./fixture.mjs";
 
 const rows = () => structuredClone(fixture());
 const collected = (list) => list.find((r) => r.kind === "rewards_collected");
 
 test("check passes on the fixture with three proven sentences", () => {
-  assert.equal(check(rows()).length, 3);
+  assert.equal(check(fixtureFetched(rows())).length, 3);
 });
 
 test("check fails when the indexer share is in whole GRT instead of wei", () => {
   const corrupted = rows();
   const row = collected(corrupted["indexing-rewards"]);
   row.indexer_rewards = (BigInt(row.indexer_rewards) / 10n ** 18n).toString();
-  assert.throws(() => check(corrupted), /indexer .* \+ delegator/);
+  assert.throws(
+    () => check(fixtureFetched(corrupted)),
+    /indexer .* \+ delegator/,
+  );
 });
 
 test("check proves per-indexer rewards add up on the fixture", () => {
-  assert.match(check(rows())[1], /Per-indexer rewards add up/);
+  assert.match(check(fixtureFetched(rows()))[1], /Per-indexer rewards add up/);
+});
+
+test("check fails when a row sits outside the window", () => {
+  const input = fixtureFetched(rows());
+  input.rows.delegation[0].block = input.reads.delegation.at(-1).to_block;
+  assert.throws(() => check(input), /delegation row at block .* outside/);
 });
 
 test("check fails when a reward log is counted twice", () => {
   const corrupted = rows();
   corrupted["indexing-rewards"].push({ ...corrupted["indexing-rewards"][0] });
-  assert.throws(() => check(corrupted), /twice/);
+  assert.throws(() => check(fixtureFetched(corrupted)), /twice/);
 });
 
 test("check fails when a delegator holds more shares than the pool", () => {
@@ -32,22 +41,25 @@ test("check fails when a delegator holds more shares than the pool", () => {
   corrupted.delegation[0].delegator_shares = (
     BigInt(corrupted.delegation[0].pool_shares) + 1n
   ).toString();
-  assert.throws(() => check(corrupted), /shares of a pool/);
+  assert.throws(() => check(fixtureFetched(corrupted)), /shares of a pool/);
 });
 
 test("shape credits a reward to the indexer its row names", () => {
   const data = rows();
-  const [top] = shape(data, fixtureBinds).indexers;
+  const [top] = shape(fixtureFetched(data), fixtureBinds).indexers;
   const row = data["indexing-rewards"].find(
     (r) => r.kind === "rewards_collected" && r.indexer === top.address,
   );
   row.indexer = "0x" + "1".repeat(40);
-  assert.notEqual(shape(data, fixtureBinds).indexers[0].rewards, top.rewards);
+  assert.notEqual(
+    shape(fixtureFetched(data), fixtureBinds).indexers[0].rewards,
+    top.rewards,
+  );
 });
 
 test("shape ranks indexers by rewards and takes the pool from the last delegation row", () => {
   const data = rows();
-  const view = shape(data, fixtureBinds);
+  const view = shape(fixtureFetched(data), fixtureBinds);
   const totals = new Map();
   for (const row of data["indexing-rewards"])
     totals.set(
@@ -74,7 +86,9 @@ test("shape subtracts undelegations from net delegation", () => {
   );
   assert.notEqual(net, gross);
   assert.equal(
-    shape(data, fixtureBinds).netDelegation.startsWith(net < 0n ? "−" : "+"),
+    shape(fixtureFetched(data), fixtureBinds).netDelegation.startsWith(
+      net < 0n ? "−" : "+",
+    ),
     true,
   );
 });

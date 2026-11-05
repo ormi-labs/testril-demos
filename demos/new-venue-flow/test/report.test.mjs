@@ -6,14 +6,14 @@ import { fixture, fixtureBinds } from "./fixture.mjs";
 const rows = () => structuredClone(fixture());
 
 test("check passes on the fixture for every venue", () => {
-  assert.equal(check(rows(), fixtureBinds).length, 3);
+  assert.equal(check({ rows: rows() }, fixtureBinds).length, 3);
 });
 
 test("check fails when an amount is negative", () => {
   const corrupted = rows();
   corrupted["aqua-base"][0].amount = "-5";
   assert.throws(
-    () => check(corrupted, fixtureBinds),
+    () => check({ rows: corrupted }, fixtureBinds),
     /negative or non-integer/,
   );
 });
@@ -21,28 +21,40 @@ test("check fails when an amount is negative", () => {
 test("check fails when a day is counted twice", () => {
   const corrupted = rows();
   corrupted["tessera-base"].push({ ...corrupted["tessera-base"][0] });
-  assert.throws(() => check(corrupted, fixtureBinds), /appears twice/);
+  assert.throws(
+    () => check({ rows: corrupted }, fixtureBinds),
+    /appears twice/,
+  );
 });
 
 test("check fails on a day outside the window", () => {
   const corrupted = rows();
   corrupted["aqua-ethereum"][0].day = "2026-11-02";
-  assert.throws(() => check(corrupted, fixtureBinds), /outside the window/);
+  assert.throws(
+    () => check({ rows: corrupted }, fixtureBinds),
+    /outside the window/,
+  );
 });
 
 test("check fails on a row where nothing moved", () => {
   const corrupted = rows();
   corrupted["aqua-base"][0].pushes = "0";
-  assert.throws(() => check(corrupted, fixtureBinds), /zero count or amount/);
+  assert.throws(
+    () => check({ rows: corrupted }, fixtureBinds),
+    /zero count or amount/,
+  );
   const zeroAmount = rows();
   zeroAmount["aqua-base"][0].amount = "0";
-  assert.throws(() => check(zeroAmount, fixtureBinds), /zero count or amount/);
+  assert.throws(
+    () => check({ rows: zeroAmount }, fixtureBinds),
+    /zero count or amount/,
+  );
 });
 
 test("check fails when an amount is in decimal units instead of raw", () => {
   const corrupted = rows();
   corrupted["tessera-base"][0].amount_in = "0.04";
-  assert.throws(() => check(corrupted, fixtureBinds), /non-integer/);
+  assert.throws(() => check({ rows: corrupted }, fixtureBinds), /non-integer/);
 });
 
 test("shape keeps 18-decimal and 6-decimal tokens apart and fills quiet days", () => {
@@ -56,7 +68,7 @@ test("shape keeps 18-decimal and 6-decimal tokens apart and fills quiet days", (
     { day, token: usdc, pushes: "3", amount: "1500000000" },
     { day, token: weth, pushes: "2", amount: "2500000000000000000" },
   ];
-  const base = shape(rowsByName, fixtureBinds).venues.find(
+  const base = shape({ rows: rowsByName }, fixtureBinds).venues.find(
     (v) => v.name === "aqua-base",
   );
   assert.deepEqual(

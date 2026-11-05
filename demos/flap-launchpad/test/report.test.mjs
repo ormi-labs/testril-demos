@@ -7,14 +7,14 @@ import {
   tradesDayOf,
   zeroAddress,
 } from "../src/report.mjs";
-import { fixture, fixtureBinds, usd1 } from "./fixture.mjs";
+import { fixture, fixtureBinds, fixtureFetched, usd1 } from "./fixture.mjs";
 
 const tradesDay = tradesDayOf(fixtureBinds);
 
 const rows = () => structuredClone(fixture());
 
 test("check proves the trade day's volume and fees", () => {
-  const passed = check(rows(), fixtureBinds);
+  const passed = check(fixtureFetched(rows()), fixtureBinds);
   assert.equal(passed.length, 3);
   assert.match(passed[1], /equal the sums of 240 trade rows/);
 });
@@ -23,7 +23,10 @@ test("check fails when a sell is read as a buy", () => {
   const corrupted = rows();
   const sell = corrupted.trades.find((t) => !t.is_buy);
   sell.is_buy = true;
-  assert.throws(() => check(corrupted, fixtureBinds), /sums (buys|sells) to/);
+  assert.throws(
+    () => check(fixtureFetched(corrupted), fixtureBinds),
+    /sums (buys|sells) to/,
+  );
 });
 
 test("check fails when volume is in BNB instead of raw wei", () => {
@@ -33,20 +36,29 @@ test("check fails when volume is in BNB instead of raw wei", () => {
       BigInt(row.buy_quote_amount) /
       10n ** 18n
     ).toString();
-  assert.throws(() => check(corrupted, fixtureBinds), /sums buys to/);
+  assert.throws(
+    () => check(fixtureFetched(corrupted), fixtureBinds),
+    /sums buys to/,
+  );
 });
 
 test("check fails when a trade is missing from the rows", () => {
   const corrupted = rows();
   corrupted.trades.pop();
-  assert.throws(() => check(corrupted, fixtureBinds), /counts \d+ trades|sums/);
+  assert.throws(
+    () => check(fixtureFetched(corrupted), fixtureBinds),
+    /counts \d+ trades|sums/,
+  );
 });
 
 test("check fails when a fee is scaled by 10^18", () => {
   const corrupted = rows();
   const trade = corrupted.trades[3];
   trade.fee_amount = (BigInt(trade.fee_amount) * 10n ** 18n).toString();
-  assert.throws(() => check(corrupted, fixtureBinds), /has fee/);
+  assert.throws(
+    () => check(fixtureFetched(corrupted), fixtureBinds),
+    /has fee/,
+  );
 });
 
 test("check fails when fee and quote amount are swapped", () => {
@@ -56,31 +68,49 @@ test("check fails when fee and quote amount are swapped", () => {
     trade.quote_amount,
     trade.fee_amount,
   ];
-  assert.throws(() => check(corrupted, fixtureBinds), /has fee/);
+  assert.throws(
+    () => check(fixtureFetched(corrupted), fixtureBinds),
+    /has fee/,
+  );
 });
 
 test("check fails when a trade is relabelled to another quote asset", () => {
   const corrupted = rows();
   corrupted.trades.find((t) => t.quote_token === zeroAddress).quote_token =
     usd1;
-  assert.throws(() => check(corrupted, fixtureBinds), /On 2026-11-01, .* /);
+  assert.throws(
+    () => check(fixtureFetched(corrupted), fixtureBinds),
+    /On 2026-11-01, .* /,
+  );
 });
 
 test("check fails on a volume row outside the window", () => {
   const corrupted = rows();
   corrupted.volume.push({ ...corrupted.volume[0], day: "2026-11-05" });
-  assert.throws(() => check(corrupted, fixtureBinds), /2026-11-05 is outside/);
+  assert.throws(
+    () => check(fixtureFetched(corrupted), fixtureBinds),
+    /2026-11-05 is outside/,
+  );
+});
+
+test("check fails on a trade outside the window", () => {
+  const input = fixtureFetched(rows());
+  input.rows.trades[0].block = input.reads.trades.at(-1).to_block;
+  assert.throws(() => check(input, fixtureBinds), /Trade at block .* outside/);
 });
 
 test("check fails when a volume day is missing", () => {
   const corrupted = rows();
   corrupted.volume = corrupted.volume.filter((r) => r.day !== "2026-10-27");
-  assert.throws(() => check(corrupted, fixtureBinds), /missing 2026-10-27/);
+  assert.throws(
+    () => check(fixtureFetched(corrupted), fixtureBinds),
+    /missing 2026-10-27/,
+  );
 });
 
 test("shape ranks tokens by buys plus sells and totals match the rows", () => {
   const data = rows();
-  const view = shape(data, fixtureBinds);
+  const view = shape(fixtureFetched(data), fixtureBinds);
   const native = data.volume.filter((r) => r.quote_token === zeroAddress);
   const buys = native.reduce((s, r) => s + BigInt(r.buy_quote_amount), 0n);
   assert.equal(view.buys, formatBnb(buys));
@@ -94,7 +124,7 @@ test("shape ranks tokens by buys plus sells and totals match the rows", () => {
 
 test("shape leaves out the token quoted in another asset", () => {
   const data = rows();
-  const view = shape(data, fixtureBinds);
+  const view = shape(fixtureFetched(data), fixtureBinds);
   const everyBuy = data.volume.reduce(
     (s, r) => s + BigInt(r.buy_quote_amount),
     0n,

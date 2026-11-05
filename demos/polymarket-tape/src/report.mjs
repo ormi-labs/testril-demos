@@ -1,6 +1,4 @@
 const dayMs = 86400000;
-const hourMs = 3600000;
-const hoursPerDay = 24;
 const isoSecond = (ms) => new Date(ms).toISOString().replace(".000Z", "Z");
 export const zeroWord = `0x${"0".repeat(64)}`;
 export const exchanges = [
@@ -12,40 +10,40 @@ export const conditionalTokens = "0x4d97dcd97ec945f40cf65f87097ace5ea0476045";
 
 export function bindsAt(now = Date.now()) {
   const yesterday = Math.floor(now / dayMs) * dayMs - dayMs;
-  const between = (from, to) => ({
-    from_time: isoSecond(from),
-    to_time: isoSecond(to),
-  });
+  const window = {
+    from_time: isoSecond(yesterday),
+    to_time: isoSecond(yesterday + dayMs),
+  };
   return [
-    ...Array.from({ length: hoursPerDay }, (_, hour) => ({
-      name: `fills-${String(hour).padStart(2, "0")}`,
+    {
+      name: "fills",
       function_slug: "polymarket_clob.order_fill",
       chain_id: 137,
       params: { exchanges },
-      window: between(
-        yesterday + hour * hourMs,
-        yesterday + (hour + 1) * hourMs,
-      ),
-    })),
+      window,
+      read: { chunk_hours: 1 },
+    },
     {
       name: "payouts",
       function_slug: "conditional_tokens.condition_payouts",
       chain_id: 137,
       params: { conditional_tokens: conditionalTokens },
-      window: between(yesterday, yesterday + dayMs),
+      window,
     },
   ];
 }
 
-export const fillBinds = (binds) =>
-  binds.filter((bind) => bind.name.startsWith("fills-"));
 export const dayOf = (binds) =>
-  fillBinds(binds)[0].window.from_time.slice(0, 10);
+  binds.find((bind) => bind.name === "fills").window.from_time.slice(0, 10);
 
-export function fillsOf(rows, binds) {
-  return fillBinds(binds).flatMap((bind, hour) =>
-    rows[bind.name].map((fill) => ({ ...fill, hour })),
-  );
+const holdsBlock = (block) => (read) =>
+  block >= read.from_block && block < read.to_block;
+
+export function fillsOf({ rows, reads }) {
+  return rows.fills.map((fill) => ({
+    ...fill,
+    hour: reads.fills.findIndex(holdsBlock(fill.block)),
+  }));
 }
 
 const outcomesPerCondition = 2;
@@ -95,27 +93,12 @@ const feeIsInRequiredAsset = (fill) => {
   return BigInt(unpaid) === 0n;
 };
 
-function requireBlocksInHourOrder(fills) {
-  let earlierHours = -1;
-  let thisHour = -1;
-  let hour = 0;
-  for (const fill of fills) {
-    if (fill.hour !== hour) {
-      earlierHours = Math.max(earlierHours, thisHour);
-      hour = fill.hour;
-    }
-    if (fill.block <= earlierHours)
-      throw new Error(
-        `Fill at block ${fill.block} is in hour ${hour} but an earlier hour already reached block ${earlierHours}.`,
-      );
-    thisHour = Math.max(thisHour, fill.block);
-  }
-}
-
-export function check(rows, binds) {
+export function check({ rows, reads }) {
   const { payouts } = rows;
-  const fills = fillsOf(rows, binds);
-  requireBlocksInHourOrder(fills);
+  const fills = fillsOf({ rows, reads });
+  const outside = fills.find((fill) => fill.hour < 0);
+  if (outside)
+    throw new Error(`Fill at block ${outside.block} is outside the window.`);
   const stranger = fills.find((fill) => !exchanges.includes(fill.exchange));
   if (stranger)
     throw new Error(`Fill from ${stranger.exchange} is not a named exchange.`);
@@ -152,6 +135,13 @@ export function check(rows, binds) {
   assertLeaderboardAddsUp(leaderboardEntries(fills), total);
   const conditions = conditionsOf(payouts);
   for (const condition of conditions) {
+    const stray = condition.rows.find(
+      (row) => !reads.payouts.some(holdsBlock(row.block)),
+    );
+    if (stray)
+      throw new Error(
+        `Condition ${shortHex(condition.id)} resolved at block ${stray.block}, outside the window.`,
+      );
     const indices = condition.rows.map((r) => Number(r.outcome_index));
     const complete = Array.from(
       { length: outcomesPerCondition },
@@ -305,9 +295,9 @@ function resolved(payouts) {
   }));
 }
 
-export function shape(rows, binds) {
+export function shape({ rows, reads }, binds) {
   const { payouts } = rows;
-  const fills = fillsOf(rows, binds);
+  const fills = fillsOf({ rows, reads });
   const total = totalVolume(fills);
   const largest = fills.reduce((a, b) => (volumeOf(b) > volumeOf(a) ? b : a));
   const builders = builderVolumes(fills);
