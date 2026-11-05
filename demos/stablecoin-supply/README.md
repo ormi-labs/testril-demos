@@ -21,7 +21,7 @@ what Testril already indexed.
 | Variable            | Purpose                                                    |
 | ------------------- | ---------------------------------------------------------- |
 | `TESTRIL_PAYER_KEY` | Hex private key that signs vouchers; required to fetch     |
-| `TESTRIL_MCP_URL`   | Testril MCP endpoint; default `https://dev.testril.ai/mcp` |
+| `TESTRIL_MCP_URL`   | Testril MCP endpoint; default `https://api.testril.si/mcp` |
 
 ## Run
 
@@ -40,9 +40,12 @@ the job, then `read`s the window. The page shows a bar per bind and overall from
 Testril's own job progress (`blocks_done` of `blocks_total`, `days_done` of
 `days_total`) and the usage credits spent. Then it draws four headline numbers,
 supply per day for USDT and USDC, a flow of the ten largest USDC pairs, a table
-of the top 20 pairs, and the cross-check. The first fetch cost about $27.79 and
-1.5 minutes; a fetch after that cost $0.23 and 57 seconds, all reads. Nothing is
-saved: a restart starts empty and the next fetch reads again.
+of the top 20 pairs, and the cross-check. The windows follow the moment you
+press the button, so each new UTC day adds one day to index. On dev, a first
+fetch of a month cost about $27.79 and 1.5 minutes; a fetch three days later,
+with three new days to index, cost $3.73 and 5 minutes; a fetch of indexed
+windows cost $0.23 and 57 seconds, all reads. Nothing is saved: a restart starts
+empty and the next fetch reads again.
 
 Without `TESTRIL_PAYER_KEY` the button is disabled and the page says what to set.
 
@@ -68,12 +71,15 @@ and is never shown on the page.
 
 - USDT `0xdac17f958d2ee523a2206206994597c13d831ec7` and USDC
   `0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48`, both 6 decimals.
-- Supply: UTC days `[2026-10-02, 2026-11-02)`, read at each day's last block.
-- Transfers: 2026-11-01, blocks `[26316189, 26323365)`: the first block at or
-  after 2026-11-01T00:00Z up to the first block of 2026-11-02, so they match the
-  supply rows for 2026-10-31 and 2026-11-01.
-- ENS registry `0x00000000000c2e074ec69a0dfb2997ba6c7d2e1e`, names read at
-  block 26323364, the last block of 2026-11-01.
+  Every window is computed when you press the button and stated to Testril as
+  `from_time` / `to_time`; Testril resolves each end to the first block at or
+  after it.
+
+- Supply: the 31 complete UTC days before today, read at each day's last block.
+- Transfers: yesterday (UTC), so they match the supply rows for the last two
+  days.
+- ENS registry `0x00000000000c2e074ec69a0dfb2997ba6c7d2e1e`; each address's
+  name is its last row in yesterday's last five minutes.
 
 The 20 named addresses are fixed in `src/report.mjs`, chosen as likely large
 USDC movers. Pairs between other addresses show shortened hex.
@@ -105,29 +111,29 @@ USDC movers. Pairs between other addresses show shortened hex.
 
 Windows are half-open: the end is the first block or day not included.
 
-| Name                           | Function               | Chain | Params                | Window                  |
-| ------------------------------ | ---------------------- | ----- | --------------------- | ----------------------- |
-| `supply`                       | `erc20.token_supply`   | 1     | `tokens`, `by`        | 2026-10-02 → 2026-11-02 |
-| `usdc-edges`                   | `erc20.transfer_edges` | 1     | `token_address`       | 26316189 → 26323365     |
-| `ens-circle`                   | `ens.primary_name`     | 1     | `registry`, `address` | 26323364 → 26323365     |
-| `ens-binance-14`               | `ens.primary_name`     | 1     | `registry`, `address` | 26323364 → 26323365     |
-| `ens-binance-8`                | `ens.primary_name`     | 1     | `registry`, `address` | 26323364 → 26323365     |
-| `ens-coinbase-10`              | `ens.primary_name`     | 1     | `registry`, `address` | 26323364 → 26323365     |
-| `ens-kraken-4`                 | `ens.primary_name`     | 1     | `registry`, `address` | 26323364 → 26323365     |
-| `ens-okx-73`                   | `ens.primary_name`     | 1     | `registry`, `address` | 26323364 → 26323365     |
-| `ens-bitfinex-2`               | `ens.primary_name`     | 1     | `registry`, `address` | 26323364 → 26323365     |
-| `ens-uniswap-v3-usdc-weth`     | `ens.primary_name`     | 1     | `registry`, `address` | 26323364 → 26323365     |
-| `ens-uniswap-v3-usdc-usdt`     | `ens.primary_name`     | 1     | `registry`, `address` | 26323364 → 26323365     |
-| `ens-uniswap-v4-pool-manager`  | `ens.primary_name`     | 1     | `registry`, `address` | 26323364 → 26323365     |
-| `ens-uniswap-universal-router` | `ens.primary_name`     | 1     | `registry`, `address` | 26323364 → 26323365     |
-| `ens-curve-3pool`              | `ens.primary_name`     | 1     | `registry`, `address` | 26323364 → 26323365     |
-| `ens-aave-v3-ausdc`            | `ens.primary_name`     | 1     | `registry`, `address` | 26323364 → 26323365     |
-| `ens-morpho-blue`              | `ens.primary_name`     | 1     | `registry`, `address` | 26323364 → 26323365     |
-| `ens-maker-psm-usdc`           | `ens.primary_name`     | 1     | `registry`, `address` | 26323364 → 26323365     |
-| `ens-cow-settlement`           | `ens.primary_name`     | 1     | `registry`, `address` | 26323364 → 26323365     |
-| `ens-1inch-v6-router`          | `ens.primary_name`     | 1     | `registry`, `address` | 26323364 → 26323365     |
-| `ens-0x-exchange-proxy`        | `ens.primary_name`     | 1     | `registry`, `address` | 26323364 → 26323365     |
-| `ens-balancer-v2-vault`        | `ens.primary_name`     | 1     | `registry`, `address` | 26323364 → 26323365     |
-| `ens-vitalik`                  | `ens.primary_name`     | 1     | `registry`, `address` | 26323364 → 26323365     |
+| Name                           | Function               | Chain | Params                | Window                 |
+| ------------------------------ | ---------------------- | ----- | --------------------- | ---------------------- |
+| `supply`                       | `erc20.token_supply`   | 1     | `tokens`, `by`        | 31 days before today   |
+| `usdc-edges`                   | `erc20.transfer_edges` | 1     | `token_address`       | yesterday              |
+| `ens-circle`                   | `ens.primary_name`     | 1     | `registry`, `address` | yesterday's last 5 min |
+| `ens-binance-14`               | `ens.primary_name`     | 1     | `registry`, `address` | yesterday's last 5 min |
+| `ens-binance-8`                | `ens.primary_name`     | 1     | `registry`, `address` | yesterday's last 5 min |
+| `ens-coinbase-10`              | `ens.primary_name`     | 1     | `registry`, `address` | yesterday's last 5 min |
+| `ens-kraken-4`                 | `ens.primary_name`     | 1     | `registry`, `address` | yesterday's last 5 min |
+| `ens-okx-73`                   | `ens.primary_name`     | 1     | `registry`, `address` | yesterday's last 5 min |
+| `ens-bitfinex-2`               | `ens.primary_name`     | 1     | `registry`, `address` | yesterday's last 5 min |
+| `ens-uniswap-v3-usdc-weth`     | `ens.primary_name`     | 1     | `registry`, `address` | yesterday's last 5 min |
+| `ens-uniswap-v3-usdc-usdt`     | `ens.primary_name`     | 1     | `registry`, `address` | yesterday's last 5 min |
+| `ens-uniswap-v4-pool-manager`  | `ens.primary_name`     | 1     | `registry`, `address` | yesterday's last 5 min |
+| `ens-uniswap-universal-router` | `ens.primary_name`     | 1     | `registry`, `address` | yesterday's last 5 min |
+| `ens-curve-3pool`              | `ens.primary_name`     | 1     | `registry`, `address` | yesterday's last 5 min |
+| `ens-aave-v3-ausdc`            | `ens.primary_name`     | 1     | `registry`, `address` | yesterday's last 5 min |
+| `ens-morpho-blue`              | `ens.primary_name`     | 1     | `registry`, `address` | yesterday's last 5 min |
+| `ens-maker-psm-usdc`           | `ens.primary_name`     | 1     | `registry`, `address` | yesterday's last 5 min |
+| `ens-cow-settlement`           | `ens.primary_name`     | 1     | `registry`, `address` | yesterday's last 5 min |
+| `ens-1inch-v6-router`          | `ens.primary_name`     | 1     | `registry`, `address` | yesterday's last 5 min |
+| `ens-0x-exchange-proxy`        | `ens.primary_name`     | 1     | `registry`, `address` | yesterday's last 5 min |
+| `ens-balancer-v2-vault`        | `ens.primary_name`     | 1     | `registry`, `address` | yesterday's last 5 min |
+| `ens-vitalik`                  | `ens.primary_name`     | 1     | `registry`, `address` | yesterday's last 5 min |
 
-`usdc-edges` is read in chunks of 600 blocks.
+`usdc-edges` is read in chunks of two hours.

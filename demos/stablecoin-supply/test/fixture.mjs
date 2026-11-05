@@ -1,13 +1,16 @@
 import {
-  binds,
-  edgesWindow,
+  bindsAt,
   ensAddresses,
   supplyDays,
   usdc,
   usdt,
   zeroAddress,
 } from "../src/report.mjs";
+import { blockAt } from "./fake-testril.mjs";
 
+export const fixtureNow = Date.parse("2026-11-02T12:00:00Z");
+export const fixtureBinds = bindsAt(fixtureNow);
+const bindNamed = (name) => fixtureBinds.find((bind) => bind.name === name);
 const blockSpacing = 30;
 
 function seeded(seed) {
@@ -39,7 +42,8 @@ function edgeRows(random) {
     if (from !== to) transfers.push([from, to, 2e4 + random() ** 4 * 4e7]);
   }
   return transfers.map(([from, to, dollars], index) => ({
-    block: edgesWindow.from_block + index * blockSpacing,
+    block:
+      blockAt(bindNamed("usdc-edges").window.from_time) + index * blockSpacing,
     from,
     to,
     amount: raw(dollars, random).toString(),
@@ -48,7 +52,7 @@ function edgeRows(random) {
 }
 
 function supplyRows(random, token, startDollars, lastChange) {
-  const days = supplyDays();
+  const days = supplyDays(fixtureBinds);
   let supply = raw(startDollars, random);
   return days.map((day, index) => {
     if (index === days.length - 1) supply += lastChange;
@@ -68,13 +72,13 @@ export function fixture() {
     0n,
   );
   const ensRows = Object.fromEntries(
-    binds
+    fixtureBinds
       .filter((bind) => bind.function_slug === "ens.primary_name")
       .map((bind) => [
         bind.name,
         [
           {
-            block: bind.window.from_block,
+            block: blockAt(bind.window.to_time) - 1,
             address: bind.params.address,
             name: bind.name === "ens-vitalik" ? "vitalik.eth" : "",
           },
@@ -94,16 +98,17 @@ export function fixture() {
 export function fixtureRows() {
   const rows = fixture();
   const nameOf = (bind) =>
-    binds.find(
+    fixtureBinds.find(
       (b) =>
         b.function_slug === bind.function_slug &&
         JSON.stringify(b.params) === JSON.stringify(bind.params),
     ).name;
   return (bind, window) =>
-    "from_block" in window && bind.function_slug === "erc20.transfer_edges"
+    bind.function_slug === "erc20.transfer_edges"
       ? rows[nameOf(bind)].filter(
           (row) =>
-            row.block >= window.from_block && row.block < window.to_block,
+            row.block >= blockAt(window.from_time) &&
+            row.block < blockAt(window.to_time),
         )
       : rows[nameOf(bind)];
 }
