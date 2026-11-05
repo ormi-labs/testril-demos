@@ -23,7 +23,7 @@ what Testril already indexed.
 | Variable            | Purpose                                                    |
 | ------------------- | ---------------------------------------------------------- |
 | `TESTRIL_PAYER_KEY` | Hex private key that signs vouchers; required to fetch     |
-| `TESTRIL_MCP_URL`   | Testril MCP endpoint; default `https://dev.testril.ai/mcp` |
+| `TESTRIL_MCP_URL`   | Testril MCP endpoint; default `https://api.testril.si/mcp` |
 
 ## Run
 
@@ -69,7 +69,8 @@ for the report. The fixture lives in `test/` and is never shown on the page.
 
 ## Subjects and window
 
-- Window: UTC days `[2026-10-25, 2026-11-02)`, eight days. Each pool function
+- Window: the eight UTC days before the day of the press (`from_time` eight
+  days before today 00:00 UTC, `to_time` today 00:00 UTC). Each pool function
   is bound to its factory (or the v4 pool manager) and reads every pool; the
   report picks the subject pools below.
 - Measure: the ETH side of each pool, paid in plus paid out, in raw 18-decimal

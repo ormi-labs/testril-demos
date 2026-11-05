@@ -4,7 +4,7 @@ import { setTimeout as delay } from "node:timers/promises";
 import { createApp } from "../src/server.mjs";
 import { payerAccount } from "../src/testril.mjs";
 import { fakeTestril } from "./fake-testril.mjs";
-import { fixtureRows } from "./fixture.mjs";
+import { fixtureNow, fixtureRows } from "./fixture.mjs";
 
 // Public deterministic test key. Never fund this account.
 const payerKey = `${"0".repeat(63)}1`;
@@ -34,7 +34,12 @@ test("the button's fetch ends in the shaped report and its passed cross-check", 
   });
   t.after(() => fake.close());
   const base = await listen(
-    createApp({ url: await fake.listen(), payerKey, pollMs: 1 }),
+    createApp({
+      url: await fake.listen(),
+      payerKey,
+      pollMs: 1,
+      now: () => fixtureNow,
+    }),
     t,
   );
   assert.equal(
@@ -47,11 +52,8 @@ test("the button's fetch ends in the shaped report and its passed cross-check", 
     run = await (await fetch(`${base}/api/run`)).json();
   } while (run.state === "running");
   assert.equal(run.state, "done", run.error);
-  assert.equal(run.report.checks.ok, false);
-  assert.match(
-    run.report.checks.error,
-    /lacks an increasing last block per hour/,
-  );
+  assert.equal(run.report.checks.ok, true, run.report.checks.error);
+  assert.match(run.report.checks.passed[0], /counted once each/);
   assert.equal(run.report.view.tokens[1].symbol, "mETH");
   assert.ok(BigInt(run.spentAtoms) > 0n);
 

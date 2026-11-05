@@ -64,9 +64,9 @@ function barChart(hooks, count) {
 function render(report) {
   const view = report.view;
   document.querySelector("#pools-window").textContent =
-    `${view.poolsWindow.from_block}–${view.poolsWindow.to_block - 1}`;
+    `${view.poolsSince} to ${view.volumeDays.last}`;
   document.querySelector("#volume-window").textContent =
-    `${view.volumeWindow.from_day} to ${view.volumeWindow.to_day} (exclusive)`;
+    `${view.volumeDays.first} to ${view.volumeDays.last}`;
   document
     .querySelector("#headline")
     .replaceChildren(

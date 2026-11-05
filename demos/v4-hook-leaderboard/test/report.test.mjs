@@ -8,12 +8,12 @@ import {
   usdc,
   zeroAddress,
 } from "../src/report.mjs";
-import { fixture } from "./fixture.mjs";
+import { fixture, fixtureBinds } from "./fixture.mjs";
 
 const rows = () => structuredClone(fixture());
 
 test("check passes and names the hook sum and the unhooked pools", () => {
-  const passed = check(rows());
+  const passed = check(rows(), fixtureBinds);
   assert.match(passed[1], /Hooks add up to \d+ swaps/);
   assert.match(
     passed[2],
@@ -24,19 +24,19 @@ test("check passes and names the hook sum and the unhooked pools", () => {
 test("check fails when a volume pool is not in pool_list", () => {
   const corrupted = rows();
   corrupted.volume[0].pool = `0x${"ab".repeat(32)}`;
-  assert.throws(() => check(corrupted), /is not in pool_list/);
+  assert.throws(() => check(corrupted, fixtureBinds), /is not in pool_list/);
 });
 
 test("check fails when a pool is listed twice and its swaps count twice", () => {
   const corrupted = rows();
   corrupted.pools.push(structuredClone(corrupted.pools[0]));
-  assert.throws(() => check(corrupted), /Hooks add up to/);
+  assert.throws(() => check(corrupted, fixtureBinds), /Hooks add up to/);
 });
 
 test("check fails when a volume day is outside the window", () => {
   const corrupted = rows();
   corrupted.volume[0].day = "2026-11-02";
-  assert.throws(() => check(corrupted), /outside the window/);
+  assert.throws(() => check(corrupted, fixtureBinds), /outside the window/);
 });
 
 test("hook swaps are the sum of their pools' volume rows", () => {
@@ -52,7 +52,7 @@ test("hook swaps are the sum of their pools' volume rows", () => {
 });
 
 test("shape labels Arrakis hooks, other hooks and the zero address", () => {
-  const view = shape(rows());
+  const view = shape(rows(), fixtureBinds);
   const labels = new Set(view.hooks.map((hook) => hook.label));
   assert.deepEqual([...labels].sort(), ["Arrakis", "No hook", "Unlabelled"]);
   const none = view.hooks.find((hook) => hook.hook === zeroAddress);
@@ -89,7 +89,7 @@ test("stablecoin volume reads volume0 when the stablecoin is currency0", () => {
 test("check fails when the Arrakis hook list contains the zero address", () => {
   const corrupted = rows();
   corrupted["arrakis-hooks"][0].hook = zeroAddress;
-  assert.throws(() => check(corrupted), /zero address/);
+  assert.throws(() => check(corrupted, fixtureBinds), /zero address/);
 });
 
 test("checksummed addresses give the same report as lowercase ones", () => {
@@ -101,7 +101,7 @@ test("checksummed addresses give the same report as lowercase ones", () => {
   }
   for (const row of shouted["arrakis-hooks"])
     row.hook = row.hook.toUpperCase().replace("0X", "0x");
-  assert.deepEqual(shape(shouted), shape(rows()));
+  assert.deepEqual(shape(shouted, fixtureBinds), shape(rows(), fixtureBinds));
 });
 
 test("compact amounts under a thousand dollars are not shown as thousandths", () => {

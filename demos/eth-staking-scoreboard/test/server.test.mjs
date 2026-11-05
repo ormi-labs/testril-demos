@@ -4,7 +4,7 @@ import { setTimeout as delay } from "node:timers/promises";
 import { createApp, report } from "../src/server.mjs";
 import { payerAccount } from "../src/testril.mjs";
 import { fakeTestril } from "./fake-testril.mjs";
-import { fixture, fixtureRows } from "./fixture.mjs";
+import { fixture, fixtureBinds, fixtureNow, fixtureRows } from "./fixture.mjs";
 
 // Public deterministic test key. Never fund this account.
 const payerKey = `${"0".repeat(63)}1`;
@@ -34,7 +34,12 @@ test("the button's fetch ends in the shaped report and its passed cross-check", 
   });
   t.after(() => fake.close());
   const base = await listen(
-    createApp({ url: await fake.listen(), payerKey, pollMs: 1 }),
+    createApp({
+      url: await fake.listen(),
+      payerKey,
+      pollMs: 1,
+      now: () => fixtureNow,
+    }),
     t,
   );
   assert.equal(
@@ -64,7 +69,7 @@ test("the button's fetch ends in the shaped report and its passed cross-check", 
 test("report shows the failed cross-check when a day is missing", () => {
   const rows = fixture();
   rows.stmatic.splice(30, 1);
-  const result = report(rows);
+  const result = report(rows, fixtureBinds);
   assert.equal(result.checks.ok, false);
   assert.match(result.checks.error, /stmatic is missing/);
   assert.equal(result.view, null);

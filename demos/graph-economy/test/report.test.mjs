@@ -1,7 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { check, formatGrt, shape } from "../src/report.mjs";
-import { fixture } from "./fixture.mjs";
+import { fixture, fixtureBinds } from "./fixture.mjs";
 
 const rows = () => structuredClone(fixture());
 const collected = (list) => list.find((r) => r.kind === "rewards_collected");
@@ -37,17 +37,17 @@ test("check fails when a delegator holds more shares than the pool", () => {
 
 test("shape credits a reward to the indexer its row names", () => {
   const data = rows();
-  const [top] = shape(data).indexers;
+  const [top] = shape(data, fixtureBinds).indexers;
   const row = data["indexing-rewards"].find(
     (r) => r.kind === "rewards_collected" && r.indexer === top.address,
   );
   row.indexer = "0x" + "1".repeat(40);
-  assert.notEqual(shape(data).indexers[0].rewards, top.rewards);
+  assert.notEqual(shape(data, fixtureBinds).indexers[0].rewards, top.rewards);
 });
 
 test("shape ranks indexers by rewards and takes the pool from the last delegation row", () => {
   const data = rows();
-  const view = shape(data);
+  const view = shape(data, fixtureBinds);
   const totals = new Map();
   for (const row of data["indexing-rewards"])
     totals.set(
@@ -74,7 +74,7 @@ test("shape subtracts undelegations from net delegation", () => {
   );
   assert.notEqual(net, gross);
   assert.equal(
-    shape(data).netDelegation.startsWith(net < 0n ? "−" : "+"),
+    shape(data, fixtureBinds).netDelegation.startsWith(net < 0n ? "−" : "+"),
     true,
   );
 });

@@ -1,10 +1,16 @@
-import {
-  binds,
-  exchanges,
-  fillWindow,
-  payoutWindow,
-  zeroWord,
-} from "../src/report.mjs";
+import { bindsAt, exchanges, fillBinds, zeroWord } from "../src/report.mjs";
+import { blockAt as chainBlockAt } from "./fake-testril.mjs";
+
+export const fixtureNow = Date.parse("2026-11-02T12:00:00Z");
+export const fixtureBinds = bindsAt(fixtureNow);
+const payoutsWindow = fixtureBinds.find(
+  (bind) => bind.name === "payouts",
+).window;
+const fillWindow = {
+  from_block: chainBlockAt(payoutsWindow.from_time),
+  to_block: chainBlockAt(payoutsWindow.to_time),
+};
+const payoutWindow = fillWindow;
 
 const fillCount = 280;
 const blocksInDay = fillWindow.to_block - fillWindow.from_block;
@@ -127,38 +133,45 @@ function payoutRows() {
   });
 }
 
+export const fillsIn = (rows) =>
+  fillBinds(fixtureBinds).flatMap((bind) => rows[bind.name]);
+export const firstFillBind = (rows) =>
+  fillBinds(fixtureBinds).find((bind) => rows[bind.name].length).name;
+
 export function fixture() {
   startFromSeed();
   const fills = [
     ...Array.from({ length: fillCount - 4 }, randomFill),
     ...whaleFills(),
   ].sort((a, b) => a.block - b.block || a.log_index - b.log_index);
-  return { fills, payouts: payoutRows() };
+  return {
+    ...Object.fromEntries(
+      fillBinds(fixtureBinds).map(({ name, window }) => [
+        name,
+        fills.filter(
+          (f) =>
+            f.block >= chainBlockAt(window.from_time) &&
+            f.block < chainBlockAt(window.to_time),
+        ),
+      ]),
+    ),
+    payouts: payoutRows(),
+  };
 }
 
 const sameParams = (a, b) => JSON.stringify(a) === JSON.stringify(b);
-const covers = (outer, inner) =>
-  Object.keys(inner).every((key) =>
-    key.startsWith("from_")
-      ? inner[key] >= outer[key]
-      : inner[key] <= outer[key],
-  );
 
 export function fixtureRows() {
   const rows = fixture();
   return (bound, window) => {
-    const bind = binds.find(
+    const bind = fixtureBinds.find(
       (candidate) =>
         candidate.function_slug === bound.function_slug &&
         candidate.chain_id === bound.chain_id &&
         sameParams(candidate.params, bound.params) &&
-        covers(candidate.window, window),
+        candidate.window.from_time <= window.from_time &&
+        candidate.window.to_time >= window.to_time,
     );
-    return "from_block" in window && bind.read
-      ? rows[bind.name].filter(
-          (row) =>
-            row.block >= window.from_block && row.block < window.to_block,
-        )
-      : rows[bind.name];
+    return rows[bind.name];
   };
 }

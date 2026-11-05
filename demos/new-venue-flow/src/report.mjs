@@ -1,35 +1,45 @@
-export const binds = [
-  {
-    name: "aqua-ethereum",
-    function_slug: "aqua.push_volume",
-    chain_id: 1,
-    params: {
-      swap: { registry: "0x499943e74fb0ce105688beee8ef2abec5d936d31" },
-      by: "day",
+const dayMs = 86400000;
+const isoSecond = (ms) => new Date(ms).toISOString().replace(".000Z", "Z");
+
+export function bindsAt(now = Date.now()) {
+  const today = Math.floor(now / dayMs) * dayMs;
+  const untilToday = (ms) => ({
+    from_time: isoSecond(today - ms),
+    to_time: isoSecond(today),
+  });
+  return [
+    {
+      name: "aqua-ethereum",
+      function_slug: "aqua.push_volume",
+      chain_id: 1,
+      params: {
+        swap: { registry: "0x499943e74fb0ce105688beee8ef2abec5d936d31" },
+        by: "day",
+      },
+      window: untilToday(8 * dayMs),
     },
-    window: { from_day: "2026-10-25", to_day: "2026-11-02" },
-  },
-  {
-    name: "aqua-base",
-    function_slug: "aqua.push_volume",
-    chain_id: 8453,
-    params: {
-      swap: { registry: "0x499943e74fb0ce105688beee8ef2abec5d936d31" },
-      by: "day",
+    {
+      name: "aqua-base",
+      function_slug: "aqua.push_volume",
+      chain_id: 8453,
+      params: {
+        swap: { registry: "0x499943e74fb0ce105688beee8ef2abec5d936d31" },
+        by: "day",
+      },
+      window: untilToday(8 * dayMs),
     },
-    window: { from_day: "2026-10-25", to_day: "2026-11-02" },
-  },
-  {
-    name: "tessera-base",
-    function_slug: "tessera_v.token_volume",
-    chain_id: 8453,
-    params: {
-      swap: { swap_address: "0x55555522005bcae1c2424d474bfd5ed477749e3e" },
-      by: "day",
+    {
+      name: "tessera-base",
+      function_slug: "tessera_v.token_volume",
+      chain_id: 8453,
+      params: {
+        swap: { swap_address: "0x55555522005bcae1c2424d474bfd5ed477749e3e" },
+        by: "day",
+      },
+      window: untilToday(8 * dayMs),
     },
-    window: { from_day: "2026-10-25", to_day: "2026-11-02" },
-  },
-];
+  ];
+}
 
 const fieldsBySlug = {
   "aqua.push_volume": {
@@ -63,12 +73,12 @@ const tokens = {
     "0x4200000000000000000000000000000000000006": ["WETH", 18],
   },
 };
-export const venues = binds.map((bind) => ({
-  ...bind,
-  title: venueNames[bind.name],
-  fields: fieldsBySlug[bind.function_slug],
-}));
-export const reportWindow = binds[0].window;
+export const venuesOf = (binds) =>
+  binds.map((bind) => ({
+    ...bind,
+    title: venueNames[bind.name],
+    fields: fieldsBySlug[bind.function_slug],
+  }));
 const integer = /^[0-9]+$/;
 
 const nextDay = (day) =>
@@ -76,9 +86,14 @@ const nextDay = (day) =>
     .toISOString()
     .slice(0, 10);
 
-export function windowDays({ from_day, to_day }) {
+export function windowDays({ from_time, to_time }) {
   const days = [];
-  for (let day = from_day; day < to_day; day = nextDay(day)) days.push(day);
+  for (
+    let day = from_time.slice(0, 10);
+    day < to_time.slice(0, 10);
+    day = nextDay(day)
+  )
+    days.push(day);
   return days;
 }
 
@@ -114,8 +129,8 @@ function checkVenue(venue, rows) {
   return `${venue.title}: ${seen.size} token-days in ${days.length} days, every row has a positive count and amount, no day counted twice`;
 }
 
-export function check(rows) {
-  return venues.map((venue) => checkVenue(venue, rows[venue.name]));
+export function check(rows, binds) {
+  return venuesOf(binds).map((venue) => checkVenue(venue, rows[venue.name]));
 }
 
 export function formatAmount(raw, decimals) {
@@ -153,10 +168,11 @@ function tokenSummary(venue, rows, address, days) {
   };
 }
 
-export function shape(rows) {
+export function shape(rows, binds) {
+  const reportDays = windowDays(binds[0].window);
   return {
-    window: reportWindow,
-    venues: venues.map((venue) => {
+    window: { first: reportDays[0], last: reportDays.at(-1) },
+    venues: venuesOf(binds).map((venue) => {
       const venueRows = rows[venue.name];
       const days = windowDays(venue.window);
       const addresses = [

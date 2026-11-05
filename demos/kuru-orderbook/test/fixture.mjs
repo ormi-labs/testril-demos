@@ -1,4 +1,7 @@
-import { binds, usdc, volumeDays, zeroAddress } from "../src/report.mjs";
+import { bindsAt, usdc, volumeDays, zeroAddress } from "../src/report.mjs";
+
+export const fixtureNow = Date.parse("2026-11-02T12:00:00Z");
+export const fixtureBinds = bindsAt(fixtureNow);
 
 const wmon = "0x3bd359c1119da7da1d913d1c4d2b7c461115433a";
 const weth = "0xee8c0e9f1bffb4eb878d8f15f368a02a35481242";
@@ -104,7 +107,7 @@ function marketRows(random) {
 
 function volumeRows(random, markets) {
   const rows = [];
-  for (const day of volumeDays())
+  for (const day of volumeDays(fixtureBinds))
     marketSpecs.forEach((spec, index) => {
       if (random() >= spec.activeShare) return;
       const quoteVolume =
@@ -140,28 +143,16 @@ export function fixture() {
 }
 
 const sameParams = (a, b) => JSON.stringify(a) === JSON.stringify(b);
-const covers = (outer, inner) =>
-  Object.keys(inner).every((key) =>
-    key.startsWith("from_")
-      ? inner[key] >= outer[key]
-      : inner[key] <= outer[key],
-  );
 
 export function fixtureRows() {
   const rows = fixture();
-  return (bound, window) => {
-    const bind = binds.find(
-      (candidate) =>
-        candidate.function_slug === bound.function_slug &&
-        candidate.chain_id === bound.chain_id &&
-        sameParams(candidate.params, bound.params) &&
-        covers(candidate.window, window),
-    );
-    return "from_block" in window && bind.read
-      ? rows[bind.name].filter(
-          (row) =>
-            row.block >= window.from_block && row.block < window.to_block,
-        )
-      : rows[bind.name];
-  };
+  return (bound) =>
+    rows[
+      fixtureBinds.find(
+        (candidate) =>
+          candidate.function_slug === bound.function_slug &&
+          candidate.chain_id === bound.chain_id &&
+          sameParams(candidate.params, bound.params),
+      ).name
+    ];
 }

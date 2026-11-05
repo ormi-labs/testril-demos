@@ -1,4 +1,7 @@
-import { binds, days, knownPools } from "../src/report.mjs";
+import { bindsAt, days, knownPools } from "../src/report.mjs";
+
+export const fixtureNow = Date.parse("2026-11-02T12:00:00Z");
+export const fixtureBinds = bindsAt(fixtureNow);
 
 const [wethUsdc, usdcCbbtc] = Object.keys(knownPools);
 const otherPools = Array.from(
@@ -19,7 +22,7 @@ const units = (amount, decimals, random) =>
   BigInt(Math.floor(random() * 10 ** Math.min(decimals, 6)));
 
 function poolRows(random, pool, dailyDollars, volumes, skipOdds) {
-  return days()
+  return days(fixtureBinds)
     .filter(() => random() >= skipOdds)
     .map((day) => {
       const dollars = dailyDollars * (0.6 + random() * 0.8);
@@ -71,29 +74,7 @@ export function fixture() {
   return { "pool-volume": rows };
 }
 
-const sameParams = (a, b) => JSON.stringify(a) === JSON.stringify(b);
-const covers = (outer, inner) =>
-  Object.keys(inner).every((key) =>
-    key.startsWith("from_")
-      ? inner[key] >= outer[key]
-      : inner[key] <= outer[key],
-  );
-
 export function fixtureRows() {
   const rows = fixture();
-  return (bound, window) => {
-    const bind = binds.find(
-      (candidate) =>
-        candidate.function_slug === bound.function_slug &&
-        candidate.chain_id === bound.chain_id &&
-        sameParams(candidate.params, bound.params) &&
-        covers(candidate.window, window),
-    );
-    return "from_block" in window && bind.read
-      ? rows[bind.name].filter(
-          (row) =>
-            row.block >= window.from_block && row.block < window.to_block,
-        )
-      : rows[bind.name];
-  };
+  return () => rows["pool-volume"];
 }

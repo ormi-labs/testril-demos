@@ -1,69 +1,79 @@
-export const binds = [
-  {
-    name: "reserves",
-    function_slug: "aave_v3.reserve_list",
-    chain_id: 1,
-    params: {
-      proxy_list: {
-        pool_addresses_provider: "0x2f39d218133afab8f2b819b1066c7e434ad94e9e",
-      },
-    },
-    window: { from_block: 16291000, to_block: 26323365 },
-  },
-  {
-    name: "reserve-state",
-    function_slug: "aave_v3.reserve_state",
-    chain_id: 1,
-    params: {
-      proxy_list: {
-        pool_addresses_provider: "0x2f39d218133afab8f2b819b1066c7e434ad94e9e",
-      },
-      reserve_list: {
+const dayMs = 86400000;
+const aaveProviderCreatedAt = "2022-12-29T14:25:47Z";
+const isoSecond = (ms) => new Date(ms).toISOString().replace(".000Z", "Z");
+
+export function bindsAt(now = Date.now()) {
+  const today = Math.floor(now / dayMs) * dayMs;
+  const untilToday = (ms) => ({
+    from_time: isoSecond(today - ms),
+    to_time: isoSecond(today),
+  });
+  return [
+    {
+      name: "reserves",
+      function_slug: "aave_v3.reserve_list",
+      chain_id: 1,
+      params: {
         proxy_list: {
           pool_addresses_provider: "0x2f39d218133afab8f2b819b1066c7e434ad94e9e",
         },
       },
-      by: "hour",
+      window: { from_time: aaveProviderCreatedAt, to_time: isoSecond(today) },
     },
-    window: { from_hour: "2026-10-25T00", to_hour: "2026-11-01T00" },
-  },
-  {
-    name: "reserve-totals",
-    function_slug: "aave_v3.reserve_totals",
-    chain_id: 1,
-    params: {
-      proxy_list: {
-        pool_addresses_provider: "0x2f39d218133afab8f2b819b1066c7e434ad94e9e",
+    {
+      name: "reserve-state",
+      function_slug: "aave_v3.reserve_state",
+      chain_id: 1,
+      params: {
+        proxy_list: {
+          pool_addresses_provider: "0x2f39d218133afab8f2b819b1066c7e434ad94e9e",
+        },
+        reserve_list: {
+          proxy_list: {
+            pool_addresses_provider:
+              "0x2f39d218133afab8f2b819b1066c7e434ad94e9e",
+          },
+        },
+        by: "hour",
       },
+      window: untilToday(7 * dayMs),
     },
-    window: { from_block: 26316189, to_block: 26323365 },
-  },
-  {
-    name: "morpho-holdings",
-    function_slug: "morpho_blue.token_holdings",
-    chain_id: 1,
-    params: {
-      morpho_blue: "0xbbbbbbbbbb9cc5e90e3b3af64bdaf62c37eeffcb",
-      market_list: {
+    {
+      name: "reserve-totals",
+      function_slug: "aave_v3.reserve_totals",
+      chain_id: 1,
+      params: {
+        proxy_list: {
+          pool_addresses_provider: "0x2f39d218133afab8f2b819b1066c7e434ad94e9e",
+        },
+      },
+      window: untilToday(dayMs),
+    },
+    {
+      name: "morpho-holdings",
+      function_slug: "morpho_blue.token_holdings",
+      chain_id: 1,
+      params: {
         morpho_blue: "0xbbbbbbbbbb9cc5e90e3b3af64bdaf62c37eeffcb",
+        market_list: {
+          morpho_blue: "0xbbbbbbbbbb9cc5e90e3b3af64bdaf62c37eeffcb",
+        },
+        vault_list: {
+          factories: [
+            "0xa9c3d3a366466fa809d1ae982fb2c46e5fc41101",
+            "0x1897a8997241c1cd4bd0698647e4eb7213535c24",
+          ],
+        },
+        by: "day",
       },
-      vault_list: {
-        factories: [
-          "0xa9c3d3a366466fa809d1ae982fb2c46e5fc41101",
-          "0x1897a8997241c1cd4bd0698647e4eb7213535c24",
-        ],
-      },
-      by: "day",
+      window: untilToday(7 * dayMs),
     },
-    window: { from_day: "2026-10-25", to_day: "2026-11-01" },
-  },
-];
+  ];
+}
 
-const bindByName = Object.fromEntries(binds.map((bind) => [bind.name, bind]));
-export const stateWindow = bindByName["reserve-state"].window;
-export const totalsWindow = bindByName["reserve-totals"].window;
-export const holdingsWindow = bindByName["morpho-holdings"].window;
-export const reservesWindow = bindByName.reserves.window;
+const windowOf = (binds, name) =>
+  binds.find((bind) => bind.name === name).window;
+const hourOf = (time) => time.slice(0, 13);
 
 export const assets = [
   {
@@ -129,17 +139,25 @@ export const addDays = (day, step) =>
     .toISOString()
     .slice(0, 10);
 
-export function holdingDays() {
+export function holdingDays(binds) {
+  const { from_time, to_time } = windowOf(binds, "morpho-holdings");
   const days = [];
   for (
-    let d = holdingsWindow.from_day;
-    d < holdingsWindow.to_day;
+    let d = from_time.slice(0, 10);
+    d < to_time.slice(0, 10);
     d = addDays(d, 1)
   )
     days.push(d);
   return days;
 }
-export const lastStateHour = addHours(stateWindow.to_hour, -1);
+export const stateHours = (binds) => {
+  const { from_time, to_time } = windowOf(binds, "reserve-state");
+  const hours = [];
+  for (let h = hourOf(from_time); h < hourOf(to_time); h = addHours(h, 1))
+    hours.push(h);
+  return hours;
+};
+export const lastStateHour = (binds) => stateHours(binds).at(-1);
 
 const assetByAddress = (asset) =>
   assets.find((a) => a.address === asset.toLowerCase());
@@ -158,7 +176,9 @@ function latestPerAsset(rows, order) {
   return latest;
 }
 
-function checkState(rows) {
+function checkState(rows, binds) {
+  const hours = stateHours(binds);
+  const lastHour = hours.at(-1);
   const listed = new Set(rows.reserves.map((row) => row.asset.toLowerCase()));
   for (const row of rows["reserve-state"]) {
     const name = assetByAddress(row.asset)?.symbol ?? row.asset;
@@ -166,7 +186,7 @@ function checkState(rows) {
       throw new Error(
         `${name} has hourly state but is not in the reserve list.`,
       );
-    if (row.hour < stateWindow.from_hour || row.hour >= stateWindow.to_hour)
+    if (!hours.includes(row.hour))
       throw new Error(`${name} state at ${row.hour} is outside the window.`);
     if (BigInt(row.variable_debt) > BigInt(row.a_token_supply))
       throw new Error(
@@ -187,8 +207,8 @@ function checkState(rows) {
   }
   const latest = latestPerAsset(rows["reserve-state"], (row) => row.hour);
   for (const { symbol, address } of assets)
-    if (latest.get(address)?.hour !== lastStateHour)
-      throw new Error(`${symbol} has no state at ${lastStateHour}.`);
+    if (latest.get(address)?.hour !== lastHour)
+      throw new Error(`${symbol} has no state at ${lastHour}.`);
 }
 
 function checkTotals(rows) {
@@ -199,10 +219,6 @@ function checkTotals(rows) {
     const name = assetByAddress(asset)?.symbol ?? asset;
     const sorted = list.toSorted((a, b) => a.block - b.block);
     sorted.forEach((row, i) => {
-      if (row.block >= totalsWindow.to_block)
-        throw new Error(
-          `${name} totals at block ${row.block} are after the window.`,
-        );
       if (BigInt(row.flash_premium) > BigInt(row.flash_loaned))
         throw new Error(
           `${name} flash-loan premiums exceed the amount flash-loaned at block ${row.block}.`,
@@ -219,13 +235,13 @@ function checkTotals(rows) {
       throw new Error(`${symbol} has no lifetime totals.`);
 }
 
-function checkHoldings(rows) {
+function checkHoldings(rows, binds) {
   for (const row of rows["morpho-holdings"])
     if (!rawAmount.test(row.in_markets) || !rawAmount.test(row.in_vaults))
       throw new Error(
         `Morpho holdings of ${row.token} on ${row.day} are not non-negative integers.`,
       );
-  for (const day of holdingDays()) {
+  for (const day of holdingDays(binds)) {
     const venues = usdcByVenue(rows, day);
     if (!venues)
       throw new Error(
@@ -236,11 +252,11 @@ function checkHoldings(rows) {
   }
 }
 
-export function check(rows) {
-  checkState(rows);
+export function check(rows, binds) {
+  checkState(rows, binds);
   checkTotals(rows);
-  checkHoldings(rows);
-  const days = holdingDays().length;
+  checkHoldings(rows, binds);
+  const days = holdingDays(binds).length;
   return [
     `Every Aave reserve with state is in the reserve list, and all ${rows["reserve-state"].length} hourly rows lie inside the window`,
     "Variable debt never exceeds aToken supply (utilization within 0–100%); supply rates never exceed borrow rates; borrow rates read as ray stay between 0.001% and 1000%",
@@ -321,16 +337,18 @@ function lifetimeTotals(rows) {
   });
 }
 
-export function shape(rows) {
-  const byVenue = holdingDays().map((day) => usdcByVenue(rows, day));
+export function shape(rows, binds) {
+  const hours = stateHours(binds);
+  const days = holdingDays(binds);
+  const byVenue = days.map((day) => usdcByVenue(rows, day));
   const display = (raw) => formatAmount(raw, usdc.decimals);
   const latest = byVenue.at(-1);
   const board = rateBoard(rows);
   const totals = lifetimeTotals(rows);
   return {
-    stateWindow,
-    totalsWindow,
-    holdingsWindow,
+    stateHours: { first: hours[0], last: hours.at(-1) },
+    totalsDay: windowOf(binds, "reserve-totals").from_time.slice(0, 10),
+    holdingDays: { first: days[0], last: days.at(-1) },
     reserveCount: rows.reserves.length,
     headline: {
       usdcUtilization: board[0].utilization,

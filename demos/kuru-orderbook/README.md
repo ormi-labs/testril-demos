@@ -19,7 +19,7 @@ what Testril already indexed.
 | Variable            | Purpose                                                    |
 | ------------------- | ---------------------------------------------------------- |
 | `TESTRIL_PAYER_KEY` | Hex private key that signs vouchers; required to fetch     |
-| `TESTRIL_MCP_URL`   | Testril MCP endpoint; default `https://dev.testril.ai/mcp` |
+| `TESTRIL_MCP_URL`   | Testril MCP endpoint; default `https://api.testril.si/mcp` |
 
 ## Run
 
@@ -69,23 +69,23 @@ for the report. The fixture lives in `test/` and is never shown on the page.
   quoted in another asset are listed after them, in that asset.
 - Symbols for WMON, WETH, WBTC and USDT0 come from fixed addresses in
   `src/report.mjs` (verify); other assets show shortened hex.
-- Volume: UTC days `[2026-10-25, 2026-11-02)`, so 2026-10-25 to 2026-11-01. The
-  daemon's `to_day` is exclusive.
-- Markets: blocks `[0, 118765043)`. The router's registrations are read from
-  the start of the chain so every market that traded in the window is listed;
-  `118765043` was the Monad head when the demo was planned.
+- Volume: the eight UTC days before the day of the press.
+- Markets: from the start of the chain (`from_time` 1970-01-01T00:00:00Z, the
+  timestamp of Monad's block 0) to 00:00 UTC on the day of the press. The
+  router's registrations are read from the start of the chain so every market
+  that traded in the window is listed.
 
 Volumes, fees and rebates are whole tokens with 18 decimals whatever the token's
 own decimals; the page divides by 10^18.
 
 ## Binds (`src/report.mjs`)
 
-Windows are half-open: the end is the first block or day not included.
+Windows end at 00:00 UTC on the day of the press; the end is not included.
 
-| Name      | Function             | Chain | Params                       | Window                  |
-| --------- | -------------------- | ----- | ---------------------------- | ----------------------- |
-| `markets` | `kuru.market_list`   | 143   | `router`                     | 0 → 118765043           |
-| `volume`  | `kuru.market_volume` | 143   | `swap.market_list`, `by` day | 2026-10-25 → 2026-11-02 |
+| Name      | Function             | Chain | Params                       | Window              |
+| --------- | -------------------- | ----- | ---------------------------- | ------------------- |
+| `markets` | `kuru.market_list`   | 143   | `router`                     | chain start → today |
+| `volume`  | `kuru.market_volume` | 143   | `swap.market_list`, `by` day | 8 days → today      |
 
 `volume` depends on the router's `kuru.trade` rows, which depend on
 `kuru.market_list`.

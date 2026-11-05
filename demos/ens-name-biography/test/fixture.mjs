@@ -1,17 +1,37 @@
 import {
-  binds,
-  blockWindow,
+  bindsAt,
   gracePeriodSeconds,
-  interpolatedMonthBlock,
   monthsInWindow,
-  subjects,
   nameWrapper,
+  secondsOfBlock,
+  secondsOfMonth,
+  subjectsOf,
   zeroAddress,
 } from "../src/report.mjs";
 
+export const fixtureNow = Date.parse("2026-11-02T12:00:00Z");
+export const fixtureBinds = bindsAt(fixtureNow);
+const subjects = subjectsOf(fixtureBinds);
+const registryWindow = fixtureBinds.find(
+  (bind) => bind.function_slug === "ens.domain",
+).window;
+const firstBlockSeconds = Date.parse(registryWindow.from_time) / 1000;
+const lastBlockSeconds = Date.parse(registryWindow.to_time) / 1000;
+const firstBlock = 9380380;
+const mergeBlock = 15537394;
+const mergeSeconds = secondsOfBlock(mergeBlock);
+
+function blockOfSeconds(seconds) {
+  return seconds >= mergeSeconds
+    ? mergeBlock + Math.round((seconds - mergeSeconds) / 12)
+    : Math.round(
+        firstBlock +
+          ((seconds - firstBlockSeconds) * (mergeBlock - firstBlock)) /
+            (mergeSeconds - firstBlockSeconds),
+      );
+}
+
 const yearSeconds = 365 * 86400;
-const firstBlockSeconds = Date.UTC(2020, 0, 30) / 1000;
-const lastBlockSeconds = Date.UTC(2026, 10, 2) / 1000;
 const ethNode =
   "0x93cdeb708b7545dc668eb9280176169d1c33cfd8ed6f04690a0bcc88a93fc4ae";
 const publicResolver2020 = "0x4976fb03c32e5b8cfe2b6ccb31c09ba78ebaba41";
@@ -84,16 +104,10 @@ function seeded(seed) {
 }
 
 const blockAt = (windowShare, random) =>
-  blockWindow.from_block +
-  Math.floor(windowShare * (blockWindow.to_block - blockWindow.from_block)) +
-  Math.floor(random() * 5000);
-const secondsAt = (block) =>
-  Math.round(
-    firstBlockSeconds +
-      ((block - blockWindow.from_block) /
-        (blockWindow.to_block - blockWindow.from_block)) *
-        (lastBlockSeconds - firstBlockSeconds),
-  );
+  blockOfSeconds(
+    firstBlockSeconds + windowShare * (lastBlockSeconds - firstBlockSeconds),
+  ) + Math.floor(random() * 5000);
+const secondsAt = (block) => Math.round(secondsOfBlock(block));
 
 function registrationRows(story, random) {
   let expires = 0;
@@ -153,10 +167,11 @@ function wrappedRows(story, wrapBlocks, registrations) {
 }
 
 function addressRows(story, domain) {
-  return monthsInWindow().map((month, index) => {
+  return monthsInWindow(fixtureBinds).map((month, index) => {
     const resolver =
-      domain.filter((row) => row.block <= interpolatedMonthBlock(month)).at(-1)
-        ?.resolver ?? zeroAddress;
+      domain
+        .filter((row) => secondsOfBlock(row.block) <= secondsOfMonth(month))
+        .at(-1)?.resolver ?? zeroAddress;
     const step = story.addresses.filter((s) => s.month <= index).at(-1);
     const address =
       resolver === zeroAddress || !step
@@ -185,28 +200,16 @@ export function fixture() {
 }
 
 const sameParams = (a, b) => JSON.stringify(a) === JSON.stringify(b);
-const covers = (outer, inner) =>
-  Object.keys(inner).every((key) =>
-    key.startsWith("from_")
-      ? inner[key] >= outer[key]
-      : inner[key] <= outer[key],
-  );
 
 export function fixtureRows() {
   const rows = fixture();
-  return (bound, window) => {
-    const bind = binds.find(
-      (candidate) =>
-        candidate.function_slug === bound.function_slug &&
-        candidate.chain_id === bound.chain_id &&
-        sameParams(candidate.params, bound.params) &&
-        covers(candidate.window, window),
-    );
-    return "from_block" in window && bind.read
-      ? rows[bind.name].filter(
-          (row) =>
-            row.block >= window.from_block && row.block < window.to_block,
-        )
-      : rows[bind.name];
-  };
+  return (bound) =>
+    rows[
+      fixtureBinds.find(
+        (candidate) =>
+          candidate.function_slug === bound.function_slug &&
+          candidate.chain_id === bound.chain_id &&
+          sameParams(candidate.params, bound.params),
+      ).name
+    ];
 }

@@ -94,7 +94,7 @@ function render(report) {
   const view = report.view;
   document.querySelector("#day").textContent = view.day;
   document.querySelector("#blocks").textContent =
-    `${view.fillWindow.from_block}–${view.fillWindow.to_block - 1}`;
+    `${view.day}, 00:00 to 24:00 UTC`;
   document.querySelector("#exchanges").textContent = view.exchanges.length;
   document
     .querySelector("#headline")

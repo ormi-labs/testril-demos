@@ -1,67 +1,74 @@
-export const binds = [
-  {
-    name: "launches",
-    function_slug: "pons.curve_list",
-    chain_id: 4663,
-    params: { factory: "0x7ed598bcef8bd9edd8c97a195c6d13f40801ec7e" },
-    window: { from_block: 26314521, to_block: 103783392 },
-  },
-  {
-    name: "graduations",
-    function_slug: "pons.graduated_pool_list",
-    chain_id: 4663,
-    params: {
-      factory: "0x7ed598bcef8bd9edd8c97a195c6d13f40801ec7e",
-      pool_manager: "0x58daec3116aae6d93017baaea7749052e8a04fa7",
+const dayMs = 86400000;
+const isoSecond = (ms) => new Date(ms).toISOString().replace(".000Z", "Z");
+
+export function bindsAt(now = Date.now()) {
+  const today = Math.floor(now / dayMs) * dayMs;
+  const untilToday = (ms) => ({
+    from_time: isoSecond(today - ms),
+    to_time: isoSecond(today),
+  });
+  return [
+    {
+      name: "launches",
+      function_slug: "pons.curve_list",
+      chain_id: 4663,
+      params: { factory: "0x7ed598bcef8bd9edd8c97a195c6d13f40801ec7e" },
+      window: untilToday(91 * dayMs),
     },
-    window: { from_block: 26314521, to_block: 103783392 },
-  },
-  {
-    name: "curve-volume",
-    function_slug: "pons.curve_volume",
-    chain_id: 4663,
-    params: {
-      swap: {
-        curve_list: { factory: "0x7ed598bcef8bd9edd8c97a195c6d13f40801ec7e" },
+    {
+      name: "graduations",
+      function_slug: "pons.graduated_pool_list",
+      chain_id: 4663,
+      params: {
+        factory: "0x7ed598bcef8bd9edd8c97a195c6d13f40801ec7e",
+        pool_manager: "0x58daec3116aae6d93017baaea7749052e8a04fa7",
       },
-      by: "day",
+      window: untilToday(91 * dayMs),
     },
-    window: { from_day: "2026-08-03", to_day: "2026-11-02" },
-  },
-  {
-    name: "pool-fees",
-    function_slug: "pons.pool_fees",
-    chain_id: 4663,
-    params: {
-      swap: {
+    {
+      name: "curve-volume",
+      function_slug: "pons.curve_volume",
+      chain_id: 4663,
+      params: {
+        swap: {
+          curve_list: { factory: "0x7ed598bcef8bd9edd8c97a195c6d13f40801ec7e" },
+        },
+        by: "day",
+      },
+      window: untilToday(91 * dayMs),
+    },
+    {
+      name: "pool-fees",
+      function_slug: "pons.pool_fees",
+      chain_id: 4663,
+      params: {
+        swap: {
+          hook: "0xe5e702641ea86f4ae6cc3cdaed2b886f976be044",
+          graduated_pool_list: {
+            factory: "0x7ed598bcef8bd9edd8c97a195c6d13f40801ec7e",
+            pool_manager: "0x58daec3116aae6d93017baaea7749052e8a04fa7",
+          },
+        },
+        by: "day",
+      },
+      window: untilToday(91 * dayMs),
+    },
+    {
+      name: "pool-fee-sweep",
+      function_slug: "pons.pool_fee_sweep",
+      chain_id: 4663,
+      params: {
         hook: "0xe5e702641ea86f4ae6cc3cdaed2b886f976be044",
         graduated_pool_list: {
           factory: "0x7ed598bcef8bd9edd8c97a195c6d13f40801ec7e",
           pool_manager: "0x58daec3116aae6d93017baaea7749052e8a04fa7",
         },
       },
-      by: "day",
+      window: untilToday(91 * dayMs),
     },
-    window: { from_day: "2026-08-03", to_day: "2026-11-02" },
-  },
-  {
-    name: "pool-fee-sweep",
-    function_slug: "pons.pool_fee_sweep",
-    chain_id: 4663,
-    params: {
-      hook: "0xe5e702641ea86f4ae6cc3cdaed2b886f976be044",
-      graduated_pool_list: {
-        factory: "0x7ed598bcef8bd9edd8c97a195c6d13f40801ec7e",
-        pool_manager: "0x58daec3116aae6d93017baaea7749052e8a04fa7",
-      },
-    },
-    window: { from_block: 26314521, to_block: 103783392 },
-  },
-];
+  ];
+}
 
-const bindByName = Object.fromEntries(binds.map((bind) => [bind.name, bind]));
-export const feesWindow = bindByName["pool-fees"].window;
-export const launchWindow = bindByName.launches.window;
 const topTokens = 12;
 
 const nextDay = (day) =>
@@ -69,9 +76,14 @@ const nextDay = (day) =>
     .toISOString()
     .slice(0, 10);
 
-export function feeDays() {
+export function feeDays(binds) {
+  const { window } = binds.find((bind) => bind.name === "pool-fees");
   const days = [];
-  for (let d = feesWindow.from_day; d < feesWindow.to_day; d = nextDay(d))
+  for (
+    let d = window.from_time.slice(0, 10);
+    d < window.to_time.slice(0, 10);
+    d = nextDay(d)
+  )
     days.push(d);
   return days;
 }
@@ -188,7 +200,8 @@ const eth = (wei) => Number(wei / 10n ** 12n) / 1e6;
 const tokenFees = (feeRows) =>
   [...feeTotals(feeRows).values()].sort(byTotalDesc);
 
-export function shape(rows) {
+export function shape(rows, binds) {
+  const days = feeDays(binds);
   const launched = rows.launches.length;
   const graduated = tokensOf(rows.graduations).size;
   const sweptTokenCount = tokensOf(rows["pool-fees"]).size;
@@ -206,8 +219,7 @@ export function shape(rows) {
   );
   const dailyFees = sumBy(rows["pool-fees"], "day");
   return {
-    feesWindow,
-    launchWindow,
+    window: { first: days[0], last: days.at(-1) },
     funnel: [
       { label: "Launched", count: launched },
       { label: "Graduated", count: graduated },
@@ -222,7 +234,7 @@ export function shape(rows) {
     creatorShare: percent(creator, total),
     buybackShare: percent(buyback, total),
     protocolShare: percent(protocol, total),
-    daily: feeDays().map((day) => ({
+    daily: days.map((day) => ({
       day,
       eth: eth(dailyFees.get(day) ?? 0n),
     })),

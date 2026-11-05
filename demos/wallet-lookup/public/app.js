@@ -73,15 +73,15 @@ function dailyChart(daily) {
   return chart;
 }
 
-function renderWallet(wallet, weekWindow) {
+function renderWallet(wallet, week) {
   document.querySelector("#address").textContent = wallet.address;
   document.querySelector("#week-window").textContent =
-    `blocks ${weekWindow.from_block}–${weekWindow.to_block - 1}`;
+    `${week.first} to ${week.last}`;
   document
     .querySelector("#headline")
     .replaceChildren(
       metric("ENS NAME", wallet.name),
-      metric("ETH BALANCE", wallet.balance, "at the last block of the window"),
+      metric("ETH BALANCE", wallet.balance, "at the end of the last day"),
       metric("TRANSFERS", String(wallet.transferCount), "in seven days"),
     );
   document
@@ -105,7 +105,7 @@ function renderWallet(wallet, weekWindow) {
 }
 
 function render(report) {
-  const { wallets, weekWindow } = report.view;
+  const { wallets, week } = report.view;
   const picker = document.querySelector("#wallet");
   picker.hidden = false;
   picker.replaceChildren(
@@ -115,9 +115,8 @@ function render(report) {
       return option;
     }),
   );
-  picker.onchange = () =>
-    renderWallet(wallets[Number(picker.value)], weekWindow);
-  renderWallet(wallets[0], weekWindow);
+  picker.onchange = () => renderWallet(wallets[Number(picker.value)], week);
+  renderWallet(wallets[0], week);
   document
     .querySelector("#checks")
     .replaceChildren(

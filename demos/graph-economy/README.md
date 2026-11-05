@@ -19,7 +19,7 @@ what Testril already indexed.
 | Variable            | Purpose                                                    |
 | ------------------- | ---------------------------------------------------------- |
 | `TESTRIL_PAYER_KEY` | Hex private key that signs vouchers; required to fetch     |
-| `TESTRIL_MCP_URL`   | Testril MCP endpoint; default `https://dev.testril.ai/mcp` |
+| `TESTRIL_MCP_URL`   | Testril MCP endpoint; default `https://api.testril.si/mcp` |
 
 ## Run
 
@@ -79,19 +79,17 @@ SubgraphService below.
 | SubgraphService | `0xb2bb92d0de618878e438b55d5846cfecd9301105` | named by RewardsManager.subgraphService |
 | GraphPayments   | `0x7aae8ae011927bc36cb4d0d3e81f2e6e30dae06d` | Controller `GraphPayments`              |
 
-Window: Arbitrum blocks `[518282017, 520415225)`, the seven UTC days
-2026-10-26 to 2026-11-01. Both ends were confirmed by block timestamp: 518282017 is 2026-10-26 00:00:00 UTC (its predecessor is 2026-10-25 23:59:59) and 520415225 is 2026-11-02 00:00:00 UTC. Both ends are the first block at or after midnight
-UTC (2026-10-26 and 2026-11-02), found by binary search over the public
-Arbitrum RPC, not through Testril.
+Window: the seven UTC days before the day of the press (`from_time` seven days
+before today 00:00 UTC, `to_time` today 00:00 UTC), read in eight-hour chunks.
 
 ## Binds (`src/report.mjs`)
 
-Windows are half-open: the end is the first block not included.
+Windows end at 00:00 UTC on the day of the press; the end is not included.
 
-| Name               | Function                         | Chain | Params                                                            | Window                |
-| ------------------ | -------------------------------- | ----- | ----------------------------------------------------------------- | --------------------- |
-| `indexing-rewards` | `graph_network.indexing_rewards` | 42161 | `rewards_manager`, `subgraph_service`, `staking`, `epoch_manager` | 518282017 → 520415225 |
-| `delegation`       | `graph_network.delegation`       | 42161 | `staking`, `epoch_manager`                                        | 518282017 → 520415225 |
-| `query-fees`       | `graph_network.query_fees`       | 42161 | `staking`, `subgraph_service`, `graph_payments`, `epoch_manager`  | 518282017 → 520415225 |
+| Name               | Function                         | Chain | Params                                                            | Window         |
+| ------------------ | -------------------------------- | ----- | ----------------------------------------------------------------- | -------------- |
+| `indexing-rewards` | `graph_network.indexing_rewards` | 42161 | `rewards_manager`, `subgraph_service`, `staking`, `epoch_manager` | 7 days → today |
+| `delegation`       | `graph_network.delegation`       | 42161 | `staking`, `epoch_manager`                                        | 7 days → today |
+| `query-fees`       | `graph_network.query_fees`       | 42161 | `staking`, `subgraph_service`, `graph_payments`, `epoch_manager`  | 7 days → today |
 
-Each bind is read in chunks of 100000 blocks.
+Each bind is read in chunks of eight hours.

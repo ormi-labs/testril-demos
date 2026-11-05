@@ -1,4 +1,13 @@
-import { binds, rewardWindow as window } from "../src/report.mjs";
+import { bindsAt } from "../src/report.mjs";
+import { blockAt } from "./fake-testril.mjs";
+
+export const fixtureNow = Date.parse("2026-11-02T12:00:00Z");
+export const fixtureBinds = bindsAt(fixtureNow);
+const rewardWindow = fixtureBinds[0].window;
+const window = {
+  from_block: blockAt(rewardWindow.from_time),
+  to_block: blockAt(rewardWindow.to_time),
+};
 
 const wei = 10n ** 18n;
 const firstEpoch = 1423;
@@ -87,7 +96,7 @@ function delegationRows(indexers, random) {
     const poolShares = (pool * 97n) / 100n;
     return {
       indexer,
-      verifier: binds[0].params.subgraph_service,
+      verifier: fixtureBinds[0].params.subgraph_service,
       delegator: `0x${hex(random, 40)}`,
       tokens: tokens.toString(),
       shares: ((tokens * 97n) / 100n).toString(),
@@ -161,28 +170,20 @@ export function fixture() {
 }
 
 const sameParams = (a, b) => JSON.stringify(a) === JSON.stringify(b);
-const covers = (outer, inner) =>
-  Object.keys(inner).every((key) =>
-    key.startsWith("from_")
-      ? inner[key] >= outer[key]
-      : inner[key] <= outer[key],
-  );
 
 export function fixtureRows() {
   const rows = fixture();
-  return (bound, window) => {
-    const bind = binds.find(
+  return (bound, requested) => {
+    const bind = fixtureBinds.find(
       (candidate) =>
         candidate.function_slug === bound.function_slug &&
         candidate.chain_id === bound.chain_id &&
-        sameParams(candidate.params, bound.params) &&
-        covers(candidate.window, window),
+        sameParams(candidate.params, bound.params),
     );
-    return "from_block" in window && bind.read
-      ? rows[bind.name].filter(
-          (row) =>
-            row.block >= window.from_block && row.block < window.to_block,
-        )
-      : rows[bind.name];
+    return rows[bind.name].filter(
+      (row) =>
+        row.block >= blockAt(requested.from_time) &&
+        row.block < blockAt(requested.to_time),
+    );
   };
 }

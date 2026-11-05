@@ -20,7 +20,7 @@ what Testril already indexed.
 | Variable            | Purpose                                                    |
 | ------------------- | ---------------------------------------------------------- |
 | `TESTRIL_PAYER_KEY` | Hex private key that signs vouchers; required to fetch     |
-| `TESTRIL_MCP_URL`   | Testril MCP endpoint; default `https://dev.testril.ai/mcp` |
+| `TESTRIL_MCP_URL`   | Testril MCP endpoint; default `https://api.testril.si/mcp` |
 
 ## Run
 
@@ -43,7 +43,7 @@ restart starts empty and the next fetch reads again.
 
 Without `TESTRIL_PAYER_KEY` the button is disabled and the page says what to set.
 
-Do not press **Fetch from Testril** until the Arrakis hook factory address and creation block and the pool window end block in `src/report.mjs` are verified on the chain.
+Do not press **Fetch from Testril** until the Arrakis hook factory address and creation time in `src/report.mjs` are verified on the chain.
 
 ## Test
 
@@ -67,34 +67,34 @@ for the report. The fixture lives in `test/` and is never shown on the page.
 
 ## Subjects and window
 
-- Pools: every pool the PoolManager initialized, from its creation block
-  21688329 to the first block of 2026-11-02 UTC, `[21688329, 26323365)`
-  (the end block is an estimate, verify it before fetching).
-- Volume: UTC days `[2026-10-25, 2026-11-02)`, one row per pool per day.
+- Pools: every pool the PoolManager initialized, from its creation
+  (2025-01-23T16:16:47Z, the timestamp of block 21688329) to 00:00 UTC on the
+  day of the press, read in 336-hour chunks.
+- Volume: the eight UTC days before the day of the press, one row per pool per
+  day.
 - Volume in dollars is the USDC or USDT side of a pool (6 decimals); pools with
   neither show swaps only.
 - Arrakis hooks: the private hooks created by the Arrakis hook factory, from
-  the factory's creation block to the same end block (the factory address and
-  its creation block are placeholders, verify both before fetching).
+  the factory's creation to the same end (the factory address and its creation
+  time are placeholders, verify both before fetching).
 
 | Subject                | Address                                      | Note                                                          |
 | ---------------------- | -------------------------------------------- | ------------------------------------------------------------- |
 | Uniswap v4 PoolManager | `0x000000000004444c5dc75cb358380d2e3de08a90` |                                                               |
 | Arrakis hook factory   | `0xef129a430032c8183aba158c1a70799e3b840df9` | verify: known on Base, not confirmed on Ethereum              |
-| Factory creation       | block 21688329                               | verify: placeholder (PoolManager creation), use the factory's |
-| PoolManager creation   | block 21688329                               | verify                                                        |
-| Pool window end        | block 26323365                               | verify: must be the first block at or after 2026-11-02T00:00Z |
+| Factory creation       | 2025-01-23T16:16:47Z (block 21688329)        | verify: placeholder (PoolManager creation), use the factory's |
+| PoolManager creation   | 2025-01-23T16:16:47Z (block 21688329)        | verify                                                        |
 | USDC                   | `0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48` |                                                               |
 | USDT                   | `0xdac17f958d2ee523a2206206994597c13d831ec7` |                                                               |
 
 ## Binds (`src/report.mjs`)
 
-Windows are half-open: the end is the first block or day not included.
+Windows end at 00:00 UTC on the day of the press; the end is not included.
 
-| Name            | Function                 | Chain | Params       | Window                  |
-| --------------- | ------------------------ | ----- | ------------ | ----------------------- |
-| `pools`         | `uniswap_v4.pool_list`   | 1     | `manager`    | 21688329 → 26323365     |
-| `volume`        | `uniswap_v4.pool_volume` | 1     | `swap`, `by` | 2026-10-25 → 2026-11-02 |
-| `arrakis-hooks` | `arrakis.hook_list`      | 1     | `factory`    | 21688329 → 26323365     |
+| Name            | Function                 | Chain | Params       | Window           |
+| --------------- | ------------------------ | ----- | ------------ | ---------------- |
+| `pools`         | `uniswap_v4.pool_list`   | 1     | `manager`    | creation → today |
+| `volume`        | `uniswap_v4.pool_volume` | 1     | `swap`, `by` | 8 days → today   |
+| `arrakis-hooks` | `arrakis.hook_list`      | 1     | `factory`    | creation → today |
 
-`pools` and `arrakis-hooks` are read in chunks of 100000 blocks.
+`pools` and `arrakis-hooks` are read in chunks of 336 hours.

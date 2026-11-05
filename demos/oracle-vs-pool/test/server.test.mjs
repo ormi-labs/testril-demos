@@ -4,7 +4,7 @@ import { setTimeout as delay } from "node:timers/promises";
 import { createApp } from "../src/server.mjs";
 import { payerAccount } from "../src/testril.mjs";
 import { fakeTestril } from "./fake-testril.mjs";
-import { fixture, fixtureRows } from "./fixture.mjs";
+import { fixture, fixtureNow, fixtureRows } from "./fixture.mjs";
 
 // Public deterministic test key. Never fund this account.
 const payerKey = `${"0".repeat(63)}1`;
@@ -34,7 +34,12 @@ test("the button's fetch ends in the shaped report and its passed cross-check", 
   });
   t.after(() => fake.close());
   const base = await listen(
-    createApp({ url: await fake.listen(), payerKey, pollMs: 1 }),
+    createApp({
+      url: await fake.listen(),
+      payerKey,
+      pollMs: 1,
+      now: () => fixtureNow,
+    }),
     t,
   );
   assert.equal(
@@ -70,7 +75,12 @@ test("a fetch with a missing hour reports a failed check, not an error", async (
   });
   t.after(() => fake.close());
   const base = await listen(
-    createApp({ url: await fake.listen(), payerKey, pollMs: 1 }),
+    createApp({
+      url: await fake.listen(),
+      payerKey,
+      pollMs: 1,
+      now: () => fixtureNow,
+    }),
     t,
   );
   await fetch(`${base}/api/run`, { method: "POST" });

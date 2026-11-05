@@ -19,37 +19,50 @@ const voucherTypes = {
   ],
 };
 
-const kindOf = (window) =>
-  ["hour", "day", "month"].find((kind) => `from_${kind}` in window) ?? "block";
-const blocksIn = (window) =>
-  kindOf(window) === "block" ? window.to_block - window.from_block : 7200;
+// A fake chain: one block every 12 s, block 26316189 at 2026-11-01T00:00:00Z.
+const anchorBlock = 26316189;
+const anchorMs = Date.parse("2026-11-01T00:00:00Z");
+const blockMs = 12000;
 const periodMs = { hour: 3600000, day: 86400000 };
-const monthIndex = (value) => {
-  const [year, month] = value.split("-").map(Number);
-  return year * 12 + month;
-};
-const startMs = (kind, value) =>
-  Date.parse(kind === "hour" ? `${value}:00:00Z` : `${value}T00:00:00Z`);
+const retiredFields = ["from_hour", "from_day", "from_month"];
 
-function jobSize(window) {
-  const kind = kindOf(window);
-  if (kind === "block") return { unit: "blocks", total: blocksIn(window) };
-  if (kind === "month")
-    return {
-      unit: "months",
-      total: monthIndex(window.to_month) - monthIndex(window.from_month),
-    };
-  const span =
-    startMs(kind, window[`to_${kind}`]) - startMs(kind, window[`from_${kind}`]);
-  return { unit: `${kind}s`, total: span / periodMs[kind] };
+export function blockAt(time) {
+  return anchorBlock + Math.ceil((Date.parse(time) - anchorMs) / blockMs);
 }
 
-function defaultRows(_bind, window) {
-  return kindOf(window) === "block"
-    ? Array.from({ length: blocksIn(window) }, (_, i) => ({
-        block: window.from_block + i,
-      }))
-    : [{ day: window.from_day }];
+function blockRange(window) {
+  return "from_time" in window
+    ? [blockAt(window.from_time), blockAt(window.to_time)]
+    : [window.from_block, window.to_block];
+}
+
+const blocksIn = (window) => {
+  const [from, to] = blockRange(window);
+  return to - from;
+};
+
+function monthsBetween(from, to) {
+  const months = (time) =>
+    new Date(time).getUTCFullYear() * 12 + new Date(time).getUTCMonth();
+  return months(to) - months(from);
+}
+
+function jobSize(bind, window) {
+  const by = bind.params.by;
+  if (!by) return { unit: "blocks", total: blocksIn(window) };
+  const span = Date.parse(window.to_time) - Date.parse(window.from_time);
+  const total =
+    by === "month"
+      ? monthsBetween(window.from_time, window.to_time)
+      : span / periodMs[by];
+  return { unit: `${by}s`, total };
+}
+
+function defaultRows(bind, window) {
+  if (bind.params.by)
+    return [{ [bind.params.by]: window.from_time.slice(0, 10) }];
+  const [from, to] = blockRange(window);
+  return Array.from({ length: to - from }, (_, i) => ({ block: from + i }));
 }
 const key = (id, window) => `${id} ${JSON.stringify(window)}`;
 const windowOf = ({ bound_function_id: _, ...window }) => window;
@@ -134,6 +147,13 @@ export function fakeTestril({
     const id = args.bound_function_id;
     const bind = bound.get(id);
     const window = windowOf(args);
+    const retired = retiredFields.find((field) => field in window);
+    if (retired)
+      return {
+        outcome: "error",
+        kind: "invalid_params",
+        message: `\`${tool}\` takes no field \`${retired}\``,
+      };
     if (tool === "materialize") {
       const busyJob = busy.find(
         (b) => b.function_slug === bind.function_slug && !served.has(b),
@@ -142,7 +162,7 @@ export function fakeTestril({
         served.add(busyJob);
         jobs.set(busyJob.job_id, {
           key: busyJob.partial ? undefined : key(id, window),
-          ...jobSize(window),
+          ...jobSize(bind, window),
         });
         return {
           outcome: "error",
@@ -177,7 +197,7 @@ export function fakeTestril({
     };
     if (tool === "materialize") {
       const jobId = `job:${jobs.size + 1}`;
-      jobs.set(jobId, { key: key(id, window), ...jobSize(window) });
+      jobs.set(jobId, { key: key(id, window), ...jobSize(bind, window) });
       return { outcome: "success", job: { job_id: jobId }, receipt };
     }
     return { outcome: "success", values: rows(bind, window), receipt };

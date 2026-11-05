@@ -1,11 +1,16 @@
 import {
-  binds,
+  bindsAt,
   finalTicks,
   liquidityAt,
   pool,
-  stateDay,
-  tickWindow,
+  stateDayOf,
 } from "../src/report.mjs";
+import { blockAt } from "./fake-testril.mjs";
+
+export const fixtureNow = Date.parse("2026-11-02T12:00:00Z");
+export const fixtureBinds = bindsAt(fixtureNow);
+const stateDay = stateDayOf(fixtureBinds);
+const tickFromBlock = blockAt(fixtureBinds[0].window.from_time);
 
 const currentTick = -196310n;
 const tickSpacing = 10;
@@ -51,7 +56,7 @@ function positions(random) {
 
 function changes(list) {
   const events = list.flatMap((position, index) => {
-    const block = tickWindow.from_block + 1000 + index * blockSpacing;
+    const block = tickFromBlock + 1000 + index * blockSpacing;
     const opened = [
       { block, tick: position.lower, amount: position.liquidity, side: 1n },
       { block, tick: position.upper, amount: position.liquidity, side: -1n },
@@ -116,27 +121,21 @@ export function fixture() {
 }
 
 const sameParams = (a, b) => JSON.stringify(a) === JSON.stringify(b);
-const covers = (outer, inner) =>
-  Object.keys(inner).every((key) =>
-    key.startsWith("from_")
-      ? inner[key] >= outer[key]
-      : inner[key] <= outer[key],
-  );
 
 export function fixtureRows() {
   const rows = fixture();
   return (bound, window) => {
-    const bind = binds.find(
+    const bind = fixtureBinds.find(
       (candidate) =>
         candidate.function_slug === bound.function_slug &&
         candidate.chain_id === bound.chain_id &&
-        sameParams(candidate.params, bound.params) &&
-        covers(candidate.window, window),
+        sameParams(candidate.params, bound.params),
     );
-    return "from_block" in window && bind.read
+    return bind.read
       ? rows[bind.name].filter(
           (row) =>
-            row.block >= window.from_block && row.block < window.to_block,
+            row.block >= blockAt(window.from_time) &&
+            row.block < blockAt(window.to_time),
         )
       : rows[bind.name];
   };

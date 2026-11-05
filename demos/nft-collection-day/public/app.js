@@ -33,7 +33,7 @@ function hoursChart(hours) {
   const chart = svg("svg", {
     viewBox: `0 0 ${width} ${height}`,
     role: "img",
-    "aria-label": "Mints and trades per approximate UTC hour",
+    "aria-label": "Mints and trades per UTC hour",
   });
   chart.append(
     svg("line", {
@@ -147,9 +147,9 @@ function render(report) {
   document.querySelector("#eyebrow").textContent =
     `ETHEREUM · ${view.name.toUpperCase()} (${view.symbol})`;
   document.querySelector("#day-window").textContent =
-    `${view.day} · ${view.dayWindow.from_block}–${view.dayWindow.to_block - 1}`;
+    `${view.day}, 00:00 to 24:00 UTC`;
   document.querySelector("#owners-window").textContent =
-    `blocks ${view.ownersWindow.from_block}–${view.ownersWindow.to_block - 1}`;
+    `${view.ownersSince} to ${view.day}`;
   document.querySelector("#collection").textContent = view.collection;
   document
     .querySelector("#headline")

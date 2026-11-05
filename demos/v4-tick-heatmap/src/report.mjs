@@ -1,32 +1,39 @@
-export const binds = [
-  {
-    name: "ticks",
-    function_slug: "uniswap_v4.tick",
-    chain_id: 1,
-    params: {
-      manager: "0x000000000004444c5dc75cb358380d2e3de08a90",
-      pool: "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
-    },
-    window: { from_block: 21688329, to_block: 26323365 },
-    read: { chunk_blocks: 200000 },
-  },
-  {
-    name: "pool-state",
-    function_slug: "uniswap_v4.pool_state",
-    chain_id: 1,
-    params: {
-      manager: "0x000000000004444c5dc75cb358380d2e3de08a90",
-      pool: "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
-      by: "day",
-    },
-    window: { from_day: "2026-11-01", to_day: "2026-11-02" },
-  },
-];
+const dayMs = 86400000;
+const managerCreatedAt = "2025-01-23T16:16:47Z";
+const tickChunkHours = 672;
+const isoSecond = (ms) => new Date(ms).toISOString().replace(".000Z", "Z");
+export const manager = "0x000000000004444c5dc75cb358380d2e3de08a90";
+export const pool =
+  "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27";
 
-const bindByName = Object.fromEntries(binds.map((bind) => [bind.name, bind]));
-export const { manager, pool } = bindByName.ticks.params;
-export const tickWindow = bindByName.ticks.window;
-export const stateDay = bindByName["pool-state"].window.from_day;
+export function bindsAt(now = Date.now()) {
+  const today = Math.floor(now / dayMs) * dayMs;
+  return [
+    {
+      name: "ticks",
+      function_slug: "uniswap_v4.tick",
+      chain_id: 1,
+      params: { manager, pool },
+      window: { from_time: managerCreatedAt, to_time: isoSecond(today) },
+      read: { chunk_hours: tickChunkHours },
+    },
+    {
+      name: "pool-state",
+      function_slug: "uniswap_v4.pool_state",
+      chain_id: 1,
+      params: { manager, pool, by: "day" },
+      window: {
+        from_time: isoSecond(today - dayMs),
+        to_time: isoSecond(today),
+      },
+    },
+  ];
+}
+
+export const stateDayOf = (binds) =>
+  binds
+    .find((bind) => bind.name === "pool-state")
+    .window.from_time.slice(0, 10);
 const decimalsGap = 1e12;
 const barTicks = 100;
 const barCount = 60;
@@ -56,25 +63,18 @@ export function liquidityAt(ticks, tick) {
     .reduce((sum, entry) => sum + entry.net, 0n);
 }
 
-function poolStateRow(rows) {
+function poolStateRow(rows, stateDay) {
   const row = rows["pool-state"].find((entry) => entry.day === stateDay);
   if (!row) throw new Error(`Pool state is missing ${stateDay}.`);
   return row;
 }
 
-export function check(rows) {
+export function check(rows, binds) {
+  const stateDay = stateDayOf(binds);
   const stray = [...rows.ticks, ...rows["pool-state"]].find(
     (row) => row.pool !== pool,
   );
   if (stray) throw new Error(`Row for pool ${stray.pool} is not ${pool}.`);
-  const outside = rows.ticks.find(
-    (row) =>
-      row.block < tickWindow.from_block || row.block >= tickWindow.to_block,
-  );
-  if (outside)
-    throw new Error(
-      `Tick row at block ${outside.block} is outside the window.`,
-    );
   const ticks = finalTicks(rows.ticks);
   const overdrawn = ticks.find(
     (entry) => (entry.net < 0n ? -entry.net : entry.net) > entry.gross,
@@ -86,7 +86,7 @@ export function check(rows) {
   const total = ticks.reduce((sum, entry) => sum + entry.net, 0n);
   if (total !== 0n)
     throw new Error(`Net liquidity across all ticks is ${total}, not 0.`);
-  const state = poolStateRow(rows);
+  const state = poolStateRow(rows, stateDay);
   const summed = liquidityAt(ticks, BigInt(state.tick));
   if (summed !== BigInt(state.liquidity))
     throw new Error(
@@ -153,8 +153,9 @@ function side(tick, currentTick) {
   return tick < currentTick ? "below price" : "above price";
 }
 
-export function shape(rows) {
-  const state = poolStateRow(rows);
+export function shape(rows, binds) {
+  const stateDay = stateDayOf(binds);
+  const state = poolStateRow(rows, stateDay);
   const ticks = finalTicks(rows.ticks);
   const currentTick = BigInt(state.tick);
   const initialized = ticks.filter((entry) => entry.gross > 0n);
@@ -168,7 +169,7 @@ export function shape(rows) {
       manager,
       fee: `${Number(state.lp_fee) / feeUnitsPerPercent}%`,
     },
-    tickWindow,
+    ticksSince: managerCreatedAt.slice(0, 10),
     stateDay,
     price: sqrtPriceUsd(BigInt(state.sqrt_price_x96)),
     currentTick: state.tick,

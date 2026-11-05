@@ -37,20 +37,6 @@ function metric(label, value, note) {
   return node;
 }
 
-const monthIndex = (month) => {
-  const [year, number] = month.split("-").map(Number);
-  return year * 12 + number - 1;
-};
-
-function yearTicks({ from_month: from, to_month: to }) {
-  const first = monthIndex(from);
-  const months = monthIndex(to) - first;
-  const ticks = [];
-  for (let m = first; m < first + months; m++)
-    if (m % 12 === 0) ticks.push({ year: m / 12, share: (m - first) / months });
-  return ticks;
-}
-
 function laneRows() {
   let y = 0;
   return rowOrder.map((kind) => {
@@ -127,7 +113,7 @@ function timelineChart(view) {
     }
   });
   const axisY = height - axisHeight + 18;
-  for (const { year, share } of yearTicks(view.monthWindow))
+  for (const { year, share } of view.yearTicks)
     chart.append(svg("text", { x: x(share), y: axisY, class: "tick" }, year));
   return chart;
 }
@@ -135,9 +121,9 @@ function timelineChart(view) {
 function render(report) {
   const view = report.view;
   document.querySelector("#block-window").textContent =
-    `${view.blockWindow.from_block} to ${view.blockWindow.to_block} (exclusive)`;
+    `${view.registryWindow.from_time} to ${view.registryWindow.to_time}`;
   document.querySelector("#month-window").textContent =
-    `${view.monthWindow.from_month} to ${view.monthWindow.to_month} (exclusive)`;
+    `${view.monthWindow.first} to ${view.monthWindow.last}`;
   document
     .querySelector("#headline")
     .replaceChildren(

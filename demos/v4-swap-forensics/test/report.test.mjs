@@ -1,12 +1,12 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { check, jitEvents, sandwiches, shape } from "../src/report.mjs";
-import { fixture } from "./fixture.mjs";
+import { fixture, fixtureBinds, toBindRows } from "./fixture.mjs";
 
 const rows = () => structuredClone(fixture());
 
 test("check passes on the fixture with all three invariants", () => {
-  const passed = check(rows());
+  const passed = check(toBindRows(rows()), fixtureBinds);
   assert.equal(passed.length, 3);
   assert.match(passed[2], /^3 JIT adds/);
 });
@@ -16,32 +16,47 @@ test("check fails when a swap's amounts are flipped against its price move", () 
   const swap = corrupted.swaps.findLast((s) => BigInt(s.amount0) > 0n);
   swap.amount0 = `-${swap.amount0}`;
   swap.amount1 = swap.amount1.slice(1);
-  assert.throws(() => check(corrupted), /price must/);
+  assert.throws(() => check(toBindRows(corrupted), fixtureBinds), /price must/);
 });
 
 test("check fails when a swap pays and receives the same sign", () => {
   const corrupted = rows();
   corrupted.swaps[0].amount1 = corrupted.swaps[0].amount0;
-  assert.throws(() => check(corrupted), /pays one currency/);
+  assert.throws(
+    () => check(toBindRows(corrupted), fixtureBinds),
+    /pays one currency/,
+  );
 });
 
 test("check fails when a swap reports less liquidity than a JIT add in range", () => {
   const corrupted = rows();
   const { swap } = jitEvents(corrupted)[0];
   corrupted.swaps.find((s) => s.tx === swap.tx).liquidity = "1";
-  assert.throws(() => check(corrupted), /less than the .* added in range/);
+  assert.throws(
+    () => check(toBindRows(corrupted), fixtureBinds),
+    /less than the .* added in range/,
+  );
 });
 
-test("check fails when a row sits outside the block window", () => {
-  const corrupted = rows();
-  corrupted.swaps[0].block = 1;
-  assert.throws(() => check(corrupted), /outside the window/);
+test("check fails when a row's block is out of hour order", () => {
+  const bound = toBindRows(rows());
+  const hours = fixtureBinds
+    .filter((bind) => bind.name.startsWith("swaps-") && bound[bind.name].length)
+    .map((bind) => bind.name);
+  bound[hours[0]].push(bound[hours.at(-1)].pop());
+  assert.throws(
+    () => check(bound, fixtureBinds),
+    /earlier hour already reached/,
+  );
 });
 
 test("check fails when USDC decimals are not 6", () => {
   const corrupted = rows();
   corrupted.tokens[0].decimals = "18";
-  assert.throws(() => check(corrupted), /not 6 decimals/);
+  assert.throws(
+    () => check(toBindRows(corrupted), fixtureBinds),
+    /not 6 decimals/,
+  );
 });
 
 test("JIT needs an exactly negated remove: one unit short is not JIT", () => {
@@ -62,7 +77,7 @@ test("a sandwich needs opposite directions: same direction twice is not one", ()
 });
 
 test("shape lists the biggest swaps first and counts the planted patterns", () => {
-  const view = shape(rows());
+  const view = shape(toBindRows(rows()), fixtureBinds);
   assert.equal(view.biggest[0].size, "$4,200,000.00");
   assert.equal(view.biggest[0].direction, "ETH → USDC");
   assert.equal(view.biggest[1].direction, "USDC → ETH");

@@ -20,7 +20,7 @@ what Testril already indexed.
 | Variable            | Purpose                                                    |
 | ------------------- | ---------------------------------------------------------- |
 | `TESTRIL_PAYER_KEY` | Hex private key that signs vouchers; required to fetch     |
-| `TESTRIL_MCP_URL`   | Testril MCP endpoint; default `https://dev.testril.ai/mcp` |
+| `TESTRIL_MCP_URL`   | Testril MCP endpoint; default `https://api.testril.si/mcp` |
 
 ## Run
 
@@ -64,8 +64,9 @@ for the report. The fixture lives in `test/` and is never shown on the page.
 
 ## Subjects and window
 
-- Hours: `[2026-10-25T00, 2026-11-01T00)`, 168 UTC hours, each read at the
-  hour's last block.
+- Hours: the 168 UTC hours before the hour of the press (`from_time` 168 hours
+  before the start of the current hour, `to_time` the start of the current
+  hour), each read at the hour's last block.
 - The pool is ETH (currency0, 18 decimals) against USDC (currency1, 6
   decimals), so USD per ETH is `sqrt_price_x96² / 2¹⁹² × 10¹²`.
 - Feeds answer with 8 decimals.
@@ -83,7 +84,7 @@ for the report. The fixture lives in `test/` and is never shown on the page.
 
 Windows are half-open: the end is the first hour not included.
 
-| Name    | Function                   | Chain | Params                  | Window                        |
-| ------- | -------------------------- | ----- | ----------------------- | ----------------------------- |
-| `pool`  | `uniswap_v4.pool_state`    | 1     | `manager`, `pool`, `by` | 2026-10-25T00 → 2026-11-01T00 |
-| `feeds` | `aggregator.latest_answer` | 1     | `feeds`, `by`           | 2026-10-25T00 → 2026-11-01T00 |
+| Name    | Function                   | Chain | Params                  | Window          |
+| ------- | -------------------------- | ----- | ----------------------- | --------------- |
+| `pool`  | `uniswap_v4.pool_state`    | 1     | `manager`, `pool`, `by` | 168 hours → now |
+| `feeds` | `aggregator.latest_answer` | 1     | `feeds`, `by`           | 168 hours → now |

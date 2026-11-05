@@ -1,29 +1,25 @@
 import {
   binds,
   hoursInWindow,
+  segments,
   tokens,
-  transferWindow,
+  walletKeys,
   wallets,
 } from "../src/report.mjs";
+import { blockAt } from "./fake-testril.mjs";
+
+export const fixtureNow = Date.parse("2026-11-02T12:00:00Z");
+export const fixtureBinds = binds;
 
 const unit = 10n ** 18n;
 const [stEth, mEth, cmEth] = tokens;
 const [cold, exploiter, walletA, walletB, walletC, walletD] = wallets;
 
-const hourCount = hoursInWindow().length;
-const blockSpan = transferWindow.to_block - transferWindow.from_block;
-export const hourEndBlocks = Object.fromEntries(
-  hoursInWindow().map((hour, index) => [
-    hour,
-    transferWindow.from_block +
-      Math.floor(((index + 1) * blockSpan) / hourCount) -
-      1,
-  ]),
-);
-const hourEnds = Object.values(hourEndBlocks);
-const hourStartBlock = (hour) =>
-  hour === 0 ? transferWindow.from_block : hourEnds[hour - 1] + 1;
-const hourOfBlock = (block) => hourEnds.findIndex((end) => block <= end);
+const blocksPerHour = 300;
+const windowStartBlock = blockAt(binds[0].window.from_time);
+const hourStartBlock = (hour) => windowStartBlock + hour * blocksPerHour;
+export const hourOfBlock = (block) =>
+  Math.floor((block - windowStartBlock) / blocksPerHour);
 const rebaseHour = (index) => index % 24 === 12;
 const rebaseNumerator = 10001n;
 const rebaseDenominator = 10000n;
@@ -96,14 +92,27 @@ const bindsOf = (slug) => binds.filter((bind) => bind.function_slug === slug);
 
 function transferRows(events) {
   return Object.fromEntries(
-    bindsOf("erc20.wallet_transfers").map((bind) => [
-      bind.name,
+    walletKeys.map((key, index) => [
+      `transfers-${key}`,
       events.filter(
-        (event) =>
-          event.from === bind.params.wallet || event.to === bind.params.wallet,
+        (event) => event.from === wallets[index] || event.to === wallets[index],
       ),
     ]),
   );
+}
+
+export function toBindRows(recording) {
+  const rows = { ...recording };
+  for (const key of walletKeys)
+    for (const segment of segments)
+      rows[`transfers-${key}-${segment.key}`] = recording[
+        `transfers-${key}`
+      ].filter(
+        (event) =>
+          event.block >= blockAt(segment.from_time) &&
+          event.block < blockAt(segment.to_time),
+      );
+  return rows;
 }
 
 function tokenBalanceRows(events) {
@@ -190,28 +199,18 @@ export function fixture() {
 }
 
 const sameParams = (a, b) => JSON.stringify(a) === JSON.stringify(b);
-const covers = (outer, inner) =>
-  Object.keys(inner).every((key) =>
-    key.startsWith("from_")
-      ? inner[key] >= outer[key]
-      : inner[key] <= outer[key],
-  );
 
 export function fixtureRows() {
-  const rows = fixture();
+  const rows = toBindRows(fixture());
   return (bound, window) => {
     const bind = binds.find(
       (candidate) =>
         candidate.function_slug === bound.function_slug &&
         candidate.chain_id === bound.chain_id &&
         sameParams(candidate.params, bound.params) &&
-        covers(candidate.window, window),
+        candidate.window.from_time <= window.from_time &&
+        candidate.window.to_time >= window.to_time,
     );
-    return "from_block" in window && bind.read
-      ? rows[bind.name].filter(
-          (row) =>
-            row.block >= window.from_block && row.block < window.to_block,
-        )
-      : rows[bind.name];
+    return rows[bind.name];
   };
 }

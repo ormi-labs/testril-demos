@@ -1,12 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import {
-  check,
-  hourBlocks,
-  hours,
-  shape,
-  zeroAddress,
-} from "../src/report.mjs";
+import { check, edgesBind, hours, shape, zeroAddress } from "../src/report.mjs";
 import { fixture } from "./fixture.mjs";
 
 const rows = () => structuredClone(fixture());
@@ -17,9 +11,7 @@ test("check proves each hour's supply change from mints and burns", () => {
 
 test("check fails when a burn is read as a mint", () => {
   const corrupted = rows();
-  const burn = corrupted["usdc-edges"].find(
-    (e) => e.to === zeroAddress && e.block >= hourBlocks(1).from,
-  );
+  const burn = corrupted[edgesBind(hours[1])].find((e) => e.to === zeroAddress);
   [burn.from, burn.to] = [zeroAddress, burn.from];
   assert.throws(() => check(corrupted), /mints minus burns/);
 });

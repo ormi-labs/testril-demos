@@ -103,7 +103,7 @@ function render(report) {
   if (!report.checks.ok) return;
   const view = report.view;
   document.querySelector("#pool-window").textContent =
-    `${view.poolWindow.from_hour} to ${view.poolWindow.to_hour} (exclusive)`;
+    `${view.poolWindow.first}:00 to ${view.poolWindow.last}:00 UTC`;
   document
     .querySelector("#headline")
     .replaceChildren(

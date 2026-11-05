@@ -56,18 +56,11 @@ function barChart(bars) {
   return chart;
 }
 
-function daysBetween(from, to) {
-  return (Date.parse(to) - Date.parse(from)) / 86400000;
-}
-
 function render(report) {
   const view = report.view;
-  const days = daysBetween(
-    view.volumeWindow.from_day,
-    view.volumeWindow.to_day,
-  );
+  const days = view.volumeDays.count;
   document.querySelector("#volume-window").textContent =
-    `${view.volumeWindow.from_day} to ${view.volumeWindow.to_day} (exclusive)`;
+    `${view.volumeDays.first} to ${view.volumeDays.last}`;
   document.querySelector("#router").textContent =
     `${view.router.slice(0, 8)}…${view.router.slice(-6)}`;
   document

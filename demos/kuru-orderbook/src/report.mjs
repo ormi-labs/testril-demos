@@ -1,29 +1,38 @@
-export const binds = [
-  {
-    name: "markets",
-    function_slug: "kuru.market_list",
-    chain_id: 143,
-    params: { router: "0xd651346d7c789536ebf06dc72ae3c8502cd695cc" },
-    window: { from_block: 0, to_block: 118765043 },
-  },
-  {
-    name: "volume",
-    function_slug: "kuru.market_volume",
-    chain_id: 143,
-    params: {
-      swap: {
-        market_list: { router: "0xd651346d7c789536ebf06dc72ae3c8502cd695cc" },
-      },
-      by: "day",
+const dayMs = 86400000;
+const chainStart = "1970-01-01T00:00:00Z";
+const isoSecond = (ms) => new Date(ms).toISOString().replace(".000Z", "Z");
+
+export function bindsAt(now = Date.now()) {
+  const today = Math.floor(now / dayMs) * dayMs;
+  const untilToday = (ms) => ({
+    from_time: isoSecond(today - ms),
+    to_time: isoSecond(today),
+  });
+  return [
+    {
+      name: "markets",
+      function_slug: "kuru.market_list",
+      chain_id: 143,
+      params: { router },
+      window: { from_time: chainStart, to_time: isoSecond(today) },
     },
-    window: { from_day: "2026-10-25", to_day: "2026-11-02" },
-  },
-];
+    {
+      name: "volume",
+      function_slug: "kuru.market_volume",
+      chain_id: 143,
+      params: {
+        swap: {
+          market_list: { router },
+        },
+        by: "day",
+      },
+      window: untilToday(8 * dayMs),
+    },
+  ];
+}
 
 export const zeroAddress = "0x0000000000000000000000000000000000000000";
-const bindByName = Object.fromEntries(binds.map((bind) => [bind.name, bind]));
-export const router = bindByName.markets.params.router;
-export const volumeWindow = bindByName.volume.window;
+export const router = "0xd651346d7c789536ebf06dc72ae3c8502cd695cc";
 export const usdc = "0x754704bc059f8c67012fed69bc8a327a5aafb603";
 const symbols = new Map([
   [zeroAddress, "MON"],
@@ -40,11 +49,14 @@ const nextDay = (day, step) =>
     .toISOString()
     .slice(0, 10);
 
-export function volumeDays() {
+const utcDay = (time) => time.slice(0, 10);
+
+export function volumeDays(binds) {
+  const { window } = binds.find((bind) => bind.name === "volume");
   const days = [];
   for (
-    let d = volumeWindow.from_day;
-    d < volumeWindow.to_day;
+    let d = utcDay(window.from_time);
+    d < utcDay(window.to_time);
     d = nextDay(d, 1)
   )
     days.push(d);
@@ -74,11 +86,12 @@ function checkFees(row, market) {
       throw feeError(row, `${side}_rebate exceeds ${side}_fee`);
 }
 
-export function check(rows) {
+export function check(rows, binds) {
   const registered = new Map(
     rows.markets.map((market) => [market.market.toLowerCase(), market]),
   );
-  const days = new Set(volumeDays());
+  const allDays = volumeDays(binds);
+  const days = new Set(allDays);
   const seen = new Set();
   for (const row of rows.volume) {
     const market = registered.get(row.market.toLowerCase());
@@ -97,7 +110,7 @@ export function check(rows) {
   return [
     `All ${rows.volume.length} volume rows belong to the ${registered.size} registered markets`,
     `Fees and rebates fit each market's registered rates in all ${rows.volume.length} rows`,
-    `Every row is inside ${volumeWindow.from_day} to ${volumeWindow.to_day} (exclusive) and each market has one row per day`,
+    `Every row is inside ${allDays[0]} to ${allDays.at(-1)} and each market has one row per day`,
   ];
 }
 
@@ -187,7 +200,8 @@ function share(part, whole) {
   return `${tenths / 10n}.${tenths % 10n}%`;
 }
 
-export function shape(rows) {
+export function shape(rows, binds) {
+  const days = volumeDays(binds);
   const totals = totalsByMarket(rows.volume);
   const entries = rows.markets
     .map((market) => {
@@ -207,7 +221,7 @@ export function shape(rows) {
   const trades = [...totals.values()].reduce((sum, t) => sum + t.trades, 0n);
   const top = usdcEntries[0];
   return {
-    volumeWindow,
+    volumeDays: { first: days[0], last: days.at(-1), count: days.length },
     router,
     registered: entries.length,
     active: totals.size,

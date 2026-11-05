@@ -92,7 +92,7 @@ function legend(exchanges) {
 function render(report) {
   const view = report.view;
   document.querySelector("#window").textContent =
-    `${view.tideWindow.from_hour} to ${view.tideWindow.to_hour} (exclusive)`;
+    `${view.tideWindow.first}:00 to ${view.tideWindow.last}:00 UTC`;
   document
     .querySelector("#headline")
     .replaceChildren(

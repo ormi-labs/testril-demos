@@ -1,4 +1,18 @@
-import { binds, tokens, wallets, weekWindow } from "../src/report.mjs";
+import { bindsAt, tokens, wallets } from "../src/report.mjs";
+import { blockAt } from "./fake-testril.mjs";
+
+export const fixtureNow = Date.parse("2026-11-02T12:00:00Z");
+export const fixtureBinds = bindsAt(fixtureNow);
+const weekWindow = {
+  from_block: blockAt(
+    fixtureBinds.find((b) => b.name.startsWith("transfers-")).window.from_time,
+  ),
+  to_block: blockAt(
+    fixtureBinds.find((b) => b.name === "ens-vitalik").window.to_time,
+  ),
+};
+const balanceAt =
+  blockAt(fixtureBinds.find((b) => b.name === "balance").window.to_time) - 1;
 
 const tokenAddresses = Object.keys(tokens);
 const counterparties = [
@@ -63,16 +77,15 @@ export function fixture() {
   const random = seeded(11);
   const rows = {
     balance: wallets.map((wallet) => ({
-      block: binds.find((bind) => bind.name === "balance").window.from_block,
+      block: balanceAt,
       owner: wallet.address,
       balance: balances[wallet.key].toString(),
     })),
   };
   for (const wallet of wallets) {
-    const ens = binds.find((bind) => bind.name === `ens-${wallet.key}`);
-    rows[ens.name] = [
+    rows[`ens-${wallet.key}`] = [
       {
-        block: ens.window.from_block,
+        block: balanceAt,
         address: wallet.address,
         name: names[wallet.key],
       },
@@ -83,28 +96,36 @@ export function fixture() {
 }
 
 const sameParams = (a, b) => JSON.stringify(a) === JSON.stringify(b);
-const covers = (outer, inner) =>
-  Object.keys(inner).every((key) =>
-    key.startsWith("from_")
-      ? inner[key] >= outer[key]
-      : inner[key] <= outer[key],
+
+export function toBindRows(recording) {
+  return Object.fromEntries(
+    fixtureBinds.map((bind) => {
+      const key = bind.name.split("-")[1];
+      return [
+        bind.name,
+        bind.function_slug === "erc20.wallet_transfers"
+          ? recording[`transfers-${key}`].filter(
+              (row) =>
+                row.block >= blockAt(bind.window.from_time) &&
+                row.block < blockAt(bind.window.to_time),
+            )
+          : recording[bind.name],
+      ];
+    }),
   );
+}
 
 export function fixtureRows() {
-  const rows = fixture();
+  const rows = toBindRows(fixture());
   return (bound, window) => {
-    const bind = binds.find(
+    const bind = fixtureBinds.find(
       (candidate) =>
         candidate.function_slug === bound.function_slug &&
         candidate.chain_id === bound.chain_id &&
         sameParams(candidate.params, bound.params) &&
-        covers(candidate.window, window),
+        candidate.window.from_time <= window.from_time &&
+        candidate.window.to_time >= window.to_time,
     );
-    return "from_block" in window && bind.read
-      ? rows[bind.name].filter(
-          (row) =>
-            row.block >= window.from_block && row.block < window.to_block,
-        )
-      : rows[bind.name];
+    return rows[bind.name];
   };
 }

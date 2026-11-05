@@ -15,7 +15,7 @@ what Testril already indexed.
 | Variable            | Purpose                                                    |
 | ------------------- | ---------------------------------------------------------- |
 | `TESTRIL_PAYER_KEY` | Hex private key that signs vouchers; required to fetch     |
-| `TESTRIL_MCP_URL`   | Testril MCP endpoint; default `https://dev.testril.ai/mcp` |
+| `TESTRIL_MCP_URL`   | Testril MCP endpoint; default `https://api.testril.si/mcp` |
 
 ## Run
 
@@ -38,10 +38,6 @@ again.
 
 Without `TESTRIL_PAYER_KEY` the button is disabled and the page says what to set.
 
-The cross-check needs `hourEndBlocks`, which the fetch does not read, so the page
-shows the failed check ("lacks an increasing last block per hour") until that is
-settled.
-
 ## Test
 
 ```sh
@@ -55,12 +51,12 @@ npm run format:check
 `npm test` also fetches from a fake Testril: the fetch pays with the payer's
 vouchers, reports Testril's job progress and keeps every row.
 `npm run test:browser` presses the button against the fake Testril and waits
-for the report and the failed cross-check. The fixture lives in `test/` and is
+for the report and its passed cross-check. The fixture lives in `test/` and is
 never shown on the page.
 
 ## Subjects and window
 
-Ethereum, blocks 21890994 to 21948291 (2025-02-21 to 2025-02-28 UTC, half-open at 21948292, found by binary search over a public RPC) and UTC hours 2025-02-21T00 to 2025-02-28T23. Tokens: stETH, mETH, cmETH.
+Ethereum, the eight fixed UTC days 2025-02-21T00:00:00Z to 2025-03-01T00:00:00Z (the hack was 2025-02-21). The window is history, so it does not follow the press. Tokens: stETH, mETH, cmETH.
 
 | Wallet             | Address                                      | Note                        |
 | ------------------ | -------------------------------------------- | --------------------------- |
@@ -77,19 +73,21 @@ Token addresses (verify): stETH `0xae7ab96520de3a18e5e111b5eaab095312d7fe84`, mE
 
 Declared in `src/report.mjs`, one trio per wallet.
 
-| Bind                         | Function                                        | Window                                           |
-| ---------------------------- | ----------------------------------------------- | ------------------------------------------------ |
-| `transfers-<wallet>` (6)     | `erc20.wallet_transfers`, the three tokens      | blocks 21890994 to 21948292                      |
-| `token-balance-<wallet>` (6) | `erc20.token_balance` by hour, the three tokens | hours 2025-02-21T00 to 2025-03-01T00 (exclusive) |
-| `balance-<wallet>` (6)       | `native.balance` by hour                        | hours 2025-02-21T00 to 2025-03-01T00 (exclusive) |
+| Bind                                    | Function                                        | Window                                                                           |
+| --------------------------------------- | ----------------------------------------------- | -------------------------------------------------------------------------------- |
+| `transfers-<wallet>-<day>-<hour>` (144) | `erc20.wallet_transfers`, the three tokens      | one segment: 00:00-12:00, 12:00-14:00, 14:00-24:00 UTC of each of the eight days |
+| `token-balance-<wallet>` (6)            | `erc20.token_balance` by hour, the three tokens | 2025-02-21T00:00:00Z to 2025-03-01T00:00:00Z                                     |
+| `balance-<wallet>` (6)                  | `native.balance` by hour                        | 2025-02-21T00:00:00Z to 2025-03-01T00:00:00Z                                     |
+
+A transfer row carries its block, not a time, so a transfer's place in time is the bind it was read in. The segment from 12:00 to 14:00 UTC stands alone because it holds Lido's daily stETH rebase.
 
 ## Cross-check
 
-`check` in `src/report.mjs` uses BigInt throughout and throws on a failure:
+`check` in `src/check.mjs` uses BigInt throughout and throws on a failure:
 
 - A transfer is keyed by transaction and log index, so one read from both its sender's and recipient's wallet counts once; a repeat inside one wallet fails.
 - A transfer between two trail wallets must appear, identical, on both sides.
-- A wallet's hourly token balance changes between hours by exactly the transfers in the trail in that hour (inflows minus outflows, per token). The check reads each hour's last block from `hourEndBlocks` (hour to block); a transfer belongs to the first hour whose last block is at or after it. stETH may differ by 2 wei per transfer for share rounding, plus up to 0.02% of the balance in the 12:00 and 13:00 UTC hours that hold Lido's daily rebase. The first hour's balance is the starting point.
+- A wallet's token balance, read at the last block of the last hour of each segment, changes from one segment to the next by exactly the wallet's transfers in the later segment (inflows minus outflows, per token). stETH may differ by 2 wei per transfer for share rounding, plus up to 0.02% of the balance in the 12:00 to 14:00 UTC segment, which holds the rebase. The first segment's balance is the starting point.
 - Balance rows must lie inside the hour window, once per hour and token.
 
 Native ETH moves emit no ERC-20 transfer, so hourly ETH balances are only charted and window-checked, not reconciled. The roughly 401,000 ETH taken in the hack was native ETH and is not in the transfers; the headline counts stETH, mETH and cmETH separately.

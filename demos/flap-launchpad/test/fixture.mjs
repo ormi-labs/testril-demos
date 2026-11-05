@@ -1,10 +1,16 @@
 import {
-  binds,
-  tradesDay,
-  tradesWindow,
+  bindsAt,
+  tradesDayOf,
   volumeDays,
   zeroAddress,
 } from "../src/report.mjs";
+import { blockAt } from "./fake-testril.mjs";
+
+export const fixtureNow = Date.parse("2026-11-02T12:00:00Z");
+export const fixtureBinds = bindsAt(fixtureNow);
+const tradesDay = tradesDayOf(fixtureBinds);
+const tradesWindow = fixtureBinds.find((bind) => bind.name === "trades").window;
+const tradesFromBlock = blockAt(tradesWindow.from_time);
 
 const tokenCount = 14;
 const tradeCount = 240;
@@ -34,14 +40,14 @@ function makeTokens(random) {
 }
 
 function tradeRows(random, tokens, usd1Token) {
-  const span = tradesWindow.to_block - tradesWindow.from_block;
+  const span = blockAt(tradesWindow.to_time) - tradesFromBlock;
   const trades = Array.from({ length: tradeCount }, (_, index) => {
     const picked = tokens[Math.floor(random() ** 2.2 * tokens.length)];
     const inUsd1 = index % usd1Every === 0;
     const token = inUsd1 ? usd1Token : picked;
     const quote = raw(0.01 + random() ** 3 * 30, random);
     return {
-      block: tradesWindow.from_block + Math.floor((index / tradeCount) * span),
+      block: tradesFromBlock + Math.floor((index / tradeCount) * span),
       log_index: String(Math.floor(random() * 300)),
       tx: `0x${hex(random, 64)}`,
       token,
@@ -71,7 +77,7 @@ function tradeDaySums(trades) {
 
 function volumeRows(random, pairs, trades) {
   const sums = tradeDaySums(trades);
-  return volumeDays().flatMap((day) =>
+  return volumeDays(fixtureBinds).flatMap((day) =>
     pairs.flatMap(([token, quote_token], rank) => {
       if (day === tradesDay) {
         const sum = sums.get(`${token}:${quote_token}`);
@@ -116,27 +122,21 @@ export function fixture() {
 }
 
 const sameParams = (a, b) => JSON.stringify(a) === JSON.stringify(b);
-const covers = (outer, inner) =>
-  Object.keys(inner).every((key) =>
-    key.startsWith("from_")
-      ? inner[key] >= outer[key]
-      : inner[key] <= outer[key],
-  );
 
 export function fixtureRows() {
   const rows = fixture();
   return (bound, window) => {
-    const bind = binds.find(
+    const bind = fixtureBinds.find(
       (candidate) =>
         candidate.function_slug === bound.function_slug &&
         candidate.chain_id === bound.chain_id &&
-        sameParams(candidate.params, bound.params) &&
-        covers(candidate.window, window),
+        sameParams(candidate.params, bound.params),
     );
-    return "from_block" in window && bind.read
+    return bind.read
       ? rows[bind.name].filter(
           (row) =>
-            row.block >= window.from_block && row.block < window.to_block,
+            row.block >= blockAt(window.from_time) &&
+            row.block < blockAt(window.to_time),
         )
       : rows[bind.name];
   };

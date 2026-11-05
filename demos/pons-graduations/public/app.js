@@ -107,9 +107,9 @@ function dailyChart(daily) {
 function render(report) {
   const view = report.view;
   document.querySelector("#launch-window").textContent =
-    `${view.launchWindow.from_block}–${view.launchWindow.to_block - 1}`;
+    `${view.window.first} to ${view.window.last}`;
   document.querySelector("#fees-window").textContent =
-    `${view.feesWindow.from_day} to ${view.feesWindow.to_day} (exclusive)`;
+    `${view.window.first} to ${view.window.last}`;
   const [launched, graduated] = view.funnel;
   document
     .querySelector("#headline")

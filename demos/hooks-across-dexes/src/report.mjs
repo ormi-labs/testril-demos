@@ -1,59 +1,79 @@
-export const binds = [
-  {
-    name: "cl-volume",
-    function_slug: "pancakeswap_infinity.cl_pool_volume",
-    chain_id: 56,
-    params: {
-      swap: { manager: "0xa0ffb9c1ce1fe56963b0321b32e7a0302114058b" },
-      by: "day",
+const dayMs = 86400000;
+const poolListChunkHours = 1440;
+const isoSecond = (ms) => new Date(ms).toISOString().replace(".000Z", "Z");
+
+export function bindsAt(now = Date.now()) {
+  const today = Math.floor(now / dayMs) * dayMs;
+  const untilToday = (ms) => ({
+    from_time: isoSecond(today - ms),
+    to_time: isoSecond(today),
+  });
+  return [
+    {
+      name: "cl-volume",
+      function_slug: "pancakeswap_infinity.cl_pool_volume",
+      chain_id: 56,
+      params: {
+        swap: { manager: "0xa0ffb9c1ce1fe56963b0321b32e7a0302114058b" },
+        by: "day",
+      },
+      window: untilToday(8 * dayMs),
     },
-    window: { from_day: "2026-10-25", to_day: "2026-11-02" },
-  },
-  {
-    name: "cl-pools",
-    function_slug: "pancakeswap_infinity.cl_pool_list",
-    chain_id: 56,
-    params: { manager: "0xa0ffb9c1ce1fe56963b0321b32e7a0302114058b" },
-    window: { from_block: 47214308, to_block: 131141195 },
-    read: { chunk_blocks: 10000000 },
-  },
-  {
-    name: "bin-volume",
-    function_slug: "pancakeswap_infinity.bin_pool_volume",
-    chain_id: 56,
-    params: {
-      swap: { manager: "0xc697d2898e0d09264376196696c51d7abbbaa4a9" },
-      by: "day",
+    {
+      name: "cl-pools",
+      function_slug: "pancakeswap_infinity.cl_pool_list",
+      chain_id: 56,
+      params: { manager: "0xa0ffb9c1ce1fe56963b0321b32e7a0302114058b" },
+      window: {
+        from_time: "2025-03-06T01:28:31Z",
+        to_time: isoSecond(today),
+      },
+      read: { chunk_hours: poolListChunkHours },
     },
-    window: { from_day: "2026-10-25", to_day: "2026-11-02" },
-  },
-  {
-    name: "bin-pools",
-    function_slug: "pancakeswap_infinity.bin_pool_list",
-    chain_id: 56,
-    params: { manager: "0xc697d2898e0d09264376196696c51d7abbbaa4a9" },
-    window: { from_block: 47214336, to_block: 131141195 },
-    read: { chunk_blocks: 10000000 },
-  },
-  {
-    name: "v4-volume",
-    function_slug: "uniswap_v4.pool_volume",
-    chain_id: 56,
-    params: {
-      swap: { manager: "0x28e2ea090877bf75740558f6bfb36a5ffee9e9df" },
-      by: "day",
+    {
+      name: "bin-volume",
+      function_slug: "pancakeswap_infinity.bin_pool_volume",
+      chain_id: 56,
+      params: {
+        swap: { manager: "0xc697d2898e0d09264376196696c51d7abbbaa4a9" },
+        by: "day",
+      },
+      window: untilToday(8 * dayMs),
     },
-    window: { from_day: "2026-10-25", to_day: "2026-11-02" },
-  },
-  {
-    name: "v4-pools",
-    function_slug: "uniswap_v4.pool_list",
-    chain_id: 56,
-    params: { manager: "0x28e2ea090877bf75740558f6bfb36a5ffee9e9df" },
-    window: { from_block: 45970610, to_block: 131141195 },
-    read: { chunk_blocks: 10000000 },
-  },
-];
+    {
+      name: "bin-pools",
+      function_slug: "pancakeswap_infinity.bin_pool_list",
+      chain_id: 56,
+      params: { manager: "0xc697d2898e0d09264376196696c51d7abbbaa4a9" },
+      window: {
+        from_time: "2025-03-06T01:29:55Z",
+        to_time: isoSecond(today),
+      },
+      read: { chunk_hours: poolListChunkHours },
+    },
+    {
+      name: "v4-volume",
+      function_slug: "uniswap_v4.pool_volume",
+      chain_id: 56,
+      params: {
+        swap: { manager: "0x28e2ea090877bf75740558f6bfb36a5ffee9e9df" },
+        by: "day",
+      },
+      window: untilToday(8 * dayMs),
+    },
+    {
+      name: "v4-pools",
+      function_slug: "uniswap_v4.pool_list",
+      chain_id: 56,
+      params: { manager: "0x28e2ea090877bf75740558f6bfb36a5ffee9e9df" },
+      window: {
+        from_time: "2025-01-21T20:58:44Z",
+        to_time: isoSecond(today),
+      },
+      read: { chunk_hours: poolListChunkHours },
+    },
+  ];
+}
 
 export const zeroAddress = "0x0000000000000000000000000000000000000000";
 export const stablecoins = new Map([
@@ -71,22 +91,29 @@ export const symbols = new Map([
 const decimals = 18n;
 const topHookPools = 10;
 
-const bindByName = Object.fromEntries(binds.map((bind) => [bind.name, bind]));
-const volumeWindows = ["cl", "bin", "v4"].map(
-  (key) => bindByName[`${key}-volume`].window,
-);
-if (new Set(volumeWindows.map((w) => JSON.stringify(w))).size !== 1)
-  throw new Error("The three volume bindByName must share one day window.");
-export const [dayWindow] = volumeWindows;
 export const venues = [
-  { key: "cl", dex: "PancakeSwap Infinity", name: "PancakeSwap Infinity CL" },
-  { key: "bin", dex: "PancakeSwap Infinity", name: "PancakeSwap Infinity Bin" },
-  { key: "v4", dex: "Uniswap v4", name: "Uniswap v4" },
+  {
+    key: "cl",
+    dex: "PancakeSwap Infinity",
+    name: "PancakeSwap Infinity CL",
+    manager: "0xa0ffb9c1ce1fe56963b0321b32e7a0302114058b",
+  },
+  {
+    key: "bin",
+    dex: "PancakeSwap Infinity",
+    name: "PancakeSwap Infinity Bin",
+    manager: "0xc697d2898e0d09264376196696c51d7abbbaa4a9",
+  },
+  {
+    key: "v4",
+    dex: "Uniswap v4",
+    name: "Uniswap v4",
+    manager: "0x28e2ea090877bf75740558f6bfb36a5ffee9e9df",
+  },
 ].map((venue) => ({
   ...venue,
   volumeBind: `${venue.key}-volume`,
   poolsBind: `${venue.key}-pools`,
-  manager: bindByName[`${venue.key}-volume`].params.swap.manager,
 }));
 
 const nextDay = (day) =>
@@ -94,9 +121,16 @@ const nextDay = (day) =>
     .toISOString()
     .slice(0, 10);
 
-export function windowDays() {
+const utcDay = (time) => time.slice(0, 10);
+
+export function windowDays(binds) {
+  const { window } = binds.find((bind) => bind.name === "cl-volume");
   const days = [];
-  for (let d = dayWindow.from_day; d < dayWindow.to_day; d = nextDay(d))
+  for (
+    let d = utcDay(window.from_time);
+    d < utcDay(window.to_time);
+    d = nextDay(d)
+  )
     days.push(d);
   return days;
 }
@@ -187,8 +221,8 @@ function checkVenue(rows, pools, venue, days) {
   return seen.size;
 }
 
-export function check(rows) {
-  const days = windowDays();
+export function check(rows, binds) {
+  const days = windowDays(binds);
   const pools = poolMaps(rows);
   return venues.map((venue) => {
     const venuePools = pools.get(venue.key);
@@ -283,13 +317,14 @@ function topHooked(rows, poolMaps) {
     }));
 }
 
-export function shape(rows) {
+export function shape(rows, binds) {
+  const days = windowDays(binds);
   const pools = poolMaps(rows);
   const summaries = venues.map((venue) =>
     venueSummary(rows, venue, pools.get(venue.key)),
   );
   return {
-    dayWindow,
+    dayWindow: { first: days[0], last: days.at(-1) },
     venues: summaries.map((s) => s.view),
     dexes: dexSummaries(summaries),
     hookedPools: topHooked(rows, pools),

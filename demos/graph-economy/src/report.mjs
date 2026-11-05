@@ -1,45 +1,53 @@
-export const binds = [
-  {
-    name: "indexing-rewards",
-    function_slug: "graph_network.indexing_rewards",
-    chain_id: 42161,
-    params: {
-      rewards_manager: "0x971b9d3d0ae3eca029cab5ea1fb0f72c85e6a525",
-      subgraph_service: "0xb2bb92d0de618878e438b55d5846cfecd9301105",
-      staking: "0x00669a4cf01450b64e8a2a20e9b1fcb71e61ef03",
-      epoch_manager: "0x5a843145c43d328b9bb7a4401d94918f131bb281",
-    },
-    window: { from_block: 518282017, to_block: 520415225 },
-    read: { chunk_blocks: 100000 },
-  },
-  {
-    name: "delegation",
-    function_slug: "graph_network.delegation",
-    chain_id: 42161,
-    params: {
-      staking: "0x00669a4cf01450b64e8a2a20e9b1fcb71e61ef03",
-      epoch_manager: "0x5a843145c43d328b9bb7a4401d94918f131bb281",
-    },
-    window: { from_block: 518282017, to_block: 520415225 },
-    read: { chunk_blocks: 100000 },
-  },
-  {
-    name: "query-fees",
-    function_slug: "graph_network.query_fees",
-    chain_id: 42161,
-    params: {
-      staking: "0x00669a4cf01450b64e8a2a20e9b1fcb71e61ef03",
-      subgraph_service: "0xb2bb92d0de618878e438b55d5846cfecd9301105",
-      graph_payments: "0x7aae8ae011927bc36cb4d0d3e81f2e6e30dae06d",
-      epoch_manager: "0x5a843145c43d328b9bb7a4401d94918f131bb281",
-    },
-    window: { from_block: 518282017, to_block: 520415225 },
-    read: { chunk_blocks: 100000 },
-  },
-];
+const dayMs = 86400000;
+const isoSecond = (ms) => new Date(ms).toISOString().replace(".000Z", "Z");
 
-const bindByName = Object.fromEntries(binds.map((bind) => [bind.name, bind]));
-export const rewardWindow = bindByName["indexing-rewards"].window;
+export function bindsAt(now = Date.now()) {
+  const today = Math.floor(now / dayMs) * dayMs;
+  const untilToday = (ms) => ({
+    from_time: isoSecond(today - ms),
+    to_time: isoSecond(today),
+  });
+  return [
+    {
+      name: "indexing-rewards",
+      function_slug: "graph_network.indexing_rewards",
+      chain_id: 42161,
+      params: {
+        rewards_manager: "0x971b9d3d0ae3eca029cab5ea1fb0f72c85e6a525",
+        subgraph_service: "0xb2bb92d0de618878e438b55d5846cfecd9301105",
+        staking: "0x00669a4cf01450b64e8a2a20e9b1fcb71e61ef03",
+        epoch_manager: "0x5a843145c43d328b9bb7a4401d94918f131bb281",
+      },
+      window: untilToday(7 * dayMs),
+      read: { chunk_hours: 8 },
+    },
+    {
+      name: "delegation",
+      function_slug: "graph_network.delegation",
+      chain_id: 42161,
+      params: {
+        staking: "0x00669a4cf01450b64e8a2a20e9b1fcb71e61ef03",
+        epoch_manager: "0x5a843145c43d328b9bb7a4401d94918f131bb281",
+      },
+      window: untilToday(7 * dayMs),
+      read: { chunk_hours: 8 },
+    },
+    {
+      name: "query-fees",
+      function_slug: "graph_network.query_fees",
+      chain_id: 42161,
+      params: {
+        staking: "0x00669a4cf01450b64e8a2a20e9b1fcb71e61ef03",
+        subgraph_service: "0xb2bb92d0de618878e438b55d5846cfecd9301105",
+        graph_payments: "0x7aae8ae011927bc36cb4d0d3e81f2e6e30dae06d",
+        epoch_manager: "0x5a843145c43d328b9bb7a4401d94918f131bb281",
+      },
+      window: untilToday(7 * dayMs),
+      read: { chunk_hours: 8 },
+    },
+  ];
+}
+
 const topIndexerCount = 10;
 const wei = 10n ** 18n;
 
@@ -55,17 +63,6 @@ const splitAmount = (row) =>
   row.kind === "rewards_collected" ? BigInt(row.amount) : 0n;
 const byLog = (a, b) =>
   a.block - b.block || Number(a.log_index) - Number(b.log_index);
-const inWindow = (row, { from_block, to_block }) =>
-  row.block >= from_block && row.block < to_block;
-
-function requireInWindow(name, rows) {
-  const outside = rows.find((row) => !inWindow(row, bindByName[name].window));
-  if (outside)
-    throw new Error(
-      `${name} row at block ${outside.block} is outside the window.`,
-    );
-}
-
 function requireUniqueLogs(name, rows) {
   const seen = new Set();
   for (const row of rows) {
@@ -108,7 +105,6 @@ function requirePerIndexerTotals(rewards) {
 export function check(rows) {
   const { "indexing-rewards": rewards, delegation } = rows;
   for (const [name, list] of Object.entries(rows)) {
-    requireInWindow(name, list);
     requireUniqueLogs(name, list);
   }
   requireRewardSplit(rewards);
@@ -204,7 +200,17 @@ function feesPerEpoch(fees) {
     }));
 }
 
-export function shape(rows) {
+const utcDay = (ms) => new Date(ms).toISOString().slice(0, 10);
+
+function windowDays(binds) {
+  const { window } = binds.find((bind) => bind.name === "indexing-rewards");
+  return {
+    first: utcDay(Date.parse(window.from_time)),
+    last: utcDay(Date.parse(window.to_time) - dayMs),
+  };
+}
+
+export function shape(rows, binds) {
   const { "indexing-rewards": rewards, delegation, "query-fees": fees } = rows;
   const total = sum(rewards.map((row) => BigInt(row.amount)));
   const delegatorTotal = sum(
@@ -218,7 +224,7 @@ export function shape(rows) {
   const feeTotal = sum(fees.map((row) => BigInt(row.total)));
   const epochs = feesPerEpoch(fees);
   return {
-    window: rewardWindow,
+    window: windowDays(binds),
     epochs: { first: epochs[0].epoch, last: epochs.at(-1).epoch },
     rewards: formatGrt(total),
     delegatorShare: formatPercent(

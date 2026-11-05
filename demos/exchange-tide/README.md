@@ -20,7 +20,7 @@ what Testril already indexed.
 | Variable            | Purpose                                                    |
 | ------------------- | ---------------------------------------------------------- |
 | `TESTRIL_PAYER_KEY` | Hex private key that signs vouchers; required to fetch     |
-| `TESTRIL_MCP_URL`   | Testril MCP endpoint; default `https://dev.testril.ai/mcp` |
+| `TESTRIL_MCP_URL`   | Testril MCP endpoint; default `https://api.testril.si/mcp` |
 
 ## Run
 
@@ -66,8 +66,9 @@ for the report. The fixture lives in `test/` and is never shown on the page.
 
 - USDT `0xdac17f958d2ee523a2206206994597c13d831ec7` and USDC
   `0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48`, both 6 decimals.
-- Window: UTC hours `[2026-10-25T00, 2026-11-01T00)`, 168 hours, each read at
-  the hour's last block. The end is exclusive.
+- Window: the 168 UTC hours before the hour of the press (`from_time` 168 hours
+  before the start of the current hour, `to_time` the start of the current hour),
+  each read at the hour's last block.
 - `erc20.token_balance` returns one total per token per hour for the owners
   named, so each wallet of a multi-wallet exchange also has its own bind to
   check the total against.
@@ -86,28 +87,28 @@ for the report. The fixture lives in `test/` and is never shown on the page.
 
 ## Binds (`src/report.mjs`)
 
-Windows are half-open: the end is the first hour not included.
+Every window is the 168 hours ending at the start of the current hour.
 
-| Name               | Function              | Owners                  | Window                        |
-| ------------------ | --------------------- | ----------------------- | ----------------------------- |
-| `binance-total`    | `erc20.token_balance` | 2 owner(s), USDT + USDC | 2026-10-25T00 → 2026-11-01T00 |
-| `binance-owner-1`  | `erc20.token_balance` | 1 owner(s), USDT + USDC | 2026-10-25T00 → 2026-11-01T00 |
-| `binance-owner-2`  | `erc20.token_balance` | 1 owner(s), USDT + USDC | 2026-10-25T00 → 2026-11-01T00 |
-| `binance-native`   | `native.balance`      | 2 owner(s)              | 2026-10-25T00 → 2026-11-01T00 |
-| `coinbase-total`   | `erc20.token_balance` | 2 owner(s), USDT + USDC | 2026-10-25T00 → 2026-11-01T00 |
-| `coinbase-owner-1` | `erc20.token_balance` | 1 owner(s), USDT + USDC | 2026-10-25T00 → 2026-11-01T00 |
-| `coinbase-owner-2` | `erc20.token_balance` | 1 owner(s), USDT + USDC | 2026-10-25T00 → 2026-11-01T00 |
-| `coinbase-native`  | `native.balance`      | 2 owner(s)              | 2026-10-25T00 → 2026-11-01T00 |
-| `kraken-total`     | `erc20.token_balance` | 2 owner(s), USDT + USDC | 2026-10-25T00 → 2026-11-01T00 |
-| `kraken-owner-1`   | `erc20.token_balance` | 1 owner(s), USDT + USDC | 2026-10-25T00 → 2026-11-01T00 |
-| `kraken-owner-2`   | `erc20.token_balance` | 1 owner(s), USDT + USDC | 2026-10-25T00 → 2026-11-01T00 |
-| `kraken-native`    | `native.balance`      | 2 owner(s)              | 2026-10-25T00 → 2026-11-01T00 |
-| `okx-total`        | `erc20.token_balance` | 1 owner(s), USDT + USDC | 2026-10-25T00 → 2026-11-01T00 |
-| `okx-native`       | `native.balance`      | 1 owner(s)              | 2026-10-25T00 → 2026-11-01T00 |
-| `bitfinex-total`   | `erc20.token_balance` | 1 owner(s), USDT + USDC | 2026-10-25T00 → 2026-11-01T00 |
-| `bitfinex-native`  | `native.balance`      | 1 owner(s)              | 2026-10-25T00 → 2026-11-01T00 |
-| `gemini-total`     | `erc20.token_balance` | 1 owner(s), USDT + USDC | 2026-10-25T00 → 2026-11-01T00 |
-| `gemini-native`    | `native.balance`      | 1 owner(s)              | 2026-10-25T00 → 2026-11-01T00 |
+| Name               | Function              | Owners                  | Window          |
+| ------------------ | --------------------- | ----------------------- | --------------- |
+| `binance-total`    | `erc20.token_balance` | 2 owner(s), USDT + USDC | 168 hours → now |
+| `binance-owner-1`  | `erc20.token_balance` | 1 owner(s), USDT + USDC | 168 hours → now |
+| `binance-owner-2`  | `erc20.token_balance` | 1 owner(s), USDT + USDC | 168 hours → now |
+| `binance-native`   | `native.balance`      | 2 owner(s)              | 168 hours → now |
+| `coinbase-total`   | `erc20.token_balance` | 2 owner(s), USDT + USDC | 168 hours → now |
+| `coinbase-owner-1` | `erc20.token_balance` | 1 owner(s), USDT + USDC | 168 hours → now |
+| `coinbase-owner-2` | `erc20.token_balance` | 1 owner(s), USDT + USDC | 168 hours → now |
+| `coinbase-native`  | `native.balance`      | 2 owner(s)              | 168 hours → now |
+| `kraken-total`     | `erc20.token_balance` | 2 owner(s), USDT + USDC | 168 hours → now |
+| `kraken-owner-1`   | `erc20.token_balance` | 1 owner(s), USDT + USDC | 168 hours → now |
+| `kraken-owner-2`   | `erc20.token_balance` | 1 owner(s), USDT + USDC | 168 hours → now |
+| `kraken-native`    | `native.balance`      | 2 owner(s)              | 168 hours → now |
+| `okx-total`        | `erc20.token_balance` | 1 owner(s), USDT + USDC | 168 hours → now |
+| `okx-native`       | `native.balance`      | 1 owner(s)              | 168 hours → now |
+| `bitfinex-total`   | `erc20.token_balance` | 1 owner(s), USDT + USDC | 168 hours → now |
+| `bitfinex-native`  | `native.balance`      | 1 owner(s)              | 168 hours → now |
+| `gemini-total`     | `erc20.token_balance` | 1 owner(s), USDT + USDC | 168 hours → now |
+| `gemini-native`    | `native.balance`      | 1 owner(s)              | 168 hours → now |
 
 All binds are on chain 1 and read `by: "hour"`. `<exchange>-total` names every
 wallet of the exchange; `<exchange>-owner-N` names one. `src/report.mjs` links

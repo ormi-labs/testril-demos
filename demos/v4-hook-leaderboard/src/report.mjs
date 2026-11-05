@@ -1,38 +1,47 @@
-export const binds = [
-  {
-    name: "pools",
-    function_slug: "uniswap_v4.pool_list",
-    chain_id: 1,
-    params: { manager: "0x000000000004444c5dc75cb358380d2e3de08a90" },
-    window: { from_block: 21688329, to_block: 26323365 },
-    read: { chunk_blocks: 100000 },
-  },
-  {
-    name: "volume",
-    function_slug: "uniswap_v4.pool_volume",
-    chain_id: 1,
-    params: {
-      swap: { manager: "0x000000000004444c5dc75cb358380d2e3de08a90" },
-      by: "day",
+const dayMs = 86400000;
+const managerCreatedAt = "2025-01-23T16:16:47Z";
+const listChunkHours = 336;
+const isoSecond = (ms) => new Date(ms).toISOString().replace(".000Z", "Z");
+
+export function bindsAt(now = Date.now()) {
+  const today = Math.floor(now / dayMs) * dayMs;
+  const untilToday = (ms) => ({
+    from_time: isoSecond(today - ms),
+    to_time: isoSecond(today),
+  });
+  return [
+    {
+      name: "pools",
+      function_slug: "uniswap_v4.pool_list",
+      chain_id: 1,
+      params: { manager },
+      window: { from_time: managerCreatedAt, to_time: isoSecond(today) },
+      read: { chunk_hours: listChunkHours },
     },
-    window: { from_day: "2026-10-25", to_day: "2026-11-02" },
-  },
-  {
-    name: "arrakis-hooks",
-    function_slug: "arrakis.hook_list",
-    chain_id: 1,
-    params: { factory: "0xef129a430032c8183aba158c1a70799e3b840df9" },
-    window: { from_block: 21688329, to_block: 26323365 },
-    read: { chunk_blocks: 100000 },
-  },
-];
+    {
+      name: "volume",
+      function_slug: "uniswap_v4.pool_volume",
+      chain_id: 1,
+      params: {
+        swap: { manager },
+        by: "day",
+      },
+      window: untilToday(8 * dayMs),
+    },
+    {
+      name: "arrakis-hooks",
+      function_slug: "arrakis.hook_list",
+      chain_id: 1,
+      params: { factory: arrakisFactory },
+      window: { from_time: managerCreatedAt, to_time: isoSecond(today) },
+      read: { chunk_hours: listChunkHours },
+    },
+  ];
+}
 
 export const zeroAddress = "0x0000000000000000000000000000000000000000";
-const bindByName = Object.fromEntries(binds.map((bind) => [bind.name, bind]));
-export const poolsWindow = bindByName.pools.window;
-export const volumeWindow = bindByName.volume.window;
-export const manager = bindByName.pools.params.manager;
-export const arrakisFactory = bindByName["arrakis-hooks"].params.factory;
+export const manager = "0x000000000004444c5dc75cb358380d2e3de08a90";
+export const arrakisFactory = "0xef129a430032c8183aba158c1a70799e3b840df9";
 export const usdc = "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48";
 export const usdt = "0xdac17f958d2ee523a2206206994597c13d831ec7";
 const stablecoins = new Set([usdc, usdt]);
@@ -70,12 +79,13 @@ function stablecoinSide(pool) {
   return null;
 }
 
-export function volumeDays() {
+export function volumeDays(binds) {
+  const { window } = binds.find((bind) => bind.name === "volume");
   const days = [];
   for (
-    let day = Date.parse(`${volumeWindow.from_day}T00:00:00Z`);
-    day < Date.parse(`${volumeWindow.to_day}T00:00:00Z`);
-    day += 86400000
+    let day = Date.parse(window.from_time);
+    day < Date.parse(window.to_time);
+    day += dayMs
   )
     days.push(new Date(day).toISOString().slice(0, 10));
   return days;
@@ -119,13 +129,13 @@ export function hookTotals(rows) {
   );
 }
 
-export function check(listed) {
+export function check(listed, binds) {
   const rows = lowercased(listed);
   const known = new Set(rows.pools.map((pool) => pool.pool));
   const unknown = rows.volume.find((row) => !known.has(row.pool));
   if (unknown)
     throw new Error(`Volume pool ${unknown.pool} is not in pool_list.`);
-  const days = volumeDays();
+  const days = volumeDays(binds);
   const outside = rows.volume.find((row) => !days.includes(row.day));
   if (outside)
     throw new Error(`Volume day ${outside.day} is outside the window.`);
@@ -167,7 +177,8 @@ function hookLabel(hook, arrakisHooks) {
   return arrakisHooks.has(hook) ? "Arrakis" : "Unlabelled";
 }
 
-export function shape(listed) {
+export function shape(listed, binds) {
+  const days = volumeDays(binds);
   const rows = lowercased(listed);
   const arrakisHooks = arrakisHookSet(rows);
   const hooks = hookTotals(rows);
@@ -176,8 +187,8 @@ export function shape(listed) {
   const hookedSwaps = sum(hooked.map((hook) => hook.swaps));
   const arrakis = hooked.filter((hook) => arrakisHooks.has(hook.hook));
   return {
-    poolsWindow,
-    volumeWindow,
+    volumeDays: { first: days[0], last: days.at(-1) },
+    poolsSince: managerCreatedAt.slice(0, 10),
     manager,
     totalSwaps: grouped(totalSwaps),
     totalVolume: formatCompact(sum(hooks.map((hook) => hook.volume))),

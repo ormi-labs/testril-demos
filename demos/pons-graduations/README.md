@@ -21,7 +21,7 @@ what Testril already indexed.
 | Variable            | Purpose                                                    |
 | ------------------- | ---------------------------------------------------------- |
 | `TESTRIL_PAYER_KEY` | Hex private key that signs vouchers; required to fetch     |
-| `TESTRIL_MCP_URL`   | Testril MCP endpoint; default `https://dev.testril.ai/mcp` |
+| `TESTRIL_MCP_URL`   | Testril MCP endpoint; default `https://api.testril.si/mcp` |
 
 ## Run
 
@@ -77,25 +77,22 @@ manager come from testril's DefiLlama card for Pons v2. The `pool_manager` param
 | Pons meme hook                             | `0xe5e702641ea86f4ae6cc3cdaed2b886f976be044` | the only `PoolFeesSwept` emitter used        |
 | Uniswap v4 position manager (positionInfo) | `0x58daec3116aae6d93017baaea7749052e8a04fa7` | `pool_manager` of `pons.graduated_pool_list` |
 
-- Period: UTC days `[2026-08-03, 2026-11-02)`, from the first day the protocol
-  reports. Every bind covers exactly this period, so the cross-check compares
-  like with like.
-- Block windows: `[26314521, 103783392)`, the first block of 2026-08-03 UTC to
-  the first block of 2026-11-02 UTC. The chain makes about 823,950 blocks per
-  day (measured on 2026-10-25: blocks [97160853, 97984803)).
+- Period: the 91 UTC days before the day of the press (`from_time` 91 days before
+  today 00:00 UTC, `to_time` today 00:00 UTC). Every bind covers exactly this
+  period, so the cross-check compares like with like.
 - Amounts are raw wei of the pair token, which is the native coin (ETH).
 
 ## Binds (`src/report.mjs`)
 
-Windows are half-open: the end is the first block or day not included.
+Windows end at 00:00 UTC on the day of the press; the end is not included.
 
-| Name             | Function                   | Chain | Params                                        | Window                  |
-| ---------------- | -------------------------- | ----- | --------------------------------------------- | ----------------------- |
-| `launches`       | `pons.curve_list`          | 4663  | `factory`                                     | 26314521 → 103783392    |
-| `graduations`    | `pons.graduated_pool_list` | 4663  | `factory`, `pool_manager`                     | 26314521 → 103783392    |
-| `curve-volume`   | `pons.curve_volume`        | 4663  | `swap.curve_list`, `by`                       | 2026-08-03 → 2026-11-02 |
-| `pool-fees`      | `pons.pool_fees`           | 4663  | `swap.hook`, `swap.graduated_pool_list`, `by` | 2026-08-03 → 2026-11-02 |
-| `pool-fee-sweep` | `pons.pool_fee_sweep`      | 4663  | `hook`, `graduated_pool_list`                 | 26314521 → 103783392    |
+| Name             | Function                   | Chain | Params                                        | Window          |
+| ---------------- | -------------------------- | ----- | --------------------------------------------- | --------------- |
+| `launches`       | `pons.curve_list`          | 4663  | `factory`                                     | 91 days → today |
+| `graduations`    | `pons.graduated_pool_list` | 4663  | `factory`, `pool_manager`                     | 91 days → today |
+| `curve-volume`   | `pons.curve_volume`        | 4663  | `swap.curve_list`, `by`                       | 91 days → today |
+| `pool-fees`      | `pons.pool_fees`           | 4663  | `swap.hook`, `swap.graduated_pool_list`, `by` | 91 days → today |
+| `pool-fee-sweep` | `pons.pool_fee_sweep`      | 4663  | `hook`, `graduated_pool_list`                 | 91 days → today |
 
 `pons.pool_fee_sweep` is a fifth bind beyond the four functions the demo is
 about. The spec's check that creator, buyback and protocol amounts equal the

@@ -1,5 +1,5 @@
 import { expect, test } from "@playwright/test";
-import { binds } from "../src/report.mjs";
+import { fixtureBinds } from "./fixture.mjs";
 
 test("the Fetch button shows progress, then the report and its cross-check", async ({
   page,
@@ -7,7 +7,9 @@ test("the Fetch button shows progress, then the report and its cross-check", asy
   await page.goto("/");
   await expect(page.locator("#report")).toBeHidden();
   await page.getByRole("button", { name: "Fetch from Testril" }).click();
-  await expect(page.locator("#fetch-binds li")).toHaveCount(binds.length);
+  await expect(page.locator("#fetch-binds li")).toHaveCount(
+    fixtureBinds.length,
+  );
   await expect(page.locator("#report")).toBeVisible();
   await expect(page.locator("#fetch-overall")).toHaveJSProperty("value", 1);
   await expect(page.locator("#feeds tr")).not.toHaveCount(0);

@@ -82,7 +82,7 @@ function render(report) {
   for (const window of view.windows)
     document.querySelector(
       `#window-${window.chain.toLowerCase()}`,
-    ).textContent = `${window.from_block}–${window.to_block - 1}`;
+    ).textContent = `${window.first} to ${window.last}`;
   document
     .querySelector("#headline")
     .replaceChildren(

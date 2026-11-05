@@ -115,9 +115,7 @@ function timelineChart(timeline) {
 function render(report) {
   const view = report.view;
   document.querySelector("#hour-window").textContent =
-    `${view.hourWindow.from_hour} to ${view.hourWindow.to_hour} (exclusive)`;
-  document.querySelector("#edges-window").textContent =
-    `blocks ${view.edgesWindow.from_block}–${view.edgesWindow.to_block - 1}`;
+    `${view.hourWindow.first}:00 to ${view.hourWindow.last}:59 UTC`;
   document
     .querySelector("#headline")
     .replaceChildren(

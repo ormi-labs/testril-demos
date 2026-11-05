@@ -1,10 +1,12 @@
-import { binds, feeDays } from "../src/report.mjs";
+import { bindsAt, feeDays } from "../src/report.mjs";
+import { blockAt } from "./fake-testril.mjs";
 
-const bindByName = Object.fromEntries(binds.map((bind) => [bind.name, bind]));
+export const fixtureNow = Date.parse("2026-11-02T12:00:00Z");
+export const fixtureBinds = bindsAt(fixtureNow);
 const blocksPerDay = 823950;
 const factoryDeploymentBlock = 26841846;
 const dayStartBlock = (dayIndex) =>
-  bindByName.launches.window.from_block + dayIndex * blocksPerDay;
+  blockAt(fixtureBinds[0].window.from_time) + dayIndex * blocksPerDay;
 
 const launchCount = 48;
 const graduatedCount = 14;
@@ -34,8 +36,8 @@ const milliEth = (thousandths) =>
   (BigInt(Math.round(thousandths)) * wei) / 1000n;
 
 function launchRows(random) {
-  const { factory } = bindByName.launches.params;
-  const end = dayStartBlock(feeDays().length);
+  const { factory } = fixtureBinds[0].params;
+  const end = dayStartBlock(feeDays(fixtureBinds).length);
   const step = Math.floor((end - factoryDeploymentBlock) / launchCount);
   return Array.from({ length: launchCount }, (_, i) => ({
     block: factoryDeploymentBlock + i * step + Math.floor(random() * step),
@@ -59,7 +61,7 @@ function graduationRows(launches, random) {
 }
 
 function volumeRows(launches, random) {
-  const days = feeDays();
+  const days = feeDays(fixtureBinds);
   return days.flatMap((day, d) =>
     launches
       .filter(
@@ -86,7 +88,7 @@ function volumeRows(launches, random) {
 }
 
 function sweepRows(graduations, random) {
-  const days = feeDays();
+  const days = feeDays(fixtureBinds);
   return graduations.flatMap((graduation) =>
     days.flatMap((day, d) => {
       if (dayStartBlock(d) <= graduation.block || random() < 0.6) return [];
@@ -143,28 +145,16 @@ export function fixture() {
 }
 
 const sameParams = (a, b) => JSON.stringify(a) === JSON.stringify(b);
-const covers = (outer, inner) =>
-  Object.keys(inner).every((key) =>
-    key.startsWith("from_")
-      ? inner[key] >= outer[key]
-      : inner[key] <= outer[key],
-  );
 
 export function fixtureRows() {
   const rows = fixture();
-  return (bound, window) => {
-    const bind = binds.find(
-      (candidate) =>
-        candidate.function_slug === bound.function_slug &&
-        candidate.chain_id === bound.chain_id &&
-        sameParams(candidate.params, bound.params) &&
-        covers(candidate.window, window),
-    );
-    return "from_block" in window && bind.read
-      ? rows[bind.name].filter(
-          (row) =>
-            row.block >= window.from_block && row.block < window.to_block,
-        )
-      : rows[bind.name];
-  };
+  return (bound) =>
+    rows[
+      fixtureBinds.find(
+        (candidate) =>
+          candidate.function_slug === bound.function_slug &&
+          candidate.chain_id === bound.chain_id &&
+          sameParams(candidate.params, bound.params),
+      ).name
+    ];
 }

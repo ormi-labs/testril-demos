@@ -1,7 +1,21 @@
 import { setTimeout as delay } from "node:timers/promises";
 import { succeeded } from "./testril.mjs";
 
+const hourMs = 3600000;
+const isoSecond = (ms) => new Date(ms).toISOString().replace(".000Z", "Z");
+
 export function readParts(window, read = {}) {
+  if (read.chunk_hours && "from_time" in window) {
+    const end = Date.parse(window.to_time);
+    const step = read.chunk_hours * hourMs;
+    const parts = [];
+    for (let from = Date.parse(window.from_time); from < end; from += step)
+      parts.push({
+        from_time: isoSecond(from),
+        to_time: isoSecond(Math.min(from + step, end)),
+      });
+    return parts;
+  }
   if (!read.chunk_blocks) return [window];
   const parts = [];
   for (

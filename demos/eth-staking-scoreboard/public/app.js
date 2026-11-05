@@ -102,7 +102,7 @@ function render(report) {
   renderChecks(report.checks);
   if (!view) return;
   document.querySelector("#window").textContent =
-    `${view.window.from_day} to ${view.window.to_day} (exclusive)`;
+    `${view.window.first} to ${view.window.last}`;
   const [, vaults, wbeth, stmatic] = view.venues;
   document
     .querySelector("#headline")

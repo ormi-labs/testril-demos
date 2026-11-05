@@ -1,258 +1,79 @@
+const hourMs = 3600000;
+const windowStart = "2025-02-21T00:00:00Z";
+const windowEnd = "2025-03-01T00:00:00Z";
+const isoSecond = (ms) => new Date(ms).toISOString().replace(".000Z", "Z");
+
+export const tokens = [
+  "0xae7ab96520de3a18e5e111b5eaab095312d7fe84",
+  "0xd5f7838f5c461feff7fe49ea5ebaf7728bb0adfa",
+  "0xe6829d9a7ee3040e1276fa75293bde931859e8fa",
+];
+const trail = [
+  ["bybit-cold-wallet", "0x1db92e2eebc8e0c075a02bea49a2935bcd2dfcf4"],
+  ["exploiter", "0x47666fab8bd0ac7003bce3f5c3585383f09486e2"],
+  ["hop-a4b2", "0xa4b2fd68593b6f34e51cb9edb66e71c1b4ab449e"],
+  ["hop-bdd0", "0xbdd077f651ebe7f7b3ce16fe5f2b025be2969516"],
+  ["hop-0fa0", "0x0fa09c3a328792253f8dee7116848723b72a6d2e"],
+  ["hop-1542", "0x1542368a03ad1f03d96d51b414f4a2d6d2fe0d04"],
+];
+export const wallets = trail.map(([, address]) => address);
+
+// A transfer row carries a block, not a time, so transfers are read in
+// segments of a day; the segment holding Lido's daily rebase hours stands alone.
+const rebaseStartHour = 12;
+const segmentStartHours = [0, rebaseStartHour, 14];
+const hoursPerDay = 24;
+
+export const segments = [];
+for (
+  let day = Date.parse(windowStart);
+  day < Date.parse(windowEnd);
+  day += hoursPerDay * hourMs
+)
+  segmentStartHours.forEach((startHour, index) => {
+    const endHour = segmentStartHours[index + 1] ?? hoursPerDay;
+    segments.push({
+      key: `${isoSecond(day).slice(0, 10)}-${String(startHour).padStart(2, "0")}`,
+      from_time: isoSecond(day + startHour * hourMs),
+      to_time: isoSecond(day + endHour * hourMs),
+      lastHour: new Date(day + (endHour - 1) * hourMs)
+        .toISOString()
+        .slice(0, 13),
+      holdsRebase: startHour === rebaseStartHour,
+    });
+  });
+
+const hourlyWindow = { from_time: windowStart, to_time: windowEnd };
+
 export const binds = [
-  {
-    name: "transfers-bybit-cold-wallet",
-    function_slug: "erc20.wallet_transfers",
-    chain_id: 1,
-    params: {
-      wallet: "0x1db92e2eebc8e0c075a02bea49a2935bcd2dfcf4",
-      tokens: [
-        "0xae7ab96520de3a18e5e111b5eaab095312d7fe84",
-        "0xd5f7838f5c461feff7fe49ea5ebaf7728bb0adfa",
-        "0xe6829d9a7ee3040e1276fa75293bde931859e8fa",
-      ],
-    },
-    window: { from_block: 21890994, to_block: 21948292 },
-    read: { chunk_blocks: 3000 },
-  },
-  {
-    name: "transfers-exploiter",
-    function_slug: "erc20.wallet_transfers",
-    chain_id: 1,
-    params: {
-      wallet: "0x47666fab8bd0ac7003bce3f5c3585383f09486e2",
-      tokens: [
-        "0xae7ab96520de3a18e5e111b5eaab095312d7fe84",
-        "0xd5f7838f5c461feff7fe49ea5ebaf7728bb0adfa",
-        "0xe6829d9a7ee3040e1276fa75293bde931859e8fa",
-      ],
-    },
-    window: { from_block: 21890994, to_block: 21948292 },
-    read: { chunk_blocks: 3000 },
-  },
-  {
-    name: "transfers-hop-a4b2",
-    function_slug: "erc20.wallet_transfers",
-    chain_id: 1,
-    params: {
-      wallet: "0xa4b2fd68593b6f34e51cb9edb66e71c1b4ab449e",
-      tokens: [
-        "0xae7ab96520de3a18e5e111b5eaab095312d7fe84",
-        "0xd5f7838f5c461feff7fe49ea5ebaf7728bb0adfa",
-        "0xe6829d9a7ee3040e1276fa75293bde931859e8fa",
-      ],
-    },
-    window: { from_block: 21890994, to_block: 21948292 },
-    read: { chunk_blocks: 3000 },
-  },
-  {
-    name: "transfers-hop-bdd0",
-    function_slug: "erc20.wallet_transfers",
-    chain_id: 1,
-    params: {
-      wallet: "0xbdd077f651ebe7f7b3ce16fe5f2b025be2969516",
-      tokens: [
-        "0xae7ab96520de3a18e5e111b5eaab095312d7fe84",
-        "0xd5f7838f5c461feff7fe49ea5ebaf7728bb0adfa",
-        "0xe6829d9a7ee3040e1276fa75293bde931859e8fa",
-      ],
-    },
-    window: { from_block: 21890994, to_block: 21948292 },
-    read: { chunk_blocks: 3000 },
-  },
-  {
-    name: "transfers-hop-0fa0",
-    function_slug: "erc20.wallet_transfers",
-    chain_id: 1,
-    params: {
-      wallet: "0x0fa09c3a328792253f8dee7116848723b72a6d2e",
-      tokens: [
-        "0xae7ab96520de3a18e5e111b5eaab095312d7fe84",
-        "0xd5f7838f5c461feff7fe49ea5ebaf7728bb0adfa",
-        "0xe6829d9a7ee3040e1276fa75293bde931859e8fa",
-      ],
-    },
-    window: { from_block: 21890994, to_block: 21948292 },
-    read: { chunk_blocks: 3000 },
-  },
-  {
-    name: "transfers-hop-1542",
-    function_slug: "erc20.wallet_transfers",
-    chain_id: 1,
-    params: {
-      wallet: "0x1542368a03ad1f03d96d51b414f4a2d6d2fe0d04",
-      tokens: [
-        "0xae7ab96520de3a18e5e111b5eaab095312d7fe84",
-        "0xd5f7838f5c461feff7fe49ea5ebaf7728bb0adfa",
-        "0xe6829d9a7ee3040e1276fa75293bde931859e8fa",
-      ],
-    },
-    window: { from_block: 21890994, to_block: 21948292 },
-    read: { chunk_blocks: 3000 },
-  },
-  {
-    name: "balance-bybit-cold-wallet",
+  ...trail.flatMap(([key, wallet]) =>
+    segments.map((segment) => ({
+      name: `transfers-${key}-${segment.key}`,
+      function_slug: "erc20.wallet_transfers",
+      chain_id: 1,
+      params: { wallet, tokens },
+      window: { from_time: segment.from_time, to_time: segment.to_time },
+    })),
+  ),
+  ...trail.map(([key, owner]) => ({
+    name: `balance-${key}`,
     function_slug: "native.balance",
     chain_id: 1,
-    params: {
-      owners: ["0x1db92e2eebc8e0c075a02bea49a2935bcd2dfcf4"],
-      by: "hour",
-    },
-    window: { from_hour: "2025-02-21T00", to_hour: "2025-03-01T00" },
-  },
-  {
-    name: "balance-exploiter",
-    function_slug: "native.balance",
-    chain_id: 1,
-    params: {
-      owners: ["0x47666fab8bd0ac7003bce3f5c3585383f09486e2"],
-      by: "hour",
-    },
-    window: { from_hour: "2025-02-21T00", to_hour: "2025-03-01T00" },
-  },
-  {
-    name: "balance-hop-a4b2",
-    function_slug: "native.balance",
-    chain_id: 1,
-    params: {
-      owners: ["0xa4b2fd68593b6f34e51cb9edb66e71c1b4ab449e"],
-      by: "hour",
-    },
-    window: { from_hour: "2025-02-21T00", to_hour: "2025-03-01T00" },
-  },
-  {
-    name: "balance-hop-bdd0",
-    function_slug: "native.balance",
-    chain_id: 1,
-    params: {
-      owners: ["0xbdd077f651ebe7f7b3ce16fe5f2b025be2969516"],
-      by: "hour",
-    },
-    window: { from_hour: "2025-02-21T00", to_hour: "2025-03-01T00" },
-  },
-  {
-    name: "balance-hop-0fa0",
-    function_slug: "native.balance",
-    chain_id: 1,
-    params: {
-      owners: ["0x0fa09c3a328792253f8dee7116848723b72a6d2e"],
-      by: "hour",
-    },
-    window: { from_hour: "2025-02-21T00", to_hour: "2025-03-01T00" },
-  },
-  {
-    name: "balance-hop-1542",
-    function_slug: "native.balance",
-    chain_id: 1,
-    params: {
-      owners: ["0x1542368a03ad1f03d96d51b414f4a2d6d2fe0d04"],
-      by: "hour",
-    },
-    window: { from_hour: "2025-02-21T00", to_hour: "2025-03-01T00" },
-  },
-  {
-    name: "token-balance-bybit-cold-wallet",
+    params: { owners: [owner], by: "hour" },
+    window: hourlyWindow,
+  })),
+  ...trail.map(([key, owner]) => ({
+    name: `token-balance-${key}`,
     function_slug: "erc20.token_balance",
     chain_id: 1,
-    params: {
-      reads: {
-        tokens: [
-          "0xae7ab96520de3a18e5e111b5eaab095312d7fe84",
-          "0xd5f7838f5c461feff7fe49ea5ebaf7728bb0adfa",
-          "0xe6829d9a7ee3040e1276fa75293bde931859e8fa",
-        ],
-        owners: ["0x1db92e2eebc8e0c075a02bea49a2935bcd2dfcf4"],
-      },
-      by: "hour",
-    },
-    window: { from_hour: "2025-02-21T00", to_hour: "2025-03-01T00" },
-  },
-  {
-    name: "token-balance-exploiter",
-    function_slug: "erc20.token_balance",
-    chain_id: 1,
-    params: {
-      reads: {
-        tokens: [
-          "0xae7ab96520de3a18e5e111b5eaab095312d7fe84",
-          "0xd5f7838f5c461feff7fe49ea5ebaf7728bb0adfa",
-          "0xe6829d9a7ee3040e1276fa75293bde931859e8fa",
-        ],
-        owners: ["0x47666fab8bd0ac7003bce3f5c3585383f09486e2"],
-      },
-      by: "hour",
-    },
-    window: { from_hour: "2025-02-21T00", to_hour: "2025-03-01T00" },
-  },
-  {
-    name: "token-balance-hop-a4b2",
-    function_slug: "erc20.token_balance",
-    chain_id: 1,
-    params: {
-      reads: {
-        tokens: [
-          "0xae7ab96520de3a18e5e111b5eaab095312d7fe84",
-          "0xd5f7838f5c461feff7fe49ea5ebaf7728bb0adfa",
-          "0xe6829d9a7ee3040e1276fa75293bde931859e8fa",
-        ],
-        owners: ["0xa4b2fd68593b6f34e51cb9edb66e71c1b4ab449e"],
-      },
-      by: "hour",
-    },
-    window: { from_hour: "2025-02-21T00", to_hour: "2025-03-01T00" },
-  },
-  {
-    name: "token-balance-hop-bdd0",
-    function_slug: "erc20.token_balance",
-    chain_id: 1,
-    params: {
-      reads: {
-        tokens: [
-          "0xae7ab96520de3a18e5e111b5eaab095312d7fe84",
-          "0xd5f7838f5c461feff7fe49ea5ebaf7728bb0adfa",
-          "0xe6829d9a7ee3040e1276fa75293bde931859e8fa",
-        ],
-        owners: ["0xbdd077f651ebe7f7b3ce16fe5f2b025be2969516"],
-      },
-      by: "hour",
-    },
-    window: { from_hour: "2025-02-21T00", to_hour: "2025-03-01T00" },
-  },
-  {
-    name: "token-balance-hop-0fa0",
-    function_slug: "erc20.token_balance",
-    chain_id: 1,
-    params: {
-      reads: {
-        tokens: [
-          "0xae7ab96520de3a18e5e111b5eaab095312d7fe84",
-          "0xd5f7838f5c461feff7fe49ea5ebaf7728bb0adfa",
-          "0xe6829d9a7ee3040e1276fa75293bde931859e8fa",
-        ],
-        owners: ["0x0fa09c3a328792253f8dee7116848723b72a6d2e"],
-      },
-      by: "hour",
-    },
-    window: { from_hour: "2025-02-21T00", to_hour: "2025-03-01T00" },
-  },
-  {
-    name: "token-balance-hop-1542",
-    function_slug: "erc20.token_balance",
-    chain_id: 1,
-    params: {
-      reads: {
-        tokens: [
-          "0xae7ab96520de3a18e5e111b5eaab095312d7fe84",
-          "0xd5f7838f5c461feff7fe49ea5ebaf7728bb0adfa",
-          "0xe6829d9a7ee3040e1276fa75293bde931859e8fa",
-        ],
-        owners: ["0x1542368a03ad1f03d96d51b414f4a2d6d2fe0d04"],
-      },
-      by: "hour",
-    },
-    window: { from_hour: "2025-02-21T00", to_hour: "2025-03-01T00" },
-  },
+    params: { reads: { tokens, owners: [owner] }, by: "hour" },
+    window: hourlyWindow,
+  })),
 ];
 
+export const bindsAt = () => binds;
+
+export const walletKeys = trail.map(([key]) => key);
 export const transferBinds = binds.filter(
   (bind) => bind.function_slug === "erc20.wallet_transfers",
 );
@@ -262,33 +83,28 @@ export const balanceBinds = binds.filter(
 export const tokenBalanceBinds = binds.filter(
   (bind) => bind.function_slug === "erc20.token_balance",
 );
-export const transferWindow = transferBinds[0].window;
-export const hourWindow = balanceBinds[0].window;
-export const wallets = transferBinds.map((bind) => bind.params.wallet);
-const walletOf = (bindName) =>
-  transferBinds.find((bind) => bind.name === bindName).params.wallet;
-const source = walletOf("transfers-bybit-cold-wallet");
-const exploiter = walletOf("transfers-exploiter");
+export const transfersOfWallet = (rows, key) =>
+  segments.flatMap((segment) => rows[`transfers-${key}-${segment.key}`]);
+const walletOf = (key) => trail.find(([name]) => name === key)[1];
+const source = walletOf("bybit-cold-wallet");
+const exploiter = walletOf("exploiter");
 export const maxNodes = 10;
 const minDrawnAmount = 1000n * 10n ** 18n;
 
 const titles = {
-  "transfers-bybit-cold-wallet": "Bybit cold wallet",
-  "transfers-exploiter": "Exploiter",
-  "transfers-hop-a4b2": "Wallet 0xa4b2…449e",
-  "transfers-hop-bdd0": "Wallet 0xbdd0…9516",
-  "transfers-hop-0fa0": "Wallet 0x0fa0…6d2e",
-  "transfers-hop-1542": "Wallet 0x1542…0d04",
+  "bybit-cold-wallet": "Bybit cold wallet",
+  exploiter: "Exploiter",
+  "hop-a4b2": "Wallet 0xa4b2…449e",
+  "hop-bdd0": "Wallet 0xbdd0…9516",
+  "hop-0fa0": "Wallet 0x0fa0…6d2e",
+  "hop-1542": "Wallet 0x1542…0d04",
 };
-const names = new Map(
-  transferBinds.map((bind) => [bind.params.wallet, titles[bind.name]]),
-);
+const names = new Map(trail.map(([key, address]) => [address, titles[key]]));
 const symbols = new Map([
   ["0xae7ab96520de3a18e5e111b5eaab095312d7fe84", "stETH"],
   ["0xd5f7838f5c461feff7fe49ea5ebaf7728bb0adfa", "mETH"],
   ["0xe6829d9a7ee3040e1276fa75293bde931859e8fa", "cmETH"],
 ]);
-export const tokens = transferBinds[0].params.tokens;
 
 const unit = 10n ** 18n;
 export const symbolOf = (token) => symbols.get(token);
@@ -299,11 +115,10 @@ const edgeKey = (from, to) => `${from}>${to}`;
 
 export function hoursInWindow() {
   const hours = [];
-  const end = Date.parse(`${hourWindow.to_hour}:00:00Z`);
   for (
-    let time = Date.parse(`${hourWindow.from_hour}:00:00Z`);
-    time < end;
-    time += 3600000
+    let time = Date.parse(windowStart);
+    time < Date.parse(windowEnd);
+    time += hourMs
   )
     hours.push(new Date(time).toISOString().slice(0, 13));
   return hours;
@@ -391,6 +206,8 @@ function walletTokens(entries, address) {
     .filter((entry) => entry.received > 0n || entry.sent > 0n);
 }
 
+const lastDay = isoSecond(Date.parse(windowEnd) - 1).slice(0, 10);
+
 export function shape(rows) {
   const entries = [...uniqueTransfers(rows).values()].map((e) => e.row);
   const edges = sumEdges(entries);
@@ -428,8 +245,7 @@ export function shape(rows) {
     ]),
   );
   return {
-    transferWindow,
-    hourWindow,
+    window: { first: windowStart.slice(0, 10), last: lastDay },
     headline: {
       intoExploiter: walletTokens(entries, exploiter).map((entry) => ({
         symbol: entry.symbol,
@@ -458,8 +274,7 @@ export function shape(rows) {
       share: toChartEth(edge.amount) / biggest.get(edge.token),
     })),
     hiddenEdges: edges.length - drawn.length,
-    wallets: transferBinds.map((bind, index) => {
-      const address = bind.params.wallet;
+    wallets: trail.map(([, address], index) => {
       return {
         address,
         label: label(address),

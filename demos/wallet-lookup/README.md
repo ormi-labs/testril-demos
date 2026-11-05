@@ -18,7 +18,7 @@ what Testril already indexed.
 | Variable            | Purpose                                                    |
 | ------------------- | ---------------------------------------------------------- |
 | `TESTRIL_PAYER_KEY` | Hex private key that signs vouchers; required to fetch     |
-| `TESTRIL_MCP_URL`   | Testril MCP endpoint; default `https://dev.testril.ai/mcp` |
+| `TESTRIL_MCP_URL`   | Testril MCP endpoint; default `https://api.testril.si/mcp` |
 
 ## Run
 
@@ -61,9 +61,12 @@ for the report. The fixture lives in `test/` and is never shown on the page.
 
 ## Subjects and window
 
-- Transfers: seven days of 7,200 blocks, `[26272965, 26323365)`, ending at the
-  first block of 2026-11-02 (estimate, verify).
-- Balance and ENS name: read at block 26323364, the last block of 2026-11-01 (estimate, verify).
+- Transfers: the seven UTC days before the day of the press, one
+  `transfers-<wallet>-<day>` bind per wallet and day, so each transfer's day is
+  the bind it was read in (the check requires blocks to rise from one day to
+  the next).
+- Balance and ENS name: read over the five minutes before 00:00 UTC on the day
+  of the press; the last row is the end of the last day.
 - ENS registry `0x00000000000c2e074ec69a0dfb2997ba6c7d2e1e`.
 - Tokens: USDC `0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48`, USDT
   `0xdac17f958d2ee523a2206206994597c13d831ec7`, DAI
@@ -78,16 +81,10 @@ for the report. The fixture lives in `test/` and is never shown on the page.
 
 ## Binds (`src/report.mjs`)
 
-Windows are half-open: the end is the first block not included.
+Windows end at 00:00 UTC on the day of the press; the end is not included.
 
-| Name                | Function                 | Chain | Params              | Window              |
-| ------------------- | ------------------------ | ----- | ------------------- | ------------------- |
-| `ens-vitalik`       | `ens.primary_name`       | 1     | `registry, address` | 26323364 → 26323365 |
-| `ens-nick`          | `ens.primary_name`       | 1     | `registry, address` | 26323364 → 26323365 |
-| `ens-brantly`       | `ens.primary_name`       | 1     | `registry, address` | 26323364 → 26323365 |
-| `balance`           | `native.balance`         | 1     | `owners`            | 26323364 → 26323365 |
-| `transfers-vitalik` | `erc20.wallet_transfers` | 1     | `wallet, tokens`    | 26272965 → 26323365 |
-| `transfers-nick`    | `erc20.wallet_transfers` | 1     | `wallet, tokens`    | 26272965 → 26323365 |
-| `transfers-brantly` | `erc20.wallet_transfers` | 1     | `wallet, tokens`    | 26272965 → 26323365 |
-
-`transfers-*` are read in chunks of 7,200 blocks.
+| Name                            | Function                 | Chain | Params              | Window               |
+| ------------------------------- | ------------------------ | ----- | ------------------- | -------------------- |
+| `ens-<wallet>` (3)              | `ens.primary_name`       | 1     | `registry, address` | 5 minutes → today    |
+| `balance`                       | `native.balance`         | 1     | `owners`            | 5 minutes → today    |
+| `transfers-<wallet>-<day>` (21) | `erc20.wallet_transfers` | 1     | `wallet, tokens`    | one day of 7 → today |

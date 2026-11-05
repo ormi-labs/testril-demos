@@ -1,4 +1,8 @@
-import { binds, chains, unitSeparator, windowOf } from "../src/report.mjs";
+import { bindsAt, chains, unitSeparator, windowOf } from "../src/report.mjs";
+import { blockAt } from "./fake-testril.mjs";
+
+export const fixtureNow = Date.parse("2026-11-02T12:00:00Z");
+export const fixtureBinds = bindsAt(fixtureNow);
 
 const firstBond = 10n ** 16n;
 const invalidAnswer = `0x${"f".repeat(64)}`;
@@ -45,7 +49,9 @@ const hex = (random, bytes) =>
 const word = (index) => `0x${index.toString(16).padStart(64, "0")}`;
 
 function chainRows(chain, random) {
-  const { from_block, to_block } = windowOf(chain);
+  const window = windowOf(fixtureBinds, chain);
+  const from_block = blockAt(window.from_time);
+  const to_block = blockAt(window.to_time);
   const span = to_block - from_block;
   const questions = [];
   const answers = [];
@@ -118,28 +124,16 @@ export function fixture() {
 }
 
 const sameParams = (a, b) => JSON.stringify(a) === JSON.stringify(b);
-const covers = (outer, inner) =>
-  Object.keys(inner).every((key) =>
-    key.startsWith("from_")
-      ? inner[key] >= outer[key]
-      : inner[key] <= outer[key],
-  );
 
 export function fixtureRows() {
   const rows = fixture();
-  return (bound, window) => {
-    const bind = binds.find(
-      (candidate) =>
-        candidate.function_slug === bound.function_slug &&
-        candidate.chain_id === bound.chain_id &&
-        sameParams(candidate.params, bound.params) &&
-        covers(candidate.window, window),
-    );
-    return "from_block" in window && bind.read
-      ? rows[bind.name].filter(
-          (row) =>
-            row.block >= window.from_block && row.block < window.to_block,
-        )
-      : rows[bind.name];
-  };
+  return (bound) =>
+    rows[
+      fixtureBinds.find(
+        (candidate) =>
+          candidate.function_slug === bound.function_slug &&
+          candidate.chain_id === bound.chain_id &&
+          sameParams(candidate.params, bound.params),
+      ).name
+    ];
 }

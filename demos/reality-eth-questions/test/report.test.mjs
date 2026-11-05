@@ -1,7 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { check, shape } from "../src/report.mjs";
-import { fixture } from "./fixture.mjs";
+import { fixture, fixtureBinds } from "./fixture.mjs";
 
 const rows = () => structuredClone(fixture());
 const longestLadder = (answers) => {
@@ -43,7 +43,7 @@ test("check accepts a bond of exactly double", () => {
 });
 
 test("shape ranks the most contested question first with its ladder", () => {
-  const view = shape(rows());
+  const view = shape(rows(), fixtureBinds);
   assert.equal(view.mostRounds, "7");
   assert.equal(view.questions[0].answers, 7);
   assert.equal(view.contested.ladder.length, 7);
@@ -54,7 +54,7 @@ test("shape ranks the most contested question first with its ladder", () => {
 test("shape reports the highest bond per chain, never comparing across units", () => {
   const data = rows();
   data["gnosis-answers"].at(-1).bond = (10n ** 30n).toString();
-  const view = shape(data);
+  const view = shape(data, fixtureBinds);
   assert.deepEqual(
     view.highestBonds.map((h) => h.chain),
     ["Ethereum", "Gnosis"],
@@ -71,14 +71,14 @@ test("shape labels answers by template", () => {
   );
   ladder[0].answer = `0x${(42).toString(16).padStart(64, "0")}`;
   ladder[1].answer = `0x${"F".repeat(64)}`;
-  const view = shape(data);
+  const view = shape(data, fixtureBinds);
   const row = view.questions.find((q) => q.title === question.title);
   assert.equal(row.ladder[0].answer, "42");
   assert.equal(row.ladder[1].answer, "Invalid");
 });
 
 test("shape names multiple-choice answers from the outcomes", () => {
-  const view = shape(rows());
+  const view = shape(rows(), fixtureBinds);
   const labels = view.questions.flatMap((q) => q.ladder.map((l) => l.answer));
   assert.ok(labels.includes("Team B"));
   assert.ok(labels.includes("Invalid"));

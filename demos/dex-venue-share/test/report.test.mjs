@@ -1,7 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { basisPoints, check, days, shape } from "../src/report.mjs";
-import { fixture } from "./fixture.mjs";
+import { fixture, fixtureBinds } from "./fixture.mjs";
 
 const rows = () => structuredClone(fixture());
 const curvePool = "0x7f86bf177dd4f3494b841a37e810a34dd56c829b";
@@ -9,7 +9,7 @@ const v4Pool =
   "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27";
 
 test("check passes on the fixture for both pairs", () => {
-  const passed = check(rows());
+  const passed = check(rows(), fixtureBinds);
   assert.equal(passed.length, 4);
   assert.match(passed[0], /ETH \/ USDC every subject pool has rows/);
 });
@@ -18,7 +18,10 @@ test("check fails when v4 USDC volume is read as its ETH side", () => {
   const corrupted = rows();
   for (const row of corrupted["uniswap-v4"].filter((r) => r.pool === v4Pool))
     [row.volume0, row.volume1] = [row.volume1, row.volume0];
-  assert.throws(() => check(corrupted), /Uniswap v4 trades .* per ETH/);
+  assert.throws(
+    () => check(corrupted, fixtureBinds),
+    /Uniswap v4 trades .* per ETH/,
+  );
 });
 
 test("check fails when a subject pool address matches no rows", () => {
@@ -26,7 +29,7 @@ test("check fails when a subject pool address matches no rows", () => {
   for (const row of corrupted["uniswap-v4"].filter((r) => r.pool === v4Pool))
     row.pool = `0x${"cd".repeat(32)}`;
   assert.throws(
-    () => check(corrupted),
+    () => check(corrupted, fixtureBinds),
     /Uniswap v4 subject pool 0x21c6.* has no rows/,
   );
 });
@@ -36,7 +39,7 @@ test("check fails when Curve's ETH coin index points at USDC", () => {
   for (const row of corrupted.curve.filter((r) => r.pool === curvePool))
     if (row.coin_index === "2") row.coin_index = "0";
     else if (row.coin_index === "0") row.coin_index = "2";
-  assert.throws(() => check(corrupted), /Curve .* per ETH/);
+  assert.throws(() => check(corrupted, fixtureBinds), /Curve .* per ETH/);
 });
 
 test("check fails when both wstETH pools are read with the sides swapped", () => {
@@ -48,7 +51,7 @@ test("check fails when both wstETH pools are read with the sides swapped", () =>
   for (const bind of ["uniswap-v3", "fluid-dex"])
     for (const row of corrupted[bind].filter((r) => wsteth.includes(r.pool)))
       [row.volume0, row.volume1] = [row.volume1, row.volume0];
-  assert.throws(() => check(corrupted), /outside the plausible/);
+  assert.throws(() => check(corrupted, fixtureBinds), /outside the plausible/);
 });
 
 test("check fails when a venue's price drifts past the tolerance inside the band", () => {
@@ -56,13 +59,13 @@ test("check fails when a venue's price drifts past the tolerance inside the band
   for (const row of corrupted["uniswap-v4"].filter((r) => r.pool === v4Pool))
     row.volume1 = ((BigInt(row.volume1) * 12n) / 10n).toString();
   assert.throws(
-    () => check(corrupted),
+    () => check(corrupted, fixtureBinds),
     /Uniswap v4 trades .* token sides are not comparable/,
   );
 });
 
 test("check names Curve only on the pair that has it", () => {
-  const [usdc, wsteth] = check(rows()).filter((line) =>
+  const [usdc, wsteth] = check(rows(), fixtureBinds).filter((line) =>
     line.includes("priced pools"),
   );
   assert.match(usdc, /all but Curve/);
@@ -71,11 +74,11 @@ test("check names Curve only on the pair that has it", () => {
 
 test("check fails when a day has no volume at any venue", () => {
   const corrupted = rows();
-  const [, second] = days();
+  const [, second] = days(fixtureBinds);
   for (const list of Object.values(corrupted))
     list.splice(0, list.length, ...list.filter((r) => r.day !== second));
   assert.throws(
-    () => check(corrupted),
+    () => check(corrupted, fixtureBinds),
     new RegExp(`No ETH / USDC volume on ${second}`),
   );
 });
@@ -86,7 +89,7 @@ test("basisPoints hands leftover points to the largest remainders", () => {
 });
 
 test("shape shows v4 and Fluid gaining share while v3 loses it", () => {
-  const view = shape(rows());
+  const view = shape(rows(), fixtureBinds);
   const [first, last] = [view.pairs[0].days[0], view.pairs[0].days.at(-1)];
   const share = (day, venue) =>
     day.shares.find((s) => s.venue === venue).fraction;

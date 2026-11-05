@@ -20,7 +20,7 @@ what Testril already indexed.
 | Variable            | Purpose                                                    |
 | ------------------- | ---------------------------------------------------------- |
 | `TESTRIL_PAYER_KEY` | Hex private key that signs vouchers; required to fetch     |
-| `TESTRIL_MCP_URL`   | Testril MCP endpoint; default `https://dev.testril.ai/mcp` |
+| `TESTRIL_MCP_URL`   | Testril MCP endpoint; default `https://api.testril.si/mcp` |
 
 ## Run
 
@@ -64,9 +64,10 @@ for the report. The fixture lives in `test/` and is never shown on the page.
 
 ## Subjects and window
 
-- Ethereum (Uniswap, ENS DAO): UTC days `[2026-08-03, 2026-11-02)`, 91 days,
+- Ethereum (Uniswap, ENS DAO): the 91 UTC days before the day of the press
+  (`from_time` 91 days before today 00:00 UTC to `to_time` today 00:00 UTC),
   each read at the day's last block.
-- Arbitrum (Arbitrum DAO): UTC days `[2026-10-25, 2026-11-02)`, 8 days.
+- Arbitrum (Arbitrum DAO): the 8 UTC days before the day of the press.
 - Per DAO, `<dao>-tokens` reads the three tokens over both wallets,
   `<dao>-tokens-<wallet>` reads them one wallet at a time, and `<dao>-native`
   reads each wallet's native ETH. A token a wallet does not hold has no row.

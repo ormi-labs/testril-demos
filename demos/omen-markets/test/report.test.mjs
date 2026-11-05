@@ -1,7 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { check, shape, window } from "../src/report.mjs";
-import { fixture } from "./fixture.mjs";
+import { check, shape } from "../src/report.mjs";
+import { fixture, fixtureBinds } from "./fixture.mjs";
 
 const rows = () => structuredClone(fixture());
 
@@ -17,9 +17,7 @@ test("check fails when a trade is on a market that is not listed", () => {
 
 test("check fails when a trade is dated before its market was created", () => {
   const corrupted = rows();
-  const [created] = corrupted.markets.filter(
-    (m) => m.block > window.from_block,
-  );
+  const [created] = corrupted["markets-created"];
   const trade = corrupted.trades.find((t) => t.market === created.market);
   trade.block = created.block - 1;
   assert.throws(() => check(corrupted), /before the factory created it/);
@@ -84,7 +82,7 @@ test("check passes when a stray transfer adds tokens to a pool", () => {
 });
 
 test("shape ranks wxDAI markets by volume and lists other collateral apart", () => {
-  const view = shape(rows());
+  const view = shape(rows(), fixtureBinds);
   assert.equal(view.markets[0].volume, "1,801.00 wxDAI");
   assert.equal(view.markets[0].trades, "3");
   assert.equal(view.otherCollateral[0].rawVolume, "350000000");
@@ -93,21 +91,20 @@ test("shape ranks wxDAI markets by volume and lists other collateral apart", () 
 
 test("shape counts only markets created in the window", () => {
   const data = rows();
-  const created = data.markets.filter(
-    (m) => m.block >= window.from_block && m.block < window.to_block,
-  );
+  const created = data["markets-created"];
+  assert.ok(created.length > 0);
   assert.ok(created.length < data.markets.length);
-  assert.equal(shape(data).marketCount, String(created.length));
+  assert.equal(shape(data, fixtureBinds).marketCount, String(created.length));
 });
 
 test("shape skips a trade on an unlisted market instead of throwing", () => {
   const corrupted = rows();
   corrupted.trades[0].market = `0x${"1".repeat(40)}`;
-  assert.doesNotThrow(() => shape(corrupted));
+  assert.doesNotThrow(() => shape(corrupted, fixtureBinds));
 });
 
 test("shape shows the last answer per question, bonds in xDAI", () => {
-  const view = shape(rows());
+  const view = shape(rows(), fixtureBinds);
   const questions = view.answers.map((a) => a.question);
   assert.equal(new Set(questions).size, questions.length);
   assert.ok(view.answers.some((a) => a.answer === "Invalid"));

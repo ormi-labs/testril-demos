@@ -20,7 +20,7 @@ what Testril already indexed.
 | Variable            | Purpose                                                    |
 | ------------------- | ---------------------------------------------------------- |
 | `TESTRIL_PAYER_KEY` | Hex private key that signs vouchers; required to fetch     |
-| `TESTRIL_MCP_URL`   | Testril MCP endpoint; default `https://dev.testril.ai/mcp` |
+| `TESTRIL_MCP_URL`   | Testril MCP endpoint; default `https://api.testril.si/mcp` |
 
 ## Run
 
@@ -65,9 +65,10 @@ for the report. The fixture lives in `test/` and is never shown on the page.
 
 ## Subjects and window
 
-Registry history starts at the registry deployment (block 9380380, early
-2020); earlier history lives in the pre-2020 registry and is not covered.
-Windows are half-open: the end is the first block or month not included.
+Registry history starts at the registry deployment (2020-01-30T00:37:12Z, block
+9380380); earlier history lives in the pre-2020 registry and is not covered.
+Every window ends at 00:00 UTC on the day of the press (the address record at
+the start of that month), so it follows the press. The end is not included.
 
 | Subject                       | Address                                      | Note   |
 | ----------------------------- | -------------------------------------------- | ------ |
@@ -78,9 +79,9 @@ Windows are half-open: the end is the first block or month not included.
 | ETHRegistrarController (2025) | `0x59e16fccd424cc24e280be16e11bcd56fb0ce547` | verify |
 | NameWrapper                   | `0xd4416b13d2b3a9abae7acd5d6c2bbdbe25686401` |        |
 
-Names: `vitalik.eth` and `nick.eth`. Registry and registrar start blocks
-(9380380) and the NameWrapper start block (16925758, its creation block, so the
-wrapped window means "since the wrapper existed") are also to verify before
+Names: `vitalik.eth` and `nick.eth`. The registry and registrar start instant
+and the NameWrapper start instant (2023-03-28T12:13:11Z, its creation block, so
+the wrapped window means "since the wrapper existed") are also to verify before
 fetching. `cost` counts only the listed controllers.
 
 Both names were registered before the window starts, and the registrar rows
@@ -91,12 +92,15 @@ follows the first row.
 
 ## Binds (`src/report.mjs`)
 
-| Name                                        | Function             | Chain | Params                                   | Window              |
-| ------------------------------------------- | -------------------- | ----- | ---------------------------------------- | ------------------- |
-| `vitalik-domain`, `nick-domain`             | `ens.domain`         | 1     | `registry`, `name`                       | 9380380 → 26323365  |
-| `vitalik-registration`, `nick-registration` | `ens.registration`   | 1     | `base_registrar`, `label`, `controllers` | 9380380 → 26323365  |
-| `vitalik-address`, `nick-address`           | `ens.address_record` | 1     | `registry`, `name`, `by` (`month`)       | 2020-01 → 2026-11   |
-| `vitalik-wrapped`, `nick-wrapped`           | `ens.wrapped_domain` | 1     | `name_wrapper`, `name`                   | 16925758 → 26323365 |
+| Name                                        | Function             | Chain | Params                                   | Window               |
+| ------------------------------------------- | -------------------- | ----- | ---------------------------------------- | -------------------- |
+| `vitalik-domain`, `nick-domain`             | `ens.domain`         | 1     | `registry`, `name`                       | 2020-01-30 → today   |
+| `vitalik-registration`, `nick-registration` | `ens.registration`   | 1     | `base_registrar`, `label`, `controllers` | 2020-01-30 → today   |
+| `vitalik-address`, `nick-address`           | `ens.address_record` | 1     | `registry`, `name`, `by` (`month`)       | 2020-01 → this month |
+| `vitalik-wrapped`, `nick-wrapped`           | `ens.wrapped_domain` | 1     | `name_wrapper`, `name`                   | 2023-03-28 → today   |
 
-Address-record months have no block, so the timeline places them by linear
-interpolation across the block window.
+Rows carry a block, address-record rows a month. The timeline places both on
+one time axis: a month at its first instant, a block by an approximate clock
+(linear between the registry deployment block and the Merge, then 12 s a block).
+The positions are approximate; the order of the registry, registrar and wrapper
+events is exact.

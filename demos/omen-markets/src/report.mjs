@@ -1,67 +1,67 @@
-export const binds = [
-  {
-    name: "markets",
-    function_slug: "omen.market_list",
-    chain_id: 100,
-    params: {
-      factory: "0x9083a2b699c0a4ad06f63580bde2635d26a3eef0",
-      conditional_tokens: "0xceafdd6bc0bef976fdcd1112955828e00543c0ce",
-    },
-    window: { from_block: 0, to_block: 49062480 },
-  },
-  {
-    name: "trades",
-    function_slug: "omen.trade",
-    chain_id: 100,
-    params: {
-      market_list: {
-        factory: "0x9083a2b699c0a4ad06f63580bde2635d26a3eef0",
-        conditional_tokens: "0xceafdd6bc0bef976fdcd1112955828e00543c0ce",
-      },
-    },
-    window: { from_block: 48558286, to_block: 49062480 },
-    read: { chunk_blocks: 20000 },
-  },
-  {
-    name: "liquidity",
-    function_slug: "omen.liquidity",
-    chain_id: 100,
-    params: {
-      market_list: {
-        factory: "0x9083a2b699c0a4ad06f63580bde2635d26a3eef0",
-        conditional_tokens: "0xceafdd6bc0bef976fdcd1112955828e00543c0ce",
-      },
-    },
-    window: { from_block: 48558286, to_block: 49062480 },
-    read: { chunk_blocks: 20000 },
-  },
-  {
-    name: "market_state",
-    function_slug: "omen.market_state",
-    chain_id: 100,
-    params: {
-      market_list: {
-        factory: "0x9083a2b699c0a4ad06f63580bde2635d26a3eef0",
-        conditional_tokens: "0xceafdd6bc0bef976fdcd1112955828e00543c0ce",
-      },
-    },
-    window: { from_block: 48558286, to_block: 49062480 },
-    read: { chunk_blocks: 20000 },
-  },
-  {
-    name: "answers",
-    function_slug: "realitio.answer",
-    chain_id: 100,
-    params: { realitio: "0x79e32ae03fb27b07c89c0c568f80287c01ca2e57" },
-    window: { from_block: 48558286, to_block: 49062480 },
-    read: { chunk_blocks: 20000 },
-  },
-];
+const dayMs = 86400000;
+const windowDays = 30;
+const chainStart = "1970-01-01T00:00:00Z";
+const chunkHours = 24;
+const isoSecond = (ms) => new Date(ms).toISOString().replace(".000Z", "Z");
+export const factory = "0x9083a2b699c0a4ad06f63580bde2635d26a3eef0";
+const conditionalTokens = "0xceafdd6bc0bef976fdcd1112955828e00543c0ce";
+export const realitio = "0x79e32ae03fb27b07c89c0c568f80287c01ca2e57";
+const marketList = { factory, conditional_tokens: conditionalTokens };
 
-const bindByName = Object.fromEntries(binds.map((bind) => [bind.name, bind]));
-export const window = bindByName.trades.window;
-export const factory = bindByName.markets.params.factory;
-export const realitio = bindByName.answers.params.realitio;
+export function bindsAt(now = Date.now()) {
+  const today = Math.floor(now / dayMs) * dayMs;
+  const windowStart = isoSecond(today - windowDays * dayMs);
+  const window = { from_time: windowStart, to_time: isoSecond(today) };
+  return [
+    {
+      name: "markets",
+      function_slug: "omen.market_list",
+      chain_id: 100,
+      params: marketList,
+      window: { from_time: chainStart, to_time: isoSecond(today) },
+    },
+    {
+      name: "markets-created",
+      function_slug: "omen.market_list",
+      chain_id: 100,
+      params: marketList,
+      window,
+    },
+    {
+      name: "trades",
+      function_slug: "omen.trade",
+      chain_id: 100,
+      params: { market_list: marketList },
+      window,
+      read: { chunk_hours: chunkHours },
+    },
+    {
+      name: "liquidity",
+      function_slug: "omen.liquidity",
+      chain_id: 100,
+      params: { market_list: marketList },
+      window,
+      read: { chunk_hours: chunkHours },
+    },
+    {
+      name: "market_state",
+      function_slug: "omen.market_state",
+      chain_id: 100,
+      params: { market_list: marketList },
+      window,
+      read: { chunk_hours: chunkHours },
+    },
+    {
+      name: "answers",
+      function_slug: "realitio.answer",
+      chain_id: 100,
+      params: { realitio },
+      window,
+      read: { chunk_hours: chunkHours },
+    },
+  ];
+}
+
 export const wxdai = "0xe91d153e0b41518a2ce8dd3d7944fa863463a97d";
 const one = 10n ** 18n;
 const invalidAnswer = `0x${"f".repeat(64)}`;
@@ -72,8 +72,6 @@ const maxAnswerTimeoutSeconds = 365n * 24n * 3600n;
 const shortAddress = (address) => `${address.slice(0, 6)}…${address.slice(-4)}`;
 const day = (unixSeconds) =>
   new Date(Number(unixSeconds) * 1000).toISOString().slice(0, 10);
-const inWindow = (block) =>
-  block >= window.from_block && block < window.to_block;
 const isWxdai = (market) => market.collateral_token.toLowerCase() === wxdai;
 
 export function formatAmount(raw, unit) {
@@ -156,6 +154,13 @@ export function check(rows) {
   const markets = new Map(
     rows.markets.map((market) => [market.market, market]),
   );
+  const unknownCreation = rows["markets-created"].find(
+    (market) => !markets.has(market.market),
+  );
+  if (unknownCreation)
+    throw new Error(
+      `Market ${unknownCreation.market} was created in the window but is not in market_list.`,
+    );
   const unlisted = [
     ...rows.trades,
     ...rows.liquidity,
@@ -284,16 +289,20 @@ function settlingAnswers(answers) {
   }));
 }
 
-export function shape(rows) {
+const utcDay = (time) => time.slice(0, 10);
+const lastDay = (time) => utcDay(isoSecond(Date.parse(time) - dayMs));
+
+export function shape(rows, binds) {
+  const { window } = binds.find((bind) => bind.name === "trades");
   const summaries = wxdaiSummaries(rows);
   const volume = summaries.reduce((sum, market) => sum + market.volume, 0n);
   const answers = settlingAnswers(rows.answers);
   const others = otherCollateral(rows);
   return {
-    window,
+    window: { first: utcDay(window.from_time), last: lastDay(window.to_time) },
     factory,
     realitio,
-    marketCount: String(rows.markets.filter((m) => inWindow(m.block)).length),
+    marketCount: String(rows["markets-created"].length),
     tradeCount: String(rows.trades.length),
     volume: formatAmount(volume, "wxDAI"),
     otherCollateral: others,

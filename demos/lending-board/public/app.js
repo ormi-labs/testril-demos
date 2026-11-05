@@ -93,11 +93,11 @@ function stackedBars(byVenue) {
 function render(report) {
   const view = report.view;
   document.querySelector("#state-window").textContent =
-    `${view.stateWindow.from_hour} to ${view.stateWindow.to_hour} (exclusive)`;
+    `${view.stateHours.first}:00 to ${view.stateHours.last}:00 UTC`;
   document.querySelector("#totals-window").textContent =
-    `read at blocks ${view.totalsWindow.from_block}–${view.totalsWindow.to_block - 1}`;
+    `read over ${view.totalsDay}, 00:00 to 24:00 UTC`;
   document.querySelector("#holdings-window").textContent =
-    `${view.holdingsWindow.from_day} to ${view.holdingsWindow.to_day} (exclusive)`;
+    `${view.holdingDays.first} to ${view.holdingDays.last}`;
   const { headline } = view;
   document
     .querySelector("#headline")

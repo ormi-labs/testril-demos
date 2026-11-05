@@ -1,21 +1,23 @@
-export const binds = [
-  {
-    name: "pool-volume",
-    function_slug: "uniswap_v3.pool_volume",
-    chain_id: 8453,
-    params: {
-      swap: {
-        pool_list: { factory: "0x5e7bb104d84c7cb9b682aac2f3d509f5f406809a" },
-      },
-      by: "day",
-    },
-    window: { from_day: "2026-10-25", to_day: "2026-11-02" },
-  },
-];
+const dayMs = 86400000;
+const windowDays = 8;
+export const factory = "0x5e7bb104d84c7cb9b682aac2f3d509f5f406809a";
+const isoSecond = (ms) => new Date(ms).toISOString().replace(".000Z", "Z");
 
-export const poolVolume = binds.find((bind) => bind.name === "pool-volume");
-export const window = poolVolume.window;
-export const factory = poolVolume.params.swap.pool_list.factory;
+export function bindsAt(now = Date.now()) {
+  const today = Math.floor(now / dayMs) * dayMs;
+  return [
+    {
+      name: "pool-volume",
+      function_slug: "uniswap_v3.pool_volume",
+      chain_id: 8453,
+      params: { swap: { pool_list: { factory } }, by: "day" },
+      window: {
+        from_time: isoSecond(today - windowDays * dayMs),
+        to_time: isoSecond(today),
+      },
+    },
+  ];
+}
 const dollarDecimals = 6n;
 const dollar = 10n ** dollarDecimals;
 
@@ -43,9 +45,17 @@ const nextDay = (day) =>
     .toISOString()
     .slice(0, 10);
 
-export function days() {
+const utcDay = (time) => time.slice(0, 10);
+
+export function days(binds) {
+  const { window } = binds[0];
   const all = [];
-  for (let d = window.from_day; d < window.to_day; d = nextDay(d)) all.push(d);
+  for (
+    let d = utcDay(window.from_time);
+    d < utcDay(window.to_time);
+    d = nextDay(d)
+  )
+    all.push(d);
   return all;
 }
 
@@ -117,12 +127,13 @@ export function checkLeaderboard(poolRows, ranked) {
   });
 }
 
-export function check(rows) {
+export function check(rows, binds) {
+  const window = days(binds);
   const poolRows = rows["pool-volume"];
   if (!poolRows.length) throw new Error("No pool volume rows.");
   const seen = new Set();
   for (const row of poolRows) {
-    if (row.day < window.from_day || row.day >= window.to_day)
+    if (!window.includes(row.day))
       throw new Error(
         `Row for ${row.pool} on ${row.day} is outside the window.`,
       );
@@ -165,26 +176,27 @@ export function formatCompact(raw) {
 
 const shortAddress = (address) => `${address.slice(0, 6)}…${address.slice(-4)}`;
 
-function series(rows, pool) {
+function series(rows, days, pool) {
   const perDay = new Map(
     rows
       .filter((row) => row.pool === pool)
       .map((row) => [row.day, dollarVolume(row)]),
   );
-  return days().map((day) => ({
+  return days.map((day) => ({
     day,
     millions: Number((perDay.get(day) ?? 0n) / dollar) / 1e6,
   }));
 }
 
-export function shape(rows) {
+export function shape(rows, binds) {
+  const window = days(binds);
   const poolRows = rows["pool-volume"];
   const { ranked, unranked } = leaderboard(poolRows);
   const board = [...ranked, ...unranked];
   const totalSwaps = board.reduce((sum, entry) => sum + entry.swaps, 0n);
   const totalDollars = ranked.reduce((sum, entry) => sum + entry.dollars, 0n);
   return {
-    window,
+    window: { first: window[0], last: window.at(-1) },
     factory,
     poolCount: board.length,
     totalSwaps: totalSwaps.toLocaleString("en-US"),
@@ -195,7 +207,7 @@ export function shape(rows) {
     },
     charts: ranked.map((entry) => ({
       symbol: knownPools[entry.pool].pair,
-      series: series(poolRows, entry.pool),
+      series: series(poolRows, window, entry.pool),
     })),
     rankedPools: ranked.map((entry, index) => ({
       rank: String(index + 1),

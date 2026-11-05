@@ -1,7 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { check, shape } from "../src/report.mjs";
-import { fixture } from "./fixture.mjs";
+import { fixture, fixtureBinds } from "./fixture.mjs";
 
 const rows = () => structuredClone(fixture());
 
@@ -55,7 +55,7 @@ test("check fails when a sweep is counted twice", () => {
 });
 
 test("shape builds the funnel and splits the swept fees 50/25/25", () => {
-  const view = shape(rows());
+  const view = shape(rows(), fixtureBinds);
   assert.deepEqual(
     view.funnel.map((step) => step.count),
     [48, 14, 14],

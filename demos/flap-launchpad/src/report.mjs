@@ -1,29 +1,36 @@
-export const binds = [
-  {
-    name: "volume",
-    function_slug: "flap.token_volume",
-    chain_id: 56,
-    params: {
-      swap: { portal: "0xe2ce6ab80874fa9fa2aae65d277dd6b8e65c9de0" },
-      by: "day",
+const dayMs = 86400000;
+const isoSecond = (ms) => new Date(ms).toISOString().replace(".000Z", "Z");
+
+export function bindsAt(now = Date.now()) {
+  const today = Math.floor(now / dayMs) * dayMs;
+  const untilToday = (ms) => ({
+    from_time: isoSecond(today - ms),
+    to_time: isoSecond(today),
+  });
+  return [
+    {
+      name: "volume",
+      function_slug: "flap.token_volume",
+      chain_id: 56,
+      params: {
+        swap: { portal },
+        by: "day",
+      },
+      window: untilToday(8 * dayMs),
     },
-    window: { from_day: "2026-10-25", to_day: "2026-11-02" },
-  },
-  {
-    name: "trades",
-    function_slug: "flap.trade",
-    chain_id: 56,
-    params: { portal: "0xe2ce6ab80874fa9fa2aae65d277dd6b8e65c9de0" },
-    window: { from_block: 130949246, to_block: 131141195 },
-    read: { chunk_blocks: 20000 },
-  },
-];
+    {
+      name: "trades",
+      function_slug: "flap.trade",
+      chain_id: 56,
+      params: { portal },
+      window: untilToday(dayMs),
+      read: { chunk_hours: 2 },
+    },
+  ];
+}
 
 export const zeroAddress = "0x0000000000000000000000000000000000000000";
-const bindByName = Object.fromEntries(binds.map((bind) => [bind.name, bind]));
-export const portal = bindByName.trades.params.portal;
-export const volumeWindow = bindByName.volume.window;
-export const tradesWindow = bindByName.trades.window;
+export const portal = "0xe2ce6ab80874fa9fa2aae65d277dd6b8e65c9de0";
 const decimals = 18n;
 const topTokens = 20;
 const chartTokens = 10;
@@ -33,15 +40,20 @@ const nextDay = (day, step) =>
     .toISOString()
     .slice(0, 10);
 
-export function volumeDays() {
-  const dayCount =
-    (Date.parse(volumeWindow.to_day) - Date.parse(volumeWindow.from_day)) /
-    86400000;
+const utcDay = (time) => time.slice(0, 10);
+const windowOf = (binds, name) =>
+  binds.find((bind) => bind.name === name).window;
+
+export function volumeDays(binds) {
+  const { from_time, to_time } = windowOf(binds, "volume");
+  const dayCount = (Date.parse(to_time) - Date.parse(from_time)) / dayMs;
   return Array.from({ length: dayCount }, (_, i) =>
-    nextDay(volumeWindow.from_day, i),
+    nextDay(utcDay(from_time), i),
   );
 }
-export const tradesDay = nextDay(volumeWindow.to_day, -1);
+
+export const tradesDayOf = (binds) =>
+  utcDay(windowOf(binds, "trades").from_time);
 
 const keyOf = (row) => `${row.token}:${row.quote_token}`;
 
@@ -73,22 +85,15 @@ function mismatch(volume, sum) {
     return `sums sells to ${volume.sell_quote_amount} but the trade rows sum to ${sum.sell_quote_amount}`;
 }
 
-export function check(rows) {
-  const days = volumeDays();
+export function check(rows, binds) {
+  const days = volumeDays(binds);
+  const tradesDay = tradesDayOf(binds);
   const missing = days.filter((day) => !rows.volume.some((r) => r.day === day));
   if (missing.length)
     throw new Error(`Volume is missing ${missing.join(", ")}.`);
   const strayDay = rows.volume.find((r) => !days.includes(r.day));
   if (strayDay)
     throw new Error(`Volume row for ${strayDay.day} is outside the window.`);
-  const outside = rows.trades.filter(
-    (t) =>
-      t.block < tradesWindow.from_block || t.block >= tradesWindow.to_block,
-  );
-  if (outside.length)
-    throw new Error(
-      `Trade at block ${outside[0].block} is outside the window.`,
-    );
   const badFee = rows.trades.find((t) => {
     const fee = BigInt(t.fee_amount);
     return fee < 0n || fee > BigInt(t.quote_amount);
@@ -151,7 +156,8 @@ function leaderboard(rows) {
     }));
 }
 
-export function shape(rows) {
+export function shape(rows, binds) {
+  const days = volumeDays(binds);
   const native = rows.volume.filter((r) => r.quote_token === zeroAddress);
   const sum = (key) => native.reduce((s, r) => s + BigInt(r[key]), 0n);
   const buys = sum("buy_quote_amount");
@@ -162,9 +168,8 @@ export function shape(rows) {
   const tokens = leaderboard(rows);
   return {
     portal,
-    volumeWindow,
-    tradesDay,
-    tradesWindow,
+    volumeDays: { first: days[0], last: days.at(-1) },
+    tradesDay: tradesDayOf(binds),
     chartTokens,
     buys: formatBnb(buys),
     sells: formatBnb(sells),

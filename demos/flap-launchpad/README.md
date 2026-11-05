@@ -18,7 +18,7 @@ what Testril already indexed.
 | Variable            | Purpose                                                    |
 | ------------------- | ---------------------------------------------------------- |
 | `TESTRIL_PAYER_KEY` | Hex private key that signs vouchers; required to fetch     |
-| `TESTRIL_MCP_URL`   | Testril MCP endpoint; default `https://dev.testril.ai/mcp` |
+| `TESTRIL_MCP_URL`   | Testril MCP endpoint; default `https://api.testril.si/mcp` |
 
 ## Run
 
@@ -64,23 +64,20 @@ for the report. The fixture lives in `test/` and is never shown on the page.
 
 - Flap portal on BSC `0xe2ce6ab80874fa9fa2aae65d277dd6b8e65c9de0`
   (verify).
-- Volume: UTC days `[2026-10-25, 2026-11-02)`, per token and quote asset.
-- Trades: 2026-11-01, blocks `[130949246, 131141195)`, found by binary search
-  over the public BSC RPC. They match the volume rows for 2026-11-01.
-  Verify before fetching: block 130949246 must have timestamp
-  2026-11-01 00:00:00 UTC or later with block 130949245 earlier, and block
-  131141195 must be the first at or after 2026-11-02 00:00:00 UTC. The
-  window covers 191,949 blocks against BSC's roughly 192,000 per day.
+- Volume: the eight UTC days before the day of the press, per token and quote
+  asset.
+- Trades: the last of those days (yesterday, 00:00 to 24:00 UTC), as `from_time`
+  and `to_time`. They match the volume rows for that day.
 - Amounts are raw wei of the quote asset. The page ranks tokens quoted in BNB
   (the zero address) only.
 
 ## Binds (`src/report.mjs`)
 
-Windows are half-open: the end is the first block or day not included.
+Windows end at 00:00 UTC on the day of the press; the end is not included.
 
-| Name     | Function            | Chain | Params       | Window                  |
-| -------- | ------------------- | ----- | ------------ | ----------------------- |
-| `volume` | `flap.token_volume` | 56    | `swap`, `by` | 2026-10-25 → 2026-11-02 |
-| `trades` | `flap.trade`        | 56    | `portal`     | 130949246 → 131141195   |
+| Name     | Function            | Chain | Params       | Window         |
+| -------- | ------------------- | ----- | ------------ | -------------- |
+| `volume` | `flap.token_volume` | 56    | `swap`, `by` | 8 days → today |
+| `trades` | `flap.trade`        | 56    | `portal`     | 1 day → today  |
 
-`trades` is read in chunks of 20000 blocks.
+`trades` is read in chunks of two hours.
