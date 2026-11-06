@@ -56,7 +56,9 @@ npm run format:check
 `npm test` checks the cross-checks pass on the fixture and fail when a swap's
 amounts disagree with its price move, when a swap pays and receives the same
 sign, when a swap reports less liquidity than the JIT add before it, when a row
-is outside the window or when USDC decimals are wrong. It also checks that a
+is outside the window or when USDC decimals are wrong. It also checks, on a
+real hook pool's three swaps, that one moving neither currency is left out of
+the trades but still moves the price. It also checks that a
 remove one unit short of the add is not JIT, that two same-direction swaps are
 not a sandwich, and that the server returns the shaped report.
 `npm test` also fetches from a fake Testril: the fetch pays with the payer's
@@ -67,10 +69,16 @@ for the report. The fixture lives in `test/` and is never shown on the page.
 ## Cross-checks
 
 - Every swap pays one currency and receives the other (amounts have opposite
-  signs).
+  signs). A swap that moves neither currency (both amounts 0, as when it crosses
+  ticks with no liquidity) is no trade: the page leaves it out of every count
+  and list and says how many there were. On 2026-11-05 that was 1,508 of
+  144,929 swaps.
 - Price after each swap moves the way its amounts say: selling currency0 never
   raises the pool's price, buying it never lowers it, compared with the pool's
-  previous swap.
+  previous swap, including one that moved neither currency, since it still
+  moves the price.
+- Testril's swap amounts are the pool's side: a positive `amount0` is currency0
+  paid into the pool, the opposite sign of the v4 `Swap` event's own fields.
 - A JIT add in range is covered by the liquidity the following swap reports.
 
 All comparisons use raw integer units (BigInt).

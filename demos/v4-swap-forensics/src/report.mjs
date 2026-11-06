@@ -34,6 +34,9 @@ export function bindsAt(now = Date.now()) {
 export const dayOf = (binds) =>
   binds.find((bind) => bind.name === "tokens").window.from_time.slice(0, 10);
 
+const movesCurrency = (swap) =>
+  BigInt(swap.amount0) !== 0n || BigInt(swap.amount1) !== 0n;
+
 export function unpack({ rows, reads }) {
   const placed = (name) =>
     rows[name].map((row) => ({
@@ -42,8 +45,10 @@ export function unpack({ rows, reads }) {
         (read) => row.block >= read.from_block && row.block < read.to_block,
       ),
     }));
+  const swaps = placed("swaps");
   return {
-    swaps: placed("swaps"),
+    swaps: swaps.filter(movesCurrency),
+    idleSwaps: swaps.filter((swap) => !movesCurrency(swap)),
     liquidity: placed("liquidity"),
     tokens: rows.tokens,
   };
@@ -117,17 +122,18 @@ export function sandwiches({ swaps }) {
   return found;
 }
 
-function checkSwapDirection(swaps) {
+function checkSwapDirection(swaps, idleSwaps) {
   const lastPrice = new Map();
-  for (const swap of [...swaps].sort(order)) {
-    if (sign(swap.amount0) * sign(swap.amount1) !== -1)
+  for (const swap of [...swaps, ...idleSwaps].sort(order)) {
+    const idle = !movesCurrency(swap);
+    if (!idle && sign(swap.amount0) * sign(swap.amount1) !== -1)
       throw new Error(
         `Swap ${swap.tx} moved ${swap.amount0} and ${swap.amount1}; a swap pays one currency and receives the other.`,
       );
     const price = BigInt(swap.sqrt_price_x96);
     const before = lastPrice.get(swap.pool);
     lastPrice.set(swap.pool, price);
-    if (before === undefined) continue;
+    if (before === undefined || idle) continue;
     if (sells0(swap) ? price > before : price < before)
       throw new Error(
         `Swap ${swap.tx} ${sells0(swap) ? "sells" : "buys"} currency0, so the price must ${sells0(swap) ? "fall" : "rise"}, but it went ${before} → ${price}.`,
@@ -147,9 +153,14 @@ function checkJitLiquidity(events) {
   }
 }
 
+const idleNote = (count) =>
+  count === 0
+    ? ""
+    : `; ${count.toLocaleString("en-US")} ${count === 1 ? "swap that moved neither currency is" : "swaps that moved neither currency are"} left out`;
+
 export function check(fetched) {
   const rows = unpack(fetched);
-  const { swaps, liquidity } = rows;
+  const { swaps, idleSwaps, liquidity } = rows;
   const outside = [...swaps, ...liquidity].find((row) => row.hour < 0);
   if (outside)
     throw new Error(`Row at block ${outside.block} is outside the window.`);
@@ -158,14 +169,14 @@ export function check(fetched) {
   );
   if (positions.size !== swaps.length + liquidity.length)
     throw new Error("Two rows share a block and log index.");
-  checkSwapDirection(swaps);
+  checkSwapDirection(swaps, idleSwaps);
   const jit = jitEvents(rows);
   checkJitLiquidity(jit);
   const quote = rows.tokens.find((row) => row.token === usdc);
   if (quote?.decimals !== "6")
     throw new Error("USDC metadata is missing or not 6 decimals.");
   return [
-    `Every one of ${swaps.length} swaps pays one currency and receives the other`,
+    `Every one of ${swaps.length.toLocaleString("en-US")} swaps pays one currency and receives the other${idleNote(idleSwaps.length)}`,
     `Price after each swap moves the way its amounts say, across ${new Set(swaps.map((s) => s.pool)).size} pools`,
     `${jit.length} JIT adds are covered by the liquidity the swap reports`,
   ];
