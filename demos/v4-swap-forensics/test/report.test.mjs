@@ -31,6 +31,45 @@ test("check fails when a swap pays and receives the same sign", () => {
   );
 });
 
+test("a swap that moves neither currency is no trade but still moves the price", () => {
+  const withHookPool = rows();
+  const [first] = withHookPool.swaps;
+  const hookPool = (block, log_index, amount0, amount1, sqrt_price_x96) => ({
+    ...first,
+    pool: "0x553f5e94603f1fcdaa08eb22499d59e4a39e2f8d071c3c6946c27e5e38754ffc",
+    block,
+    log_index,
+    amount0,
+    amount1,
+    sqrt_price_x96,
+  });
+  withHookPool.swaps.push(
+    hookPool(
+      first.block,
+      "154",
+      "-37892571220642093",
+      "155465585464023120000",
+      "5069078210375824844527435597110",
+    ),
+    hookPool(
+      first.block + 1,
+      "674",
+      "0",
+      "0",
+      "5082679333024033268320489209063",
+    ),
+    hookPool(
+      first.block + 95,
+      "91",
+      "499766185526712000",
+      "-2048326869363549813136",
+      "5081269209820402020424843464559",
+    ),
+  );
+  const passed = check(fixtureFetched(withHookPool), fixtureBinds);
+  assert.match(passed[0], /; 1 swap that moved neither currency is left out$/);
+});
+
 test("check fails when a swap reports less liquidity than a JIT add in range", () => {
   const corrupted = rows();
   const { swap } = jitEvents(corrupted)[0];
