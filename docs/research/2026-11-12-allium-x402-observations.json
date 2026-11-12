@@ -1,0 +1,421 @@
+{
+  "description": "Summarized unpaid observations, not complete HTTP captures. POST request bodies are not retained here. See the research note for representative reproductions.",
+  "account_credentials_supplied": false,
+  "payments_signed": false,
+  "observations": [
+    {
+      "name": "prices",
+      "method": "POST",
+      "path": "/api/v1/developer/prices",
+      "checked_at": "2026-11-12T18:16:32.917167+00:00",
+      "status": 404,
+      "body": "{\"detail\":\"Not Found\"}",
+      "base_url": "https://agents.allium.so",
+      "request_headers": {
+        "Content-Type": "application/json",
+        "X-Prefer-Payment": "x402"
+      }
+    },
+    {
+      "name": "prices-at-time",
+      "method": "POST",
+      "path": "/api/v1/developer/prices/at-timestamp",
+      "checked_at": "2026-11-12T18:16:33.671520+00:00",
+      "status": 404,
+      "body": "{\"detail\":\"Not Found\"}",
+      "base_url": "https://agents.allium.so",
+      "request_headers": {
+        "Content-Type": "application/json",
+        "X-Prefer-Payment": "x402"
+      }
+    },
+    {
+      "name": "prices-history",
+      "method": "POST",
+      "path": "/api/v1/developer/prices/history",
+      "checked_at": "2026-11-12T18:16:34.380635+00:00",
+      "status": 404,
+      "body": "{\"detail\":\"Not Found\"}",
+      "base_url": "https://agents.allium.so",
+      "request_headers": {
+        "Content-Type": "application/json",
+        "X-Prefer-Payment": "x402"
+      }
+    },
+    {
+      "name": "prices-stats",
+      "method": "POST",
+      "path": "/api/v1/developer/prices/stats",
+      "checked_at": "2026-11-12T18:16:35.090388+00:00",
+      "status": 404,
+      "body": "{\"detail\":\"Not Found\"}",
+      "base_url": "https://agents.allium.so",
+      "request_headers": {
+        "Content-Type": "application/json",
+        "X-Prefer-Payment": "x402"
+      }
+    },
+    {
+      "name": "tokens-list",
+      "method": "GET",
+      "path": "/api/v1/developer/tokens?chain=ethereum&limit=1",
+      "checked_at": "2026-11-12T18:16:35.791831+00:00",
+      "status": 401,
+      "body": "{\"detail\":\"Authentication Required.\"}",
+      "base_url": "https://agents.allium.so",
+      "request_headers": {
+        "Content-Type": "application/json",
+        "X-Prefer-Payment": "x402"
+      }
+    },
+    {
+      "name": "tokens-search",
+      "method": "GET",
+      "path": "/api/v1/developer/tokens/search?query=USDC&limit=1",
+      "checked_at": "2026-11-12T18:16:36.571033+00:00",
+      "status": 401,
+      "body": "{\"detail\":\"Authentication Required.\"}",
+      "base_url": "https://agents.allium.so",
+      "request_headers": {
+        "Content-Type": "application/json",
+        "X-Prefer-Payment": "x402"
+      }
+    },
+    {
+      "name": "tokens-address",
+      "method": "POST",
+      "path": "/api/v1/developer/tokens/chain-address",
+      "checked_at": "2026-11-12T18:16:37.366578+00:00",
+      "status": 401,
+      "body": "{\"detail\":\"Authentication Required.\"}",
+      "base_url": "https://agents.allium.so",
+      "request_headers": {
+        "Content-Type": "application/json",
+        "X-Prefer-Payment": "x402"
+      }
+    },
+    {
+      "name": "token-transfers",
+      "method": "GET",
+      "path": "/api/v1/developer/tokens/transfers?chain=ethereum&address=0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045&token=0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48&limit=1&min_timestamp=2026-11-10T12:00:00Z&max_timestamp=2026-11-10T13:00:00Z",
+      "checked_at": "2026-11-12T18:16:38.035139+00:00",
+      "status": 401,
+      "body": "{\"detail\":\"Authentication Required.\"}",
+      "base_url": "https://agents.allium.so",
+      "request_headers": {
+        "Content-Type": "application/json",
+        "X-Prefer-Payment": "x402"
+      }
+    },
+    {
+      "name": "balances",
+      "method": "POST",
+      "path": "/api/v1/developer/wallet/balances",
+      "checked_at": "2026-11-12T18:16:38.715644+00:00",
+      "status": 404,
+      "body": "{\"detail\":\"Not Found\"}",
+      "base_url": "https://agents.allium.so",
+      "request_headers": {
+        "Content-Type": "application/json",
+        "X-Prefer-Payment": "x402"
+      }
+    },
+    {
+      "name": "balances-history",
+      "method": "POST",
+      "path": "/api/v1/developer/wallet/balances/history?limit=1",
+      "checked_at": "2026-11-12T18:16:39.385717+00:00",
+      "status": 404,
+      "body": "{\"detail\":\"Not Found\"}",
+      "base_url": "https://agents.allium.so",
+      "request_headers": {
+        "Content-Type": "application/json",
+        "X-Prefer-Payment": "x402"
+      }
+    },
+    {
+      "name": "transactions",
+      "method": "POST",
+      "path": "/api/v1/developer/wallet/transactions?limit=1&lookback_days=1",
+      "checked_at": "2026-11-12T18:16:40.039262+00:00",
+      "status": 404,
+      "body": "{\"detail\":\"Not Found\"}",
+      "base_url": "https://agents.allium.so",
+      "request_headers": {
+        "Content-Type": "application/json",
+        "X-Prefer-Payment": "x402"
+      }
+    },
+    {
+      "name": "holdings-history",
+      "method": "POST",
+      "path": "/api/v1/developer/wallet/holdings/history",
+      "checked_at": "2026-11-12T18:16:40.760594+00:00",
+      "status": 404,
+      "body": "{\"detail\":\"Not Found\"}",
+      "base_url": "https://agents.allium.so",
+      "request_headers": {
+        "Content-Type": "application/json",
+        "X-Prefer-Payment": "x402"
+      }
+    },
+    {
+      "name": "pnl",
+      "method": "POST",
+      "path": "/api/v1/developer/wallet/pnl",
+      "checked_at": "2026-11-12T18:16:41.471571+00:00",
+      "status": 404,
+      "body": "{\"detail\":\"Not Found\"}",
+      "base_url": "https://agents.allium.so",
+      "request_headers": {
+        "Content-Type": "application/json",
+        "X-Prefer-Payment": "x402"
+      }
+    },
+    {
+      "name": "pnl-history",
+      "method": "POST",
+      "path": "/api/v1/developer/wallet/pnl/history",
+      "checked_at": "2026-11-12T18:16:42.884249+00:00",
+      "status": 404,
+      "body": "{\"detail\":\"Not Found\"}",
+      "base_url": "https://agents.allium.so",
+      "request_headers": {
+        "Content-Type": "application/json",
+        "X-Prefer-Payment": "x402"
+      }
+    },
+    {
+      "name": "pnl-token",
+      "method": "POST",
+      "path": "/api/v1/developer/wallet/pnl-by-token",
+      "checked_at": "2026-11-12T18:16:43.604780+00:00",
+      "status": 404,
+      "body": "{\"detail\":\"Not Found\"}",
+      "base_url": "https://agents.allium.so",
+      "request_headers": {
+        "Content-Type": "application/json",
+        "X-Prefer-Payment": "x402"
+      }
+    },
+    {
+      "name": "pnl-token-history",
+      "method": "POST",
+      "path": "/api/v1/developer/wallet/pnl-by-token/history",
+      "checked_at": "2026-11-12T18:16:44.317663+00:00",
+      "status": 404,
+      "body": "{\"detail\":\"Not Found\"}",
+      "base_url": "https://agents.allium.so",
+      "request_headers": {
+        "Content-Type": "application/json",
+        "X-Prefer-Payment": "x402"
+      }
+    },
+    {
+      "name": "positions",
+      "method": "POST",
+      "path": "/api/v1/developer/wallet/positions?limit=1",
+      "checked_at": "2026-11-12T18:16:45.047745+00:00",
+      "status": 401,
+      "body": "{\"detail\":\"Authentication Required.\"}",
+      "base_url": "https://agents.allium.so",
+      "request_headers": {
+        "Content-Type": "application/json",
+        "X-Prefer-Payment": "x402"
+      }
+    },
+    {
+      "name": "assets-list",
+      "method": "GET",
+      "path": "/api/v1/developer/assets?limit=1",
+      "checked_at": "2026-11-12T18:16:45.768105+00:00",
+      "status": 401,
+      "body": "{\"detail\":\"Not authenticated\"}",
+      "base_url": "https://agents.allium.so",
+      "request_headers": {
+        "Content-Type": "application/json",
+        "X-Prefer-Payment": "x402"
+      }
+    },
+    {
+      "name": "assets-batch",
+      "method": "POST",
+      "path": "/api/v1/developer/assets/batch",
+      "checked_at": "2026-11-12T18:16:46.501972+00:00",
+      "status": 401,
+      "body": "{\"detail\":\"Not authenticated\"}",
+      "base_url": "https://agents.allium.so",
+      "request_headers": {
+        "Content-Type": "application/json",
+        "X-Prefer-Payment": "x402"
+      }
+    },
+    {
+      "name": "hyperliquid-info",
+      "method": "POST",
+      "path": "/api/v1/developer/trading/hyperliquid/info",
+      "checked_at": "2026-11-12T18:16:47.249178+00:00",
+      "status": 404,
+      "body": "{\"detail\":\"Not Found\"}",
+      "base_url": "https://agents.allium.so",
+      "request_headers": {
+        "Content-Type": "application/json",
+        "X-Prefer-Payment": "x402"
+      }
+    },
+    {
+      "name": "markets",
+      "method": "GET",
+      "path": "/api/v1/markets?limit=1",
+      "checked_at": "2026-11-12T18:16:47.976283+00:00",
+      "status": 404,
+      "body": "{\"detail\":\"Not Found\"}",
+      "base_url": "https://agents.allium.so",
+      "request_headers": {
+        "Content-Type": "application/json",
+        "X-Prefer-Payment": "x402"
+      }
+    },
+    {
+      "name": "schemas-browse",
+      "method": "GET",
+      "path": "/api/v1/docs/schemas/browse?path=ethereum",
+      "checked_at": "2026-11-12T18:16:48.716971+00:00",
+      "status": 404,
+      "body": "{\"detail\":\"Not Found\"}",
+      "base_url": "https://agents.allium.so",
+      "request_headers": {
+        "Content-Type": "application/json",
+        "X-Prefer-Payment": "x402"
+      }
+    },
+    {
+      "name": "schemas-search",
+      "method": "GET",
+      "path": "/api/v1/docs/schemas/search?query=erc20",
+      "checked_at": "2026-11-12T18:16:49.433311+00:00",
+      "status": 404,
+      "body": "{\"detail\":\"Not Found\"}",
+      "base_url": "https://agents.allium.so",
+      "request_headers": {
+        "Content-Type": "application/json",
+        "X-Prefer-Payment": "x402"
+      }
+    },
+    {
+      "name": "docs-browse",
+      "method": "GET",
+      "path": "/api/v1/docs/docs/browse?path=api/developer",
+      "checked_at": "2026-11-12T18:16:50.991347+00:00",
+      "status": 200,
+      "note": "Successful documentation response; content omitted from this summary.",
+      "base_url": "https://agents.allium.so",
+      "request_headers": {
+        "Content-Type": "application/json",
+        "X-Prefer-Payment": "x402"
+      }
+    },
+    {
+      "name": "docs-search",
+      "method": "GET",
+      "path": "/api/v1/docs/docs/search?query=balances",
+      "checked_at": "2026-11-12T18:16:52.704567+00:00",
+      "status": 200,
+      "note": "Successful documentation response; content omitted from this summary.",
+      "base_url": "https://agents.allium.so",
+      "request_headers": {
+        "Content-Type": "application/json",
+        "X-Prefer-Payment": "x402"
+      }
+    },
+    {
+      "name": "sql",
+      "method": "POST",
+      "path": "/api/v1/explorer/queries/run-async",
+      "checked_at": "2026-11-12T18:16:53.428235+00:00",
+      "status": 503,
+      "body": "{\"message\":\"This endpoint is currently unavailable.\"}",
+      "base_url": "https://agents.allium.so",
+      "request_headers": {
+        "Content-Type": "application/json",
+        "X-Prefer-Payment": "x402"
+      }
+    },
+    {
+      "name": "chains",
+      "method": "GET",
+      "path": "/api/v1/supported-chains/realtime-apis/simple",
+      "checked_at": "2026-11-12T18:16:54.255190+00:00",
+      "status": 200,
+      "endpoints": [
+        "/api/v1/developer/wallet/balances/history",
+        "/api/v1/developer/wallet/balances",
+        "/api/v1/developer/wallet/transactions",
+        "/api/v1/developer/wallet/pnl",
+        "/api/v1/developer/wallet/pnl/history",
+        "/api/v1/developer/wallet/pnl-by-token",
+        "/api/v1/developer/wallet/pnl-by-token/history",
+        "/api/v1/developer/wallet/holdings/history",
+        "/api/v1/developer/prices/history",
+        "/api/v1/developer/prices",
+        "/api/v1/developer/prices/stats",
+        "/api/v1/developer/prices/at-timestamp",
+        "/api/v1/developer/tokens/chain-address",
+        "/api/v1/developer/tokens/transfers",
+        "/api/v1/developer/tokens",
+        "/api/v1/developer/tokens/search",
+        "/api/v1/developer/assets",
+        "/api/v1/developer/assets/batch",
+        "/api/v1/developer/trading/hyperliquid/info/fills",
+        "/api/v1/developer/trading/hyperliquid/info/order/history",
+        "/api/v1/developer/trading/hyperliquid/info/order/status",
+        "/api/v1/developer/trading/hyperliquid/info",
+        "/api/v1/developer/wallet/positions"
+      ],
+      "base_url": "https://agents.allium.so",
+      "request_headers": {
+        "Content-Type": "application/json",
+        "X-Prefer-Payment": "x402"
+      }
+    },
+    {
+      "name": "hyperliquid-fills",
+      "method": "POST",
+      "path": "/api/v1/developer/trading/hyperliquid/info/fills",
+      "checked_at": "2026-11-12T18:18:50.429637+00:00",
+      "status": 404,
+      "body": "{\"detail\":\"Not Found\"}",
+      "base_url": "https://agents.allium.so",
+      "request_headers": {
+        "Content-Type": "application/json",
+        "X-Prefer-Payment": "x402"
+      }
+    },
+    {
+      "name": "hyperliquid-order-history",
+      "method": "POST",
+      "path": "/api/v1/developer/trading/hyperliquid/info/order/history",
+      "checked_at": "2026-11-12T18:18:51.158431+00:00",
+      "status": 404,
+      "body": "{\"detail\":\"Not Found\"}",
+      "base_url": "https://agents.allium.so",
+      "request_headers": {
+        "Content-Type": "application/json",
+        "X-Prefer-Payment": "x402"
+      }
+    },
+    {
+      "name": "hyperliquid-order-status",
+      "method": "POST",
+      "path": "/api/v1/developer/trading/hyperliquid/info/order/status",
+      "checked_at": "2026-11-12T18:18:51.890732+00:00",
+      "status": 404,
+      "body": "{\"detail\":\"Not Found\"}",
+      "base_url": "https://agents.allium.so",
+      "request_headers": {
+        "Content-Type": "application/json",
+        "X-Prefer-Payment": "x402"
+      }
+    }
+  ]
+}

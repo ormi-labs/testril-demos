@@ -2,6 +2,8 @@
 
 Blog research handoff · checked 18 October 2026 · prepared for Paul and his writing agent.
 
+**Later check:** the [12 November investigation](2026-11-12-allium-x402-state.md) found that all 12 explicitly advertised machine-payment data operations failed to offer a payment challenge. The October observations below are historical; they do not establish current availability.
+
 ## Main finding
 
 **Allium offers accountless paid data access through its machine-payment HTTP API. Its hosted MCP server requires authentication.** These are separate interfaces. A claim that “Allium requires an account for x402 access” would misrepresent what we found.
