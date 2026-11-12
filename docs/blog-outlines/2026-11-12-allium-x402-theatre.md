@@ -60,7 +60,29 @@ The agents landing page also returned 503 and said the service was disabled. Rep
 
 Keep the detailed 30-request matrix in the linked evidence appendix. Readers should be able to reproduce the central failures without reading an incident report.
 
-## 5. Include the facts that complicate the criticism
+## 5. Show what happened when we tried competitors
+
+On the same day, we checked Nansen and Dune without accounts or API keys. Both offered payment negotiation. Link the [research note](../research/2026-11-12-nansen-dune-accountless-demos.md) and [timestamped observations](../research/2026-11-12-nansen-dune-observations.json).
+
+| Provider | Accountless payment interface | Observed on November 12                                                                                                                                                       |
+| -------- | ----------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Allium   | Advertised x402               | None of the 12 advertised data operations checked offered a payment challenge.                                                                                                |
+| Nansen   | x402 v2, including Base USDC  | All six checked endpoints offered payment: balances, historical balances, transactions, and transfers at $0.01 per request; counterparties and Smart Money holdings at $0.05. |
+| Dune     | MPP on Tempo                  | Raw SQL execution offered a payment challenge in all three requests, with default, medium, and large performance settings.                                                    |
+
+Cite [Nansen's accountless payment documentation](https://docs.nansen.ai/getting-started/agentic-payments/x402-payments) and [Dune's MPP documentation](https://docs.dune.com/docs/agents/mpp). Dune uses a different protocol: HTTP 402 does not make it x402. Its channel deposit is not the amount spent on a query. Nansen's public discovery manifest listed 93 resources; only six were probed. The table is a comparison of observed access behavior, not equal workloads or an uptime ranking.
+
+State the limit plainly: **we did not complete a paid purchase from either competitor.** Their responses establish that a new buyer could reach payment negotiation, not that data delivery, correctness, or performance has been verified. Apply the same standard to Allium's October 402 responses.
+
+Suggested paragraph:
+
+> We tried the same first step elsewhere: ask for data without an account and see whether the service offers a price. Nansen returned x402 payment offers. Dune returned a Tempo payment challenge. Allium's advertised routes returned errors. We still have to verify paid delivery from the alternatives, but at least they let us reach the checkout.
+
+Explain why this matters to the original project. We now have three plausible comparisons: a USDC wallet statement against Nansen, a counterparty-flow report against Nansen, or the known-pool volume calculation against Dune. These are candidates, not completed benchmarks. A small paid trial must establish equivalent data first; Nansen's transfer schema lacks log indices and raw integer amounts, while Dune introduces a different payment network. Testril's materialization cost will remain separate from reads, and complete costs must include pagination and retrieval on the other side.
+
+The editorial point: developers have alternatives to investigate, and an unusable advertised purchase path can send their next integration elsewhere. This does not prove that either competitor is faster, cheaper, or universally more reliable.
+
+## 6. Include the facts that complicate the criticism
 
 In October, balances, prices, and SQL submission did return payment challenges. We did not complete a paid transaction then. SQL returned 503 on November 5 and again on November 12; that does not prove uninterrupted downtime between checks.
 
@@ -68,7 +90,7 @@ The CLI contains a wallet-payment implementation, including local signing. The h
 
 The sharper question is: why does the public documentation continue to direct a new buyer into a path we cannot use, and where is the working replacement or clear service-status explanation?
 
-## 6. Define what “x402 theatre” means here
+## 7. Define what “x402 theatre” means here
 
 Make the editorial case that a payment protocol logo, sample signer, and pricing table are not enough to deliver the promised autonomous purchase experience. A buyer needs maintained routes, discoverable prices, working delivery, and clear failure behavior.
 
@@ -78,15 +100,19 @@ Suggested line:
 
 Qualify this as our experience and a product criticism. An outage can happen to any service. The issue is the mismatch between the offer still being published and the path available to a new buyer when checked.
 
-## 7. Explain the cost to builders
+## 8. Explain the cost to builders
 
 Our comparison could not proceed. We spent time ruling out request mistakes and looking for another task the API could support. We could not produce a real timing or spending comparison.
 
 Keep this concrete. Do not invent engineering-hour totals, customer losses, outage duration, or evidence of other affected buyers.
 
-## 8. Ask Allium for a testable answer
+## 9. Ask Allium for a testable answer
 
 Ask for the production x402 URL, enabled operations, an explanation of the observed responses, and a complete wallet-only example that returns data. Ask whether the full SQL purchase includes polling and retrieval without an API key.
+
+Paul's question is: **“What is Allium afraid of?”** We do not know that fear has anything to do with this. Do not imply that Allium is avoiding a benchmark, protecting its prices from scrutiny, or deliberately blocking anonymous buyers. An outage, migration, or neglected deployment could explain these results; no cause has been established.
+
+Turn the frustration into a question they can answer: **“Nansen and Dune let an unknown buyer reach payment negotiation. What is preventing Allium from providing the accountless access it advertises?”** Ask for a working example and an explanation of the failures, rather than a statement about motives.
 
 Paul previously reported posting a question on X. Insert its actual URL and any response only after obtaining them. No response record is available in this research; do not claim silence or refusal.
 
@@ -101,9 +127,10 @@ Suggested closing:
 - Re-run the three representative unpaid requests and preserve their dated results. If behavior changes, update the thesis and table.
 - Keep the author's Testril connection prominent. Make no Testril speed or cost claims from an uncompleted comparison.
 - Include the October counterevidence and distinguish the advertised 12 operations from the wider exploratory sweep.
+- Recheck Nansen and Dune too. Keep payment challenges separate from completed purchases, and MPP separate from x402. Update the comparison if any provider's behavior changes.
 - Add any Allium response accurately. Do not imply that anyone was contacted by this agent.
 - Treat allegations of intent, fabricated volume, fraud, or customer harm as unsupported; the observed access failures are sufficient for the argument.
 
 ## Writing direction
 
-Aim for 900–1,200 words. Be angry about the experience, precise about the evidence, and plain about what would resolve it. Lead with the attempted purchase and the results. Avoid a long x402 tutorial or a Testril sales pitch.
+Aim for 1,100–1,400 words. Be angry about the experience, precise about the evidence, and plain about what would resolve it. Lead with the attempted purchase and the results. Keep the alternative demo ideas to a short paragraph; link their implementation details. Avoid a long x402 tutorial or a Testril sales pitch.
