@@ -1,0 +1,538 @@
+{
+  "description": "Unpaid HTTP POST probes. No account, API key, payment signature, or wallet transaction. Payment challenges are decoded summaries, not complete responses. They do not prove paid delivery or request-body validation.",
+  "observations": [
+    {
+      "name": "nansen-balance",
+      "url": "https://api.nansen.ai/api/v1/profiler/address/current-balance",
+      "request": {
+        "address": "0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045",
+        "chain": "ethereum",
+        "filters": {
+          "token_address": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48"
+        },
+        "hide_spam_token": false,
+        "pagination": {
+          "page": 1,
+          "per_page": 10
+        }
+      },
+      "checked_at": "2026-11-12T18:55:28.593148+00:00",
+      "status": 402,
+      "x402Version": 2,
+      "offers": [
+        {
+          "scheme": "exact",
+          "network": "eip155:8453",
+          "amount": "10000",
+          "asset": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+          "maxTimeoutSeconds": 300
+        },
+        {
+          "scheme": "exact",
+          "network": "eip155:196",
+          "amount": "10000",
+          "asset": "0x779Ded0c9e1022225f8E0630b35a9b54bE713736",
+          "maxTimeoutSeconds": 300
+        },
+        {
+          "scheme": "exact",
+          "network": "eip155:56",
+          "amount": "10000000000000000",
+          "asset": "0xcE24439F2D9C6a2289F741120FE202248B666666",
+          "maxTimeoutSeconds": 300
+        },
+        {
+          "scheme": "exact",
+          "network": "eip155:56",
+          "amount": "10000000000000000",
+          "asset": "0x8d0d000ee44948fc98c9b98a4fa4921476f08b0d",
+          "maxTimeoutSeconds": 300
+        },
+        {
+          "scheme": "exact",
+          "network": "eip155:56",
+          "amount": "10000000000000000",
+          "asset": "0x55d398326f99059fF775485246999027B3197955",
+          "maxTimeoutSeconds": 300
+        },
+        {
+          "scheme": "exact",
+          "network": "eip155:56",
+          "amount": "10000000000000000",
+          "asset": "0x8AC76a51cc950d9822D68b83fE1Ad97B32Cd580d",
+          "maxTimeoutSeconds": 300
+        },
+        {
+          "scheme": "exact",
+          "network": "eip155:143",
+          "amount": "10000",
+          "asset": "0x754704Bc059F8C67012fEd69BC8A327a5aafb603",
+          "maxTimeoutSeconds": 300
+        },
+        {
+          "scheme": "exact",
+          "network": "solana:5eykt4UsFv8P8NJdTREpY1vzqKqZKvdp",
+          "amount": "10000",
+          "asset": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+          "maxTimeoutSeconds": 300
+        }
+      ]
+    },
+    {
+      "name": "nansen-historical-balance",
+      "url": "https://api.nansen.ai/api/v1/profiler/address/historical-balances",
+      "request": {
+        "address": "0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045",
+        "chain": "ethereum",
+        "date": {
+          "from": "2026-11-10T12:00:00Z",
+          "to": "2026-11-10T13:00:00Z"
+        },
+        "filters": {
+          "token_address": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+          "hide_spam_tokens": false
+        },
+        "pagination": {
+          "page": 1,
+          "per_page": 10
+        }
+      },
+      "checked_at": "2026-11-12T18:55:29.351153+00:00",
+      "status": 402,
+      "x402Version": 2,
+      "offers": [
+        {
+          "scheme": "exact",
+          "network": "eip155:8453",
+          "amount": "10000",
+          "asset": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+          "maxTimeoutSeconds": 300
+        },
+        {
+          "scheme": "exact",
+          "network": "eip155:196",
+          "amount": "10000",
+          "asset": "0x779Ded0c9e1022225f8E0630b35a9b54bE713736",
+          "maxTimeoutSeconds": 300
+        },
+        {
+          "scheme": "exact",
+          "network": "eip155:56",
+          "amount": "10000000000000000",
+          "asset": "0xcE24439F2D9C6a2289F741120FE202248B666666",
+          "maxTimeoutSeconds": 300
+        },
+        {
+          "scheme": "exact",
+          "network": "eip155:56",
+          "amount": "10000000000000000",
+          "asset": "0x8d0d000ee44948fc98c9b98a4fa4921476f08b0d",
+          "maxTimeoutSeconds": 300
+        },
+        {
+          "scheme": "exact",
+          "network": "eip155:56",
+          "amount": "10000000000000000",
+          "asset": "0x55d398326f99059fF775485246999027B3197955",
+          "maxTimeoutSeconds": 300
+        },
+        {
+          "scheme": "exact",
+          "network": "eip155:56",
+          "amount": "10000000000000000",
+          "asset": "0x8AC76a51cc950d9822D68b83fE1Ad97B32Cd580d",
+          "maxTimeoutSeconds": 300
+        },
+        {
+          "scheme": "exact",
+          "network": "eip155:143",
+          "amount": "10000",
+          "asset": "0x754704Bc059F8C67012fEd69BC8A327a5aafb603",
+          "maxTimeoutSeconds": 300
+        },
+        {
+          "scheme": "exact",
+          "network": "solana:5eykt4UsFv8P8NJdTREpY1vzqKqZKvdp",
+          "amount": "10000",
+          "asset": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+          "maxTimeoutSeconds": 300
+        }
+      ]
+    },
+    {
+      "name": "nansen-transactions",
+      "url": "https://api.nansen.ai/api/v1/profiler/address/transactions",
+      "request": {
+        "address": "0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045",
+        "chain": "ethereum",
+        "date": {
+          "from": "2026-11-10T12:00:00Z",
+          "to": "2026-11-10T13:00:00Z"
+        },
+        "filters": {
+          "token_address": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48"
+        },
+        "hide_spam_token": false,
+        "pagination": {
+          "page": 1,
+          "per_page": 10
+        }
+      },
+      "checked_at": "2026-11-12T18:55:30.121042+00:00",
+      "status": 402,
+      "x402Version": 2,
+      "offers": [
+        {
+          "scheme": "exact",
+          "network": "eip155:8453",
+          "amount": "10000",
+          "asset": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+          "maxTimeoutSeconds": 300
+        },
+        {
+          "scheme": "exact",
+          "network": "eip155:196",
+          "amount": "10000",
+          "asset": "0x779Ded0c9e1022225f8E0630b35a9b54bE713736",
+          "maxTimeoutSeconds": 300
+        },
+        {
+          "scheme": "exact",
+          "network": "eip155:56",
+          "amount": "10000000000000000",
+          "asset": "0xcE24439F2D9C6a2289F741120FE202248B666666",
+          "maxTimeoutSeconds": 300
+        },
+        {
+          "scheme": "exact",
+          "network": "eip155:56",
+          "amount": "10000000000000000",
+          "asset": "0x8d0d000ee44948fc98c9b98a4fa4921476f08b0d",
+          "maxTimeoutSeconds": 300
+        },
+        {
+          "scheme": "exact",
+          "network": "eip155:56",
+          "amount": "10000000000000000",
+          "asset": "0x55d398326f99059fF775485246999027B3197955",
+          "maxTimeoutSeconds": 300
+        },
+        {
+          "scheme": "exact",
+          "network": "eip155:56",
+          "amount": "10000000000000000",
+          "asset": "0x8AC76a51cc950d9822D68b83fE1Ad97B32Cd580d",
+          "maxTimeoutSeconds": 300
+        },
+        {
+          "scheme": "exact",
+          "network": "eip155:143",
+          "amount": "10000",
+          "asset": "0x754704Bc059F8C67012fEd69BC8A327a5aafb603",
+          "maxTimeoutSeconds": 300
+        },
+        {
+          "scheme": "exact",
+          "network": "solana:5eykt4UsFv8P8NJdTREpY1vzqKqZKvdp",
+          "amount": "10000",
+          "asset": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+          "maxTimeoutSeconds": 300
+        }
+      ]
+    },
+    {
+      "name": "nansen-transfers",
+      "url": "https://api.nansen.ai/api/v1/tgm/transfers",
+      "request": {
+        "chain": "ethereum",
+        "token_address": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+        "date": {
+          "from": "2026-11-10T12:00:00Z",
+          "to": "2026-11-10T13:00:00Z"
+        },
+        "filters": {
+          "from_address": "0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045"
+        },
+        "pagination": {
+          "page": 1,
+          "per_page": 10
+        }
+      },
+      "checked_at": "2026-11-12T18:55:30.869444+00:00",
+      "status": 402,
+      "x402Version": 2,
+      "offers": [
+        {
+          "scheme": "exact",
+          "network": "eip155:8453",
+          "amount": "10000",
+          "asset": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+          "maxTimeoutSeconds": 300
+        },
+        {
+          "scheme": "exact",
+          "network": "eip155:196",
+          "amount": "10000",
+          "asset": "0x779Ded0c9e1022225f8E0630b35a9b54bE713736",
+          "maxTimeoutSeconds": 300
+        },
+        {
+          "scheme": "exact",
+          "network": "eip155:56",
+          "amount": "10000000000000000",
+          "asset": "0xcE24439F2D9C6a2289F741120FE202248B666666",
+          "maxTimeoutSeconds": 300
+        },
+        {
+          "scheme": "exact",
+          "network": "eip155:56",
+          "amount": "10000000000000000",
+          "asset": "0x8d0d000ee44948fc98c9b98a4fa4921476f08b0d",
+          "maxTimeoutSeconds": 300
+        },
+        {
+          "scheme": "exact",
+          "network": "eip155:56",
+          "amount": "10000000000000000",
+          "asset": "0x55d398326f99059fF775485246999027B3197955",
+          "maxTimeoutSeconds": 300
+        },
+        {
+          "scheme": "exact",
+          "network": "eip155:56",
+          "amount": "10000000000000000",
+          "asset": "0x8AC76a51cc950d9822D68b83fE1Ad97B32Cd580d",
+          "maxTimeoutSeconds": 300
+        },
+        {
+          "scheme": "exact",
+          "network": "eip155:143",
+          "amount": "10000",
+          "asset": "0x754704Bc059F8C67012fEd69BC8A327a5aafb603",
+          "maxTimeoutSeconds": 300
+        },
+        {
+          "scheme": "exact",
+          "network": "solana:5eykt4UsFv8P8NJdTREpY1vzqKqZKvdp",
+          "amount": "10000",
+          "asset": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+          "maxTimeoutSeconds": 300
+        }
+      ]
+    },
+    {
+      "name": "nansen-counterparties",
+      "url": "https://api.nansen.ai/api/v1/profiler/address/counterparties",
+      "request": {
+        "address": "0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045",
+        "chain": "ethereum",
+        "date": {
+          "from": "2026-11-10T12:00:00Z",
+          "to": "2026-11-10T13:00:00Z"
+        },
+        "pagination": {
+          "page": 1,
+          "per_page": 10
+        }
+      },
+      "checked_at": "2026-11-12T18:55:31.579429+00:00",
+      "status": 402,
+      "x402Version": 2,
+      "offers": [
+        {
+          "scheme": "exact",
+          "network": "eip155:8453",
+          "amount": "50000",
+          "asset": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+          "maxTimeoutSeconds": 300
+        },
+        {
+          "scheme": "exact",
+          "network": "eip155:196",
+          "amount": "50000",
+          "asset": "0x779Ded0c9e1022225f8E0630b35a9b54bE713736",
+          "maxTimeoutSeconds": 300
+        },
+        {
+          "scheme": "exact",
+          "network": "eip155:56",
+          "amount": "50000000000000000",
+          "asset": "0xcE24439F2D9C6a2289F741120FE202248B666666",
+          "maxTimeoutSeconds": 300
+        },
+        {
+          "scheme": "exact",
+          "network": "eip155:56",
+          "amount": "50000000000000000",
+          "asset": "0x8d0d000ee44948fc98c9b98a4fa4921476f08b0d",
+          "maxTimeoutSeconds": 300
+        },
+        {
+          "scheme": "exact",
+          "network": "eip155:56",
+          "amount": "50000000000000000",
+          "asset": "0x55d398326f99059fF775485246999027B3197955",
+          "maxTimeoutSeconds": 300
+        },
+        {
+          "scheme": "exact",
+          "network": "eip155:56",
+          "amount": "50000000000000000",
+          "asset": "0x8AC76a51cc950d9822D68b83fE1Ad97B32Cd580d",
+          "maxTimeoutSeconds": 300
+        },
+        {
+          "scheme": "exact",
+          "network": "eip155:143",
+          "amount": "50000",
+          "asset": "0x754704Bc059F8C67012fEd69BC8A327a5aafb603",
+          "maxTimeoutSeconds": 300
+        },
+        {
+          "scheme": "exact",
+          "network": "solana:5eykt4UsFv8P8NJdTREpY1vzqKqZKvdp",
+          "amount": "50000",
+          "asset": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+          "maxTimeoutSeconds": 300
+        }
+      ]
+    },
+    {
+      "name": "nansen-smart-money",
+      "url": "https://api.nansen.ai/api/v1/smart-money/holdings",
+      "request": {
+        "chains": ["ethereum"],
+        "pagination": {
+          "page": 1,
+          "per_page": 10
+        }
+      },
+      "checked_at": "2026-11-12T18:55:32.316628+00:00",
+      "status": 402,
+      "x402Version": 2,
+      "offers": [
+        {
+          "scheme": "exact",
+          "network": "eip155:8453",
+          "amount": "50000",
+          "asset": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+          "maxTimeoutSeconds": 300
+        },
+        {
+          "scheme": "exact",
+          "network": "eip155:196",
+          "amount": "50000",
+          "asset": "0x779Ded0c9e1022225f8E0630b35a9b54bE713736",
+          "maxTimeoutSeconds": 300
+        },
+        {
+          "scheme": "exact",
+          "network": "eip155:56",
+          "amount": "50000000000000000",
+          "asset": "0xcE24439F2D9C6a2289F741120FE202248B666666",
+          "maxTimeoutSeconds": 300
+        },
+        {
+          "scheme": "exact",
+          "network": "eip155:56",
+          "amount": "50000000000000000",
+          "asset": "0x8d0d000ee44948fc98c9b98a4fa4921476f08b0d",
+          "maxTimeoutSeconds": 300
+        },
+        {
+          "scheme": "exact",
+          "network": "eip155:56",
+          "amount": "50000000000000000",
+          "asset": "0x55d398326f99059fF775485246999027B3197955",
+          "maxTimeoutSeconds": 300
+        },
+        {
+          "scheme": "exact",
+          "network": "eip155:56",
+          "amount": "50000000000000000",
+          "asset": "0x8AC76a51cc950d9822D68b83fE1Ad97B32Cd580d",
+          "maxTimeoutSeconds": 300
+        },
+        {
+          "scheme": "exact",
+          "network": "eip155:143",
+          "amount": "50000",
+          "asset": "0x754704Bc059F8C67012fEd69BC8A327a5aafb603",
+          "maxTimeoutSeconds": 300
+        },
+        {
+          "scheme": "exact",
+          "network": "solana:5eykt4UsFv8P8NJdTREpY1vzqKqZKvdp",
+          "amount": "50000",
+          "asset": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+          "maxTimeoutSeconds": 300
+        }
+      ]
+    },
+    {
+      "name": "dune-sql-default",
+      "url": "https://api.dune.com/api/v1/sql/execute",
+      "request": {
+        "sql": "SELECT 1 AS value"
+      },
+      "checked_at": "2026-11-12T18:55:32.979723+00:00",
+      "status": 402,
+      "payment_method": "tempo",
+      "intent": "session",
+      "payment_request": {
+        "amount": "4000000",
+        "currency": "0x20c000000000000000000000b9537d11c60e8b50",
+        "decimals": 6,
+        "methodDetails": {
+          "chainId": 4217,
+          "escrowContract": "0x33b901018174DDabE4841042ab76ba85D4e24f25"
+        },
+        "suggestedDeposit": "10000000"
+      }
+    },
+    {
+      "name": "dune-sql-medium",
+      "url": "https://api.dune.com/api/v1/sql/execute",
+      "request": {
+        "sql": "SELECT 1 AS value",
+        "performance": "medium"
+      },
+      "checked_at": "2026-11-12T18:55:33.623509+00:00",
+      "status": 402,
+      "payment_method": "tempo",
+      "intent": "session",
+      "payment_request": {
+        "amount": "4000000",
+        "currency": "0x20c000000000000000000000b9537d11c60e8b50",
+        "decimals": 6,
+        "methodDetails": {
+          "chainId": 4217,
+          "escrowContract": "0x33b901018174DDabE4841042ab76ba85D4e24f25"
+        },
+        "suggestedDeposit": "10000000"
+      }
+    },
+    {
+      "name": "dune-sql-large",
+      "url": "https://api.dune.com/api/v1/sql/execute",
+      "request": {
+        "sql": "SELECT 1 AS value",
+        "performance": "large"
+      },
+      "checked_at": "2026-11-12T18:55:34.287829+00:00",
+      "status": 402,
+      "payment_method": "tempo",
+      "intent": "session",
+      "payment_request": {
+        "amount": "4000000",
+        "currency": "0x20c000000000000000000000b9537d11c60e8b50",
+        "decimals": 6,
+        "methodDetails": {
+          "chainId": 4217,
+          "escrowContract": "0x33b901018174DDabE4841042ab76ba85D4e24f25"
+        },
+        "suggestedDeposit": "10000000"
+      }
+    }
+  ]
+}
