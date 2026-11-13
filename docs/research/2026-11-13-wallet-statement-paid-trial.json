@@ -1,0 +1,253 @@
+{
+  "schemaVersion": 1,
+  "kind": "paid-feasibility-trial",
+  "date": "2026-11-13",
+  "scope": {
+    "chainId": 1,
+    "address": "0x88e6a0c2ddd26feeb64f039a2c41296fcb3f5640",
+    "addressKind": "Uniswap V3 pool contract",
+    "token": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+    "from": "2026-11-10T12:00:00Z",
+    "to": "2026-11-10T13:00:00Z",
+    "fromBlock": 26384371,
+    "toBlockExclusive": 26384670
+  },
+  "payer": "0x6eA4AB444CD21bd9210D998894585f6148048517",
+  "paymentNetwork": "eip155:8453",
+  "statement": {
+    "matches": true,
+    "transactionRecords": 263,
+    "transfers": 292,
+    "incomingAtoms": "2626205204677",
+    "outgoingAtoms": "2069464783424",
+    "nansenPages": 3,
+    "costAtoms": {
+      "nansen": "30000",
+      "testrilPreparation": "35880",
+      "testrilRead": "319"
+    },
+    "timingNote": "Request durations only; preparation duration and uninterrupted complete-run duration were not recorded. Not a publishable speed benchmark.",
+    "nansenRequestDurationsMs": [3193, 5288, 3242],
+    "testrilReadRequestDurationMs": "3326.025542",
+    "independentReceiptChecks": [
+      {
+        "transaction": "0x1bb6ff37391c7fb1a512fe9a26eacdf82d345bf0970577b7b6033f4b9f78974a",
+        "status": "0x1",
+        "matchingTransfers": 1
+      },
+      {
+        "transaction": "0x4f7b6f0a32d8f32cce7877a8341ee339d0740d90897ea9aac5b08c07cd85ca0f",
+        "status": "0x1",
+        "matchingTransfers": 1
+      },
+      {
+        "transaction": "0x68cda88ab1630e7c8251da4ce0dae9065ce8c2ff94a24a06a4818d7064b72a22",
+        "status": "0x1",
+        "matchingTransfers": 1
+      },
+      {
+        "transaction": "0x1ed0f8a09fba45fcd7dbde40143f0df5d90351d7be6713825dbb4035f3711bff",
+        "status": "0x1",
+        "matchingTransfers": 1
+      },
+      {
+        "transaction": "0x8138ae48e9c460ad73888f50ade306781aff6e4f2b15e2cb15c65ec2fa488327",
+        "status": "0x1",
+        "matchingTransfers": 1
+      },
+      {
+        "transaction": "0xd680805324e15a4b1bb1e42e638532e4c5a52af5108342e3b7f16f0ba3fec418",
+        "status": "0x1",
+        "matchingTransfers": 2
+      }
+    ],
+    "nansenTransfers": {
+      "file": "2026-11-13-nansen-statement-transfers.csv",
+      "rows": 292,
+      "sha256": "c571c871edb5d662b38f16118cf9d762c5261a1168e7876da88ceb473a02448f"
+    },
+    "testrilTransfers": {
+      "file": "2026-11-13-testril-statement-transfers.csv",
+      "rows": 292,
+      "sha256": "d291fc174be7722cd996c39bd740c228db80e73f03b1d934ea72620595da92a1"
+    }
+  },
+  "counterparties": {
+    "status": "failed_equivalence",
+    "requestedFirstWindow": {
+      "from": "2026-11-10T12:00:00Z",
+      "to": "2026-11-10T13:00:00Z"
+    },
+    "requestedDisjointWindow": {
+      "from": "2026-11-10T13:00:00Z",
+      "to": "2026-11-10T14:00:00Z"
+    },
+    "firstPagesIdentical": true,
+    "pagesInspectedInFirstWindow": 5,
+    "paginationCompleted": false,
+    "diagnosticCostAtoms": "300000",
+    "example": {
+      "address": "0x51c72848c68a965f66fa7a88855f9f7784502a7f",
+      "statement": {
+        "usdcTransfers": 34,
+        "incomingAtoms": "1020320767107",
+        "outgoingAtoms": "327701521529"
+      },
+      "counterpartiesEndpoint": {
+        "usdcTransfers": 841,
+        "incomingAtoms": "39091190417167",
+        "outgoingAtoms": "35494186415681"
+      }
+    },
+    "cause": "Unknown. Identical disjoint-hour responses suggest lost time bounds or cache granularity; a full-day interpretation has not been verified."
+  },
+  "accounting": {
+    "serviceChargeAtoms": "366199",
+    "walletBalanceAtoms": "624120",
+    "escrowDepositAtoms": "10000",
+    "escrowChargedAtoms": "319",
+    "escrowUnspentAtoms": "9681",
+    "escrowWithdrawn": false
+  },
+  "payments": [
+    {
+      "file": "nansen-counterparties-1.json",
+      "transaction": "0x61b25c48d28517737cc88ae36a3d3378c3502c2b15e23691031b3cc76f8ca9fb",
+      "onchainStatus": "success",
+      "debited": [
+        {
+          "to": "0x93053f1e7A5eFEDa532Fe69CbbE43cBEc3A0F13f",
+          "amount": "50000"
+        }
+      ],
+      "serviceCharge": "50000"
+    },
+    {
+      "file": "nansen-counterparties-2.json",
+      "transaction": "0xe20e6458f7da8365fc149d82d2f16caa08ad9ba62003becf0cc016978ad3ec48",
+      "onchainStatus": "success",
+      "debited": [
+        {
+          "to": "0x93053f1e7A5eFEDa532Fe69CbbE43cBEc3A0F13f",
+          "amount": "50000"
+        }
+      ],
+      "serviceCharge": "50000"
+    },
+    {
+      "file": "nansen-counterparties-3.json",
+      "transaction": "0x9dbfdf60fd85fc4e51356a625e83eef4079fbd7a68f4e347c415b0e75976edb2",
+      "onchainStatus": "success",
+      "debited": [
+        {
+          "to": "0x93053f1e7A5eFEDa532Fe69CbbE43cBEc3A0F13f",
+          "amount": "50000"
+        }
+      ],
+      "serviceCharge": "50000"
+    },
+    {
+      "file": "nansen-counterparties-4.json",
+      "transaction": "0x57dd1a3489172fff003f67f674ffc1af648d193169e3390772bcb65303dc944d",
+      "onchainStatus": "success",
+      "debited": [
+        {
+          "to": "0x93053f1e7A5eFEDa532Fe69CbbE43cBEc3A0F13f",
+          "amount": "50000"
+        }
+      ],
+      "serviceCharge": "50000"
+    },
+    {
+      "file": "nansen-counterparties-5.json",
+      "transaction": "0x079d9790e189c3a5145a0a83e0fbbbbc636a9a818a52824c1a494850d2de48b0",
+      "onchainStatus": "success",
+      "debited": [
+        {
+          "to": "0x93053f1e7A5eFEDa532Fe69CbbE43cBEc3A0F13f",
+          "amount": "50000"
+        }
+      ],
+      "serviceCharge": "50000"
+    },
+    {
+      "file": "nansen-counterparties-disjoint-hour.json",
+      "transaction": "0x0956b89ef131556d37b7359a82f7030c04efe559f0db43ab4d5317180853cb0f",
+      "onchainStatus": "success",
+      "debited": [
+        {
+          "to": "0x93053f1e7A5eFEDa532Fe69CbbE43cBEc3A0F13f",
+          "amount": "50000"
+        }
+      ],
+      "serviceCharge": "50000"
+    },
+    {
+      "file": "nansen-statement-page-2.json",
+      "transaction": "0x1eb6cae2e2bec06b74d15ee6d171737bcf0c354c54ef7847e74dcd7a567f0496",
+      "onchainStatus": "success",
+      "debited": [
+        {
+          "to": "0x93053f1e7A5eFEDa532Fe69CbbE43cBEc3A0F13f",
+          "amount": "10000"
+        }
+      ],
+      "serviceCharge": "10000"
+    },
+    {
+      "file": "nansen-statement-page-3.json",
+      "transaction": "0x48691c2273f960e28fd6962e97fe2405d1b8821ad43e28d59ffa4546b60d4bd2",
+      "onchainStatus": "success",
+      "debited": [
+        {
+          "to": "0x93053f1e7A5eFEDa532Fe69CbbE43cBEc3A0F13f",
+          "amount": "10000"
+        }
+      ],
+      "serviceCharge": "10000"
+    },
+    {
+      "file": "nansen-statement.json",
+      "transaction": "0x1c054adf5f67fe1a9619a45e7ad8fa63fdb3bcc685dbda71f1c8af29b0066af1",
+      "onchainStatus": "success",
+      "debited": [
+        {
+          "to": "0x93053f1e7A5eFEDa532Fe69CbbE43cBEc3A0F13f",
+          "amount": "10000"
+        }
+      ],
+      "serviceCharge": "10000"
+    },
+    {
+      "file": "testril-prepare.json",
+      "transaction": "0x0ee9634f4db4ef0c21c1b650d233789013fe75e7eba94157abe8b8e8b68a7125",
+      "onchainStatus": "success",
+      "debited": [
+        {
+          "to": "0x4559A18661B816F05220C053A551172eD3015e52",
+          "amount": "35880"
+        }
+      ],
+      "serviceCharge": "35880"
+    },
+    {
+      "file": "testril-read.json",
+      "transaction": "0x4da4ac89891ea47a335014f46200acfce20c388c4fa1216d4de7452bb2ac3151",
+      "onchainStatus": "success",
+      "debited": [
+        {
+          "to": "0x4020806089470a89826cB9fB1f4059150b550004",
+          "amount": "10000"
+        }
+      ],
+      "serviceCharge": "319"
+    }
+  ],
+  "limitations": [
+    "One contract address and one historical hour, not a general guarantee for every token/address/window.",
+    "Six independent transaction receipt checks, not an independent scan of the entire block interval.",
+    "Sub-cent read receipt confirms a charged voucher; inspect reported totalClaimed zero, so its on-chain deposit is not a separate service charge.",
+    "No Dune payment or Tempo session was opened.",
+    "No private keys, signatures, transient payment challenges, or proprietary labels included."
+  ]
+}

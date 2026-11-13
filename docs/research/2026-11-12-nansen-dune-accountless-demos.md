@@ -2,6 +2,8 @@
 
 Checked 12 November 2026. Recommendation and unpaid endpoint investigation; no paid data delivery or benchmark completed.
 
+**13 November update:** a [paid wallet-statement trial](2026-11-13-wallet-statement-paid-trial.md) returned 292 matching transfers from Nansen and Testril with payment evidence. The counterparties trial found an unresolved time-window mismatch. Dune remains untested with payment. The unpaid observations below retain their original date.
+
 ## Recommendation
 
 Start with **Nansen versus Testril: a USDC wallet statement**. Nansen offers x402 without an account and returned live Base USDC payment challenges. Both providers can therefore use the same payment network. Compare a named wallet's payments over a short, completed historical interval.
