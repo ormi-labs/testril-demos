@@ -1,0 +1,454 @@
+{
+  "date": "2026-11-14",
+  "scope": {
+    "chain": "ethereum",
+    "address": "0x88e6a0c2ddd26feeb64f039a2c41296fcb3f5640",
+    "token": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+    "date": "2026-11-10",
+    "windows": ["[12:00:00Z,13:00:00Z)", "[13:00:00Z,14:00:00Z)"]
+  },
+  "comparisonDefinition": "Preserve multiplicity of transaction/from/to/raw-amount tuples. Aggregate USDC transfer events by counterparty, incoming amount, outgoing amount and event count. All integer amounts are USDC atoms (six decimals).",
+  "hours": {
+    "12": {
+      "transactions": 263,
+      "nansenPages": 3,
+      "nansenTransfers": 292,
+      "testrilTransfers": 292,
+      "statementsMatch": true,
+      "onlyNansen": [],
+      "onlyTestril": [],
+      "testrilCounterparties": 93,
+      "nansenCounterpartiesAllTokens": 910,
+      "nansenCounterpartiesUSDC": 787,
+      "testrilIncoming": "2626205204677",
+      "testrilOutgoing": "2069464783424",
+      "nansenCounterpartyIncoming": "110741003334701",
+      "nansenCounterpartyOutgoing": "119365478346750",
+      "nansenCounterpartyTransfers": 7139,
+      "fromBlock": 26384371,
+      "toBlock": 26384670
+    },
+    "13": {
+      "transactions": 470,
+      "nansenPages": 5,
+      "nansenTransfers": 503,
+      "testrilTransfers": 503,
+      "statementsMatch": true,
+      "onlyNansen": [],
+      "onlyTestril": [],
+      "testrilCounterparties": 158,
+      "nansenCounterpartiesAllTokens": 910,
+      "nansenCounterpartiesUSDC": 787,
+      "testrilIncoming": "10682099941951",
+      "testrilOutgoing": "14470892270815",
+      "nansenCounterpartyIncoming": "110741003334701",
+      "nansenCounterpartyOutgoing": "119365478346750",
+      "nansenCounterpartyTransfers": 7139,
+      "fromBlock": 26384670,
+      "toBlock": 26384969
+    }
+  },
+  "counterpartyCrossChecks": [
+    {
+      "nansenHour": 12,
+      "testrilHour": 12,
+      "matches": false,
+      "differingCounterparties": 769
+    },
+    {
+      "nansenHour": 12,
+      "testrilHour": 13,
+      "matches": false,
+      "differingCounterparties": 738
+    },
+    {
+      "nansenHour": 13,
+      "testrilHour": 12,
+      "matches": false,
+      "differingCounterparties": 769
+    },
+    {
+      "nansenHour": 13,
+      "testrilHour": 13,
+      "matches": false,
+      "differingCounterparties": 738
+    }
+  ],
+  "counterpartiesIdentical": true,
+  "example": {
+    "address": "0x51c72848c68a965f66fa7a88855f9f7784502a7f",
+    "testril12": {
+      "incoming": 1020320767107,
+      "outgoing": 327701521529,
+      "count": 34
+    },
+    "testril13": {
+      "incoming": 2458599369898,
+      "outgoing": 4978945772832,
+      "count": 49
+    },
+    "nansen12": {
+      "incoming": 39091190417167,
+      "outgoing": 35494186415681,
+      "count": 841
+    },
+    "nansen13": {
+      "incoming": 39091190417167,
+      "outgoing": 35494186415681,
+      "count": 841
+    }
+  },
+  "counterpartyFullBodiesIdentical": true,
+  "paginationCompleteForAllQueries": true,
+  "independent13HourReceiptChecks": [
+    {
+      "tx": "0x3620464edaa157b7f3358a77157927c3eb302e87d1f0eb15bfad03d93efd6455",
+      "matchingTransfers": 1,
+      "status": "0x1"
+    },
+    {
+      "tx": "0xd1ff328bc6f06fb21747b6fcd9d9f99943818316b117cbcad1c47306b93c108a",
+      "matchingTransfers": 1,
+      "status": "0x1"
+    },
+    {
+      "tx": "0x18a13cd8324691b30214aacdc4577488c3c41a182f3b3f509794f684c9e0f4bb",
+      "matchingTransfers": 2,
+      "status": "0x1"
+    }
+  ],
+  "boundaryBlocks": [
+    {
+      "block": 26384370,
+      "timestamp": 1794311999
+    },
+    {
+      "block": 26384371,
+      "timestamp": 1794312011
+    },
+    {
+      "block": 26384669,
+      "timestamp": 1794315599
+    },
+    {
+      "block": 26384670,
+      "timestamp": 1794315611
+    },
+    {
+      "block": 26384968,
+      "timestamp": 1794319199
+    },
+    {
+      "block": 26384969,
+      "timestamp": 1794319211
+    }
+  ],
+  "normalizedFiles": [
+    {
+      "file": "2026-11-14-hour-12-statement.csv",
+      "sha256": "f0bbea80cde0c79407c0b482f63f4c3f89dcc926933d20fcef5974dfd6870570"
+    },
+    {
+      "file": "2026-11-14-hour-12-counterparties.csv",
+      "sha256": "7c40ca3f923c85bd183185dcdfdc8f750cb8f4f67e89199fc13caae88a808dcc"
+    },
+    {
+      "file": "2026-11-14-hour-13-statement.csv",
+      "sha256": "ccc6220817a4c7dafb7cfa33e3ae76d4ca6b03fae9b3fd49baed7bfd639f5377"
+    },
+    {
+      "file": "2026-11-14-hour-13-counterparties.csv",
+      "sha256": "83c72c4fdf897d3851c536176072f29153c824380a82a23c0cc64b869496e626"
+    }
+  ],
+  "accounting": {
+    "newServiceChargeAtoms": "216518",
+    "cumulativeServiceChargeAtoms": "582717",
+    "walletBalanceAtoms": "408240",
+    "unspentEscrowAtoms": "9043",
+    "channels": [
+      {
+        "channelId": "0x5bef16ab8424fb2b5ff4187ae99ec6a4718e1af5c7d8a482dc275b7fa7ab4a4b",
+        "balance": "10000",
+        "chargedCumulativeAmount": "957",
+        "totalClaimed": "0",
+        "closed": false
+      }
+    ]
+  },
+  "payments": [
+    {
+      "label": "20261114-testril-13-prepare",
+      "serviceCharge": "35880",
+      "receipt": {
+        "network": "eip155:8453",
+        "payer": "0x6ea4ab444cd21bd9210d998894585f6148048517",
+        "success": true,
+        "transaction": "0x6c0f532a892d00e34cb86a8196428f1a021595562306bd63eadf42410526a2ae"
+      },
+      "onchain": {
+        "transaction": "0x6c0f532a892d00e34cb86a8196428f1a021595562306bd63eadf42410526a2ae",
+        "status": "success",
+        "debited": [
+          {
+            "to": "0x4559A18661B816F05220C053A551172eD3015e52",
+            "amount": "35880"
+          }
+        ]
+      }
+    },
+    {
+      "label": "nansen-20261114-12-counterparties-1",
+      "serviceCharge": "50000",
+      "receipt": {
+        "success": true,
+        "payer": "0x6eA4AB444CD21bd9210D998894585f6148048517",
+        "transaction": "0x80e3bde41759f4638f90e4b3a4b0ffd1c5ae3706c7c0af593c847ddfcd16df1d",
+        "network": "eip155:8453"
+      },
+      "onchain": {
+        "transaction": "0x80e3bde41759f4638f90e4b3a4b0ffd1c5ae3706c7c0af593c847ddfcd16df1d",
+        "status": "success",
+        "debited": [
+          {
+            "to": "0x93053f1e7A5eFEDa532Fe69CbbE43cBEc3A0F13f",
+            "amount": "50000"
+          }
+        ]
+      }
+    },
+    {
+      "label": "nansen-20261114-12-transactions-1",
+      "serviceCharge": "10000",
+      "receipt": {
+        "success": true,
+        "payer": "0x6eA4AB444CD21bd9210D998894585f6148048517",
+        "transaction": "0x9e29e65a64649e455c831191860f4c42cfbdc96e23b145f08d867be50c824f5b",
+        "network": "eip155:8453"
+      },
+      "onchain": {
+        "transaction": "0x9e29e65a64649e455c831191860f4c42cfbdc96e23b145f08d867be50c824f5b",
+        "status": "success",
+        "debited": [
+          {
+            "to": "0x93053f1e7A5eFEDa532Fe69CbbE43cBEc3A0F13f",
+            "amount": "10000"
+          }
+        ]
+      }
+    },
+    {
+      "label": "nansen-20261114-12-transactions-2",
+      "serviceCharge": "10000",
+      "receipt": {
+        "success": true,
+        "payer": "0x6eA4AB444CD21bd9210D998894585f6148048517",
+        "transaction": "0xf570bfa14b70846541520272e96e6563b62fbe79c853e0f0371fc982b2e14409",
+        "network": "eip155:8453"
+      },
+      "onchain": {
+        "transaction": "0xf570bfa14b70846541520272e96e6563b62fbe79c853e0f0371fc982b2e14409",
+        "status": "success",
+        "debited": [
+          {
+            "to": "0x93053f1e7A5eFEDa532Fe69CbbE43cBEc3A0F13f",
+            "amount": "10000"
+          }
+        ]
+      }
+    },
+    {
+      "label": "nansen-20261114-12-transactions-3",
+      "serviceCharge": "10000",
+      "receipt": {
+        "success": true,
+        "payer": "0x6eA4AB444CD21bd9210D998894585f6148048517",
+        "transaction": "0xdee4af51f5fa5bc3c5e633f08df694e27b179920d8439c1665d936c00aaf871c",
+        "network": "eip155:8453"
+      },
+      "onchain": {
+        "transaction": "0xdee4af51f5fa5bc3c5e633f08df694e27b179920d8439c1665d936c00aaf871c",
+        "status": "success",
+        "debited": [
+          {
+            "to": "0x93053f1e7A5eFEDa532Fe69CbbE43cBEc3A0F13f",
+            "amount": "10000"
+          }
+        ]
+      }
+    },
+    {
+      "label": "nansen-20261114-13-counterparties-1",
+      "serviceCharge": "50000",
+      "receipt": {
+        "success": true,
+        "payer": "0x6eA4AB444CD21bd9210D998894585f6148048517",
+        "transaction": "0xecc66407fbec8dc5aa92f3d858537c92575bb58712496339908a98de7ed3cca5",
+        "network": "eip155:8453"
+      },
+      "onchain": {
+        "transaction": "0xecc66407fbec8dc5aa92f3d858537c92575bb58712496339908a98de7ed3cca5",
+        "status": "success",
+        "debited": [
+          {
+            "to": "0x93053f1e7A5eFEDa532Fe69CbbE43cBEc3A0F13f",
+            "amount": "50000"
+          }
+        ]
+      }
+    },
+    {
+      "label": "nansen-20261114-13-transactions-1",
+      "serviceCharge": "10000",
+      "receipt": {
+        "success": true,
+        "payer": "0x6eA4AB444CD21bd9210D998894585f6148048517",
+        "transaction": "0xae1ae81a9ee55322726e4efb58e79ff1e27486537a3ad6e8d7cfda1f6db33b5e",
+        "network": "eip155:8453"
+      },
+      "onchain": {
+        "transaction": "0xae1ae81a9ee55322726e4efb58e79ff1e27486537a3ad6e8d7cfda1f6db33b5e",
+        "status": "success",
+        "debited": [
+          {
+            "to": "0x93053f1e7A5eFEDa532Fe69CbbE43cBEc3A0F13f",
+            "amount": "10000"
+          }
+        ]
+      }
+    },
+    {
+      "label": "nansen-20261114-13-transactions-2",
+      "serviceCharge": "10000",
+      "receipt": {
+        "success": true,
+        "payer": "0x6eA4AB444CD21bd9210D998894585f6148048517",
+        "transaction": "0x8d6f576fb592f3ca653a858978f59d13b3721b453083d2ba6d9d00d933f0cc42",
+        "network": "eip155:8453"
+      },
+      "onchain": {
+        "transaction": "0x8d6f576fb592f3ca653a858978f59d13b3721b453083d2ba6d9d00d933f0cc42",
+        "status": "success",
+        "debited": [
+          {
+            "to": "0x93053f1e7A5eFEDa532Fe69CbbE43cBEc3A0F13f",
+            "amount": "10000"
+          }
+        ]
+      }
+    },
+    {
+      "label": "nansen-20261114-13-transactions-3",
+      "serviceCharge": "10000",
+      "receipt": {
+        "success": true,
+        "payer": "0x6eA4AB444CD21bd9210D998894585f6148048517",
+        "transaction": "0xa734c2d9790eb6954b9caa22c0f7e6adba01daa5c1fafd0abda69930434d8b9a",
+        "network": "eip155:8453"
+      },
+      "onchain": {
+        "transaction": "0xa734c2d9790eb6954b9caa22c0f7e6adba01daa5c1fafd0abda69930434d8b9a",
+        "status": "success",
+        "debited": [
+          {
+            "to": "0x93053f1e7A5eFEDa532Fe69CbbE43cBEc3A0F13f",
+            "amount": "10000"
+          }
+        ]
+      }
+    },
+    {
+      "label": "nansen-20261114-13-transactions-4",
+      "serviceCharge": "10000",
+      "receipt": {
+        "success": true,
+        "payer": "0x6eA4AB444CD21bd9210D998894585f6148048517",
+        "transaction": "0xef1fb1666ee77dc5777b5138745363767dfb8dc68e8197a1d4d0ff47dab6ae78",
+        "network": "eip155:8453"
+      },
+      "onchain": {
+        "transaction": "0xef1fb1666ee77dc5777b5138745363767dfb8dc68e8197a1d4d0ff47dab6ae78",
+        "status": "success",
+        "debited": [
+          {
+            "to": "0x93053f1e7A5eFEDa532Fe69CbbE43cBEc3A0F13f",
+            "amount": "10000"
+          }
+        ]
+      }
+    },
+    {
+      "label": "nansen-20261114-13-transactions-5",
+      "serviceCharge": "10000",
+      "receipt": {
+        "success": true,
+        "payer": "0x6eA4AB444CD21bd9210D998894585f6148048517",
+        "transaction": "0x7daead1e6912510cf60d33e008708b7cee3e72c1397ed9e047ae78e7842f632e",
+        "network": "eip155:8453"
+      },
+      "onchain": {
+        "transaction": "0x7daead1e6912510cf60d33e008708b7cee3e72c1397ed9e047ae78e7842f632e",
+        "status": "success",
+        "debited": [
+          {
+            "to": "0x93053f1e7A5eFEDa532Fe69CbbE43cBEc3A0F13f",
+            "amount": "10000"
+          }
+        ]
+      }
+    },
+    {
+      "label": "20261114-testril-12-read",
+      "serviceCharge": "319",
+      "receipt": {
+        "amount": "",
+        "extra": {
+          "channelState": {
+            "balance": "10000",
+            "channelId": "0x5bef16ab8424fb2b5ff4187ae99ec6a4718e1af5c7d8a482dc275b7fa7ab4a4b",
+            "chargedCumulativeAmount": "638",
+            "refundNonce": "0",
+            "totalClaimed": "0",
+            "withdrawRequestedAt": 0
+          },
+          "chargedAmount": "319"
+        },
+        "network": "eip155:8453",
+        "payer": "0x6ea4ab444cd21bd9210d998894585f6148048517",
+        "success": true,
+        "transaction": ""
+      },
+      "onchain": null
+    },
+    {
+      "label": "20261114-testril-13-read",
+      "serviceCharge": "319",
+      "receipt": {
+        "amount": "",
+        "extra": {
+          "channelState": {
+            "balance": "10000",
+            "channelId": "0x5bef16ab8424fb2b5ff4187ae99ec6a4718e1af5c7d8a482dc275b7fa7ab4a4b",
+            "chargedCumulativeAmount": "957",
+            "refundNonce": "0",
+            "totalClaimed": "0",
+            "withdrawRequestedAt": 0
+          },
+          "chargedAmount": "319"
+        },
+        "network": "eip155:8453",
+        "payer": "0x6ea4ab444cd21bd9210d998894585f6148048517",
+        "success": true,
+        "transaction": ""
+      },
+      "onchain": null
+    }
+  ],
+  "limitations": [
+    "One Ethereum contract address and two historical hours, not a universal provider claim.",
+    "Counterparties cause is unconfirmed; no full-day equivalence was established.",
+    "Three independent second-hour transaction receipts checked, not an independent scan of every block.",
+    "Testril reads reuse funded escrow; paid vouchers have no new on-chain transaction.",
+    "Private keys, signatures, payment challenges and proprietary labels are excluded."
+  ]
+}

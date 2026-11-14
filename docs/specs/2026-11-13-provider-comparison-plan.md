@@ -2,6 +2,8 @@
 
 Updated 13 November 2026. Paul authorized paid trials and implementation after feasibility is established. The wallet-statement trial now passes paid data-equivalence checks. Counterparties failed the hour-window comparison; Dune still needs Tempo funding. [Paid trial results and evidence](../research/2026-11-13-wallet-statement-paid-trial.md)
 
+**14 November follow-up:** [complete two-hour checks](../research/2026-11-14-two-hour-comparison.md) establish that Nansen transaction history matches Testril for 292 and 503 transfers, while the complete counterparties responses are identical and match neither hour, even with labels swapped. Current accounting is 0.582717 USDC in service charges, 0.408240 in the wallet and 0.009043 unspent in escrow. The counterparty demo remains blocked; timestamp loss/cache behavior is suspected but not confirmed.
+
 ## Paid trial update
 
 - **Statement:** 292 matching USDC transfers, including multiplicity, across three Nansen transaction pages and one Testril read. Initial service charges were 0.066199 USDC, separating 0.03588 preparation from 0.000319 Testril reads and 0.03 Nansen pages. Six independent transaction receipts matched the sampled transfers.

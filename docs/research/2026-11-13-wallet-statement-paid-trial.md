@@ -2,6 +2,8 @@
 
 13 November 2026. Real Base USDC payments, accountless API access, and returned production data. [Evidence and settlement references](2026-11-13-wallet-statement-paid-trial.json)
 
+**14 November follow-up:** [both hours have now been checked completely](2026-11-14-two-hour-comparison.md), including full Nansen counterparties pagination. Transaction history matches Testril in both hours; neither identical counterparties response matches either hour. The spending and balances below describe the original trial, before that follow-up.
+
 ## Wallet statement: passes this trial
 
 Both providers returned the same **292 USDC transfers**, represented by **263 Nansen transaction records over three pages**. The comparison preserved repeated transfers instead of deduplicating by transaction hash. Every tuple of transaction hash, sender, recipient and raw amount matched, including multiplicity.
