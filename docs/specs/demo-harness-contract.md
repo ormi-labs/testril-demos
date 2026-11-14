@@ -38,6 +38,25 @@ this contract.
 The common harness handles hosting concepts. Function names, wallet roles, and
 provider-specific failure interpretation belong in the demo and its adapter.
 
+## Visitor-funded demos
+
+A demo may use a visitor's browser wallet instead of a harness-funded sandbox.
+The same failure, persistence, reference and release requirements apply. The
+harness does not acquire signing keys, sponsor purchases, allocate pool wallets
+or clean up visitor funds in this mode.
+
+The demo defines and enforces its purchase limits, validates provider payment
+terms, and records intent before forwarding each approved authorization. The
+harness supplies durable storage and serialization, admission/rate controls,
+request references, and safe hosted failure translation. Never treat missing
+browser state or a lost HTTP response as proof that nothing was spent.
+
+The wallet-statement demo exposes saved payment status without another purchase.
+It stops on unknown settlement and does not implement unattended provider
+reconciliation. Its hosting adapter must retain that isolation and evidence;
+visitors explicitly approve any new purchase after a known completed request.
+These limits must be disclosed in the demo's own standalone documentation.
+
 ## Demo interface
 
 Each participating JavaScript demo exports this synchronous function from its

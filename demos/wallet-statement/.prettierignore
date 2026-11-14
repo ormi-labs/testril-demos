@@ -1,0 +1,11 @@
+node_modules/
+public/build/
+public/source.zip
+runtime/
+recordings/*.json
+verification/evidence/*.json
+verification/data/*.jsonl
+test-results/
+playwright-report/
+public/recordings/
+public/verification/

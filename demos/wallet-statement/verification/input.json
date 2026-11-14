@@ -1,0 +1,27 @@
+{
+  "chain_id": 1,
+  "wallet": "0x88e6a0c2ddd26feeb64f039a2c41296fcb3f5640",
+  "token": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+  "decimals": 6,
+  "function_slug": "erc20.wallet_transfers",
+  "windows": [
+    {
+      "from_time": "2026-11-10T12:00:00Z",
+      "to_time": "2026-11-10T13:00:00Z",
+      "from_block": 26384371,
+      "to_block": 26384670,
+      "bound_function_id": "sha256:76b099073c3bc3db28e5f8d1006a901ad4c64b3543bbaaab0b237621fe87dac1",
+      "rows": "data/hour-12-rows.jsonl",
+      "provenance": "data/hour-12-provenance.json"
+    },
+    {
+      "from_time": "2026-11-10T13:00:00Z",
+      "to_time": "2026-11-10T14:00:00Z",
+      "from_block": 26384670,
+      "to_block": 26384969,
+      "bound_function_id": "sha256:76b099073c3bc3db28e5f8d1006a901ad4c64b3543bbaaab0b237621fe87dac1",
+      "rows": "data/hour-13-rows.jsonl",
+      "provenance": "data/hour-13-provenance.json"
+    }
+  ]
+}

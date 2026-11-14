@@ -1,0 +1,360 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Follow the Money · Testril demos</title>
+    <link rel="icon" href="assets/favicon.svg" />
+    <link rel="stylesheet" href="style.css" />
+    <script type="module" src="build/app.js"></script>
+  </head>
+  <body>
+    <header class="wrap masthead">
+      <a href="https://testril.si"
+        ><img src="assets/wordmark.svg" alt="Testril" width="115" height="38"
+      /></a>
+      <span>DATA DEMOS / 03</span>
+    </header>
+    <main class="wrap">
+      <div class="eyebrow">ONE ADDRESS · TWO PROVIDERS · CHECKABLE ANSWERS</div>
+      <h1>Follow the money.<br />Then check the answer.</h1>
+      <p class="intro">
+        Compare a USDC statement from Nansen and Testril. See what arrived, what
+        left, how long it took, and what it cost. Then follow Testril’s evidence
+        back to Ethereum.
+      </p>
+      <section class="scope" aria-label="Report scope">
+        <div>
+          <span class="label">DATA</span><strong>Ethereum · USDC</strong>
+        </div>
+        <div>
+          <span class="label">REPORT ADDRESS</span
+          ><a
+            href="https://etherscan.io/address/0x88e6a0c2ddd26feeb64f039a2c41296fcb3f5640"
+            target="_blank"
+            rel="noreferrer"
+            >Uniswap V3 USDC / WETH pool ↗</a
+          >
+        </div>
+        <div>
+          <label class="label" for="hour">10 NOVEMBER 2026 · UTC</label
+          ><select id="hour">
+            <option value="12">12:00–13:00</option>
+            <option value="13">13:00–14:00</option>
+          </select>
+        </div>
+        <div>
+          <span class="label">PAYMENTS</span
+          ><strong>USDC on Base mainnet</strong>
+        </div>
+      </section>
+      <div class="toolbar">
+        <div class="tabs" role="group" aria-label="Run mode">
+          <button id="recorded" class="selected">Recorded run</button
+          ><button id="live">Run with your wallet</button>
+        </div>
+        <button id="download" class="quiet" disabled>Download this run</button>
+      </div>
+      <section id="recorded-controls" class="controls">
+        <div>
+          <strong>Real requests. Saved evidence.</strong>
+          <p id="recording-note">Loading the verified case study…</p>
+        </div>
+        <span class="pill">No wallet needed</span>
+      </section>
+      <section id="live-controls" class="controls" hidden>
+        <div>
+          <strong>Buy the same historical report yourself.</strong>
+          <p>
+            Your wallet pays for data; the report address stays fixed. Every
+            payment needs your approval. Limit:
+            <b>0.25 USDC in service charges</b> plus up to
+            <b>0.02 USDC in escrow deposits</b>, counted separately.
+          </p>
+          <p>
+            Preparation and provenance use current Testril quotes. Unspent
+            escrow stays in your channel until withdrawn.
+          </p>
+        </div>
+        <div class="actions">
+          <button id="connect">Connect wallet</button
+          ><button id="run" disabled>Run comparison</button>
+        </div>
+      </section>
+      <p id="notice" class="notice" role="status" aria-live="polite">
+        Loading…
+      </p>
+      <div id="recovery" hidden>
+        <p>
+          A previous purchase may have completed. Keep this attempt before
+          starting another.
+        </p>
+        <button id="check-status" class="quiet">
+          Check saved payment status
+        </button>
+        <button id="download-pending" class="quiet">
+          Download pending attempt
+        </button>
+      </div>
+      <section class="comparison" aria-label="Provider comparison">
+        <article class="provider" id="testril">
+          <div class="heading">
+            <h2>Testril</h2>
+            <span class="status">—</span>
+          </div>
+          <div class="metrics">
+            <div>
+              <span class="label">TRANSFERS</span
+              ><strong class="count">—</strong>
+            </div>
+            <div>
+              <span class="label">QUERY · EXCLUDES WALLET WAIT</span
+              ><strong class="query-time">—</strong
+              ><span class="query-cost">—</span>
+            </div>
+          </div>
+          <div class="amounts">
+            <div>
+              <span class="label">USDC IN</span
+              ><strong class="incoming">—</strong>
+            </div>
+            <div>
+              <span class="label">USDC OUT</span
+              ><strong class="outgoing">—</strong>
+            </div>
+          </div>
+          <div class="provider-notes"></div>
+          <details class="evidence">
+            <summary>Preparation, provenance &amp; payment evidence</summary>
+            <div class="details-body"></div>
+          </details>
+        </article>
+        <article class="provider" id="nansen">
+          <div class="heading">
+            <h2>Nansen</h2>
+            <span class="status">—</span>
+          </div>
+          <div class="metrics">
+            <div>
+              <span class="label">TRANSFERS</span
+              ><strong class="count">—</strong>
+            </div>
+            <div>
+              <span class="label">QUERY · EXCLUDES WALLET WAIT</span
+              ><strong class="query-time">—</strong
+              ><span class="query-cost">—</span>
+            </div>
+          </div>
+          <div class="amounts">
+            <div>
+              <span class="label">USDC IN</span
+              ><strong class="incoming">—</strong>
+            </div>
+            <div>
+              <span class="label">USDC OUT</span
+              ><strong class="outgoing">—</strong>
+            </div>
+          </div>
+          <div class="provider-notes"></div>
+          <details class="evidence">
+            <summary>Requests &amp; payment evidence</summary>
+            <div class="details-body"></div>
+          </details>
+        </article>
+      </section>
+      <section class="results">
+        <div class="heading">
+          <h2>Do the transfers agree?</h2>
+          <strong id="agreement">Waiting for both answers</strong>
+        </div>
+        <p class="caption">
+          Every transaction, sender, recipient and exact amount is compared.
+          Repeated transfers are preserved.
+        </p>
+        <details>
+          <summary>Inspect the transfer ledger</summary>
+          <div class="table-wrap">
+            <table>
+              <caption>
+                First 12 Testril transfers. Download the run for every row from
+                both providers.
+              </caption>
+              <thead>
+                <tr>
+                  <th>Transaction</th>
+                  <th>Direction</th>
+                  <th>Other address</th>
+                  <th>USDC</th>
+                </tr>
+              </thead>
+              <tbody id="transfers"></tbody>
+            </table>
+          </div>
+        </details>
+      </section>
+      <section class="provenance" aria-labelledby="proof-title">
+        <div class="eyebrow">DON’T STOP AT AGREEMENT</div>
+        <div class="heading">
+          <h2 id="proof-title">Show the work.</h2>
+          <span id="proof-status" class="pill">Saved evidence available</span>
+        </div>
+        <p class="lead">
+          Provenance names the source blocks behind Testril’s answer. Rebuild
+          the transfers from those records, instead of taking either provider’s
+          word for it.
+        </p>
+        <ol class="proof-steps">
+          <li>
+            <b id="proof-blocks">—</b><span>contributing blocks named</span>
+          </li>
+          <li>
+            <b id="proof-window">—</b
+            ><span>blocks searched, including uncited blocks</span>
+          </li>
+          <li>
+            <b id="proof-transfers">—</b><span>transfers to reconstruct</span>
+          </li>
+        </ol>
+        <div class="proof-actions">
+          <button id="replay-proof">Rebuild from saved evidence</button
+          ><button id="fresh-proof" class="quiet">
+            Check live Ethereum records</button
+          ><a href="verification/source.zip" download
+            >Download the independent verifier ↗</a
+          >
+        </div>
+        <p id="proof-note" class="caption">
+          Replaying saved evidence checks the archived records. A live check
+          reads an external Ethereum service directly from your browser. Neither
+          requires a wallet.
+        </p>
+        <div id="proof-result" role="status" aria-live="polite"></div>
+        <div class="tamper">
+          <div>
+            <strong>Would a wrong amount get through?</strong>
+            <p>
+              Add 0.000001 USDC to a copy of one transfer. The checker should
+              catch it. The original data stays unchanged.
+            </p>
+          </div>
+          <button id="tamper" class="quiet" disabled>
+            Try an edited amount
+          </button>
+        </div>
+        <details>
+          <summary>Inspect the source trail</summary>
+          <div id="source-trail"></div>
+        </details>
+        <details>
+          <summary>What this check establishes</summary>
+          <p>
+            The verifier independently decodes Ethereum’s Transfer events,
+            checks block references and hour boundaries, preserves repeated
+            events, and recalculates amounts with exact integers. It also
+            searches blocks absent from the citations to detect omissions.
+          </p>
+          <p>
+            Saved replay checks consistency with the archived Ethereum
+            responses. Live verification trusts the selected Ethereum service to
+            return correct, complete records; it does not validate Ethereum
+            consensus. Run the downloaded verifier against your own node to
+            choose your source of trust.
+          </p>
+        </details>
+      </section>
+      <section class="finding">
+        <div class="eyebrow">
+          A REAL REASON TO CHECK · RECORDED 14 NOVEMBER 2026
+        </div>
+        <h2>The transfers agreed. A summary didn’t.</h2>
+        <p>
+          Nansen’s separate <b>Address Counterparties</b> service returned
+          identical summaries for these two different hours. Its
+          transaction-history service—the one used above—agreed with Testril.
+        </p>
+        <div class="table-wrap">
+          <table>
+            <caption>
+              USDC transfer counts in the recorded investigation
+            </caption>
+            <thead>
+              <tr>
+                <th>Hour · UTC</th>
+                <th>Testril / Nansen transactions</th>
+                <th>Nansen counterparty summary</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>12:00–13:00</td>
+                <td>292</td>
+                <td>7,139</td>
+              </tr>
+              <tr>
+                <td>13:00–14:00</td>
+                <td>503</td>
+                <td>7,139</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p>
+          Neither summary matched either hour. We could investigate Nansen
+          because we knew how its separate services fit together. Testril’s
+          provenance supplied a defined path back to the source records. The
+          independent reconstruction confirmed every transfer and the resulting
+          hourly totals.
+        </p>
+        <p class="caption">
+          This is a dated finding for one address and two hours. Its cause is
+          unconfirmed; it is not a claim about every Nansen result.
+        </p>
+      </section>
+      <details class="method">
+        <summary>Scope, timing and source downloads</summary>
+        <p>
+          The report uses an active Ethereum contract address, not the connected
+          payer’s wallet. Only USDC is compared. Nansen pages are fetched
+          completely. Testril reads may reuse data already prepared by someone
+          else.
+        </p>
+        <p>
+          Fresh-run query time includes payment negotiation and retrieval;
+          wallet approval, Testril preparation and provenance are shown
+          separately. Provider calls run sequentially to avoid overlapping
+          approval prompts. The original case study has no complete browser-run
+          timings, so none are invented.
+        </p>
+        <p>
+          Payment confirmations come from provider receipts. Deposits are
+          separate from service charges, and a deposit transaction is not a
+          second query fee. Unconfirmed outcomes stop the run and are never
+          automatically resubmitted. Download an interrupted attempt before
+          reviewing its payment status.
+        </p>
+        <p>
+          <a href="source.zip" download
+            >Download this demo’s complete source ↗</a
+          >
+          contains the app and its tests. “Download this run” contains the
+          selected run’s data and public evidence. The independent verifier
+          download contains the source records and verification software.
+        </p>
+      </details>
+    </main>
+    <footer class="wrap">Follow the Money · Nansen × Testril</footer>
+    <dialog id="payment-dialog" aria-labelledby="payment-title">
+      <form method="dialog">
+        <div class="eyebrow">YOUR WALLET · BASE MAINNET</div>
+        <h2 id="payment-title">Approve this data purchase</h2>
+        <p id="payment-summary"></p>
+        <p id="payment-recipient" class="address"></p>
+        <p id="deposit-note"></p>
+        <div class="actions">
+          <button value="cancel" class="quiet">Cancel run</button
+          ><button value="approve">Approve and sign</button>
+        </div>
+      </form>
+    </dialog>
+  </body>
+</html>
