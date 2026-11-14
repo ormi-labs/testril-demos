@@ -136,7 +136,7 @@ export function createProviders({
           new URL("/api/v1/profiler/address/transactions", nansenUrl),
           {
             method: "POST",
-            redirect: "error",
+            redirect: "manual",
             signal: AbortSignal.timeout(60000),
             headers: {
               "content-type": "application/json",

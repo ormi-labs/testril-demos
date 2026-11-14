@@ -66,6 +66,7 @@ export async function close(server) {
 }
 
 export async function peers({
+  bindingRefusal = false,
   omitReceipt = false,
   network = "eip155:8453",
   mismatch = false,
@@ -189,7 +190,10 @@ export async function peers({
   async function tool(name, args, payment) {
     calls.push({ provider: "testril", name, args, paid: Boolean(payment) });
     const h = Number(args.from_time?.slice(11, 13) ?? 12);
-    if (name === "bind") return { outcome: "success", bound_function_id: id };
+    if (name === "bind")
+      return bindingRefusal
+        ? { outcome: "error", kind: "invalid_params" }
+        : { outcome: "success", bound_function_id: id };
     if (name === "inspect")
       return args.subject === "channels"
         ? { outcome: "success", channels }

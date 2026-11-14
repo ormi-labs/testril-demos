@@ -200,3 +200,33 @@ test("a lost paid browser response stops and preserves the known confirmation", 
   expect(await page.evaluate(() => window.testSignatures)).toBe(0);
   expect(signatures).toBeGreaterThan(0);
 });
+
+test("hosted failures retain a safe request reference without exposing arbitrary provider text", async ({
+  page,
+}) => {
+  await installWallet(page);
+  const ref = "cccccccc-cccc-4ccc-8ccc-cccccccccccc";
+  await page.route("**/api/runs/*/step", (route) =>
+    route.fulfill({
+      status: 503,
+      contentType: "application/json",
+      body: JSON.stringify({
+        error: "secret provider payload",
+        code: "PROVIDER_UNAVAILABLE",
+        ref,
+      }),
+    }),
+  );
+  await page.goto("/");
+  await page.getByRole("button", { name: "Run with your wallet" }).click();
+  await page
+    .getByRole("button", { name: "Connect wallet", exact: true })
+    .click();
+  await page
+    .getByRole("button", { name: "Run comparison", exact: true })
+    .click();
+  await expect(page.locator("#notice")).toContainText(ref);
+  await expect(page.locator("#notice")).not.toContainText(
+    "secret provider payload",
+  );
+});

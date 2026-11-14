@@ -1,3 +1,4 @@
+import { createServer } from "node:http";
 import test from "node:test";
 import assert from "node:assert/strict";
 import { mkdtemp, rm, readFile } from "node:fs/promises";
@@ -347,4 +348,43 @@ test("a real result mismatch is retained rather than forced into agreement", asy
     compare(run.providers.testril.rows, run.providers.nansen.rows).matches,
     false,
   );
+});
+
+test("Nansen redirects are returned without forwarding payment credentials to another endpoint", async (t) => {
+  let redirected = 0;
+  const destination = createServer((_req, res) => {
+    redirected++;
+    res.end("{}");
+  });
+  const destinationUrl = await listen(destination);
+  const source = createServer((_req, res) => {
+    res.writeHead(307, { Location: destinationUrl });
+    res.end();
+  });
+  const sourceUrl = await listen(source);
+  t.after(async () => {
+    await close(source);
+    await close(destination);
+  });
+  const result = await createProviders({ nansenUrl: sourceUrl }).nansen(12, 1, {
+    accepted: "test authorization",
+  });
+  assert.equal(result.status, 307);
+  assert.equal(redirected, 0);
+});
+
+test("an explicit MCP binding refusal retains its domain code and supported reason", async (t) => {
+  const f = await fixture(t, { bindingRefusal: true });
+  const { id } = await f.request("api/runs", {
+    payer: account.address,
+    hour: 12,
+  });
+  const response = await fetch(`${f.base}/api/runs/${id}/step`, {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify({ action: "bind", id: crypto.randomUUID() }),
+  });
+  assert.equal(response.status, 503);
+  assert.equal((await response.json()).code, "TESTRIL_BINDING_REJECTED");
+  assert.equal(f.calls.filter((c) => c.paid).length, 0);
 });

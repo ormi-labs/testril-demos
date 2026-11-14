@@ -233,6 +233,10 @@ export async function runComparison({
       error instanceof Stop
         ? error.message
         : "The request could not finish. Any submitted payment must be checked before another run.";
+    if (typeof error?.ref === "string" && /^[a-f0-9-]{36}$/.test(error.ref)) {
+      run.failureReference = error.ref;
+      run.error += ` Reference: ${error.ref}.`;
+    }
     if (active && active.status !== "done") active.status = "stopped";
     if (run.id && run.pending) {
       try {

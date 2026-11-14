@@ -61,8 +61,12 @@ async function api(path, body) {
     throw new Error("The request did not return a response.");
   }
   const value = await response.json();
-  if (!response.ok)
-    throw new Error(value.error ?? "The request could not finish.");
+  if (!response.ok) {
+    const error = new Error(value.error ?? "The request could not finish.");
+    if (typeof value.ref === "string" && /^[a-f0-9-]{36}$/.test(value.ref))
+      error.ref = value.ref;
+    throw error;
+  }
   return value;
 }
 function persist(run) {
