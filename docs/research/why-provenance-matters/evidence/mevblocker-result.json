@@ -1,0 +1,28 @@
+{
+  "checked_at": "2026-11-14T06:35:02.352Z",
+  "rpc_host": "rpc.mevblocker.io",
+  "results": [
+    {
+      "from_time": "2026-11-10T12:00:00Z",
+      "to_time": "2026-11-10T13:00:00Z",
+      "transfers": 292,
+      "contributing_blocks": 172,
+      "incoming_atoms": "2626205204677",
+      "outgoing_atoms": "2069464783424",
+      "provenance_digest": "sha256:337ea630fb5e9f6455a1be907fc6e9af299189292bde4bec240942dd3817b8fd",
+      "exact_match": true,
+      "counterparties": 93
+    },
+    {
+      "from_time": "2026-11-10T13:00:00Z",
+      "to_time": "2026-11-10T14:00:00Z",
+      "transfers": 503,
+      "contributing_blocks": 200,
+      "incoming_atoms": "10682099941951",
+      "outgoing_atoms": "14470892270815",
+      "provenance_digest": "sha256:32cc71c8a01d278d173a1ca7ca021a13d4018757608f83f65fef8c22ba0c07d9",
+      "exact_match": true,
+      "counterparties": 158
+    }
+  ]
+}

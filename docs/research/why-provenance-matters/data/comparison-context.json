@@ -1,0 +1,103 @@
+{
+  "date": "2026-11-14",
+  "scope": {
+    "chain": "ethereum",
+    "address": "0x88e6a0c2ddd26feeb64f039a2c41296fcb3f5640",
+    "token": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+    "date": "2026-11-10",
+    "windows": ["[12:00:00Z,13:00:00Z)", "[13:00:00Z,14:00:00Z)"]
+  },
+  "comparisonDefinition": "Preserve multiplicity of transaction/from/to/raw-amount tuples. Aggregate USDC transfer events by counterparty, incoming amount, outgoing amount and event count. All integer amounts are USDC atoms (six decimals).",
+  "hours": {
+    "12": {
+      "transactions": 263,
+      "nansenPages": 3,
+      "nansenTransfers": 292,
+      "testrilTransfers": 292,
+      "statementsMatch": true,
+      "onlyNansen": [],
+      "onlyTestril": [],
+      "testrilCounterparties": 93,
+      "nansenCounterpartiesAllTokens": 910,
+      "nansenCounterpartiesUSDC": 787,
+      "testrilIncoming": "2626205204677",
+      "testrilOutgoing": "2069464783424",
+      "nansenCounterpartyIncoming": "110741003334701",
+      "nansenCounterpartyOutgoing": "119365478346750",
+      "nansenCounterpartyTransfers": 7139,
+      "fromBlock": 26384371,
+      "toBlock": 26384670
+    },
+    "13": {
+      "transactions": 470,
+      "nansenPages": 5,
+      "nansenTransfers": 503,
+      "testrilTransfers": 503,
+      "statementsMatch": true,
+      "onlyNansen": [],
+      "onlyTestril": [],
+      "testrilCounterparties": 158,
+      "nansenCounterpartiesAllTokens": 910,
+      "nansenCounterpartiesUSDC": 787,
+      "testrilIncoming": "10682099941951",
+      "testrilOutgoing": "14470892270815",
+      "nansenCounterpartyIncoming": "110741003334701",
+      "nansenCounterpartyOutgoing": "119365478346750",
+      "nansenCounterpartyTransfers": 7139,
+      "fromBlock": 26384670,
+      "toBlock": 26384969
+    }
+  },
+  "counterpartyCrossChecks": [
+    {
+      "nansenHour": 12,
+      "testrilHour": 12,
+      "matches": false,
+      "differingCounterparties": 769
+    },
+    {
+      "nansenHour": 12,
+      "testrilHour": 13,
+      "matches": false,
+      "differingCounterparties": 738
+    },
+    {
+      "nansenHour": 13,
+      "testrilHour": 12,
+      "matches": false,
+      "differingCounterparties": 769
+    },
+    {
+      "nansenHour": 13,
+      "testrilHour": 13,
+      "matches": false,
+      "differingCounterparties": 738
+    }
+  ],
+  "counterpartiesIdentical": true,
+  "example": {
+    "address": "0x51c72848c68a965f66fa7a88855f9f7784502a7f",
+    "testril12": {
+      "incoming": 1020320767107,
+      "outgoing": 327701521529,
+      "count": 34
+    },
+    "testril13": {
+      "incoming": 2458599369898,
+      "outgoing": 4978945772832,
+      "count": 49
+    },
+    "nansen12": {
+      "incoming": 39091190417167,
+      "outgoing": 35494186415681,
+      "count": 841
+    },
+    "nansen13": {
+      "incoming": 39091190417167,
+      "outgoing": 35494186415681,
+      "count": 841
+    }
+  },
+  "counterpartyFullBodiesIdentical": true,
+  "paginationCompleteForAllQueries": true
+}

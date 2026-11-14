@@ -2,6 +2,8 @@
 
 Checked 14 November 2026 with paid production queries. The data windows are **10 November 2026, 12:00–13:00 and 13:00–14:00 UTC**, both half-open. The subject is Ethereum pool contract `0x88e6a0c2ddd26feeb64f039a2c41296fcb3f5640`; the token is Ethereum USDC.
 
+**Later verification:** the [Why Provenance Matters materials](why-provenance-matters/README.md) independently reconstruct all 795 transfers and all per-hour counterparty totals from Ethereum, starting with the saved provenance. That follow-up searches the full 598-block range, verifies cited block hashes and source digests, and goes beyond the receipt samples described below. The accompanying program and recorded Ethereum responses make the check reproducible.
+
 ## Result
 
 **Neither Nansen counterparties result matches either Testril hour.** Nansen's transaction-history endpoint matches Testril exactly in both hours.

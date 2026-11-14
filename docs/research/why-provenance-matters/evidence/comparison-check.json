@@ -1,0 +1,28 @@
+[
+  {
+    "hour": 12,
+    "canonical_transfers_match": true,
+    "all_counterparty_totals_match": true,
+    "counterparties_checked": 93,
+    "nansen_transaction_listing_agrees": true,
+    "example": {
+      "address": "0x51c72848c68a965f66fa7a88855f9f7784502a7f",
+      "transfers": 34,
+      "incoming_atoms": "1020320767107",
+      "outgoing_atoms": "327701521529"
+    }
+  },
+  {
+    "hour": 13,
+    "canonical_transfers_match": true,
+    "all_counterparty_totals_match": true,
+    "counterparties_checked": 158,
+    "nansen_transaction_listing_agrees": true,
+    "example": {
+      "address": "0x51c72848c68a965f66fa7a88855f9f7784502a7f",
+      "transfers": 49,
+      "incoming_atoms": "2458599369898",
+      "outgoing_atoms": "4978945772832"
+    }
+  }
+]
