@@ -208,7 +208,11 @@ export async function livePeer(t, options = {}) {
             paymentResponse: old.paymentResponse,
           };
           return options.reconciliationResponse
-            ? options.reconciliationResponse(result, { verb: name, args })
+            ? options.reconciliationResponse(result, {
+                verb: name,
+                args,
+                payment,
+              })
             : result;
         }
         if (uncertain) {
@@ -376,7 +380,7 @@ export async function livePeer(t, options = {}) {
           const { quote_id, lines, accepts } = value;
           const challenge = {
             x402Version: 2,
-            error: "payment_required",
+            error: value.error ?? options.paymentError ?? "payment_required",
             accepts: options.paymentOffers ?? accepts,
           };
           result = {

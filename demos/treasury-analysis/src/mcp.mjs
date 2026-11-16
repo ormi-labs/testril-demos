@@ -62,7 +62,7 @@ export async function connectMcp(url) {
       if (
         result.isError &&
         value?.x402Version === 2 &&
-        value.error === "payment_required"
+        typeof value.error === "string"
       ) {
         let quote;
         try {
@@ -82,6 +82,21 @@ export async function connectMcp(url) {
             `Testril ${operation} returned an invalid payment challenge.`,
             { operation },
           );
+        if (value.error !== "payment_required") {
+          const reasons = new Map([
+            [
+              "invalid_batch_settlement_evm_cumulative_amount_mismatch",
+              "cumulative-amount-mismatch",
+            ],
+            ["payment_identifier_conflict", "identifier-conflict"],
+            ["invalid_payload", "invalid-payload"],
+          ]);
+          throw demoFailure(
+            "TESTRIL_PAYMENT_REJECTED",
+            `Testril refused the ${operation} payment. Preserve its journal before retrying.`,
+            { operation, reason: reasons.get(value.error) ?? "unknown" },
+          );
+        }
         return {
           ...value,
           quote_id: quote.quote_id,

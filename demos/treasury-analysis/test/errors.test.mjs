@@ -408,3 +408,60 @@ test("SDK failures retain bounded transport diagnostics without provider payload
     );
   }
 });
+
+for (const [providerCode, reason] of [
+  [
+    "invalid_batch_settlement_evm_cumulative_amount_mismatch",
+    "cumulative-amount-mismatch",
+  ],
+  ["payment_identifier_conflict", "identifier-conflict"],
+  ["invalid_payload", "invalid-payload"],
+  ["PRIVATE_PROVIDER_SECRET", "unknown"],
+])
+  test(`valid x402 refusal ${reason} is distinct from a malformed challenge`, async (t) => {
+    const peer = await livePeer(t, { paymentError: providerCode });
+    await assert.rejects(peer.demo.refresh(), (error) => {
+      assert.deepEqual(describeFailure(error), {
+        code: "TESTRIL_PAYMENT_REJECTED",
+        details: { operation: "materialize", reason },
+      });
+      assert.doesNotMatch(error.message, /PRIVATE_PROVIDER_SECRET/);
+      return true;
+    });
+    assert.equal(peer.calls.filter((c) => c.payment).length, 0);
+    assert.equal(peer.prepares, 0);
+  });
+
+test("a refused reconciliation probe preserves the original uncertain purchase without signing a replacement", async (t) => {
+  const peer = await livePeer(t, {
+    loseFirstSettlement: true,
+    reconciliationResponse: (_result, { payment }) => ({
+      outcome: "payment_required",
+      error: "invalid_batch_settlement_evm_cumulative_amount_mismatch",
+      quote_id: "quote:refused-lookup",
+      lines: [],
+      accepts: [payment.accepted],
+    }),
+  });
+  await assert.rejects(peer.demo.refresh());
+  const held = structuredClone(peer.demo.export().allReceipts);
+  const paidBefore = peer.calls.filter((c) => c.payment).length;
+  await assert.rejects(peer.demo.reconcile(), (error) => {
+    assert.deepEqual(describeFailure(error), {
+      code: "TESTRIL_PAYMENT_REJECTED",
+      details: {
+        operation: "materialize",
+        reason: "cumulative-amount-mismatch",
+      },
+    });
+    return true;
+  });
+  assert.deepEqual(peer.demo.export().allReceipts, held);
+  assert.equal(peer.calls.filter((c) => c.payment).length, paidBefore + 1);
+  assert.equal(
+    peer.calls.filter((c) => c.payment).at(-1).payment.payload.voucher
+      .maxClaimableAmount,
+    "0",
+  );
+  assert.equal(peer.prepares, 0);
+});

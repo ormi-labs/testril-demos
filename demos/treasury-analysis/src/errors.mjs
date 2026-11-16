@@ -59,6 +59,15 @@ const schemas = {
     reason: refusal,
   },
   TESTRIL_OPERATION_REJECTED: { operation, reason: refusal },
+  TESTRIL_PAYMENT_REJECTED: {
+    operation,
+    reason: oneOf(
+      "cumulative-amount-mismatch",
+      "identifier-conflict",
+      "invalid-payload",
+      "unknown",
+    ),
+  },
   TESTRIL_REQUEST_FAILED: {
     operation,
     transportCode: transport,
