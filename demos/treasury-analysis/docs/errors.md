@@ -58,13 +58,13 @@ arrays. A field marked optional is omitted when unavailable. Each field is
 required otherwise. No raw provider reason, address, URL, filesystem path,
 transaction payload, or private key belongs in these details.
 
-| Name                     | Allowed values                                                                                                           |
-| ------------------------ | ------------------------------------------------------------------------------------------------------------------------ |
-| `functionSlug`           | `erc20.transfer_edges`, `erc20.token_balance`                                                                            |
-| `walletId`               | `treasury`, `a`, `b`                                                                                                     |
-| Testril `operation`      | `connect`, `close`, `bind`, `read`, `materialize`, `inspect`, `provenance`, `unknown`                                    |
-| `transportCode`          | `ECONNRESET`, `ECONNREFUSED`, `ETIMEDOUT`, `ENOTFOUND`, `EAI_AGAIN`, `unknown`                                           |
-| Testril refusal `reason` | `invalid_params`, `not_found`, `unsupported`, `range_unavailable`, `rate_limit`, `wall`, `state`, `economics`, `unknown` |
+| Name                     | Allowed values                                                                                                                                                     |
+| ------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `functionSlug`           | `erc20.transfer_edges`, `erc20.token_balance`                                                                                                                      |
+| `walletId`               | `treasury`, `a`, `b`                                                                                                                                               |
+| Testril `operation`      | `connect`, `close`, `bind`, `read`, `materialize`, `inspect`, `provenance`, `unknown`                                                                              |
+| `transportCode`          | `ECONNRESET`, `ECONNREFUSED`, `ETIMEDOUT`, `ENOTFOUND`, `EAI_AGAIN`, `HTTP_400`–`HTTP_599`, `MCP_REQUEST_TIMEOUT`, `MCP_CONNECTION_CLOSED`, `MCP_ERROR`, `unknown` |
+| Testril refusal `reason` | `invalid_params`, `not_found`, `unsupported`, `range_unavailable`, `rate_limit`, `wall`, `state`, `economics`, `unknown`                                           |
 
 `unknown` means the demo could not describe the value using the supported
 vocabulary. It is never a placeholder into which provider text may be copied.
@@ -177,3 +177,5 @@ transport failures, malformed binding replies, stable descriptors despite messag
 changes, unknown/forged errors and hostile accessors, policy-error identity,
 journal failure precedence and cleanup, and local HTTP presentation. Paid live
 verification and the paired harness integration checks are separate release work.
+
+HTTP status and MCP classifications come from the corresponding SDK error types. Raw error messages and response bodies are never copied into a descriptor. These diagnostics do not establish whether a paid request settled.

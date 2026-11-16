@@ -1,7 +1,10 @@
+import { McpError, ErrorCode } from "@modelcontextprotocol/sdk/types.js";
+import { StreamableHTTPError } from "@modelcontextprotocol/sdk/client/streamableHttp.js";
 import test from "node:test";
 import assert from "node:assert/strict";
 import { once } from "node:events";
 import {
+  transportCode,
   demoFailure,
   describeFailure,
   failureMessage,
@@ -362,4 +365,44 @@ test("an unknown policy exception cannot supply timing data to local logs or res
   assert.equal(timingReads, 0);
   assert.deepEqual(messages, []);
   assert.doesNotMatch(JSON.stringify(refused.value), /private/);
+});
+
+test("SDK failures retain bounded transport diagnostics without provider payloads", () => {
+  const cases = [
+    [new StreamableHTTPError(503, "secret provider body"), "HTTP_503"],
+    [new StreamableHTTPError(429, "secret"), "HTTP_429"],
+    [new McpError(ErrorCode.RequestTimeout, "secret"), "MCP_REQUEST_TIMEOUT"],
+    [
+      new McpError(ErrorCode.ConnectionClosed, "secret"),
+      "MCP_CONNECTION_CLOSED",
+    ],
+    [new McpError(ErrorCode.InternalError, "secret"), "MCP_ERROR"],
+    [{ code: 503, message: "forged" }, "unknown"],
+    [{ code: "ECONNRESET" }, "ECONNRESET"],
+    [new StreamableHTTPError(999, "secret"), "unknown"],
+    [
+      {
+        get code() {
+          throw new Error("secret");
+        },
+      },
+      "unknown",
+    ],
+  ];
+  for (const [error, expected] of cases) {
+    const code = transportCode(error);
+    assert.equal(code, expected);
+    assert.deepEqual(
+      describeFailure(
+        demoFailure("TESTRIL_REQUEST_FAILED", "Request failed", {
+          operation: "read",
+          transportCode: code,
+        }),
+      ),
+      {
+        code: "TESTRIL_REQUEST_FAILED",
+        details: { operation: "read", transportCode: expected },
+      },
+    );
+  }
 });

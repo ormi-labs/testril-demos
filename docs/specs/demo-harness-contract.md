@@ -203,6 +203,36 @@ protocol into common hosting code. A confirmed payment alone does not establish
 fresh data or clean wallets, so the harness must still complete cleanup and
 verification before reuse.
 
+## Automatic recovery and operations escalation
+
+The harness owns the recovery schedule, retry limits, durable attempt records and
+operations notifications. A demo owns reconciliation and the evidence needed to
+prove its resources safe. Quarantine prevents admission; it must not silently
+remove a sandbox from maintenance forever.
+
+Recovery must run without a visitor request, including after restart and for
+previously quarantined resources. Use a bounded number of attempts with backoff.
+Every attempt must share the existing recovery reservation, consumed allowance,
+payment identifiers and transaction journal. A retry does not reset a budget or
+authorize a replacement for an uncertain purchase or transfer. Reusing a sandbox
+requires successful reconciliation, fresh readable state, cleanup, verification,
+connection closure and accounting. Failure keeps it isolated.
+
+Persist attempt counts, due times, first and latest safe failure details, and
+escalation state. A restart cannot reset the attempt limit. Once attempts are
+exhausted, or safe recovery cannot start because accounting needs review, notify
+operations. Include the affected resource and network, original and recovery
+references, failed stage and supported failure context, remaining allowance,
+inspection commands, and steps to reconcile and verify reuse. Do not include keys,
+signed payloads, raw provider responses or arbitrary exception messages.
+
+Notification intent and outcome must survive restart. Deduplicate alerts, retry
+unconfirmed delivery, and issue reminders while the incident remains unresolved.
+Expose notification failure in operator status and bounded logs; an email API
+acknowledgement proves acceptance, not arrival in an inbox. An operator may start
+a new bounded recovery cycle after addressing the cause, using only the remaining
+reservation. Never make a resource available by clearing quarantine alone.
+
 ## Operation lifecycle
 
 These are requirements to verify, not a statement that every current integration

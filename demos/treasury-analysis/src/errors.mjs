@@ -1,3 +1,6 @@
+import { McpError, ErrorCode } from "@modelcontextprotocol/sdk/types.js";
+import { StreamableHTTPError } from "@modelcontextprotocol/sdk/client/streamableHttp.js";
+
 const failures = new WeakMap();
 const oneOf =
   (...values) =>
@@ -18,6 +21,10 @@ const operation = oneOf(
   "unknown",
 );
 const transport = oneOf(
+  ...Array.from({ length: 200 }, (_, i) => `HTTP_${400 + i}`),
+  "MCP_REQUEST_TIMEOUT",
+  "MCP_CONNECTION_CLOSED",
+  "MCP_ERROR",
   "ECONNRESET",
   "ECONNREFUSED",
   "ETIMEDOUT",
@@ -163,7 +170,19 @@ export function refusalReason(value) {
 export function transportCode(error) {
   try {
     const code = error?.code;
-    return transport(code) ? code : "unknown";
+    if (
+      error instanceof StreamableHTTPError &&
+      Number.isInteger(code) &&
+      code >= 400 &&
+      code <= 599
+    )
+      return `HTTP_${code}`;
+    if (error instanceof McpError) {
+      if (code === ErrorCode.RequestTimeout) return "MCP_REQUEST_TIMEOUT";
+      if (code === ErrorCode.ConnectionClosed) return "MCP_CONNECTION_CLOSED";
+      return "MCP_ERROR";
+    }
+    return typeof code === "string" && transport(code) ? code : "unknown";
   } catch {
     return "unknown";
   }
