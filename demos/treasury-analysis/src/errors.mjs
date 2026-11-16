@@ -20,16 +20,19 @@ const operation = oneOf(
   "provenance",
   "unknown",
 );
-const transport = oneOf(
-  ...Array.from({ length: 200 }, (_, i) => `HTTP_${400 + i}`),
-  "MCP_REQUEST_TIMEOUT",
-  "MCP_CONNECTION_CLOSED",
-  "MCP_ERROR",
+const networkCodes = [
   "ECONNRESET",
   "ECONNREFUSED",
   "ETIMEDOUT",
   "ENOTFOUND",
   "EAI_AGAIN",
+];
+const transport = oneOf(
+  ...networkCodes,
+  ...Array.from({ length: 200 }, (_, i) => `HTTP_${400 + i}`),
+  "MCP_REQUEST_TIMEOUT",
+  "MCP_CONNECTION_CLOSED",
+  "MCP_ERROR",
   "unknown",
 );
 const refusal = oneOf(
@@ -182,7 +185,7 @@ export function transportCode(error) {
       if (code === ErrorCode.ConnectionClosed) return "MCP_CONNECTION_CLOSED";
       return "MCP_ERROR";
     }
-    return typeof code === "string" && transport(code) ? code : "unknown";
+    return networkCodes.includes(code) ? code : "unknown";
   } catch {
     return "unknown";
   }

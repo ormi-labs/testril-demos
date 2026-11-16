@@ -378,6 +378,8 @@ test("SDK failures retain bounded transport diagnostics without provider payload
     ],
     [new McpError(ErrorCode.InternalError, "secret"), "MCP_ERROR"],
     [{ code: 503, message: "forged" }, "unknown"],
+    [{ code: "HTTP_503" }, "unknown"],
+    [{ code: "MCP_REQUEST_TIMEOUT" }, "unknown"],
     [{ code: "ECONNRESET" }, "ECONNRESET"],
     [new StreamableHTTPError(999, "secret"), "unknown"],
     [
