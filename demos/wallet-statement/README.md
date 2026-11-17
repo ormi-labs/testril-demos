@@ -1,5 +1,7 @@
 # Pool Flows: Testril and Nansen
 
+Hosted at `https://demos.testril.si/pool-flows/`.
+
 Compare the cost and time of retrieving USDC transfers into and out of Uniswap’s USDC/WETH liquidity pool on Ethereum. Every transfer and exact amount is compared, including repeated transfers.
 
 The page has two tabs, **Historical Run** and **Run with your Wallet**, and three sections:
@@ -84,7 +86,9 @@ Preflight defaults to yesterday, checks Ethereum boundaries and obtains unsigned
 
 For manual verification, compare both summary metrics, inspect all 292 historical transfers in each provider’s ledger, and check the phase table. On the wallet tab, select another day and confirm that historical figures disappear. A funded live run requires explicit spending authorization; approve each quote and inspect the dated export. Reload with a pending attempt to confirm that date changes and new runs remain blocked.
 
-The opt-in `test/live-smoke.mjs` is an operator tool, excluded from normal tests. It requires `ALLOW_PAID_SMOKE=1` and a locally supplied payer key, signs in the Node process and stops at 0.10 USDC in service quotes or 0.01 in new deposits. These conservative limits may be insufficient for a day requiring preparation. It retains a safe attempt on failure and must not be automatically repeated. Never fund the deterministic test identity.
+The opt-in `test/live-smoke.mjs` is an operator tool, excluded from normal tests. It requires `ALLOW_PAID_SMOKE=1` and a locally supplied `TESTRIL_PAYER_PRIVATE_KEY`, and signs in the Node process. By default it stops at 0.10 USDC in service quotes, 0.01 in new deposits or 0.11 combined. `PAID_SMOKE_DATE` selects a completed UTC day; `PAID_SMOKE_URL=https://demos.testril.si/pool-flows/` targets production instead of its temporary local server. `PAID_SMOKE_EXPECTED_PAYER` checks the signing address. The three allowance variables `PAID_SMOKE_SERVICE_CAP_ATOMS`, `PAID_SMOKE_DEPOSIT_CAP_ATOMS` and `PAID_SMOKE_COMBINED_CAP_ATOMS` must only be raised with explicit funding authorization; they cannot exceed the demo caps. `PAID_SMOKE_BASE_RPC_URL` optionally selects the Base node. The script saves reserved quotes before approval, retains a safe attempt on failure, closes its temporary server and must not be automatically repeated. Never fund the deterministic test identity.
+
+`test/total-smoke.mjs` is a separate operator experiment comparing a full-day **total** using Nansen counterparties against a Testril transfer read counted locally. It does not change the browser comparison. It requires the same explicit opt-in and locally supplied key, an exact `PAID_SMOKE_EXPECTED_PAYER`, and `PAID_TOTAL_PRIOR_JOURNAL` naming the earlier full-day gateway status JSON so its reservations remain in the overall budget. It fixes the date to 10 November 2026, permits at most another 0.10 USDC including deposits, and never purchases materialization. Run with `node test/total-smoke.mjs` only after supplying those variables and authorizing the spend. Its temporary directory retains safe receipts, normalized counts and Testril rows; unknown outcomes stop without replay. Quote and paid-response times exclude signing. The summary parser excludes other tokens and rejects malformed or duplicate statistics; a non-final first page stops this one-page experiment rather than publishing a partial total.
 
 ## Failure and hosting contract
 

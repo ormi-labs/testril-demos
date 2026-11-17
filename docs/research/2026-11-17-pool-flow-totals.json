@@ -1,0 +1,93 @@
+{
+  "createdAt": "2026-11-17T14:19:38.517Z",
+  "scope": {
+    "window": "day",
+    "chain_id": 1,
+    "decimals": 6,
+    "wallet": "0x88e6a0c2ddd26feeb64f039a2c41296fcb3f5640",
+    "token": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+    "function_slug": "erc20.wallet_transfers",
+    "from_time": "2026-11-10T00:00:00Z",
+    "to_time": "2026-11-11T00:00:00Z",
+    "from_block": 26380784,
+    "to_block": 26387957
+  },
+  "providers": {
+    "testril": {
+      "function": "erc20.wallet_transfers",
+      "count": "7139",
+      "requests": 1,
+      "quoteMs": 979,
+      "paidResponseMs": 2396,
+      "readMs": 3375,
+      "serviceAtoms": "7193",
+      "preparation": "Already materialized; no new preparation purchased.",
+      "method": "Retrieve transfers and count locally; no wallet-count Function exists."
+    },
+    "nansen": {
+      "endpoint": "https://api.nansen.ai/api/v1/profiler/address/counterparties",
+      "request": {
+        "address": "0x88e6a0c2ddd26feeb64f039a2c41296fcb3f5640",
+        "chain": "ethereum",
+        "date": {
+          "from": "2026-11-10T00:00:00Z",
+          "to": "2026-11-10T23:59:59Z"
+        },
+        "source_input": "Tokens",
+        "group_by": "wallet",
+        "pagination": {
+          "page": 1,
+          "per_page": 1000
+        }
+      },
+      "count": "7139",
+      "entries": 910,
+      "counterparties": 787,
+      "requests": 1,
+      "quoteMs": 392,
+      "paidResponseMs": 2079,
+      "readMs": 2471,
+      "serviceAtoms": "50000"
+    }
+  },
+  "matches": true,
+  "payments": [
+    {
+      "id": "dac12f6b-322f-47b4-a769-6080dc2d9933",
+      "provider": "nansen",
+      "amount": "50000",
+      "deposit": "0",
+      "status": "confirmed",
+      "receipt": {
+        "success": true,
+        "network": "eip155:8453",
+        "payer": "0x6eA4AB444CD21bd9210D998894585f6148048517",
+        "transaction": "0xf865b1caff7c7219439e589c57a6333711ca2d21c73daee8ca3399c370873542",
+        "chargedAmount": null
+      }
+    },
+    {
+      "id": "16a5d1ea-e19f-4737-8cbe-8edaa61d5e2d",
+      "provider": "testril",
+      "amount": "7193",
+      "deposit": "10000",
+      "status": "confirmed",
+      "receipt": {
+        "success": true,
+        "network": "eip155:8453",
+        "payer": "0x6ea4ab444cd21bd9210d998894585f6148048517",
+        "transaction": "0x261dd110ddc936de00e3dd461b07fb6aafa8b0add5ebc12487266b593c958303",
+        "chargedAmount": "7193"
+      }
+    }
+  ],
+  "verification": {
+    "allTestrilTransfersMatchIndependentEthereumArchive": true,
+    "allNansenCounterpartyCountsMatchIndependentEthereumArchive": true,
+    "ethereumArchive": "https://github.com/ormi-labs/why-provenance-matters/blob/main/evidence/ethereum-day.json",
+    "ethereumArchiveSha256": "9bbd88d63fc39ad301fe8aaa13e6bc6fb9ff188b8b9d15aae77eb058f4222d21",
+    "transfers": 7139,
+    "counterparties": 787
+  },
+  "timingMethod": "One sequential operator run from the same Mac. Quote plus paid response and local count, excluding wallet signing. Not a hosted-browser benchmark or a repeated latency study."
+}

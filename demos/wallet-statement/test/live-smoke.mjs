@@ -6,26 +6,97 @@ import { join } from "node:path";
 import { createPublicClient, http } from "viem";
 import { privateKeyToAccount } from "viem/accounts";
 import { createApp, fileStore } from "../src/server.mjs";
-import { compare, usdc, maxPages } from "../public/model.js";
+import { collector, escrow } from "../public/payments.js";
+import {
+  compare,
+  usdc,
+  maxPages,
+  chargeCap,
+  depositCap,
+  scope,
+} from "../public/model.js";
 
 if (
   process.env.ALLOW_PAID_SMOKE !== "1" ||
   !process.env.TESTRIL_PAYER_PRIVATE_KEY
 )
   throw new Error("Explicit paid-smoke configuration is required.");
+const reportDate =
+  process.env.PAID_SMOKE_DATE ??
+  new Date(Date.now() - 86400000).toISOString().slice(0, 10);
+scope(reportDate);
+function limit(name, fallback, maximum) {
+  const value = process.env[name] ?? fallback;
+  if (!/^[1-9]\d*$/.test(value) || BigInt(value) > BigInt(maximum))
+    throw new Error("Invalid operator allowance");
+  return BigInt(value);
+}
+const serviceCap = limit("PAID_SMOKE_SERVICE_CAP_ATOMS", "100000", chargeCap);
+const newDepositCap = limit(
+  "PAID_SMOKE_DEPOSIT_CAP_ATOMS",
+  "10000",
+  depositCap,
+);
+const combinedCap = limit("PAID_SMOKE_COMBINED_CAP_ATOMS", "110000", chargeCap);
 const account = privateKeyToAccount(process.env.TESTRIL_PAYER_PRIVATE_KEY);
+if (
+  process.env.PAID_SMOKE_EXPECTED_PAYER &&
+  account.address.toLowerCase() !==
+    process.env.PAID_SMOKE_EXPECTED_PAYER.toLowerCase()
+)
+  throw new Error("Unexpected operator wallet");
+const balanceAbi = [
+  {
+    type: "function",
+    name: "balanceOf",
+    stateMutability: "view",
+    inputs: [{ type: "address" }],
+    outputs: [{ type: "uint256" }],
+  },
+];
 const rpc = createPublicClient({
-  transport: http("https://mainnet.base.org", { retryCount: 0 }),
+  transport: http(
+    process.env.PAID_SMOKE_BASE_RPC_URL ?? "https://mainnet.base.org",
+    { retryCount: 0 },
+  ),
 });
 const directory = await mkdtemp(join(tmpdir(), "wallet-statement-live-"));
-const app = createApp({ store: fileStore(directory) });
-await new Promise((done) => app.listen(0, "127.0.0.1", done));
+let app;
+let target = process.env.PAID_SMOKE_URL;
+if (target && target !== "https://demos.testril.si/pool-flows/")
+  throw new Error("Use the production demo or the local operator server");
+if (!target) {
+  app = createApp({ store: fileStore(directory) });
+  await new Promise((done) => app.listen(0, "127.0.0.1", done));
+  target = `http://127.0.0.1:${app.address().port}/`;
+}
 const browser = await chromium.launch({ headless: true });
 const page = await browser.newPage();
+const reservations = [];
 let currentQuote,
+  approved,
   charges = 0n,
   deposits = 0n;
+console.log(
+  JSON.stringify({
+    target,
+    date: reportDate,
+    payer: account.address,
+    evidenceDirectory: directory,
+    serviceCapAtoms: serviceCap.toString(),
+    newDepositCapAtoms: newDepositCap.toString(),
+    combinedCapAtoms: combinedCap.toString(),
+  }),
+);
 try {
+  const balance = await rpc.readContract({
+    address: usdc,
+    abi: balanceAbi,
+    functionName: "balanceOf",
+    args: [account.address],
+  });
+  if (balance < combinedCap)
+    throw new Error("Fund the operator allowance before starting");
   page.on("response", async (response) => {
     if (response.url().endsWith("/step")) {
       try {
@@ -46,15 +117,47 @@ try {
         return rpc.request({ method, params });
       if (method === "eth_signTypedData_v4") {
         const data = JSON.parse(params[1]);
-        if (!currentQuote || Number(data.domain.chainId) !== 8453)
+        if (
+          !approved ||
+          approved.usedTypes.has(data.primaryType) ||
+          Number(data.domain.chainId) !== 8453
+        )
           throw new Error("Unexpected signing domain");
         if (
           data.primaryType === "TransferWithAuthorization" &&
           (data.domain.verifyingContract.toLowerCase() !== usdc.toLowerCase() ||
-            data.message.value !== currentQuote.accepted.amount ||
-            data.message.to !== currentQuote.accepted.payTo)
+            data.message.value !== approved.quote.accepted.amount ||
+            data.message.to !== approved.quote.accepted.payTo)
         )
           throw new Error("Unexpected authorization");
+        if (
+          data.primaryType === "TransferWithAuthorization" &&
+          approved.quote.accepted.scheme !== "exact"
+        )
+          throw new Error("Wrong signature scheme");
+        if (
+          data.primaryType === "ReceiveWithAuthorization" &&
+          (approved.quote.accepted.scheme !== "batch-settlement" ||
+            data.domain.verifyingContract.toLowerCase() !==
+              usdc.toLowerCase() ||
+            data.message.to.toLowerCase() !== collector.toLowerCase() ||
+            data.message.value !== approved.quote.plan.depositAmount)
+        )
+          throw new Error("Unexpected deposit authorization");
+        if (
+          data.primaryType === "Voucher" &&
+          (approved.quote.accepted.scheme !== "batch-settlement" ||
+            data.domain.verifyingContract.toLowerCase() !==
+              escrow.toLowerCase() ||
+            data.message.channelId !== approved.quote.plan.channelId ||
+            data.message.maxClaimableAmount !== approved.quote.plan.maximum)
+        )
+          throw new Error("Unexpected voucher authorization");
+        if (
+          data.primaryType !== "Voucher" &&
+          data.message.from.toLowerCase() !== account.address.toLowerCase()
+        )
+          throw new Error("Unexpected payer");
         if (
           ![
             "TransferWithAuthorization",
@@ -63,6 +166,7 @@ try {
           ].includes(data.primaryType)
         )
           throw new Error("Unexpected signature type");
+        approved.usedTypes.add(data.primaryType);
         return account.signTypedData(data);
       }
       throw new Error("Unexpected wallet method");
@@ -73,8 +177,11 @@ try {
       request: (request) => window.operatorWalletRequest(request),
     };
   });
-  await page.goto(`http://127.0.0.1:${app.address().port}/`);
+  await page.goto(target);
+  if (page.url() !== target) throw new Error("Unexpected demo URL");
   await page.getByRole("tab", { name: "Run with your Wallet" }).click();
+  await page.locator("#report-date").fill(reportDate);
+  await page.locator("#report-date").blur();
   await page
     .getByRole("button", { name: "Connect wallet", exact: true })
     .click();
@@ -85,11 +192,12 @@ try {
     await page.waitForFunction(
       () =>
         document.querySelector("#payment-dialog").open ||
-        /Run complete|could not|stopped|needs checking/.test(
-          document.querySelector("#notice").textContent,
+        ["done", "stopped", "cancelled"].includes(
+          JSON.parse(localStorage.getItem("testril-wallet-statement:last-run"))
+            ?.status,
         ),
       null,
-      { timeout: 90000 },
+      { timeout: 240000 },
     );
     if (!(await page.getByRole("dialog").isVisible())) break;
     if (
@@ -100,16 +208,44 @@ try {
       throw new Error("Unsupported quote");
     charges += BigInt(currentQuote.accepted.amount);
     deposits += BigInt(currentQuote.plan.depositAmount);
-    if (charges > 100000n || deposits > 10000n)
+    if (
+      charges > serviceCap ||
+      deposits > newDepositCap ||
+      charges + deposits > combinedCap
+    )
       throw new Error("Operator trial allowance reached");
+    approved = { quote: structuredClone(currentQuote), usedTypes: new Set() };
+    reservations.push({
+      action: currentQuote.action,
+      page: currentQuote.page,
+      amount: currentQuote.accepted.amount,
+      newDeposit: currentQuote.plan.depositAmount,
+    });
+    await writeFile(
+      join(directory, "allowance.json"),
+      JSON.stringify({
+        target,
+        date: reportDate,
+        serviceCap: serviceCap.toString(),
+        depositCap: newDepositCap.toString(),
+        combinedCap: combinedCap.toString(),
+        reservations,
+      }),
+      { mode: 0o600 },
+    );
+    console.log(
+      JSON.stringify({
+        approving: currentQuote.action,
+        page: currentQuote.page,
+        serviceAtomsReserved: charges.toString(),
+        depositAtomsReserved: deposits.toString(),
+      }),
+    );
     await page.getByRole("button", { name: "Approve and sign" }).click();
+    await page.waitForFunction(
+      () => !document.querySelector("#payment-dialog").open,
+    );
   }
-  await page.waitForFunction(
-    () =>
-      document.querySelector("#notice").textContent.startsWith("Run complete"),
-    null,
-    { timeout: 90000 },
-  );
   const run = JSON.parse(
     await page.evaluate(() =>
       localStorage.getItem("testril-wallet-statement:last-run"),
@@ -120,14 +256,8 @@ try {
     !compare(run.providers.testril.rows, run.providers.nansen.rows).matches
   )
     throw new Error("Paid comparison did not match");
-  await page
-    .getByRole("button", { name: "Rebuild from saved evidence" })
-    .click();
-  await page.waitForFunction(
-    () =>
-      document.querySelector("#proof-status").textContent ===
-      "Saved evidence replay passed",
-  );
+  if (run.scope.window !== reportDate)
+    throw new Error("The comparison used another day");
   const final = await page.evaluate(() =>
     localStorage.getItem("testril-wallet-statement:last-run"),
   );
@@ -155,6 +285,8 @@ try {
   process.exitCode = 1;
 } finally {
   await browser.close();
-  app.closeAllConnections();
-  await new Promise((done) => app.close(done));
+  if (app) {
+    app.closeAllConnections();
+    await new Promise((done) => app.close(done));
+  }
 }

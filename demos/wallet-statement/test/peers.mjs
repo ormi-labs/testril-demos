@@ -71,6 +71,7 @@ export async function peers({
   rpcFailure = false,
   rpcChain = "0x1",
   dailyTransactions,
+  fullDayProvenance = false,
   omitReceipt = false,
   network = "eip155:8453",
   mismatch = false,
@@ -120,6 +121,13 @@ export async function peers({
       provenance.from_block += offset;
       provenance.to_block += offset;
       provenance.blocks.forEach((block) => (block.number += offset));
+      if (fullDayProvenance) {
+        provenance.blocks = Array.from({ length: 7173 }, (_, i) => ({
+          number: record.scope.from_block + i,
+          block_hash: `0x${(record.scope.from_block + i).toString(16).padStart(64, "0")}`,
+        }));
+        provenance.block_count = provenance.blocks.length;
+      }
       provenance.digest = await digest(1, provenance.blocks);
       daily.set(date, record);
     }
