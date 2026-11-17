@@ -27,8 +27,18 @@ const networkCodes = [
   "ENOTFOUND",
   "EAI_AGAIN",
 ];
+const runtimeFailures = new Map([
+  ["Too many subrequests", "WORKER_SUBREQUEST_LIMIT"],
+  ["Response closed due to connection limit", "WORKER_CONNECTION_LIMIT"],
+  ["Cannot perform I/O on behalf of a different request", "WORKER_IO_CONTEXT"],
+]);
 const transport = oneOf(
   ...networkCodes,
+  ...runtimeFailures.values(),
+  "MCP_CONTENT_TYPE_INVALID",
+  "FETCH_FAILED",
+  "MCP_JSON_INVALID",
+  "MCP_SCHEMA_INVALID",
   ...Array.from({ length: 200 }, (_, i) => `HTTP_${400 + i}`),
   "MCP_REQUEST_TIMEOUT",
   "MCP_CONNECTION_CLOSED",
@@ -182,6 +192,14 @@ export function refusalReason(value) {
 export function transportCode(error) {
   try {
     const code = error?.code;
+    for (const [message, classification] of runtimeFailures)
+      if (
+        typeof error?.message === "string" &&
+        error.message.startsWith(message)
+      )
+        return classification;
+    if (error instanceof StreamableHTTPError && code === -1)
+      return "MCP_CONTENT_TYPE_INVALID";
     if (
       error instanceof StreamableHTTPError &&
       Number.isInteger(code) &&
@@ -194,6 +212,9 @@ export function transportCode(error) {
       if (code === ErrorCode.ConnectionClosed) return "MCP_CONNECTION_CLOSED";
       return "MCP_ERROR";
     }
+    if (error instanceof TypeError) return "FETCH_FAILED";
+    if (error instanceof SyntaxError) return "MCP_JSON_INVALID";
+    if (error?.name === "ZodError") return "MCP_SCHEMA_INVALID";
     return networkCodes.includes(code) ? code : "unknown";
   } catch {
     return "unknown";

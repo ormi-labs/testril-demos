@@ -371,6 +371,22 @@ test("SDK failures retain bounded transport diagnostics without provider payload
   const cases = [
     [new StreamableHTTPError(503, "secret provider body"), "HTTP_503"],
     [new StreamableHTTPError(429, "secret"), "HTTP_429"],
+    [new StreamableHTTPError(-1, "secret"), "MCP_CONTENT_TYPE_INVALID"],
+    [new TypeError("secret"), "FETCH_FAILED"],
+    [new SyntaxError("secret"), "MCP_JSON_INVALID"],
+    [
+      Object.assign(new Error("secret"), { name: "ZodError" }),
+      "MCP_SCHEMA_INVALID",
+    ],
+    [new Error("Too many subrequests."), "WORKER_SUBREQUEST_LIMIT"],
+    [
+      new Error("Response closed due to connection limit: secret"),
+      "WORKER_CONNECTION_LIMIT",
+    ],
+    [
+      new Error("Cannot perform I/O on behalf of a different request. secret"),
+      "WORKER_IO_CONTEXT",
+    ],
     [new McpError(ErrorCode.RequestTimeout, "secret"), "MCP_REQUEST_TIMEOUT"],
     [
       new McpError(ErrorCode.ConnectionClosed, "secret"),
