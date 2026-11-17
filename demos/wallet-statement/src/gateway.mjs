@@ -82,7 +82,7 @@ export async function execute(run, input, { providers, persist }) {
     throw failure("RUN_STOPPED");
   if (run.operations.some((o) => o.id === input.id))
     throw failure("RUN_STOPPED");
-  const report = scope(run.window);
+  const report = run.report ?? scope(run.window);
   if (input.action !== "bind" && provider === "testril" && !run.bound)
     throw failure("INVALID_REQUEST");
   if (

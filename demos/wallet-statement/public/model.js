@@ -7,8 +7,32 @@ export const token = "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48";
 const addr = /^0x[0-9a-f]{40}$/;
 const tx = /^0x[0-9a-f]{64}$/;
 
+export function dayScope(date, now = Date.now()) {
+  const from =
+    typeof date === "string" && /^\d{4}-\d{2}-\d{2}$/.test(date)
+      ? Date.parse(`${date}T00:00:00Z`)
+      : NaN;
+  if (
+    !Number.isFinite(from) ||
+    date < "2015-07-31" ||
+    new Date(from).toISOString().slice(0, 10) !== date ||
+    from + 86400000 > now
+  )
+    throw new Error("Choose a completed UTC day.");
+  return {
+    window: date,
+    chain_id: 1,
+    decimals: 6,
+    wallet: address,
+    token,
+    function_slug: "erc20.wallet_transfers",
+    from_time: new Date(from).toISOString().replace(".000Z", "Z"),
+    to_time: new Date(from + 86400000).toISOString().replace(".000Z", "Z"),
+  };
+}
 // Numeric windows are retained for the archived hourly reports.
 export function scope(window = "day") {
+  if (typeof window === "string" && window !== "day") return dayScope(window);
   if (!["day", 12, 13].includes(window))
     throw new Error("Choose the full day or an archived hourly report.");
   const day = window === "day";

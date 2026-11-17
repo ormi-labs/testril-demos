@@ -74,7 +74,7 @@ try {
     };
   });
   await page.goto(`http://127.0.0.1:${app.address().port}/`);
-  await page.getByRole("button", { name: "Run with your wallet" }).click();
+  await page.getByRole("tab", { name: "Run with your Wallet" }).click();
   await page
     .getByRole("button", { name: "Connect wallet", exact: true })
     .click();

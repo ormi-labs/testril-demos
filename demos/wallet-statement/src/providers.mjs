@@ -3,6 +3,8 @@ import { StreamableHTTPClientTransport } from "@modelcontextprotocol/sdk/client/
 import { decimalAtoms, scope, validateRows } from "../public/model.js";
 import { failure, describeFailure } from "./errors.mjs";
 
+import { resolveDay } from "./report-scope.mjs";
+
 const same = (a, b) =>
   typeof a === "string" && a.toLowerCase() === b?.toLowerCase();
 export function safeReceipt(receipt) {
@@ -85,9 +87,12 @@ export function nansenRows(text, report) {
 export function createProviders({
   testrilUrl = "https://api.testril.si/mcp",
   nansenUrl = "https://api.nansen.ai",
+  ethereumRpcUrl = "https://rpc.mevblocker.io",
   fetcher = fetch,
 } = {}) {
   return {
+    resolveScope: (report) =>
+      resolveDay(report, { url: ethereumRpcUrl, fetcher }),
     async testril(name, args, payment) {
       const client = new Client({ name: "wallet-statement", version: "0.1.0" });
       try {
@@ -151,7 +156,13 @@ export function createProviders({
             body: JSON.stringify({
               address: report.wallet,
               chain: "ethereum",
-              date: { from: report.from_time, to: report.to_time },
+              // Nansen documents inclusive endpoints; Ethereum timestamps use whole seconds.
+              date: {
+                from: report.from_time,
+                to: new Date(Date.parse(report.to_time) - 1000)
+                  .toISOString()
+                  .replace(".000Z", "Z"),
+              },
               filters: { token_address: report.token },
               hide_spam_token: false,
               pagination: { page, per_page: 100 },

@@ -8,6 +8,7 @@ import {
   keccak256,
   encodeAbiParameters,
 } from "viem";
+import { digest } from "../public/verification.js";
 import { scope, decimal, usdc } from "../public/model.js";
 import {
   batchDomain,
@@ -67,6 +68,8 @@ export async function close(server) {
 
 export async function peers({
   bindingRefusal = false,
+  rpcFailure = false,
+  rpcChain = "0x1",
   dailyTransactions,
   omitReceipt = false,
   network = "eip155:8453",
@@ -97,6 +100,30 @@ export async function peers({
         tx: `0x${(i + 1).toString(16).padStart(64, "0")}`,
       }),
     );
+  }
+  const daily = new Map();
+  async function reportRecord(fromTime) {
+    if (!fromTime?.includes("T00:"))
+      return records[Number(fromTime?.slice(11, 13) ?? 12)];
+    const date = fromTime.slice(0, 10);
+    if (!daily.has(date)) {
+      const record = structuredClone(records.day);
+      const offset =
+        Math.round((Date.parse(date) - Date.parse("2026-11-10")) / 86400000) *
+        7173;
+      Object.assign(record.scope, scope(date), {
+        from_block: 26380784 + offset,
+        to_block: 26387957 + offset,
+      });
+      record.providers.testril.rows.forEach((row) => (row.block += offset));
+      const provenance = record.providers.testril.provenance;
+      provenance.from_block += offset;
+      provenance.to_block += offset;
+      provenance.blocks.forEach((block) => (block.number += offset));
+      provenance.digest = await digest(1, provenance.blocks);
+      daily.set(date, record);
+    }
+    return daily.get(date);
   }
   const id = records[12].scope.bound_function_id;
   const calls = [],
@@ -208,9 +235,6 @@ export async function peers({
   }
   async function tool(name, args, payment) {
     calls.push({ provider: "testril", name, args, paid: Boolean(payment) });
-    const h = args.from_time?.includes("T00:")
-      ? "day"
-      : Number(args.from_time?.slice(11, 13) ?? 12);
     if (name === "bind")
       return bindingRefusal
         ? { outcome: "error", kind: "invalid_params" }
@@ -237,13 +261,14 @@ export async function peers({
     if (!payment) return challenge("batch-settlement", amount);
     await batch(payment, amount);
     if (name === "materialize") prepared = true;
+    const record = await reportRecord(args.from_time);
     return {
       value:
         name === "materialize"
           ? { outcome: "success", job: { job_id: "job:1" } }
           : name === "provenance"
-            ? records[h].providers.testril.provenance
-            : { outcome: "success", values: records[h].providers.testril.rows },
+            ? record.providers.testril.provenance
+            : { outcome: "success", values: record.providers.testril.rows },
       receipt: omitReceipt ? null : receipt(amount),
     };
   }
@@ -350,21 +375,17 @@ export async function peers({
         },
         payment.payload.signature,
       );
-      const h = body.date.from.includes("T00:")
-          ? "day"
-          : Number(body.date.from.slice(11, 13)),
+      const record = await reportRecord(body.date.from),
         byTx = new Map();
-      for (const [index, row] of records[h].providers.testril.rows.entries()) {
+      for (const [index, row] of record.providers.testril.rows.entries()) {
         const tx = byTx.get(row.tx) ?? {
           chain: "ethereum",
           transaction_hash: row.tx,
-          block_timestamp: scope(h).from_time,
+          block_timestamp: body.date.from,
           tokens_sent: [],
           tokens_received: [],
         };
-        tx[
-          row.from === scope(h).wallet ? "tokens_sent" : "tokens_received"
-        ].push({
+        tx[row.from === body.address ? "tokens_sent" : "tokens_received"].push({
           token_address: row.token,
           token_amount: decimal(
             (
@@ -399,13 +420,45 @@ export async function peers({
       res.end("{}");
     }
   });
+  const rpcCalls = [];
+  const rpc = createServer(async (req, res) => {
+    let body = "";
+    for await (const part of req) body += part;
+    const input = JSON.parse(body);
+    rpcCalls.push(input);
+    if (rpcFailure) {
+      res.writeHead(503);
+      res.end("private node failure");
+      return;
+    }
+    const epoch = Date.parse("2026-11-10") / 1000;
+    let result;
+    if (input.method === "eth_chainId") result = rpcChain;
+    else {
+      const tag = input.params[0];
+      const number =
+        tag === "finalized"
+          ? 26380784 +
+            Math.floor(((Date.now() / 1000 - 3600 - epoch) * 7173) / 86400)
+          : Number(BigInt(tag));
+      result = {
+        number: `0x${number.toString(16)}`,
+        timestamp: `0x${Math.max(0, epoch + Math.floor(((number - 26380784) * 86400) / 7173) + 1).toString(16)}`,
+      };
+    }
+    res.writeHead(200, { "content-type": "application/json" });
+    res.end(JSON.stringify({ jsonrpc: "2.0", id: input.id, result }));
+  });
   return {
     testrilUrl: await listen(mcp),
+    ethereumRpcUrl: await listen(rpc),
+    rpcCalls,
     nansenUrl: await listen(nansen),
     calls,
     close: async () => {
       await close(mcp);
       await close(nansen);
+      await close(rpc);
     },
   };
 }

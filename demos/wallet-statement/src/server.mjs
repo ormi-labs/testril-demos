@@ -37,6 +37,7 @@ export function createApp({
   providers = createProviders({
     testrilUrl: process.env.TESTRIL_MCP_URL,
     nansenUrl: process.env.NANSEN_URL,
+    ethereumRpcUrl: process.env.ETHEREUM_RPC_URL,
   }),
   store = fileStore(resolve(root, "runtime")),
 } = {}) {

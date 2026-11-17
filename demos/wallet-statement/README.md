@@ -1,10 +1,12 @@
 # Pool Flows: Testril and Nansen
 
-Compare the price of retrieving USDC transfers into and out of Uniswap’s USDC/WETH liquidity pool on Ethereum. Both providers cover the same period; every transfer and exact amount is compared. Retrieval cost leads each provider card; time appears underneath. Testril preparation is shown separately. Payment evidence, the ledger and independent provenance checks are expandable.
+Compare the cost and time of retrieving USDC transfers into and out of Uniswap’s USDC/WETH liquidity pool on Ethereum. Every transfer and exact amount is compared, including repeated transfers.
 
-The **sample** is an original, measured one-hour recording. **Live runs** request the full UTC day of 10 November 2026 from both providers. They never reuse the sample’s prices, timings or verification results. A full-day paid recording has not yet been made; the existing sample is labelled honestly rather than extrapolated.
+The page has two tabs, **Historical Run** and **Run with your Wallet**, and three sections:
 
-The small blog reference links to “Why Provenance Matters”. The earlier discrepancy involved Nansen’s counterparty summary. This demo uses its transaction-history endpoint and compares every transfer, preserving repeated transfers and exact amounts. Both historical hourly transaction listings matched Testril.
+- **Summary:** read cost and read time with equal prominence.
+- **Output:** each provider’s transfer count, complete ledgers and a JSON download.
+- **Full costs & time:** preparation, reading and provenance. Nansen’s preparation cost/time are unknown; provenance is N/A for its transaction-history endpoint. A small blog reference explains why provenance matters and the original hourly discrepancy.
 
 ## Run
 
@@ -16,98 +18,95 @@ npm ci
 npm start
 ```
 
-Open `http://127.0.0.1:4178`. Paul starts and stops this process; use Ctrl+C to stop it. After extracting the source download, run the same commands from the extracted `wallet-statement` directory, omitting the first `cd`.
+Open `http://127.0.0.1:4178`. Stop with Ctrl+C. After extracting the source ZIP, run from the extracted `wallet-statement` directory, omitting the first `cd`. Paul starts and stops interactive programs himself.
 
-Optional configuration: copy `.env.example` to `.env`. Defaults use production `https://api.testril.si/mcp` and `https://api.nansen.ai`. No provider account, API key or server signing key is required. Browser wallets must support injected Ethereum providers and typed-data signing; WalletConnect and contract-wallet signatures are not implemented.
+Optional configuration: copy `.env.example` to `.env`. Defaults use production `https://api.testril.si/mcp`, `https://api.nansen.ai` and the public Ethereum node `https://rpc.mevblocker.io`. `TESTRIL_MCP_URL`, `NANSEN_URL` and `ETHEREUM_RPC_URL` override them. No provider account, API key or server signing key is required. Browser wallets must support injected Ethereum providers and typed-data signing; WalletConnect and contract-wallet signatures are not implemented.
 
-The connected wallet is the payer. It does not change the report address: Ethereum pool `0x88e6a0c2ddd26feeb64f039a2c41296fcb3f5640`, Ethereum USDC, 10 November 2026, 00:00 UTC through 11 November, 00:00 UTC. End times are excluded. Ethereum blocks are `[26380784, 26387957)`, independently established in the [full-day source check](https://github.com/ormi-labs/why-provenance-matters#follow-up-the-hourly-summaries-describe-the-whole-day). Fixed scope keeps comparisons reproducible and prevents arbitrary queries through the demo.
+## Historical and wallet runs
 
-## Run modes and measurements
+**Historical Run** plays the measured production recording for 10 November 2026, 12:00–13:00 UTC. It makes no provider requests or payments. The second original hour remains in the source archive. A full-day paid recording has not yet been made; hourly prices and times are never presented as daily measurements.
 
-- **Sample run:** the measured production recording for 12:00–13:00, with automated wallet approvals. Playback makes no provider requests or payments. The second original hour remains in the source archive; the UI offers one sample to avoid unnecessary controls.
-- **Run with your wallet:** a full-day report using live Testril binding, coverage, preparation when needed, transfers and provenance; then every Nansen transaction page. Each quoted request requires approval. The run stops on an uncertain payment and never automatically submits it again.
+**Run with your Wallet** lets visitors select a completed UTC day. The initial selection is yesterday. The report address remains Ethereum pool `0x88e6a0c2ddd26feeb64f039a2c41296fcb3f5640`; the token remains Ethereum USDC. The connected wallet pays for data in Base mainnet USDC and does not change the pool address.
 
-Query times include quote negotiation and complete data retrieval. Wallet approval/signing, Testril preparation and provenance are measured separately. Total elapsed time is also retained. Automated approval timing is not representative of human wallet interaction. Preparation may reuse someone else's materialized coverage; known original preparation for these reports is disclosed separately. Receipt confirmations are provider assertions; a linked deposit transaction is not a second service fee or proof that every voucher has already been claimed on-chain.
+Before any purchase, the server resolves both UTC boundaries against finalized Ethereum blocks. It checks the node’s chain ID and the blocks immediately before each boundary. Date strings must identify real completed days from 31 July 2015 onward; not-yet-finalized days cannot run. Visitors cannot supply block numbers, another address or a node URL. The resolved scope is saved with the run and returned to the browser. Changing the date clears displayed results; a pending purchase prevents changing it.
 
-Full-day reports require more pages and may need new preparation. Each run is limited to **2 USDC in service charges** and **1 USDC in new escrow deposits**, counted separately. These are per-run limits, not lifetime wallet limits. The browser and gateway both check allowances before submission. Existing compatible channels are reused. Unspent deposits remain in the channel until withdrawn; this demo has no withdrawal controls. Account/network fees are not included in quoted service totals.
+Testril uses `[00:00:00, next day 00:00:00)`. Nansen [documents inclusive date bounds](https://docs.nansen.ai/guides/data-methodology-and-technical-reference), so its request ends at `23:59:59` on the selected date, matching Ethereum’s whole-second timestamps. The demo uses Nansen’s **transaction history**, not the counterparty-summary endpoint involved in the original blog discrepancy. Both historical hourly transaction listings matched Testril.
 
-The report is bounded to 100 Nansen pages of at most 100 transactions each, 20,000 normalized transfers and a one-hour run lifetime. A limit stops the run; it never reports a truncated answer as complete.
+Each live run binds Testril’s `erc20.wallet_transfers`, checks coverage, purchases any missing preparation, reads transfers and retrieves provenance. It then retrieves every Nansen transaction page. Each purchase requires wallet approval. Provider calls are sequential to avoid overlapping prompts. Unknown settlement stops the run and is never automatically submitted again.
 
-The gateway has no spending keys. Signatures are forwarded only for the approved fixed operation and never persisted or exported. Before forwarding one, the gateway durably saves a payment intent and reserves the run allowance. Browser state also saves the intent first. Known confirmations survive later formatting failures. Interrupted or unreadable state cannot establish that nothing was spent.
+## Costs, timing and limits
 
-## Provenance
+Summary metrics compare **reading only**. Query time includes quote negotiation and complete retrieval, excluding wallet approval/signing, preparation and provenance. Full costs & time shows the three phases separately. When data was reused, the preparation row shows its earlier cost/time when known, or Unknown; a note states that no new preparation charge was made and gives current setup/coverage-check time. For fresh preparation, the row includes binding, coverage checks and materialization wait. Nansen’s internal preparation is unknown.
 
-**Rebuild from saved evidence** independently decodes the archived Ethereum responses and checks all displayed transfer and counterparty totals. The saved archive covers the original hourly samples, so saved replay is disabled for a full-day live run. **Check live Ethereum records** fetches records from `rpc.mevblocker.io` directly in the browser; it requires no wallet or chain switch. The CSP permits that external service. Its availability and historical RPC limits are outside the demo's control; failed checks are never shown as verification passes.
+The historical recording used automated wallet approvals. Its approval timing does not represent a person’s interaction. The independent day lookup is common to both providers, measured separately, and requests no payment. Total elapsed and wallet time remain available under payment evidence. Provider receipts assert confirmations; a deposit transaction is not a second service fee or proof that every voucher has already been claimed on-chain.
 
-The checker verifies block references, source digests, linked headers, finalization, time boundaries, exact amounts and all relevant Transfer events across the complete requested block window, including uncited blocks. It preserves repeated events and handles self-transfers once. JavaScript `BigInt` and lossless parsing of Nansen's original decimal text avoid floating-point rounding.
+Runs are limited to **2 USDC in service charges**, **1 USDC in new escrow deposits**, 100 Nansen pages of at most 100 transactions each, 20,000 normalized transfers and one hour. Charges and deposits are checked separately by both browser and gateway. These are per-run limits, not lifetime wallet limits. A limit stops the run without presenting a truncated report as complete. Existing compatible channels are reused. Unspent escrow stays in the channel until withdrawn; this demo has no withdrawal controls. Network fees are additional.
 
-**Try an edited amount** adds one raw USDC unit to a copy of a transfer and checks that the verifier rejects it. It does not alter the real results or attribute an invented error to either provider.
+The gateway has no spending keys. Signatures are forwarded only for the approved operation and never persisted or exported. Both browser and gateway durably record intent before a signature is forwarded. The gateway also reserves the run allowance. Known confirmations survive later response failures. Interrupted or unreadable state cannot establish that nothing was spent.
 
-Saved replay establishes consistency with archived source responses. Live verification trusts the external node to supply correct canonical headers and complete logs; it does not validate Ethereum consensus or receipt-membership proofs. The source trail was retrieved separately from the original data, not as a vendor-signed attestation. Other computations require their own verification logic.
+## Provenance and source download
 
-The independent verifier download needs only Node.js:
+The interface shows provenance’s cost/time and links to [Why Provenance Matters](https://testril.si/blog/why-provenance-matters/). The interactive verification walkthrough has been removed. Testril’s provenance remains in live run exports; the source includes the independent checker and archived Ethereum evidence used to verify the historical recordings.
 
-```bash
-# From the extracted verifier directory:
-ETHEREUM_RPC_URL=https://rpc.mevblocker.io node verify.mjs input.json result.json
-```
-
-The same checker is included in this source directory:
+**Download source (ZIP)**, at the lower right, contains the independently runnable app, this README, lockfile, tests, saved recordings and verification materials. Local environment files, dependencies and runtime journals are excluded. The saved checker can be run from the source directory:
 
 ```bash
 ETHEREUM_RPC_URL=https://rpc.mevblocker.io \
   node verification/verify.mjs verification/input.json result.json
 ```
 
-Choose a new output filename for each run. Point the environment variable at your own node to choose your source of trust. This command only reads Ethereum; it contains no signing key or payment code.
+This checks the historical inputs, not an automatically selected live day. It only reads Ethereum and contains no signing key or payment code. Use a new output filename and your own node to choose your source of trust. The checker verifies source digests, finalized block references, time boundaries, exact amounts and all relevant Transfer events, including uncited blocks. It trusts the node’s canonical headers and complete logs rather than validating Ethereum consensus. Public inputs and instructions are also available in the [blog’s verification repository](https://github.com/ormi-labs/why-provenance-matters).
 
 ## Exports and interrupted runs
 
-**Download this run** contains scope, complete normalized provider rows, timing, public payment receipts, provenance and any completed verification. Partial runs export as attempts. Signatures, private keys and temporary challenges are excluded. **Source download** contains this entire independently runnable demo, lockfile, tests and verification materials; runtime state and local environment files are excluded.
+**Download this run** contains the selected scope, complete normalized provider rows, timing, public payment receipts and provenance. Partial runs export as attempts. Signatures, private keys and temporary challenges are excluded.
 
-The local gateway stores run metadata in ignored `runtime/` files with atomic replacement. Use one local server process for that directory. Each run's operations are serialized. A repeated paid request ID is refused. Do not delete a journal to retry a purchase.
+The local gateway stores metadata in ignored `runtime/` files using atomic replacement. Use one server process for that directory. Each run’s operations are serialized. Repeated paid request IDs are refused. Do not delete journals to retry purchases.
 
-The browser keeps its most recent live run in local storage. After interruption, **Check saved payment status** can recover a known confirmation without signing or paying. It does not repeat the data request. If the outcome remains uncertain, retain the export and inspect wallet/provider evidence; a new run remains disabled. A fresh purchase after a known completed request is an explicit new run, not automatic recovery. Keep the original export. The demo does not implement unattended settlement reconciliation for unresolved provider outcomes.
+The browser keeps its most recent live run in local storage. **Check saved payment status** can recover a known confirmation without another purchase; it does not repeat the data request. An uncertain outcome keeps new runs disabled. Retain the attempt and inspect wallet/provider evidence. A fresh purchase after a known confirmation is an explicit new run, not automatic recovery. This demo does not implement unattended settlement reconciliation.
 
-## Tests
+## Checks
 
 From this directory:
 
 ```bash
-npm run preflight # Optional unpaid production discovery; no signatures or paid smoke
 npm test
 npm run lint
 npm run format:check
 npx playwright install chromium
 npm run test:browser
+REPORT_DATE=2026-11-09 npm run preflight # Optional unpaid production discovery
 ```
 
-Tests use HTTP/MCP peers, cryptographically verified test signatures and a public unfunded test identity. They make no paid requests. Test-owned servers stop when checks finish. Browser tests click Connect and Run, approve the actual payment dialogs, finish all peer pages, check sample/live isolation, replay the sample’s provenance, detect an edited amount, exercise cancellation and export evidence. A separate HTTP/MCP test retrieves 6,101 synthetic transfers through 62 paid test pages; test identities are unfunded and no real payment is made. Desktop/mobile screenshots are written to the repository's `docs/screenshots/` when that directory exists.
+Tests use HTTP/MCP/RPC peers and a public unfunded test identity, with no real spending. They check different selected days and block ranges, inclusive/exclusive boundaries, invalid dates, unavailable/wrong-network nodes, pagination, exact amounts, limits, cancellation, duplicate requests, protected pending state and exports. A 62-page run verifies the actual HTTP adapters. Browser checks cover both layouts, all ledger rows, tab/date isolation and actual payment dialogs. Test-owned servers stop afterward. Screenshots are written to `docs/screenshots/` when that repository directory exists.
 
-For manual verification, load the hourly sample, rebuild its saved evidence, try an edited amount, inspect the source blocks and download a run. Switch to the live tab and check that the sample’s prices and proof result disappear and the scope becomes the full UTC day. Then use a funded Base USDC wallet for an explicitly authorized live run, approve each quote, and inspect all timing and receipt categories. Confirm wallet cancellation stops and reloading retains a pending attempt.
+Preflight defaults to yesterday, checks Ethereum boundaries and obtains unsigned provider offers. It does not sign, pay, create a materialization job or submit a transfer. It does not prove paid delivery.
 
-The opt-in `test/live-smoke.mjs` is an operator tool, excluded from normal tests. It requires `ALLOW_PAID_SMOKE=1` and a locally supplied payer key, caps service quotes at 0.10 USDC and new deposits at 0.01, signs in the Node process and exercises the actual browser flow. It records a safe attempt on failure and must not be automatically repeated. Never fund the deterministic identity in `test/peers.mjs`.
+For manual verification, compare both summary metrics, inspect all 292 historical transfers in each provider’s ledger, and check the phase table. On the wallet tab, select another day and confirm that historical figures disappear. A funded live run requires explicit spending authorization; approve each quote and inspect the dated export. Reload with a pending attempt to confirm that date changes and new runs remain blocked.
+
+The opt-in `test/live-smoke.mjs` is an operator tool, excluded from normal tests. It requires `ALLOW_PAID_SMOKE=1` and a locally supplied payer key, signs in the Node process and stops at 0.10 USDC in service quotes or 0.01 in new deposits. These conservative limits may be insufficient for a day requiring preparation. It retains a safe attempt on failure and must not be automatically repeated. Never fund the deterministic test identity.
 
 ## Failure and hosting contract
 
-`src/errors.mjs` exports `describeFailure(error)`. It recognizes only errors deliberately constructed by this module; forged objects and hostile property getters remain unknown. Wording is not an integration API. Descriptors contain exactly `{code, details}`.
+`src/errors.mjs` exports `describeFailure(error)`. Only this module’s branded failures are recognized; forged objects and hostile getters remain unknown. Wording is not an integration API. Descriptors contain exactly `{code, details}`.
 
-| Code                        | Meaning                                                      | Details                  |
-| --------------------------- | ------------------------------------------------------------ | ------------------------ |
-| `INVALID_REQUEST`           | Request does not identify an allowed fixed operation         | `{}`                     |
-| `PROVIDER_UNAVAILABLE`      | Provider transport failed                                    | `{provider, operation}`  |
-| `TESTRIL_BINDING_REJECTED`  | Explicit binding refusal                                     | `{functionSlug, reason}` |
-| `PROVIDER_REFUSED`          | Provider explicitly refused an operation                     | `{provider, operation}`  |
-| `PROVIDER_INVALID_RESPONSE` | Reply or payment offer cannot be safely consumed             | `{provider, operation}`  |
-| `PAYMENT_UNCERTAIN`         | Submitted authorization lacks matching confirmation          | `{provider, operation}`  |
-| `RUN_STOPPED`               | Expired, stopped, duplicate or unresolved run cannot proceed | `{}`                     |
-| `LIMIT_EXCEEDED`            | Service or deposit allowance would be exceeded               | `{}`                     |
-| `STATE_UNAVAILABLE`         | Durable run state cannot be read or written safely           | `{}`                     |
+| Code                        | Meaning                                                                                    | Details                  |
+| --------------------------- | ------------------------------------------------------------------------------------------ | ------------------------ |
+| `INVALID_REQUEST`           | Invalid day or unsupported operation/parameters                                            | `{}`                     |
+| `SCOPE_UNAVAILABLE`         | Ethereum could not confirm the selected day’s finalized block range; no purchase submitted | `{}`                     |
+| `PROVIDER_UNAVAILABLE`      | Provider transport failed                                                                  | `{provider, operation}`  |
+| `TESTRIL_BINDING_REJECTED`  | Explicit binding refusal                                                                   | `{functionSlug, reason}` |
+| `PROVIDER_REFUSED`          | Provider explicitly refused an operation                                                   | `{provider, operation}`  |
+| `PROVIDER_INVALID_RESPONSE` | Reply or payment offer cannot be safely consumed                                           | `{provider, operation}`  |
+| `PAYMENT_UNCERTAIN`         | Submitted authorization lacks matching confirmation                                        | `{provider, operation}`  |
+| `RUN_STOPPED`               | Expired, stopped, duplicate or unresolved run cannot proceed                               | `{}`                     |
+| `LIMIT_EXCEEDED`            | Service or deposit allowance would be exceeded                                             | `{}`                     |
+| `STATE_UNAVAILABLE`         | Durable state cannot be read or written safely                                             | `{}`                     |
 
-`functionSlug` is exactly `erc20.wallet_transfers`; binding `reason` is `invalid_params`, `function_not_found`, `unsupported_chain` or `unknown`. `provider` is `testril` or `nansen`. `operation` is `bind`, `inspect`, `coverage`, `job`, `read`, `materialize`, `provenance` or `transactions`; Nansen uses only `transactions`, and Testril uses the others. No raw provider text, credentials, signatures, stack or arbitrary cause is diagnostic context.
+`functionSlug` is `erc20.wallet_transfers`; binding `reason` is `invalid_params`, `function_not_found`, `unsupported_chain` or `unknown`. `provider` is `testril` or `nansen`. `operation` is `bind`, `inspect`, `coverage`, `job`, `read`, `materialize`, `provenance` or `transactions`; Nansen only uses `transactions`. No raw provider/node text, credentials, signatures, stack or arbitrary cause is safe context.
 
-`createApi` in `src/api.mjs` is the web Request/Response integration. New-run bodies contain `{payer, window}`: `window: "day"` is the UI default; numeric `12` and `13` identify the retained historical report windows. Arbitrary dates and addresses are refused. Journals from the older `{payer, hour}` API remain readable for payment-status recovery, but cannot execute another step. Their pending browser exports remain protected. The hourly files themselves retain their original scope metadata. The hosting adapter supplies `load(id)`, durable `save(run)`, provider connections and its trusted `onError(error)` mapper. It must serialize access to each run, preserve the saved pre-submission intent, validate descriptors and create its own public references. An uncertain run is never automatically replayed. Storage is hosting-owned; provider execution, domain state and validation remain in this standalone demo. Hosted deployments must follow the repository's public demo/harness failure contract and verify the actual selected demo/adapter pair.
+`createApi` in `src/api.mjs` is the Request/Response integration. New bodies contain `{payer, window}`, with `window` a `YYYY-MM-DD` date. The resolved scope is persisted in `run.report`; clients cannot supply it. Legacy `"day"` and numeric `12`/`13` identify retained historical windows for existing integrations. Older `{payer, hour}` journals remain readable for payment inspection but cannot execute another step. The hosting adapter supplies durable `load(id)`, `save(run)`, provider connections and its trusted error mapper. It serializes access, retains pre-submission intent and creates correlated public references. Hosted releases must verify the actual selected demo/adapter pair under the public demo/harness failure contract.
 
 ## Code map
 
-`src/gateway.mjs` validates fixed operations and reserves/persists payments. `src/providers.mjs` owns MCP/HTTP details and lossless normalization. `public/runner.js` orchestrates visitor approvals and full pagination. `public/payments.js` signs supported Base USDC terms. `public/verification.js` reconstructs from Ethereum. `public/app.js` presents results; `src/server.mjs` is the standalone local host. No sibling demo or private harness import is needed.
+`src/report-scope.mjs` resolves a day’s Ethereum boundaries. `src/gateway.mjs` validates operations and persists/reserves payments. `src/providers.mjs` owns MCP/HTTP and lossless normalization. `public/runner.js` orchestrates approvals and complete pagination. `public/payments.js` signs Base USDC terms. `public/app.js` renders the three sections; `src/server.mjs` is the standalone host. `public/verification.js` is the historical checker used by the CLI and recording tests. No sibling demo or harness import is needed.

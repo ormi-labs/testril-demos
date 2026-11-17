@@ -1,4 +1,5 @@
 import { newRun, publicRun, execute } from "./gateway.mjs";
+import { scope } from "../public/model.js";
 import { failure, describeFailure } from "./errors.mjs";
 
 async function body(request) {
@@ -35,6 +36,7 @@ export const failureStatus = (code) =>
     LIMIT_EXCEEDED: 409,
     PAYMENT_UNCERTAIN: 409,
     STATE_UNAVAILABLE: 503,
+    SCOPE_UNAVAILABLE: 503,
     PROVIDER_UNAVAILABLE: 503,
     PROVIDER_REFUSED: 503,
     TESTRIL_BINDING_REJECTED: 503,
@@ -70,12 +72,17 @@ export function createApi({
         const value = await body(request);
         if (
           !value ||
+          !Object.hasOwn(value, "window") ||
           Object.keys(value).some((k) => !["payer", "window"].includes(k))
         )
           throw failure("INVALID_REQUEST");
         const run = newRun(value.payer, value.window, createId?.(request));
+        const report = scope(run.window);
+        run.report = Number.isSafeInteger(report.from_block)
+          ? report
+          : await providers.resolveScope(report);
         await save(run);
-        return respond({ id: run.id }, 201);
+        return respond({ id: run.id, scope: run.report }, 201);
       }
       const match = path.match(
         /^\/api\/runs\/([a-f0-9]{8}-[a-f0-9-]{27})(\/step)?$/,

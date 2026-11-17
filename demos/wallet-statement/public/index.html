@@ -18,269 +18,245 @@
     <main class="wrap">
       <h1>Pool Flows</h1>
       <p class="intro">
-        See how much USDC entered and left Uniswap’s USDC/WETH liquidity pool on
-        Ethereum. Testril and Nansen retrieve transfers for the same period; we
-        match every transfer and amount, then compare retrieval price and time.
+        Compare the cost and time of tracking USDC entering and leaving
+        Uniswap’s USDC/WETH liquidity pool on Ethereum. Testril and Nansen
+        retrieve transfers for the same period; we check that every transfer and
+        amount matches.
       </p>
-      <p class="scope" aria-label="Report scope">
-        Ethereum · USDC ·
-        <a
-          href="https://etherscan.io/address/0x88e6a0c2ddd26feeb64f039a2c41296fcb3f5640"
-          target="_blank"
-          rel="noreferrer"
-          >Uniswap V3 USDC / WETH pool ↗</a
+      <div class="tabs" role="tablist" aria-label="Run mode">
+        <button
+          id="recorded"
+          role="tab"
+          aria-controls="run-panel"
+          aria-selected="true"
         >
-        <span id="report-window"></span>
-      </p>
-      <div class="toolbar">
-        <div class="tabs" role="group" aria-label="Run mode">
-          <button id="recorded" class="selected">Sample run</button
-          ><button id="live">Run with your wallet</button>
-        </div>
-        <button id="download" class="quiet" disabled>Download this run</button>
+          Historical Run
+        </button>
+        <button
+          id="live"
+          role="tab"
+          aria-controls="run-panel"
+          aria-selected="false"
+          tabindex="-1"
+        >
+          Run with your Wallet
+        </button>
       </div>
-      <section id="recorded-controls" class="controls">
-        <div>
-          <strong>Sample run</strong>
-          <p id="recording-note">
-            Saved results from real purchases. No wallet or payment needed.
+      <div id="run-panel" role="tabpanel" aria-labelledby="recorded">
+        <div class="report-context">
+          <p class="scope">
+            <a
+              href="https://etherscan.io/address/0x88e6a0c2ddd26feeb64f039a2c41296fcb3f5640"
+              target="_blank"
+              rel="noreferrer"
+              >Uniswap V3 USDC / WETH pool ↗</a
+            >
+            · Ethereum · USDC
           </p>
+          <p id="report-window"></p>
         </div>
-      </section>
-      <section id="live-controls" class="controls" hidden>
-        <div>
-          <strong id="live-title">Live run · full UTC day</strong>
+        <section id="recorded-controls" class="controls">
           <p>
-            Retrieve all transaction pages from both providers using your
-            wallet. Payments use USDC on Base; each purchase needs your
-            approval.
+            Saved results from real purchases, with measured cost and time. This
+            original recording covers one hour. No wallet needed.
           </p>
-          <details>
-            <summary>Spending limits</summary>
-            <p>
-              Up to 2 USDC in service charges and 1 USDC in new escrow deposits
-              per run. Preparation and provenance are separate from retrieval.
-              Unspent escrow stays in your channel until withdrawn; this demo
-              has no withdrawal controls. Network fees are additional.
-            </p>
-          </details>
-        </div>
-        <div class="actions">
-          <button id="connect">Connect wallet</button>
-          <button id="run" disabled>Run comparison</button>
-        </div>
-      </section>
-      <p id="notice" class="notice" role="status" aria-live="polite">
-        Loading…
-      </p>
-      <div id="recovery" hidden>
-        <p>
-          A previous purchase may have completed. Keep this attempt before
-          starting another.
-        </p>
-        <button id="check-status" class="quiet">
-          Check saved payment status
-        </button>
-        <button id="download-pending" class="quiet">
-          Download pending attempt
-        </button>
-      </div>
-      <section class="comparison" aria-label="Provider comparison">
-        <article class="provider" id="testril">
-          <div class="heading">
-            <h2>Testril</h2>
-            <span class="status">—</span>
-          </div>
-          <div class="price">
-            <span class="label">RETRIEVAL COST</span>
-            <strong class="query-cost">—</strong>
-            <span class="query-time">—</span>
-          </div>
-          <p class="provider-notes"></p>
-          <p class="preparation"></p>
-          <div class="metrics">
-            <span><b class="count">—</b> transfers</span>
-          </div>
-          <div class="amounts">
-            <div>
-              <span class="label">USDC IN</span
-              ><strong class="incoming">—</strong>
-            </div>
-            <div>
-              <span class="label">USDC OUT</span
-              ><strong class="outgoing">—</strong>
-            </div>
-          </div>
-          <details class="evidence">
-            <summary>Preparation, provenance &amp; payment evidence</summary>
-            <div class="details-body"></div>
-          </details>
-        </article>
-        <article class="provider" id="nansen">
-          <div class="heading">
-            <h2>Nansen</h2>
-            <span class="status">—</span>
-          </div>
-          <div class="price">
-            <span class="label">RETRIEVAL COST</span>
-            <strong class="query-cost">—</strong>
-            <span class="query-time">—</span>
-          </div>
-          <p class="provider-notes"></p>
-          <p class="preparation"></p>
-          <div class="metrics">
-            <span><b class="count">—</b> transfers</span>
-          </div>
-          <div class="amounts">
-            <div>
-              <span class="label">USDC IN</span
-              ><strong class="incoming">—</strong>
-            </div>
-            <div>
-              <span class="label">USDC OUT</span
-              ><strong class="outgoing">—</strong>
-            </div>
-          </div>
-          <details class="evidence">
-            <summary>Requests &amp; payment evidence</summary>
-            <div class="details-body"></div>
-          </details>
-        </article>
-      </section>
-      <p id="price-comparison" class="price-comparison" role="status"></p>
-      <section class="results">
-        <p id="agreement">Waiting for both complete answers</p>
-        <details>
-          <summary>Inspect the transfer ledger</summary>
-          <div class="table-wrap">
-            <table>
-              <caption>
-                First 12 Testril transfers. Download the run for every row from
-                both providers.
-              </caption>
-              <thead>
-                <tr>
-                  <th>Transaction</th>
-                  <th>Direction</th>
-                  <th>Other address</th>
-                  <th>USDC</th>
-                </tr>
-              </thead>
-              <tbody id="transfers"></tbody>
-            </table>
-          </div>
-        </details>
-      </section>
-      <details class="provenance">
-        <summary>Check Testril’s work</summary>
-        <div class="heading">
-          <h2 id="proof-title">Verify against Ethereum</h2>
-          <span id="proof-status" class="pill">Saved evidence available</span>
-        </div>
-        <p>
-          Use Testril’s source references to reconstruct the transfers
-          independently.
-        </p>
-        <ol class="proof-steps">
-          <li>
-            <b id="proof-blocks">—</b><span>contributing blocks named</span>
-          </li>
-          <li>
-            <b id="proof-window">—</b
-            ><span>blocks searched, including uncited blocks</span>
-          </li>
-          <li>
-            <b id="proof-transfers">—</b><span>transfers to reconstruct</span>
-          </li>
-        </ol>
-        <div class="proof-actions">
-          <button id="replay-proof">Rebuild from saved evidence</button
-          ><button id="fresh-proof" class="quiet">
-            Check live Ethereum records</button
-          ><a href="verification/source.zip" download
-            >Download verification code and evidence (ZIP) ↗</a
-          >
-        </div>
-        <p id="proof-note" class="caption">
-          Replaying saved evidence checks the archived records. A live check
-          reads an external Ethereum service directly from your browser. Neither
-          requires a wallet.
-        </p>
-        <div id="proof-result" role="status" aria-live="polite"></div>
-        <div class="tamper">
+        </section>
+        <section id="live-controls" class="controls" hidden>
           <div>
-            <strong>Would a wrong amount get through?</strong>
+            <div class="date-control">
+              <label for="report-date">Day (UTC)</label
+              ><input id="report-date" type="date" min="2015-07-31" required />
+            </div>
             <p>
-              Add 0.000001 USDC to a copy of one transfer. The checker should
-              catch it. The original data stays unchanged.
+              Choose a completed day. Your wallet pays both providers in USDC on
+              Base; you approve each purchase.
             </p>
+            <details>
+              <summary>Spending limits</summary>
+              <p>
+                Up to 2 USDC in service charges and 1 USDC in new escrow
+                deposits per run. Reports stop at 100 pages or 20,000 transfers.
+                Deposits are separate from fees; unspent escrow stays in your
+                channel until withdrawn. This demo has no withdrawal controls.
+                Network fees are additional.
+              </p>
+            </details>
           </div>
-          <button id="tamper" class="quiet" disabled>
-            Try an edited amount
+          <div class="actions">
+            <button id="connect">Connect wallet</button
+            ><button id="run" disabled>Run comparison</button>
+          </div>
+        </section>
+        <p id="notice" class="notice" role="status" aria-live="polite">
+          Loading…
+        </p>
+        <div id="recovery" hidden>
+          <p>
+            A previous purchase may have completed. Retain this attempt before
+            starting another.
+          </p>
+          <button id="check-status" class="quiet">
+            Check saved payment status
+          </button>
+          <button id="download-pending" class="quiet">
+            Download pending attempt
           </button>
         </div>
-        <details>
-          <summary>Inspect the source trail</summary>
-          <div id="source-trail"></div>
-        </details>
-        <details>
-          <summary>What this check establishes</summary>
-          <p>
-            The verifier independently decodes Ethereum’s Transfer events,
-            checks block references and time boundaries, preserves repeated
-            events, and recalculates amounts with exact integers. It also
-            searches blocks absent from the citations to detect omissions.
+        <section class="summary" aria-labelledby="summary-title">
+          <h2 id="summary-title">Summary</h2>
+          <div class="comparison">
+            <article class="provider" id="testril">
+              <div class="heading">
+                <h3>Testril</h3>
+                <span class="status">—</span>
+              </div>
+              <div class="summary-metrics">
+                <div>
+                  <span class="label">Read cost · USDC</span
+                  ><strong class="query-cost">—</strong>
+                </div>
+                <div>
+                  <span class="label">Read time</span
+                  ><strong class="query-time">—</strong>
+                </div>
+              </div>
+              <p class="provider-notes"></p>
+            </article>
+            <article class="provider" id="nansen">
+              <div class="heading">
+                <h3>Nansen</h3>
+                <span class="status">—</span>
+              </div>
+              <div class="summary-metrics">
+                <div>
+                  <span class="label">Read cost · USDC</span
+                  ><strong class="query-cost">—</strong>
+                </div>
+                <div>
+                  <span class="label">Read time</span
+                  ><strong class="query-time">—</strong>
+                </div>
+              </div>
+              <p class="provider-notes"></p>
+            </article>
+          </div>
+          <div class="ratios">
+            <p id="price-comparison"></p>
+            <p id="time-comparison"></p>
+          </div>
+          <p class="caption">
+            Read time includes negotiation and complete retrieval. Preparation,
+            provenance and wallet approval are separate.
           </p>
-          <p>
-            Saved replay checks consistency with the archived Ethereum
-            responses. Live verification trusts the selected Ethereum service to
-            return correct, complete records; it does not validate Ethereum
-            consensus. Run the downloaded verifier against your own node to
-            choose your source of trust.
+        </section>
+        <section class="output" aria-labelledby="output-title">
+          <h2 id="output-title">Output</h2>
+          <div class="output-counts">
+            <p>Testril <strong id="testril-count">—</strong> transfers</p>
+            <p>Nansen <strong id="nansen-count">—</strong> transfers</p>
+          </div>
+          <p id="agreement" role="status">Waiting for both complete answers</p>
+          <details id="ledger">
+            <summary>View the full transfer ledger</summary>
+            <label class="ledger-choice" for="ledger-provider"
+              >Provider
+              <select id="ledger-provider">
+                <option value="testril">Testril</option>
+                <option value="nansen">Nansen</option>
+              </select></label
+            >
+            <div class="table-wrap">
+              <table>
+                <caption id="ledger-caption"></caption>
+                <thead>
+                  <tr>
+                    <th>Transaction</th>
+                    <th>Direction</th>
+                    <th>Other address</th>
+                    <th>USDC</th>
+                  </tr>
+                </thead>
+                <tbody id="transfers"></tbody>
+              </table>
+            </div>
+          </details>
+          <button id="download" class="quiet" disabled>
+            Download this run
+          </button>
+        </section>
+        <section class="full-costs" aria-labelledby="costs-title">
+          <h2 id="costs-title">Full costs &amp; time</h2>
+          <div class="table-wrap">
+            <table class="breakdown">
+              <thead>
+                <tr>
+                  <th rowspan="2" scope="col">Stage</th>
+                  <th colspan="2" scope="colgroup">Testril</th>
+                  <th colspan="2" scope="colgroup">Nansen</th>
+                </tr>
+                <tr>
+                  <th scope="col">Cost · USDC</th>
+                  <th scope="col">Time</th>
+                  <th scope="col">Cost · USDC</th>
+                  <th scope="col">Time</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <th scope="row">Data prep</th>
+                  <td id="testril-preparation-cost">—</td>
+                  <td id="testril-preparation-time">—</td>
+                  <td>Unknown</td>
+                  <td>Unknown</td>
+                </tr>
+                <tr>
+                  <th scope="row">Read</th>
+                  <td id="testril-query-cost">—</td>
+                  <td id="testril-query-time">—</td>
+                  <td id="nansen-query-cost">—</td>
+                  <td id="nansen-query-time">—</td>
+                </tr>
+                <tr>
+                  <th scope="row">
+                    Provenance
+                    <a
+                      class="why"
+                      href="https://testril.si/blog/why-provenance-matters/"
+                      target="_blank"
+                      rel="noreferrer"
+                      >Why it matters ↗</a
+                    >
+                  </th>
+                  <td id="testril-provenance-cost">—</td>
+                  <td id="testril-provenance-time">—</td>
+                  <td>N/A</td>
+                  <td>N/A</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <p id="preparation-note" class="caption"></p>
+          <details class="payment-evidence">
+            <summary>Payment evidence &amp; wallet time</summary>
+            <div id="payment-evidence"></div>
+          </details>
+          <p class="blog-reference">
+            The original hourly discrepancy and the move to full days are
+            explained in
+            <a
+              href="https://testril.si/blog/why-provenance-matters/"
+              target="_blank"
+              rel="noreferrer"
+              >Why Provenance Matters</a
+            >.
           </p>
-        </details>
-      </details>
-      <p class="blog-reference">
-        Why the full-day scope? Read
-        <a
-          href="https://testril.si/blog/why-provenance-matters/"
-          target="_blank"
-          rel="noreferrer"
-          >Why Provenance Matters</a
-        >.
-      </p>
-      <details class="method">
-        <summary>Scope, timing and source downloads</summary>
-        <p>
-          The report uses an active Ethereum contract address, not the connected
-          payer’s wallet. Only USDC is compared. Nansen pages are fetched
-          completely. Testril reads may reuse data already prepared by someone
-          else.
-        </p>
-        <p>
-          Fresh-run query time includes payment negotiation and retrieval;
-          wallet approval, Testril preparation and provenance are shown
-          separately. Provider calls run sequentially to avoid overlapping
-          approval prompts. The sample’s automated wallet timing does not
-          represent a visitor approving each purchase.
-        </p>
-        <p>
-          Payment confirmations come from provider receipts. Deposits are
-          separate from service charges, and a deposit transaction is not a
-          second query fee. Unconfirmed outcomes stop the run and are never
-          automatically resubmitted. Download an interrupted attempt before
-          reviewing its payment status.
-        </p>
-        <p>
-          <a href="source.zip" download>Download demo source (ZIP) ↗</a>
-          includes the app, setup instructions, tests and saved recordings. The
-          verification ZIP contains the checker and archived Ethereum evidence
-          for the hourly samples. “Download this run” exports the selected
-          results and public payment evidence as JSON.
-        </p>
-      </details>
+        </section>
+      </div>
     </main>
-    <footer class="wrap">Pool Flows · Testril × Nansen</footer>
+    <footer class="wrap">
+      <span>Pool Flows · Testril × Nansen</span
+      ><a href="source.zip" download>Download source (ZIP) ↗</a>
+    </footer>
     <dialog id="payment-dialog" aria-labelledby="payment-title">
       <form method="dialog">
         <div class="eyebrow">YOUR WALLET · BASE MAINNET</div>

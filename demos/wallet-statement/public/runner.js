@@ -161,8 +161,31 @@ export async function runComparison({
   }
   try {
     await save();
+    const scopeStart = performance.now();
     const created = await request("api/runs", { payer, window });
     run.id = created.id;
+    if (
+      !created.scope ||
+      created.scope.from_time !== run.scope.from_time ||
+      created.scope.to_time !== run.scope.to_time ||
+      created.scope.wallet !== run.scope.wallet ||
+      created.scope.token !== run.scope.token ||
+      created.scope.chain_id !== run.scope.chain_id ||
+      created.scope.decimals !== run.scope.decimals ||
+      created.scope.function_slug !== run.scope.function_slug ||
+      created.scope.window !== run.scope.window ||
+      !Number.isSafeInteger(created.scope.from_block) ||
+      !Number.isSafeInteger(created.scope.to_block) ||
+      created.scope.from_block < 1 ||
+      created.scope.to_block <= created.scope.from_block ||
+      created.scope.to_block - created.scope.from_block > 10000
+    )
+      throw new Stop(
+        "INVALID_SCOPE",
+        "The selected day could not be resolved. No purchases were submitted.",
+      );
+    run.scope = created.scope;
+    run.scopeResolutionMs = Math.round(performance.now() - scopeStart);
     await save();
     const t = run.providers.testril,
       tStart = performance.now();
@@ -239,7 +262,9 @@ export async function runComparison({
     run.error =
       error instanceof Stop
         ? error.message
-        : "The request could not finish. Any submitted payment must be checked before another run.";
+        : !run.id
+          ? "The selected day could not be checked. No data purchases were submitted. Try another day or try again later."
+          : "The request could not finish. Any submitted payment must be checked before another run.";
     if (typeof error?.ref === "string" && /^[a-f0-9-]{36}$/.test(error.ref)) {
       run.failureReference = error.ref;
       run.error += ` Reference: ${error.ref}.`;

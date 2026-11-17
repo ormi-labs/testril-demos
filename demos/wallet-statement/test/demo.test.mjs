@@ -432,7 +432,7 @@ test("a full-day report passes both HTTP adapters and completes more than twenty
     pages.every(
       (c) =>
         c.body.date.from === run.scope.from_time &&
-        c.body.date.to === run.scope.to_time,
+        c.body.date.to === "2026-11-10T23:59:59Z",
     ),
   );
   assert.equal(
@@ -455,4 +455,108 @@ test("the previous hourly API cannot replay an old paid journal after the scope 
     (error) => describeFailure(error)?.code === "RUN_STOPPED",
   );
   assert.deepEqual(old, { hour: 12, payer: account.address, operations: [] });
+});
+
+test("selected UTC days resolve different blocks and reach both paid data adapters unchanged", async (t) => {
+  const ranges = [];
+  for (const date of ["2026-11-09", "2026-11-10"]) {
+    const f = await fixture(t);
+    const run = await runComparison({
+      window: date,
+      payer: account.address,
+      request: f.request,
+      approve: async () => true,
+      sign: (q) =>
+        signPayment(wallet(), account.address, q.challenge, q.accepted, q.plan),
+      persist: () => {},
+      sleep: async () => {},
+    });
+    assert.equal(run.status, "done", run.error);
+    assert.equal(run.scope.window, date);
+    assert.equal(run.scope.from_time, `${date}T00:00:00Z`);
+    assert.equal(run.scope.to_block - run.scope.from_block, 7173);
+    assert.equal(run.providers.testril.rows.length, 292);
+    assert.equal(
+      compare(run.providers.testril.rows, run.providers.nansen.rows).matches,
+      true,
+    );
+    assert.ok(
+      f.calls
+        .filter((c) => c.provider === "nansen")
+        .every(
+          (c) =>
+            c.body.date.from === run.scope.from_time &&
+            c.body.date.to === `${date}T23:59:59Z`,
+        ),
+    );
+    assert.ok(
+      f.calls
+        .filter((c) => c.provider === "testril" && c.name === "read")
+        .every(
+          (c) =>
+            c.args.from_time === run.scope.from_time &&
+            c.args.to_time === run.scope.to_time,
+        ),
+    );
+    assert.ok(f.rpcCalls.length > 3 && f.rpcCalls.length < 60);
+    const stored = await f.store.load(run.id);
+    const { bound_function_id, ...report } = run.scope;
+    assert.equal(bound_function_id, stored.bound);
+    assert.deepEqual(stored.report, report);
+    ranges.push(run.scope.from_block);
+  }
+  assert.equal(ranges[1] - ranges[0], 7173);
+});
+
+test("bad dates are rejected before any node lookup or purchase", async (t) => {
+  const f = await fixture(t);
+  for (const date of [
+    undefined,
+    null,
+    "2026-02-31",
+    "2099-01-01",
+    "2026-11-10T12:00:00Z",
+    "2010-01-01",
+  ]) {
+    const r = await fetch(`${f.base}/api/runs`, {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ payer: account.address, window: date }),
+    });
+    assert.equal(r.status, 400);
+    assert.equal((await r.json()).code, "INVALID_REQUEST");
+  }
+  assert.equal(f.rpcCalls.length, 0);
+  assert.equal(f.calls.length, 0);
+});
+
+test("unavailable or wrong-network Ethereum nodes stop before signing or data purchases", async (t) => {
+  for (const options of [{ rpcFailure: true }, { rpcChain: "0x2105" }]) {
+    const f = await fixture(t, options);
+    let signatures = 0;
+    const run = await runComparison({
+      window: "2026-11-09",
+      payer: account.address,
+      request: f.request,
+      approve: () => assert.fail("Unexpected purchase approval"),
+      sign: () => {
+        signatures++;
+      },
+      persist: () => {},
+    });
+    assert.equal(run.status, "stopped");
+    assert.equal(run.pending, null);
+    assert.equal(run.id, null);
+    assert.match(run.error, /No data purchases were submitted/);
+    assert.doesNotMatch(JSON.stringify(run), /private node failure/);
+    assert.equal(signatures, 0);
+    assert.equal(f.calls.length, 0);
+    const response = await fetch(`${f.base}/api/runs`, {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ payer: account.address, window: "2026-11-09" }),
+    });
+    assert.equal(response.status, 503);
+    assert.equal((await response.json()).code, "SCOPE_UNAVAILABLE");
+  }
 });

@@ -5,11 +5,22 @@ import { selectOffer } from "../public/payments.js";
 const peers = createProviders({
   testrilUrl: process.env.TESTRIL_MCP_URL,
   nansenUrl: process.env.NANSEN_URL,
+  ethereumRpcUrl: process.env.ETHEREUM_RPC_URL,
 });
-const report = scope(),
-  checks = {},
+const date =
+  process.env.REPORT_DATE ??
+  new Date(Date.now() - 86400000).toISOString().slice(0, 10);
+let report;
+const checks = {},
   blockers = [];
 try {
+  report = await peers.resolveScope(scope(date));
+  checks.day = {
+    from: report.from_time,
+    to: report.to_time,
+    fromBlock: report.from_block,
+    toBlock: report.to_block,
+  };
   const binding = await peers.testril("bind", {
     chain_id: 1,
     function_slug: "erc20.wallet_transfers",
@@ -44,10 +55,14 @@ try {
     else throw new Error("Operation unavailable");
   }
 } catch {
-  blockers.push("Testril wallet-transfer discovery failed.");
+  blockers.push(
+    report
+      ? "Testril wallet-transfer discovery failed."
+      : "Ethereum day lookup failed.",
+  );
 }
 try {
-  const r = await peers.nansen("day", 1);
+  const r = await peers.nansen(date, 1);
   const a = selectOffer(r.challenge, "nansen");
   if (a.maxTimeoutSeconds < 150) throw new Error("Unsupported validity");
   checks.nansen = {
