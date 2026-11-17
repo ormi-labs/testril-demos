@@ -1,6 +1,6 @@
-# Wallet Statement: Testril and Nansen
+# Pool Flows: Testril and Nansen
 
-Compare the price of retrieving the same Ethereum USDC transfers. Retrieval cost leads each provider card; time appears underneath. Testril preparation is shown separately. Payment evidence, the ledger and independent provenance checks are expandable.
+Compare the price of retrieving USDC transfers into and out of Uniswap’s USDC/WETH liquidity pool on Ethereum. Both providers cover the same period; every transfer and exact amount is compared. Retrieval cost leads each provider card; time appears underneath. Testril preparation is shown separately. Payment evidence, the ledger and independent provenance checks are expandable.
 
 The **sample** is an original, measured one-hour recording. **Live runs** request the full UTC day of 10 November 2026 from both providers. They never reuse the sample’s prices, timings or verification results. A full-day paid recording has not yet been made; the existing sample is labelled honestly rather than extrapolated.
 

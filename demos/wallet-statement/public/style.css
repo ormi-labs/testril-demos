@@ -424,3 +424,15 @@ dialog .eyebrow {
     gap: 14px;
   }
 }
+
+@media (max-width: 700px) {
+  .masthead {
+    min-height: 64px;
+  }
+  .masthead img {
+    width: 108px;
+  }
+  .identity {
+    font-size: 12px;
+  }
+}

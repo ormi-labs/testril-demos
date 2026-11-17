@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <title>Wallet Statement · Testril demos</title>
+    <title>Pool Flows · Testril demos</title>
     <link rel="icon" href="assets/favicon.svg" />
     <link rel="stylesheet" href="style.css" />
     <script type="module" src="build/app.js"></script>
@@ -11,16 +11,16 @@
   <body>
     <header class="wrap masthead">
       <a href="https://testril.si"
-        ><img src="assets/wordmark.svg" alt="Testril" width="115" height="38"
+        ><img src="assets/wordmark.svg" alt="Testril" width="132" height="28"
       /></a>
-      <span class="identity"
-        >Wallet Statement<small>A Testril demo</small></span
-      >
+      <span class="identity">Pool Flows<small>A Testril demo</small></span>
     </header>
     <main class="wrap">
-      <h1>Wallet Statement</h1>
+      <h1>Pool Flows</h1>
       <p class="intro">
-        The same USDC transfers. Two providers. Compare the price.
+        See how much USDC entered and left Uniswap’s USDC/WETH liquidity pool on
+        Ethereum. Testril and Nansen retrieve transfers for the same period; we
+        match every transfer and amount, then compare retrieval price and time.
       </p>
       <p class="scope" aria-label="Report scope">
         Ethereum · USDC ·
@@ -198,7 +198,7 @@
           ><button id="fresh-proof" class="quiet">
             Check live Ethereum records</button
           ><a href="verification/source.zip" download
-            >Download the independent verifier ↗</a
+            >Download verification code and evidence (ZIP) ↗</a
           >
         </div>
         <p id="proof-note" class="caption">
@@ -272,16 +272,15 @@
           reviewing its payment status.
         </p>
         <p>
-          <a href="source.zip" download
-            >Download this demo’s complete source ↗</a
-          >
-          contains the app and its tests. “Download this run” contains the
-          selected run’s data and public evidence. The independent verifier
-          download contains the source records and verification software.
+          <a href="source.zip" download>Download demo source (ZIP) ↗</a>
+          includes the app, setup instructions, tests and saved recordings. The
+          verification ZIP contains the checker and archived Ethereum evidence
+          for the hourly samples. “Download this run” exports the selected
+          results and public payment evidence as JSON.
         </p>
       </details>
     </main>
-    <footer class="wrap">Wallet Statement · Testril × Nansen</footer>
+    <footer class="wrap">Pool Flows · Testril × Nansen</footer>
     <dialog id="payment-dialog" aria-labelledby="payment-title">
       <form method="dialog">
         <div class="eyebrow">YOUR WALLET · BASE MAINNET</div>

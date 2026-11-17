@@ -106,9 +106,7 @@ if (
 ) {
   const server = createApp();
   server.listen(Number(process.env.PORT ?? 4178), "127.0.0.1", () =>
-    console.info(
-      `Wallet Statement: http://127.0.0.1:${process.env.PORT ?? 4178}`,
-    ),
+    console.info(`Pool Flows: http://127.0.0.1:${process.env.PORT ?? 4178}`),
   );
   for (const signal of ["SIGINT", "SIGTERM"])
     process.once(signal, () => {
