@@ -148,3 +148,19 @@ verification, and successful closure before reusing it.
 Keep keys in the host process. Authentication, user sessions, payment approval
 policy, and durable hosted storage belong to the embedding application. The
 included HTTP server is intended for local use.
+
+## Writing off testnet purchases after a backend reset
+
+An operator may explicitly accept the loss of unresolved test USDC purchases.
+With the engine stopped, `writeOffTestnetPayments(contents, at)` from
+`src/testnet-recovery.mjs` transforms a saved journal. Archive the original first.
+It only accepts Base Sepolia USDC, refuses a pending wallet transfer, and marks
+unfinished data purchases `abandoned`, preserving their identifiers, amounts and
+usage against the existing caps. This status means written off, not settled or
+rejected. No purchase or transfer is replayed by the transformation.
+
+The transformed journal requires fresh bindings and reads. The host must still
+run normal bounded cleanup, verify empty counterparties and finish accounting
+before admitting another visitor. Do not apply this exception to mainnet money,
+visitor-funded demos or uncertain wallet transfers. It is an explicit operator
+action, never the response to an ordinary visitor request.

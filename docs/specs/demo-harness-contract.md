@@ -321,3 +321,15 @@ Before hosting a new demo or changing this boundary, verify:
 When implementing behavioral changes, run their applicable checks. This document
 does not override the standing preference against tests for documentation-only
 changes.
+
+## Explicit testnet write-offs
+
+An operator may accept the loss of unresolved testnet data purchases after a
+backend reset. A demo may expose a deliberately invoked write-off operation for
+this purpose. It must enforce the supported testnet and asset, preserve original
+evidence in a private archive, retain existing spending usage, and distinguish
+abandoned purchases from confirmed purchases. The harness must prevent concurrent
+execution and still verify fresh state, wallet cleanup and accounting before
+reuse. This exception does not authorize discarding uncertain wallet transfers,
+mainnet purchases or visitor-funded payment state, and must not be exposed as a
+visitor action.
