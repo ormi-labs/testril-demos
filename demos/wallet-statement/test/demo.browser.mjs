@@ -44,8 +44,8 @@ test("historical layout gives cost and time equal prominence and exposes both fu
     await expect(
       page.getByRole("heading", { name: heading, exact: true }),
     ).toBeVisible();
-  await expect(page.locator("#testril .query-cost")).toHaveText("0.000319");
-  await expect(page.locator("#nansen .query-cost")).toHaveText("0.030000");
+  await expect(page.locator("#testril .query-cost")).toHaveText("0.007193");
+  await expect(page.locator("#nansen .query-cost")).toHaveText("0.690000");
   await expect(page.locator("#testril .query-time")).toHaveText(
     /^\d+\.\d{2} s$/,
   );
@@ -61,12 +61,15 @@ test("historical layout gives cost and time equal prominence and exposes both fu
       .locator("#testril .query-time")
       .evaluate((e) => getComputedStyle(e).fontSize),
   );
-  await expect(page.locator("#time-comparison")).toContainText("3.4×");
-  await expect(page.locator("#price-comparison")).toContainText("94.0×");
-  await expect(page.locator("#testril-count")).toHaveText("292");
-  await expect(page.locator("#nansen-count")).toHaveText("292");
+  await expect(page.locator("#time-comparison")).toContainText("42.1×");
+  await expect(page.locator("#price-comparison")).toContainText("95.9×");
+  await expect(page.locator("#testril-count")).toHaveText("7139");
+  await expect(page.locator("#nansen-count")).toHaveText("7139");
+  await expect(page.locator("#report-window")).toHaveText(
+    "2026-11-10 · full UTC day",
+  );
   const preparation = page.getByRole("row", { name: /^Data prep/ });
-  await expect(preparation.locator("td").nth(0)).toHaveText("0.035880");
+  await expect(preparation.locator("td").nth(0)).toHaveText("0.860760");
   await expect(preparation.locator("td").nth(1)).toHaveText("Unknown");
   await expect(preparation.locator("td").nth(2)).toHaveText("Unknown");
   const provenance = page.getByRole("row", { name: /^Provenance/ });
@@ -92,11 +95,11 @@ test("historical layout gives cost and time equal prominence and exposes both fu
   await page
     .getByText("View the full transfer ledger", { exact: true })
     .click();
-  await expect(page.locator("#transfers tr")).toHaveCount(292);
+  await expect(page.locator("#transfers tr")).toHaveCount(7139);
   await page.selectOption("#ledger-provider", "nansen");
-  await expect(page.locator("#transfers tr")).toHaveCount(292);
+  await expect(page.locator("#transfers tr")).toHaveCount(7139);
   await expect(page.locator("#ledger-caption")).toContainText(
-    "Nansen: 292 transfers · complete ledger",
+    "Nansen: 7139 transfers · complete ledger",
   );
   expect(paid).toEqual([]);
   expect(
@@ -126,7 +129,7 @@ test("historical layout gives cost and time equal prominence and exposes both fu
   await expect(
     page.getByRole("tab", { name: "Historical Run", exact: true }),
   ).toHaveAttribute("aria-selected", "true");
-  await expect(page.locator("#testril-count")).toHaveText("292");
+  await expect(page.locator("#testril-count")).toHaveText("7139");
 });
 
 test("choosing another day completes real HTTP peers, paid pages and a dated export", async ({

@@ -5,9 +5,10 @@
 Pool Flows will compare complete USDC transfer ledgers for the same full UTC day:
 Testril's `erc20.wallet_transfers` against every required page of Nansen's address
 transaction history. Compare every normalized transfer and exact amount before
-publishing cost/time ratios. Keep the earlier hourly recording until the daily
-run is complete and verified. The prior Nansen attempt stopped with an uncertain
-payment; it must not be replayed or treated as a completed recording.
+publishing cost/time ratios. The [fresh full-day run](../research/2026-11-17-pool-flow-ledgers.md)
+completed with 7,139 matching transfers and 69 Nansen pages; it replaces the hourly
+Historical Run. The prior uncertain Nansen payment remains separately recorded
+and reserved; its authorization was not replayed.
 
 The [exploratory totals trial](../research/2026-11-17-pool-flow-totals.md) uses
 different result detail on the two sides and is not the ledger benchmark.

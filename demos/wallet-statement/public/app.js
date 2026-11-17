@@ -273,7 +273,7 @@ function clearLedger() {
   $("#transfers").replaceChildren();
 }
 async function loadRecording() {
-  baseline = await api("recordings/hour-12.json");
+  baseline = await api("recordings/day-2026-11-10.json");
   if (mode === "recorded") current = structuredClone(baseline);
   render();
 }

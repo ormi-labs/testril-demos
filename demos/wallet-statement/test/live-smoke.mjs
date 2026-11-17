@@ -1,11 +1,12 @@
 // Opt-in operator check. Never included in `npm test` or the browser test suite.
 import { chromium } from "@playwright/test";
-import { mkdtemp, writeFile } from "node:fs/promises";
+import { mkdtemp, writeFile, appendFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { createPublicClient, http } from "viem";
 import { privateKeyToAccount } from "viem/accounts";
 import { createApp, fileStore } from "../src/server.mjs";
+import { createProviders } from "../src/providers.mjs";
 import { collector, escrow } from "../public/payments.js";
 import {
   compare,
@@ -66,7 +67,37 @@ let target = process.env.PAID_SMOKE_URL;
 if (target && target !== "https://demos.testril.si/pool-flows/")
   throw new Error("Use the production demo or the local operator server");
 if (!target) {
-  app = createApp({ store: fileStore(directory) });
+  app = createApp({
+    store: fileStore(directory),
+    providers: createProviders({
+      testrilUrl: process.env.TESTRIL_MCP_URL,
+      nansenUrl: process.env.NANSEN_URL,
+      ethereumRpcUrl: process.env.ETHEREUM_RPC_URL,
+      async fetcher(url, options) {
+        const response = await fetch(url, options);
+        if (new URL(url).pathname === "/api/v1/profiler/address/transactions") {
+          // Metadata only: never log headers, signatures or provider bodies.
+          try {
+            await appendFile(
+              join(directory, "provider-http.jsonl"),
+              JSON.stringify({
+                provider: "nansen",
+                page: JSON.parse(options.body).pagination.page,
+                paid: Boolean(options.headers["PAYMENT-SIGNATURE"]),
+                status: response.status,
+                hasQuote: response.headers.has("payment-required"),
+                hasReceipt: response.headers.has("payment-response"),
+              }) + "\n",
+              { mode: 0o600 },
+            );
+          } catch {
+            // Diagnostics cannot discard a completed provider response.
+          }
+        }
+        return response;
+      },
+    }),
+  });
   await new Promise((done) => app.listen(0, "127.0.0.1", done));
   target = `http://127.0.0.1:${app.address().port}/`;
 }

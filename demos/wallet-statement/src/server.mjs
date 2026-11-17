@@ -63,7 +63,7 @@ export function createApp({
       else {
         const path = url.pathname === "/" ? "/index.html" : url.pathname;
         if (
-          !/^(?:\/(?:index\.html|style\.css|source\.zip)|\/build\/app\.js|\/assets\/[a-z-]+\.svg|\/recordings\/hour-1[23]\.json|\/verification\/(?:evidence\.json|source\.zip))$/.test(
+          !/^(?:\/(?:index\.html|style\.css|source\.zip)|\/build\/app\.js|\/assets\/[a-z-]+\.svg|\/recordings\/(?:hour-1[23]|day-2026-11-10)\.json|\/verification\/(?:evidence\.json|source\.zip))$/.test(
             path,
           )
         )
