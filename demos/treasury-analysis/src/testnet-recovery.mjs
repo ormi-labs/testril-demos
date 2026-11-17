@@ -17,8 +17,6 @@ export function writeOffTestnetPayments(contents, at) {
   const entries = state.receipts.filter((r) =>
     ["paying", "paid"].includes(r.status),
   );
-  if (!entries.length)
-    throw new Error("There are no unfinished payments to write off.");
   let charge = 0n;
   let deposit = 0n;
   for (const entry of entries) {

@@ -61,7 +61,7 @@ test("testnet write-off preserves evidence and budgets while requiring fresh rea
   assert.deepEqual(next.balanceEvidence, {});
   assert.equal(next.refreshNeeded, true);
   assert.equal(next.refreshBlock, undefined);
-  assert.throws(() => writeOffTestnetPayments(result.contents, at));
+  assert.equal(writeOffTestnetPayments(result.contents, at).payments, 0);
 });
 
 test("write-off refuses mainnet, other assets, pending transfers and malformed payments", () => {
