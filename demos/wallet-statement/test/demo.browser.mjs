@@ -42,8 +42,18 @@ test("recorded answers replay source evidence, catch a changed amount and fit th
   );
   await expect(page.locator("#testril .count")).toHaveText("292");
   await expect(page.locator("#testril .query-time")).toHaveText(
-    /^\d+\.\d{2} s$/,
+    /^\d+\.\d{2} s retrieval/,
   );
+  const screenshots = new URL("../../../docs/screenshots/", import.meta.url);
+  const screenshotPath = await access(screenshots)
+    .then(() =>
+      fileURLToPath(
+        new URL(`wallet-statement-${info.project.name}.png`, screenshots),
+      ),
+    )
+    .catch(() => info.outputPath("recorded.png"));
+  await page.screenshot({ path: screenshotPath, fullPage: true });
+  await page.getByText("Check Testril’s work", { exact: true }).click();
   await page
     .getByRole("button", { name: "Rebuild from saved evidence" })
     .click();
@@ -64,20 +74,22 @@ test("recorded answers replay source evidence, catch a changed amount and fit th
       () => document.documentElement.scrollWidth <= innerWidth,
     ),
   ).toBe(true);
-  const screenshots = new URL("../../../docs/screenshots/", import.meta.url);
-  const screenshotPath = await access(screenshots)
-    .then(() =>
-      fileURLToPath(
-        new URL(`wallet-statement-${info.project.name}.png`, screenshots),
-      ),
-    )
-    .catch(() => info.outputPath("recorded.png"));
-  await page.screenshot({ path: screenshotPath, fullPage: true });
-  await page.selectOption("#hour", "13");
-  await expect(page.locator("#testril .count")).toHaveText("503");
+
+  await expect(page.locator("#recorded-controls")).toContainText("one-hour");
+  await expect(page.locator("#testril .query-cost")).toHaveText(
+    "0.000319 USDC",
+  );
+  await expect(page.locator("#nansen .query-cost")).toHaveText("0.030000 USDC");
+  await page.getByRole("button", { name: "Run with your wallet" }).click();
+  await expect(page.locator("#live-controls")).toContainText("full UTC day");
+  await expect(page.locator("#testril .query-cost")).toHaveText("—");
+  await expect(page.locator("#proof-result")).toBeEmpty();
+  await expect(page.locator("#price-comparison")).toBeEmpty();
+  await page.getByRole("button", { name: "Sample run", exact: true }).click();
+  await expect(page.locator("#testril .count")).toHaveText("292");
 });
 
-test("first Run click completes real HTTP adapters, approvals, all pages and source verification", async ({
+test("first Run click uses the full day, completes HTTP peers and keeps archived proof separate", async ({
   page,
 }) => {
   await installWallet(page);
@@ -109,18 +121,21 @@ test("first Run click completes real HTTP adapters, approvals, all pages and sou
   await expect(page.locator("#nansen .provider-notes")).toContainText(
     "3 complete transaction pages",
   );
-  await page
-    .getByRole("button", { name: "Rebuild from saved evidence" })
-    .click();
-  await expect(page.locator("#proof-status")).toHaveText(
-    "Saved evidence replay passed",
-  );
+  await expect(page.locator("#report-window")).toContainText("full day");
+  await page.getByText("Check Testril’s work", { exact: true }).click();
+  await expect(
+    page.getByRole("button", { name: "Rebuild from saved evidence" }),
+  ).toBeDisabled();
+  await expect(
+    page.getByRole("button", { name: "Check live Ethereum records" }),
+  ).toBeEnabled();
   const [download] = await Promise.all([
     page.waitForEvent("download"),
     page.getByRole("button", { name: "Download this run" }).click(),
   ]);
   const value = await readFile(await download.path(), "utf8");
   expect(JSON.parse(value).status).toBe("done");
+  expect(JSON.parse(value).scope.window).toBe("day");
   expect(value).not.toMatch(/signature|PAYMENT-SIGNATURE|channelConfig/);
 });
 
@@ -153,6 +168,7 @@ test("a failed live Ethereum request is not presented as successful verification
   await page.route("https://rpc.mevblocker.io/**", (route) => route.abort());
   await page.goto("/");
   await expect(page.locator("#agreement")).toContainText("Every transfer");
+  await page.getByText("Check Testril’s work", { exact: true }).click();
   await page
     .getByRole("button", { name: "Check live Ethereum records" })
     .click();
@@ -229,4 +245,52 @@ test("hosted failures retain a safe request reference without exposing arbitrary
   await expect(page.locator("#notice")).not.toContainText(
     "secret provider payload",
   );
+});
+
+test("an old hourly pending purchase survives the daily UI upgrade without another signature", async ({
+  page,
+}) => {
+  const old = JSON.parse(
+    await readFile(
+      new URL("../recordings/hour-12.json", import.meta.url),
+      "utf8",
+    ),
+  );
+  Object.assign(old, {
+    kind: "live",
+    status: "stopped",
+    id: "dddddddd-dddd-4ddd-8ddd-dddddddddddd",
+    pending: {
+      id: "eeeeeeee-eeee-4eee-8eee-eeeeeeeeeeee",
+      provider: "testril",
+      action: "read",
+    },
+  });
+  await page.addInitScript(
+    (value) =>
+      localStorage.setItem(
+        "testril-wallet-statement:last-run",
+        JSON.stringify(value),
+      ),
+    old,
+  );
+  const posts = [];
+  page.on("request", (r) => {
+    if (r.method() === "POST") posts.push(r.url());
+  });
+  await page.goto("/");
+  await expect(page.locator("#recovery")).toBeVisible();
+  await expect(page.locator("#run")).toBeDisabled();
+  await expect(page.locator("#live-title")).toContainText(
+    "original hourly scope",
+  );
+  await expect(page.locator("#report-window")).toContainText("12:00–13:00");
+  const [download] = await Promise.all([
+    page.waitForEvent("download"),
+    page.getByRole("button", { name: "Download pending attempt" }).click(),
+  ]);
+  const saved = JSON.parse(await readFile(await download.path(), "utf8"));
+  expect(saved.pending).toEqual(old.pending);
+  expect(saved.scope.hour).toBe(12);
+  expect(posts).toEqual([]);
 });

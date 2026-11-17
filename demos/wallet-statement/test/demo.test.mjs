@@ -10,6 +10,7 @@ import { runComparison } from "../public/runner.js";
 import { signPayment } from "../public/payments.js";
 import { scope, decimalAtoms, compare, summary } from "../public/model.js";
 import { replay, verifyWindow } from "../public/verification.js";
+import { execute } from "../src/gateway.mjs";
 import { failure, describeFailure } from "../src/errors.mjs";
 import { account, peers, wallet, listen, close } from "./peers.mjs";
 
@@ -57,7 +58,7 @@ test("real HTTP/MCP adapters complete approvals, pagination, provenance and reco
   const f = await fixture(t);
   let saved;
   const run = await runComparison({
-    hour: 12,
+    window: 12,
     payer: account.address,
     request: f.request,
     approve: async () => true,
@@ -158,7 +159,7 @@ test("cancel and unusable browser storage prevent any signature submission", asy
     const f = await fixture(t);
     let signatures = 0;
     const run = await runComparison({
-      hour: 12,
+      window: 12,
       payer: account.address,
       request: f.request,
       approve: async () => false,
@@ -178,7 +179,7 @@ test("cancel and unusable browser storage prevent any signature submission", asy
 test("missing receipt stops with durable uncertainty and cannot buy another page", async (t) => {
   const f = await fixture(t, { omitReceipt: true });
   const run = await runComparison({
-    hour: 12,
+    window: 12,
     payer: account.address,
     request: f.request,
     approve: async () => true,
@@ -213,7 +214,7 @@ test("lost browser response retains evidence without automatically resubmitting"
     return r;
   };
   const run = await runComparison({
-    hour: 12,
+    window: 12,
     payer: account.address,
     request,
     approve: async () => true,
@@ -231,7 +232,7 @@ test("wrong network, extra parameters and cross-origin requests cannot authorize
   const f = await fixture(t, { network: "eip155:84532" });
   let signed = false;
   const run = await runComparison({
-    hour: 12,
+    window: 12,
     payer: account.address,
     request: f.request,
     approve: async () => true,
@@ -248,13 +249,13 @@ test("wrong network, extra parameters and cross-origin requests cannot authorize
       "content-type": "application/json",
       origin: "https://elsewhere.invalid",
     },
-    body: JSON.stringify({ payer: account.address, hour: 12 }),
+    body: JSON.stringify({ payer: account.address, window: 12 }),
   });
   assert.equal(bad.status, 400);
   await assert.rejects(
     f.request("api/runs", {
       payer: account.address,
-      hour: 12,
+      window: 12,
       sql: "anything",
     }),
   );
@@ -290,7 +291,7 @@ test("state failures before submission prevent spending; failures after confirma
       failAfterConfirmation: !failOnPending,
     });
     const run = await runComparison({
-      hour: 12,
+      window: 12,
       payer: account.address,
       request: f.request,
       approve: async () => true,
@@ -309,7 +310,7 @@ test("duplicate concurrent paid requests are not executed twice", async (t) => {
   const f = await fixture(t);
   const { id } = await f.request("api/runs", {
     payer: account.address,
-    hour: 12,
+    window: 12,
   });
   const action = (name) =>
     f.request(`api/runs/${id}/step`, { action: name, id: crypto.randomUUID() });
@@ -334,7 +335,7 @@ test("duplicate concurrent paid requests are not executed twice", async (t) => {
 test("a real result mismatch is retained rather than forced into agreement", async (t) => {
   const f = await fixture(t, { mismatch: true });
   const run = await runComparison({
-    hour: 12,
+    window: 12,
     payer: account.address,
     request: f.request,
     approve: async () => true,
@@ -377,7 +378,7 @@ test("an explicit MCP binding refusal retains its domain code and supported reas
   const f = await fixture(t, { bindingRefusal: true });
   const { id } = await f.request("api/runs", {
     payer: account.address,
-    hour: 12,
+    window: 12,
   });
   const response = await fetch(`${f.base}/api/runs/${id}/step`, {
     method: "POST",
@@ -387,4 +388,71 @@ test("an explicit MCP binding refusal retains its domain code and supported reas
   assert.equal(response.status, 503);
   assert.equal((await response.json()).code, "TESTRIL_BINDING_REJECTED");
   assert.equal(f.calls.filter((c) => c.paid).length, 0);
+});
+
+test("a full-day report passes both HTTP adapters and completes more than twenty paid pages", async (t) => {
+  const f = await fixture(t, { dailyTransactions: 6101 });
+  const run = await runComparison({
+    window: "day",
+    payer: account.address,
+    request: f.request,
+    approve: async () => true,
+    sign: (q) =>
+      signPayment(wallet(), account.address, q.challenge, q.accepted, q.plan),
+    persist: () => {},
+    sleep: async () => {},
+  });
+  assert.equal(run.status, "done", run.error);
+  assert.equal(run.scope.from_time, "2026-11-10T00:00:00Z");
+  assert.equal(run.scope.to_time, "2026-11-11T00:00:00Z");
+  assert.equal(run.scope.from_block, 26380784);
+  assert.equal(run.scope.to_block, 26387957);
+  assert.equal(run.providers.nansen.pages, 62);
+  assert.equal(run.providers.testril.rows.length, 6101);
+  assert.equal(
+    compare(run.providers.testril.rows, run.providers.nansen.rows).matches,
+    true,
+  );
+  const reads = f.calls.filter(
+    (c) =>
+      c.provider === "testril" &&
+      ["read", "materialize", "provenance"].includes(c.name),
+  );
+  assert.ok(reads.length > 3);
+  assert.ok(
+    reads.every(
+      (c) =>
+        c.args.from_time === run.scope.from_time &&
+        c.args.to_time === run.scope.to_time,
+    ),
+  );
+  const pages = f.calls.filter((c) => c.provider === "nansen");
+  assert.ok(pages.length >= 62);
+  assert.ok(
+    pages.every(
+      (c) =>
+        c.body.date.from === run.scope.from_time &&
+        c.body.date.to === run.scope.to_time,
+    ),
+  );
+  assert.equal(
+    run.providers.nansen.payments.reduce((n, p) => n + BigInt(p.amount), 0n),
+    620000n,
+  );
+});
+
+test("the previous hourly API cannot replay an old paid journal after the scope upgrade", async () => {
+  const old = { hour: 12, payer: account.address, operations: [] };
+  await assert.rejects(
+    execute(
+      old,
+      { action: "bind", id: crypto.randomUUID() },
+      {
+        providers: { testril: () => assert.fail("Old journal executed") },
+        persist: () => assert.fail("Old journal changed"),
+      },
+    ),
+    (error) => describeFailure(error)?.code === "RUN_STOPPED",
+  );
+  assert.deepEqual(old, { hour: 12, payer: account.address, operations: [] });
 });

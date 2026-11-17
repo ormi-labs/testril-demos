@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <title>Follow the Money · Testril demos</title>
+    <title>Wallet Statement · Testril demos</title>
     <link rel="icon" href="assets/favicon.svg" />
     <link rel="stylesheet" href="style.css" />
     <script type="module" src="build/app.js"></script>
@@ -13,72 +13,61 @@
       <a href="https://testril.si"
         ><img src="assets/wordmark.svg" alt="Testril" width="115" height="38"
       /></a>
-      <span>DATA DEMOS / 03</span>
+      <span class="identity"
+        >Wallet Statement<small>A Testril demo</small></span
+      >
     </header>
     <main class="wrap">
-      <div class="eyebrow">ONE ADDRESS · TWO PROVIDERS · CHECKABLE ANSWERS</div>
-      <h1>Follow the money.<br />Then check the answer.</h1>
+      <h1>Wallet Statement</h1>
       <p class="intro">
-        Compare a USDC statement from Nansen and Testril. See what arrived, what
-        left, how long it took, and what it cost. Then follow Testril’s evidence
-        back to Ethereum.
+        The same USDC transfers. Two providers. Compare the price.
       </p>
-      <section class="scope" aria-label="Report scope">
-        <div>
-          <span class="label">DATA</span><strong>Ethereum · USDC</strong>
-        </div>
-        <div>
-          <span class="label">REPORT ADDRESS</span
-          ><a
-            href="https://etherscan.io/address/0x88e6a0c2ddd26feeb64f039a2c41296fcb3f5640"
-            target="_blank"
-            rel="noreferrer"
-            >Uniswap V3 USDC / WETH pool ↗</a
-          >
-        </div>
-        <div>
-          <label class="label" for="hour">10 NOVEMBER 2026 · UTC</label
-          ><select id="hour">
-            <option value="12">12:00–13:00</option>
-            <option value="13">13:00–14:00</option>
-          </select>
-        </div>
-        <div>
-          <span class="label">PAYMENTS</span
-          ><strong>USDC on Base mainnet</strong>
-        </div>
-      </section>
+      <p class="scope" aria-label="Report scope">
+        Ethereum · USDC ·
+        <a
+          href="https://etherscan.io/address/0x88e6a0c2ddd26feeb64f039a2c41296fcb3f5640"
+          target="_blank"
+          rel="noreferrer"
+          >Uniswap V3 USDC / WETH pool ↗</a
+        >
+        <span id="report-window"></span>
+      </p>
       <div class="toolbar">
         <div class="tabs" role="group" aria-label="Run mode">
-          <button id="recorded" class="selected">Recorded run</button
+          <button id="recorded" class="selected">Sample run</button
           ><button id="live">Run with your wallet</button>
         </div>
         <button id="download" class="quiet" disabled>Download this run</button>
       </div>
       <section id="recorded-controls" class="controls">
         <div>
-          <strong>Real requests. Saved evidence.</strong>
-          <p id="recording-note">Loading the verified case study…</p>
+          <strong>Sample run</strong>
+          <p id="recording-note">
+            Saved results from real purchases. No wallet or payment needed.
+          </p>
         </div>
-        <span class="pill">No wallet needed</span>
       </section>
       <section id="live-controls" class="controls" hidden>
         <div>
-          <strong>Buy the same historical report yourself.</strong>
+          <strong id="live-title">Live run · full UTC day</strong>
           <p>
-            Your wallet pays for data; the report address stays fixed. Every
-            payment needs your approval. Limit:
-            <b>0.25 USDC in service charges</b> plus up to
-            <b>0.02 USDC in escrow deposits</b>, counted separately.
+            Retrieve all transaction pages from both providers using your
+            wallet. Payments use USDC on Base; each purchase needs your
+            approval.
           </p>
-          <p>
-            Preparation and provenance use current Testril quotes. Unspent
-            escrow stays in your channel until withdrawn.
-          </p>
+          <details>
+            <summary>Spending limits</summary>
+            <p>
+              Up to 2 USDC in service charges and 1 USDC in new escrow deposits
+              per run. Preparation and provenance are separate from retrieval.
+              Unspent escrow stays in your channel until withdrawn; this demo
+              has no withdrawal controls. Network fees are additional.
+            </p>
+          </details>
         </div>
         <div class="actions">
-          <button id="connect">Connect wallet</button
-          ><button id="run" disabled>Run comparison</button>
+          <button id="connect">Connect wallet</button>
+          <button id="run" disabled>Run comparison</button>
         </div>
       </section>
       <p id="notice" class="notice" role="status" aria-live="polite">
@@ -102,16 +91,15 @@
             <h2>Testril</h2>
             <span class="status">—</span>
           </div>
+          <div class="price">
+            <span class="label">RETRIEVAL COST</span>
+            <strong class="query-cost">—</strong>
+            <span class="query-time">—</span>
+          </div>
+          <p class="provider-notes"></p>
+          <p class="preparation"></p>
           <div class="metrics">
-            <div>
-              <span class="label">TRANSFERS</span
-              ><strong class="count">—</strong>
-            </div>
-            <div>
-              <span class="label">QUERY · EXCLUDES WALLET WAIT</span
-              ><strong class="query-time">—</strong
-              ><span class="query-cost">—</span>
-            </div>
+            <span><b class="count">—</b> transfers</span>
           </div>
           <div class="amounts">
             <div>
@@ -123,7 +111,6 @@
               ><strong class="outgoing">—</strong>
             </div>
           </div>
-          <div class="provider-notes"></div>
           <details class="evidence">
             <summary>Preparation, provenance &amp; payment evidence</summary>
             <div class="details-body"></div>
@@ -134,16 +121,15 @@
             <h2>Nansen</h2>
             <span class="status">—</span>
           </div>
+          <div class="price">
+            <span class="label">RETRIEVAL COST</span>
+            <strong class="query-cost">—</strong>
+            <span class="query-time">—</span>
+          </div>
+          <p class="provider-notes"></p>
+          <p class="preparation"></p>
           <div class="metrics">
-            <div>
-              <span class="label">TRANSFERS</span
-              ><strong class="count">—</strong>
-            </div>
-            <div>
-              <span class="label">QUERY · EXCLUDES WALLET WAIT</span
-              ><strong class="query-time">—</strong
-              ><span class="query-cost">—</span>
-            </div>
+            <span><b class="count">—</b> transfers</span>
           </div>
           <div class="amounts">
             <div>
@@ -155,22 +141,15 @@
               ><strong class="outgoing">—</strong>
             </div>
           </div>
-          <div class="provider-notes"></div>
           <details class="evidence">
             <summary>Requests &amp; payment evidence</summary>
             <div class="details-body"></div>
           </details>
         </article>
       </section>
+      <p id="price-comparison" class="price-comparison" role="status"></p>
       <section class="results">
-        <div class="heading">
-          <h2>Do the transfers agree?</h2>
-          <strong id="agreement">Waiting for both answers</strong>
-        </div>
-        <p class="caption">
-          Every transaction, sender, recipient and exact amount is compared.
-          Repeated transfers are preserved.
-        </p>
+        <p id="agreement">Waiting for both complete answers</p>
         <details>
           <summary>Inspect the transfer ledger</summary>
           <div class="table-wrap">
@@ -192,16 +171,15 @@
           </div>
         </details>
       </section>
-      <section class="provenance" aria-labelledby="proof-title">
-        <div class="eyebrow">DON’T STOP AT AGREEMENT</div>
+      <details class="provenance">
+        <summary>Check Testril’s work</summary>
         <div class="heading">
-          <h2 id="proof-title">Show the work.</h2>
+          <h2 id="proof-title">Verify against Ethereum</h2>
           <span id="proof-status" class="pill">Saved evidence available</span>
         </div>
-        <p class="lead">
-          Provenance names the source blocks behind Testril’s answer. Rebuild
-          the transfers from those records, instead of taking either provider’s
-          word for it.
+        <p>
+          Use Testril’s source references to reconstruct the transfers
+          independently.
         </p>
         <ol class="proof-steps">
           <li>
@@ -249,7 +227,7 @@
           <summary>What this check establishes</summary>
           <p>
             The verifier independently decodes Ethereum’s Transfer events,
-            checks block references and hour boundaries, preserves repeated
+            checks block references and time boundaries, preserves repeated
             events, and recalculates amounts with exact integers. It also
             searches blocks absent from the citations to detect omissions.
           </p>
@@ -261,55 +239,16 @@
             choose your source of trust.
           </p>
         </details>
-      </section>
-      <section class="finding">
-        <div class="eyebrow">
-          A REAL REASON TO CHECK · RECORDED 14 NOVEMBER 2026
-        </div>
-        <h2>The transfers agreed. A summary didn’t.</h2>
-        <p>
-          Nansen’s separate <b>Address Counterparties</b> service returned
-          identical summaries for these two different hours. Its
-          transaction-history service—the one used above—agreed with Testril.
-        </p>
-        <div class="table-wrap">
-          <table>
-            <caption>
-              USDC transfer counts in the recorded investigation
-            </caption>
-            <thead>
-              <tr>
-                <th>Hour · UTC</th>
-                <th>Testril / Nansen transactions</th>
-                <th>Nansen counterparty summary</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>12:00–13:00</td>
-                <td>292</td>
-                <td>7,139</td>
-              </tr>
-              <tr>
-                <td>13:00–14:00</td>
-                <td>503</td>
-                <td>7,139</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-        <p>
-          Neither summary matched either hour. We could investigate Nansen
-          because we knew how its separate services fit together. Testril’s
-          provenance supplied a defined path back to the source records. The
-          independent reconstruction confirmed every transfer and the resulting
-          hourly totals.
-        </p>
-        <p class="caption">
-          This is a dated finding for one address and two hours. Its cause is
-          unconfirmed; it is not a claim about every Nansen result.
-        </p>
-      </section>
+      </details>
+      <p class="blog-reference">
+        Why the full-day scope? Read
+        <a
+          href="https://testril.si/blog/why-provenance-matters/"
+          target="_blank"
+          rel="noreferrer"
+          >Why Provenance Matters</a
+        >.
+      </p>
       <details class="method">
         <summary>Scope, timing and source downloads</summary>
         <p>
@@ -322,8 +261,8 @@
           Fresh-run query time includes payment negotiation and retrieval;
           wallet approval, Testril preparation and provenance are shown
           separately. Provider calls run sequentially to avoid overlapping
-          approval prompts. The original case study has no complete browser-run
-          timings, so none are invented.
+          approval prompts. The sample’s automated wallet timing does not
+          represent a visitor approving each purchase.
         </p>
         <p>
           Payment confirmations come from provider receipts. Deposits are
@@ -342,7 +281,7 @@
         </p>
       </details>
     </main>
-    <footer class="wrap">Follow the Money · Nansen × Testril</footer>
+    <footer class="wrap">Wallet Statement · Testril × Nansen</footer>
     <dialog id="payment-dialog" aria-labelledby="payment-title">
       <form method="dialog">
         <div class="eyebrow">YOUR WALLET · BASE MAINNET</div>

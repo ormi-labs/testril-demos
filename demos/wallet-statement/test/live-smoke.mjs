@@ -6,7 +6,7 @@ import { join } from "node:path";
 import { createPublicClient, http } from "viem";
 import { privateKeyToAccount } from "viem/accounts";
 import { createApp, fileStore } from "../src/server.mjs";
-import { compare, usdc } from "../public/model.js";
+import { compare, usdc, maxPages } from "../public/model.js";
 
 if (
   process.env.ALLOW_PAID_SMOKE !== "1" ||
@@ -81,7 +81,7 @@ try {
   await page
     .getByRole("button", { name: "Run comparison", exact: true })
     .click();
-  for (let i = 0; i < 15; i++) {
+  for (let i = 0; i < maxPages + 10; i++) {
     await page.waitForFunction(
       () =>
         document.querySelector("#payment-dialog").open ||

@@ -6,7 +6,7 @@ const peers = createProviders({
   testrilUrl: process.env.TESTRIL_MCP_URL,
   nansenUrl: process.env.NANSEN_URL,
 });
-const report = scope(12),
+const report = scope(),
   checks = {},
   blockers = [];
 try {
@@ -22,27 +22,32 @@ try {
     to_time: report.to_time,
   };
   for (const name of ["read", "provenance"]) {
+    let operation = name;
     let r = await peers.testril(name, args);
     if (name === "read" && r.value?.kind === "range_unavailable") {
       checks.coverage = "Preparation needed";
+      checks.read = { result: "requires_preparation" };
+      operation = "materialize";
       r = await peers.testril("materialize", args);
     }
     if (r.challenge) {
       const a = selectOffer(r.challenge, "testril");
-      checks[name] = {
+      checks[operation] = {
         result: "payment_offered",
         scheme: a.scheme,
         amount: a.amount,
       };
     } else if (r.value?.outcome === "success")
-      checks[name] = { result: "data_returned_without_payment" };
+      checks[operation] = { result: "data_returned_without_payment" };
+    else if (name === "provenance" && r.value?.kind === "range_unavailable")
+      checks[operation] = { result: "requires_preparation" };
     else throw new Error("Operation unavailable");
   }
 } catch {
   blockers.push("Testril wallet-transfer discovery failed.");
 }
 try {
-  const r = await peers.nansen(12, 1);
+  const r = await peers.nansen("day", 1);
   const a = selectOffer(r.challenge, "nansen");
   if (a.maxTimeoutSeconds < 150) throw new Error("Unsupported validity");
   checks.nansen = {

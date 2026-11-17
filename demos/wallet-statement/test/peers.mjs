@@ -67,6 +67,7 @@ export async function close(server) {
 
 export async function peers({
   bindingRefusal = false,
+  dailyTransactions,
   omitReceipt = false,
   network = "eip155:8453",
   mismatch = false,
@@ -79,6 +80,24 @@ export async function peers({
         "utf8",
       ),
     );
+  // The daily peer intentionally reuses a small ledger. Only its advertised
+  // window changes; this is synthetic test data, never a production recording.
+  records.day = structuredClone(records[12]);
+  Object.assign(records.day.scope, scope());
+  Object.assign(records.day.providers.testril.provenance, {
+    from_block: scope().from_block,
+    to_block: scope().to_block,
+  });
+  if (dailyTransactions) {
+    const seed = records.day.providers.testril.rows;
+    records.day.providers.testril.rows = Array.from(
+      { length: dailyTransactions },
+      (_, i) => ({
+        ...seed[i % seed.length],
+        tx: `0x${(i + 1).toString(16).padStart(64, "0")}`,
+      }),
+    );
+  }
   const id = records[12].scope.bound_function_id;
   const calls = [],
     channels = [];
@@ -189,7 +208,9 @@ export async function peers({
   }
   async function tool(name, args, payment) {
     calls.push({ provider: "testril", name, args, paid: Boolean(payment) });
-    const h = Number(args.from_time?.slice(11, 13) ?? 12);
+    const h = args.from_time?.includes("T00:")
+      ? "day"
+      : Number(args.from_time?.slice(11, 13) ?? 12);
     if (name === "bind")
       return bindingRefusal
         ? { outcome: "error", kind: "invalid_params" }
@@ -329,7 +350,9 @@ export async function peers({
         },
         payment.payload.signature,
       );
-      const h = Number(body.date.from.slice(11, 13)),
+      const h = body.date.from.includes("T00:")
+          ? "day"
+          : Number(body.date.from.slice(11, 13)),
         byTx = new Map();
       for (const [index, row] of records[h].providers.testril.rows.entries()) {
         const tx = byTx.get(row.tx) ?? {

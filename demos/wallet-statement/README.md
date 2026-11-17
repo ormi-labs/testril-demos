@@ -1,8 +1,10 @@
-# Follow the Money: Nansen and Testril
+# Wallet Statement: Testril and Nansen
 
-A side-by-side USDC statement for one Ethereum address and two fixed historical hours. Recorded runs show real requests and payment evidence. Visitors can connect an Ethereum browser wallet and pay Base mainnet USDC to repeat the comparison.
+Compare the price of retrieving the same Ethereum USDC transfers. Retrieval cost leads each provider card; time appears underneath. Testril preparation is shown separately. Payment evidence, the ledger and independent provenance checks are expandable.
 
-The provenance section reconstructs the answer in the browser, checks an intentionally edited copy, and can read fresh Ethereum records directly. A downloadable verifier runs against a reader's own node. The dated counterparty-summary discrepancy is explained separately; live statements use Nansen's transaction-history endpoint, which matched Testril in both tested hours.
+The **sample** is an original, measured one-hour recording. **Live runs** request the full UTC day of 10 November 2026 from both providers. They never reuse the sample’s prices, timings or verification results. A full-day paid recording has not yet been made; the existing sample is labelled honestly rather than extrapolated.
+
+The small blog reference links to “Why Provenance Matters”. The earlier discrepancy involved Nansen’s counterparty summary. This demo uses its transaction-history endpoint and compares every transfer, preserving repeated transfers and exact amounts. Both historical hourly transaction listings matched Testril.
 
 ## Run
 
@@ -18,24 +20,26 @@ Open `http://127.0.0.1:4178`. Paul starts and stops this process; use Ctrl+C to 
 
 Optional configuration: copy `.env.example` to `.env`. Defaults use production `https://api.testril.si/mcp` and `https://api.nansen.ai`. No provider account, API key or server signing key is required. Browser wallets must support injected Ethereum providers and typed-data signing; WalletConnect and contract-wallet signatures are not implemented.
 
-The connected wallet is the payer. It does not change the report address: Ethereum pool `0x88e6a0c2ddd26feeb64f039a2c41296fcb3f5640`, Ethereum USDC, 10 November 2026, 12:00–13:00 or 13:00–14:00 UTC. End times are excluded. Fixed scope keeps comparisons reproducible and prevents arbitrary queries through the demo.
+The connected wallet is the payer. It does not change the report address: Ethereum pool `0x88e6a0c2ddd26feeb64f039a2c41296fcb3f5640`, Ethereum USDC, 10 November 2026, 00:00 UTC through 11 November, 00:00 UTC. End times are excluded. Ethereum blocks are `[26380784, 26387957)`, independently established in the [full-day source check](https://github.com/ormi-labs/why-provenance-matters#follow-up-the-hourly-summaries-describe-the-whole-day). Fixed scope keeps comparisons reproducible and prevents arbitrary queries through the demo.
 
 ## Run modes and measurements
 
-- **Recorded:** a measured production run for 12:00–13:00, with automated wallet approvals; a verified case study for 13:00–14:00 without invented full-run timings. Playback does not call the providers or authorize payments.
-- **Your wallet:** live Testril binding, coverage, preparation when needed, transfers and provenance; then every Nansen transaction page. Each quoted request requires approval. The run stops on an uncertain payment and never automatically submits it again.
+- **Sample run:** the measured production recording for 12:00–13:00, with automated wallet approvals. Playback makes no provider requests or payments. The second original hour remains in the source archive; the UI offers one sample to avoid unnecessary controls.
+- **Run with your wallet:** a full-day report using live Testril binding, coverage, preparation when needed, transfers and provenance; then every Nansen transaction page. Each quoted request requires approval. The run stops on an uncertain payment and never automatically submits it again.
 
 Query times include quote negotiation and complete data retrieval. Wallet approval/signing, Testril preparation and provenance are measured separately. Total elapsed time is also retained. Automated approval timing is not representative of human wallet interaction. Preparation may reuse someone else's materialized coverage; known original preparation for these reports is disclosed separately. Receipt confirmations are provider assertions; a linked deposit transaction is not a second service fee or proof that every voucher has already been claimed on-chain.
 
-Each run is limited to **0.25 USDC in service charges** and **0.02 USDC in new escrow deposits**, counted separately. These are per-run limits, not lifetime wallet limits. The browser and gateway both check allowances before submission. Existing compatible channels are reused. Unspent deposits remain in the channel until withdrawn; this demo has no withdrawal controls. Account/network fees are not included in quoted service totals.
+Full-day reports require more pages and may need new preparation. Each run is limited to **2 USDC in service charges** and **1 USDC in new escrow deposits**, counted separately. These are per-run limits, not lifetime wallet limits. The browser and gateway both check allowances before submission. Existing compatible channels are reused. Unspent deposits remain in the channel until withdrawn; this demo has no withdrawal controls. Account/network fees are not included in quoted service totals.
+
+The report is bounded to 100 Nansen pages of at most 100 transactions each, 20,000 normalized transfers and a one-hour run lifetime. A limit stops the run; it never reports a truncated answer as complete.
 
 The gateway has no spending keys. Signatures are forwarded only for the approved fixed operation and never persisted or exported. Before forwarding one, the gateway durably saves a payment intent and reserves the run allowance. Browser state also saves the intent first. Known confirmations survive later formatting failures. Interrupted or unreadable state cannot establish that nothing was spent.
 
 ## Provenance
 
-**Rebuild from saved evidence** independently decodes the archived Ethereum responses and checks all displayed transfer and counterparty totals. **Check live Ethereum records** fetches records from `rpc.mevblocker.io` directly in the browser; it requires no wallet or chain switch. The CSP permits that external service. Its availability and historical RPC limits are outside the demo's control; failed checks are never shown as verification passes.
+**Rebuild from saved evidence** independently decodes the archived Ethereum responses and checks all displayed transfer and counterparty totals. The saved archive covers the original hourly samples, so saved replay is disabled for a full-day live run. **Check live Ethereum records** fetches records from `rpc.mevblocker.io` directly in the browser; it requires no wallet or chain switch. The CSP permits that external service. Its availability and historical RPC limits are outside the demo's control; failed checks are never shown as verification passes.
 
-The checker verifies block references, source digests, linked headers, finalization, hour boundaries, exact amounts and all relevant Transfer events across the complete requested block window, including uncited blocks. It preserves repeated events and handles self-transfers once. JavaScript `BigInt` and lossless parsing of Nansen's original decimal text avoid floating-point rounding.
+The checker verifies block references, source digests, linked headers, finalization, time boundaries, exact amounts and all relevant Transfer events across the complete requested block window, including uncited blocks. It preserves repeated events and handles self-transfers once. JavaScript `BigInt` and lossless parsing of Nansen's original decimal text avoid floating-point rounding.
 
 **Try an edited amount** adds one raw USDC unit to a copy of a transfer and checks that the verifier rejects it. It does not alter the real results or attribute an invented error to either provider.
 
@@ -78,9 +82,9 @@ npx playwright install chromium
 npm run test:browser
 ```
 
-Tests use HTTP/MCP peers, cryptographically verified test signatures and a public unfunded test identity. They make no paid requests. Test-owned servers stop when checks finish. Browser tests click Connect and Run, approve the actual payment dialogs, finish all pages, replay provenance, detect an edited amount, exercise cancellation and export the evidence. Desktop/mobile screenshots are written to the repository's `docs/screenshots/` when that directory exists.
+Tests use HTTP/MCP peers, cryptographically verified test signatures and a public unfunded test identity. They make no paid requests. Test-owned servers stop when checks finish. Browser tests click Connect and Run, approve the actual payment dialogs, finish all peer pages, check sample/live isolation, replay the sample’s provenance, detect an edited amount, exercise cancellation and export evidence. A separate HTTP/MCP test retrieves 6,101 synthetic transfers through 62 paid test pages; test identities are unfunded and no real payment is made. Desktop/mobile screenshots are written to the repository's `docs/screenshots/` when that directory exists.
 
-For manual verification, load each recorded hour, rebuild its saved evidence, try an edited amount, inspect the source blocks and download a run. Then use a funded Base USDC wallet for an explicitly authorized live run, approve each quote, and inspect all timing and receipt categories. Confirm wallet cancellation stops and reloading retains a pending attempt.
+For manual verification, load the hourly sample, rebuild its saved evidence, try an edited amount, inspect the source blocks and download a run. Switch to the live tab and check that the sample’s prices and proof result disappear and the scope becomes the full UTC day. Then use a funded Base USDC wallet for an explicitly authorized live run, approve each quote, and inspect all timing and receipt categories. Confirm wallet cancellation stops and reloading retains a pending attempt.
 
 The opt-in `test/live-smoke.mjs` is an operator tool, excluded from normal tests. It requires `ALLOW_PAID_SMOKE=1` and a locally supplied payer key, caps service quotes at 0.10 USDC and new deposits at 0.01, signs in the Node process and exercises the actual browser flow. It records a safe attempt on failure and must not be automatically repeated. Never fund the deterministic identity in `test/peers.mjs`.
 
@@ -102,7 +106,7 @@ The opt-in `test/live-smoke.mjs` is an operator tool, excluded from normal tests
 
 `functionSlug` is exactly `erc20.wallet_transfers`; binding `reason` is `invalid_params`, `function_not_found`, `unsupported_chain` or `unknown`. `provider` is `testril` or `nansen`. `operation` is `bind`, `inspect`, `coverage`, `job`, `read`, `materialize`, `provenance` or `transactions`; Nansen uses only `transactions`, and Testril uses the others. No raw provider text, credentials, signatures, stack or arbitrary cause is diagnostic context.
 
-`createApi` in `src/api.mjs` is the web Request/Response integration. The hosting adapter supplies `load(id)`, durable `save(run)`, provider connections and its trusted `onError(error)` mapper. It must serialize access to each run, preserve the saved pre-submission intent, validate descriptors and create its own public references. An uncertain run is never automatically replayed. Storage is hosting-owned; provider execution, domain state and validation remain in this standalone demo. Hosted deployments must follow the repository's public demo/harness failure contract and verify the actual selected demo/adapter pair.
+`createApi` in `src/api.mjs` is the web Request/Response integration. New-run bodies contain `{payer, window}`: `window: "day"` is the UI default; numeric `12` and `13` identify the retained historical report windows. Arbitrary dates and addresses are refused. Journals from the older `{payer, hour}` API remain readable for payment-status recovery, but cannot execute another step. Their pending browser exports remain protected. The hourly files themselves retain their original scope metadata. The hosting adapter supplies `load(id)`, durable `save(run)`, provider connections and its trusted `onError(error)` mapper. It must serialize access to each run, preserve the saved pre-submission intent, validate descriptors and create its own public references. An uncertain run is never automatically replayed. Storage is hosting-owned; provider execution, domain state and validation remain in this standalone demo. Hosted deployments must follow the repository's public demo/harness failure contract and verify the actual selected demo/adapter pair.
 
 ## Code map
 

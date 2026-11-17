@@ -1,4 +1,11 @@
-import { scope, atoms, chargeCap, depositCap } from "./model.js";
+import {
+  scope,
+  atoms,
+  chargeCap,
+  depositCap,
+  maxPages,
+  maxRows,
+} from "./model.js";
 
 class Stop extends Error {
   constructor(code, message) {
@@ -13,7 +20,7 @@ const phaseFor = (action) =>
       ? "provenance"
       : "query";
 export async function runComparison({
-  hour,
+  window,
   payer,
   request,
   approve,
@@ -27,7 +34,7 @@ export async function runComparison({
     kind: "live",
     status: "running",
     createdAt: new Date().toISOString(),
-    scope: scope(hour),
+    scope: scope(window),
     payer,
     id: null,
     pending: null,
@@ -154,7 +161,7 @@ export async function runComparison({
   }
   try {
     await save();
-    const created = await request("api/runs", { payer, hour });
+    const created = await request("api/runs", { payer, window });
     run.id = created.id;
     await save();
     const t = run.providers.testril,
@@ -203,10 +210,10 @@ export async function runComparison({
     await save();
     const n = run.providers.nansen,
       nStart = performance.now();
-    for (let page = 1; page <= 20; page++) {
+    for (let page = 1; page <= maxPages; page++) {
       const value = await action("nansen", "transactions", page);
       n.rows.push(...value.rows);
-      if (n.rows.length > 3000)
+      if (n.rows.length > maxRows)
         throw new Stop(
           "REPORT_TOO_LARGE",
           "The report exceeds this demo's row limit.",

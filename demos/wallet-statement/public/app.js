@@ -91,7 +91,8 @@ function renderProvider(name) {
         waiting: "Waiting",
       }[p.status] ?? p.status)
     : "Ready";
-  const totals = p?.rows.length ? summary(p.rows) : null;
+  const totals =
+    p && (p.rows.length || p.status === "done") ? summary(p.rows) : null;
   panel.querySelector(".count").textContent =
     p?.status === "done" || totals ? String(p.rows.length) : "—";
   panel.querySelector(".incoming").textContent = totals
@@ -100,36 +101,47 @@ function renderProvider(name) {
   panel.querySelector(".outgoing").textContent = totals
     ? amountText(totals.outgoing)
     : "—";
-  panel.querySelector(".query-time").textContent = elapsed(p?.timing.query);
-  panel.querySelector(".query-cost").textContent = p
-    ? cost(p.payments, "query")
-    : "—";
-  const notes = panel.querySelector(".provider-notes");
-  notes.replaceChildren();
-  if (p)
+  const payments = p?.payments ?? [];
+  const query = evidenceCosts(payments, "query");
+  const hasQuery = payments.some((v) => v.phase === "query");
+  panel.querySelector(".query-cost").textContent =
+    p?.status === "done" || hasQuery ? `${decimal(query.amount)} USDC` : "—";
+  panel.querySelector(".query-time").textContent =
+    p && p.status !== "waiting"
+      ? `${elapsed(p.timing.query)} retrieval · excludes wallet wait`
+      : "";
+  panel.querySelector(".provider-notes").textContent = !p
+    ? ""
+    : hasQuery && !query.confirmed
+      ? "Unconfirmed authorization · the run has stopped"
+      : p.status === "done"
+        ? name === "nansen"
+          ? `${p.pages} complete transaction pages`
+          : "Complete transfer history"
+        : p.status === "waiting"
+          ? "Waiting"
+          : p.status === "stopped"
+            ? "Retrieval incomplete · cost so far"
+            : "Retrieval in progress · final cost not yet known";
+  const preparation = panel.querySelector(".preparation");
+  preparation.replaceChildren();
+  if (p && name === "testril") {
+    const prepared = payments.some((v) => v.phase === "preparation");
     text(
-      notes,
-      "p",
-      name === "nansen"
-        ? `${p.pages ?? 0} complete transaction pages · ${totals?.counterparties.length ?? 0} other addresses`
-        : `${totals?.counterparties.length ?? 0} other addresses · exact raw transfer amounts`,
+      preparation,
+      "span",
+      prepared
+        ? `Preparation this run: ${cost(payments, "preparation")}.`
+        : p.status === "done"
+          ? "Preparation this run: 0 USDC · existing data reused."
+          : "Preparation: checked before purchase.",
     );
-  if (p) {
-    text(
-      notes,
-      "p",
-      `Complete elapsed: ${elapsed(p.timing.total)} · wallet approval/signing: ${elapsed(p.timing.wallet)}.`,
-    );
-    if (name === "testril") {
-      const prepared = p.payments.some((v) => v.phase === "preparation");
+    if (mode === "recorded" && baseline?.priorPreparation?.amount)
       text(
-        notes,
-        "p",
-        prepared
-          ? `Preparation: ${cost(p.payments, "preparation")} · ${elapsed(p.timing.preparation)}.`
-          : `Coverage reused. Known initial preparation: ${decimal(baseline?.priorPreparation.amount ?? "35880")} USDC, separate from this run. Setup: ${elapsed(p.timing.preparation)}.`,
+        preparation,
+        "span",
+        `Original preparation: ${decimal(baseline.priorPreparation.amount)} USDC, paid separately.`,
       );
-    }
   }
   const details = panel.querySelector(".details-body");
   details.replaceChildren();
@@ -145,12 +157,6 @@ function renderProvider(name) {
       "p",
       `Preparation this run: ${cost(p.payments, "preparation")} · ${elapsed(p.timing.preparation)}.`,
     );
-    if (!p.payments.some((v) => v.phase === "preparation"))
-      text(
-        details,
-        "p",
-        `Coverage reused. The known initial preparation for this recorded hour was ${decimal(baseline?.priorPreparation.amount ?? "35880")} USDC, separate from this run’s reads.`,
-      );
     text(
       details,
       "p",
@@ -199,6 +205,24 @@ function render() {
         ? "Every transfer and amount matches"
         : "The returned transfers differ"
       : "Waiting for both complete answers";
+  const complete =
+    t?.status === "done" &&
+    n?.status === "done" &&
+    compare(t.rows, n.rows).matches;
+  const tc = evidenceCosts(t?.payments ?? [], "query"),
+    nc = evidenceCosts(n?.payments ?? [], "query");
+  $("#price-comparison").textContent =
+    complete &&
+    tc.confirmed &&
+    nc.confirmed &&
+    BigInt(tc.amount) > 0n &&
+    BigInt(nc.amount) > BigInt(tc.amount)
+      ? `Nansen’s retrieval cost was ${(Number((BigInt(nc.amount) * 10n) / BigInt(tc.amount)) / 10).toFixed(1)}× Testril’s. Preparation and provenance are separate.`
+      : "";
+  const report = current?.scope;
+  $("#report-window").textContent = report
+    ? `${report.from_time.slice(0, 10)} · ${report.from_time.slice(11, 16)}–${report.to_time.slice(11, 16)} UTC${report.to_time.slice(0, 10) !== report.from_time.slice(0, 10) ? " (full day)" : ""}`
+    : "10 November 2026 · full UTC day";
   const rows = $("#transfers");
   rows.replaceChildren();
   for (const r of t?.rows.slice(0, 12) ?? []) {
@@ -231,7 +255,7 @@ function render() {
     );
     text(trail, "p", `Source fingerprint: ${p.digest}`, "address");
     const list = document.createElement("ul");
-    for (const b of p.blocks) {
+    for (const b of p.blocks.slice(0, 12)) {
       const a = text(
         text(list, "li", ""),
         "a",
@@ -242,9 +266,20 @@ function render() {
       a.rel = "noreferrer";
     }
     trail.append(list);
+    if (p.blocks.length > 12)
+      text(
+        trail,
+        "p",
+        "First 12 source blocks. Download this run for the complete source trail.",
+      );
   }
-  $("#replay-proof").disabled = $("#fresh-proof").disabled =
-    busy || proofBusy || !p;
+  $("#fresh-proof").disabled = busy || proofBusy || !p;
+  $("#replay-proof").disabled =
+    busy || proofBusy || !p || current.scope.window === "day";
+  $("#replay-proof").title =
+    current?.scope.window === "day"
+      ? "The saved Ethereum archive covers the original hourly samples. Use the live Ethereum check for a full-day run."
+      : "";
   $("#tamper").disabled = busy || proofBusy || !proofPassed;
   $("#download").disabled = !current;
   $("#run").disabled =
@@ -254,31 +289,35 @@ function render() {
     !payer ||
     Boolean(savedLive?.pending);
   $("#connect").disabled = busy || proofBusy;
-  for (const id of ["#hour", "#recorded", "#live"])
-    $(id).disabled = busy || proofBusy;
-  if (mode === "live" && savedLive?.pending) $("#hour").disabled = true;
+  for (const id of ["#recorded", "#live"]) $(id).disabled = busy || proofBusy;
+  $("#live-title").textContent =
+    current &&
+    mode === "live" &&
+    (current.scope.window ?? current.scope.hour) !== "day"
+      ? "Saved live run · original hourly scope"
+      : "Live run · full UTC day";
   $("#recorded-controls").hidden = mode !== "recorded";
   $("#live-controls").hidden = mode !== "live";
   $("#recovery").hidden = !savedLive?.pending;
   $("#recorded").classList.toggle("selected", mode === "recorded");
+  $("#recorded").setAttribute("aria-pressed", String(mode === "recorded"));
+  $("#live").setAttribute("aria-pressed", String(mode === "live"));
   $("#live").classList.toggle("selected", mode === "live");
 }
 async function loadRecording() {
-  baseline = await api(`recordings/hour-${$("#hour").value}.json`);
+  baseline = await api("recordings/hour-12.json");
   if (mode === "recorded") current = structuredClone(baseline);
-  else
-    current =
-      savedLive?.scope.hour === Number($("#hour").value) ? savedLive : null;
+  else current = savedLive ?? null;
   proofPassed = false;
   $("#proof-status").textContent = "Saved evidence available";
   $("#proof-result").replaceChildren();
-  $("#recording-note").textContent = baseline.recordingNote;
+  $("#recording-note").textContent =
+    "Original one-hour recording · no wallet or payment needed. Live runs cover the full day.";
   $("#notice").textContent =
     mode === "recorded"
-      ? Number.isFinite(baseline.providers.testril.timing.query)
-        ? "Recorded production run · automated approval and signing time is shown separately."
-        : "Verified case study · no complete browser timings were recorded for this run."
-      : "Connect a Base USDC wallet to request the fixed report.";
+      ? ""
+      : (savedLive?.error ??
+        "Connect a Base USDC wallet to retrieve the full day.");
   render();
 }
 async function verify(mode) {
@@ -336,7 +375,7 @@ async function verify(mode) {
         ? "Live Ethereum check passed"
         : "Saved evidence replay passed";
     $("#proof-result").textContent =
-      `${result.transfers} transfers rebuilt exactly, across ${result.contributing_blocks} contributing blocks. Source fingerprint and every hourly counterparty total reconstructed. ${mode === "live" ? "The source records came directly from the external Ethereum service." : "This checks the archived source responses; it is not a fresh network check."}`;
+      `${result.transfers} transfers rebuilt exactly, across ${result.contributing_blocks} contributing blocks. Source fingerprint and every counterparty total reconstructed. ${mode === "live" ? "The source records came directly from the external Ethereum service." : "This checks the archived source responses; it is not a fresh network check."}`;
     $("#proof-result").className = "proof-ok";
     if (selected.kind === "live") persist(selected);
   } catch (error) {
@@ -359,7 +398,7 @@ async function verify(mode) {
 function approve(quote) {
   const dialog = $("#payment-dialog");
   $("#payment-summary").textContent =
-    `${quote.provider === "testril" ? "Testril" : "Nansen"}: ${{ read: "retrieve transfers", materialize: "prepare this hour", provenance: "retrieve source evidence", transactions: "retrieve one transaction page" }[quote.action]} · ${decimal(quote.amount)} USDC service charge.`;
+    `${quote.provider === "testril" ? "Testril" : "Nansen"}: ${{ read: "retrieve transfers", materialize: "prepare this day", provenance: "retrieve source evidence", transactions: "retrieve one transaction page" }[quote.action]} · ${decimal(quote.amount)} USDC service charge.`;
   $("#payment-recipient").textContent = `Recipient: ${quote.payTo}`;
   $("#deposit-note").textContent = BigInt(quote.deposit)
     ? `A separate ${decimal(quote.deposit)} USDC escrow deposit is needed. The service charge is deducted from the channel; the deposit is not a second fee.`
@@ -402,7 +441,7 @@ $("#run").addEventListener("click", async () => {
   render();
   try {
     current = await runComparison({
-      hour: Number($("#hour").value),
+      window: "day",
       payer,
       request: api,
       approve,
@@ -430,18 +469,17 @@ $("#recorded").addEventListener("click", async () => {
 $("#live").addEventListener("click", () => {
   mode = "live";
   current = savedLive ?? null;
-  if (savedLive) $("#hour").value = String(savedLive.scope.hour);
+  proofPassed = false;
+  $("#proof-result").replaceChildren();
+  $("#proof-status").textContent = current?.providers.testril.provenance
+    ? "Source evidence available"
+    : "Run the comparison first";
   $("#notice").textContent = storageBlocked
     ? "Saved browser state could not be read. Live purchases are blocked until browser storage is available and the previous state has been reviewed."
     : (savedLive?.error ??
-      "Connect a Base USDC wallet to buy the same fixed report.");
+      "Connect a Base USDC wallet to retrieve the full day from both providers.");
   render();
 });
-$("#hour").addEventListener("change", () =>
-  loadRecording().catch(() => {
-    $("#notice").textContent = "The recorded report could not be loaded.";
-  }),
-);
 $("#replay-proof").addEventListener("click", () => verify("saved"));
 $("#fresh-proof").addEventListener("click", () => verify("live"));
 $("#tamper").addEventListener("click", () => verify("edited"));
@@ -479,7 +517,7 @@ function downloadRun(value) {
   const url = URL.createObjectURL(blob),
     a = document.createElement("a");
   a.href = url;
-  a.download = `wallet-statement-${value.scope.hour}-${value.status === "done" ? "run" : "attempt"}.json`;
+  a.download = `wallet-statement-${value.scope.window ?? value.scope.hour}-${value.status === "done" ? "run" : "attempt"}.json`;
   a.click();
   setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
@@ -492,7 +530,9 @@ try {
     if (
       savedLive?.schemaVersion !== 1 ||
       savedLive.kind !== "live" ||
-      ![12, 13].includes(savedLive.scope?.hour) ||
+      !["day", 12, 13].includes(
+        savedLive.scope?.window ?? savedLive.scope?.hour,
+      ) ||
       !["testril", "nansen"].every(
         (name) =>
           Array.isArray(savedLive.providers?.[name]?.rows) &&
@@ -508,7 +548,6 @@ try {
     }
     if (savedLive.pending) {
       mode = "live";
-      $("#hour").value = String(savedLive.scope.hour);
     }
   }
 } catch {

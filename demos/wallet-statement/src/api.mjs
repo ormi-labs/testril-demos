@@ -70,10 +70,10 @@ export function createApi({
         const value = await body(request);
         if (
           !value ||
-          Object.keys(value).some((k) => !["payer", "hour"].includes(k))
+          Object.keys(value).some((k) => !["payer", "window"].includes(k))
         )
           throw failure("INVALID_REQUEST");
-        const run = newRun(value.payer, value.hour, createId?.(request));
+        const run = newRun(value.payer, value.window, createId?.(request));
         await save(run);
         return respond({ id: run.id }, 201);
       }

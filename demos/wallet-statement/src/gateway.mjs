@@ -1,5 +1,6 @@
 import {
   scope,
+  maxPages,
   atoms,
   chargeCap,
   depositCap,
@@ -19,7 +20,7 @@ const actions = [
   "transactions",
 ];
 const uuid = /^[0-9a-f]{8}-[0-9a-f-]{27}$/;
-export function newRun(payer, hour, id = crypto.randomUUID()) {
+export function newRun(payer, window = "day", id = crypto.randomUUID()) {
   if (
     typeof payer !== "string" ||
     !/^0x[0-9a-f]{40}$/i.test(payer) ||
@@ -27,14 +28,14 @@ export function newRun(payer, hour, id = crypto.randomUUID()) {
   )
     throw failure("INVALID_REQUEST");
   try {
-    scope(hour);
+    scope(window);
   } catch {
     throw failure("INVALID_REQUEST");
   }
   return {
     id,
     payer,
-    hour,
+    window,
     created: Date.now(),
     charges: "0",
     deposits: "0",
@@ -50,7 +51,7 @@ export function publicRun(run) {
   return {
     id: run.id,
     payer: run.payer,
-    hour: run.hour,
+    window: run.window,
     charges: run.charges,
     deposits: run.deposits,
     stopped: run.stopped,
@@ -72,20 +73,23 @@ export async function execute(run, input, { providers, persist }) {
   )
     throw failure("INVALID_REQUEST");
   if (
+    run.hour !== undefined || // Older hourly purchases remain inspectable, never replayed.
     run.stopped ||
     run.pending ||
-    Date.now() - run.created > 900000 ||
-    run.operations.length >= 100
+    Date.now() - run.created > 3600000 ||
+    run.operations.length >= 128
   )
     throw failure("RUN_STOPPED");
   if (run.operations.some((o) => o.id === input.id))
     throw failure("RUN_STOPPED");
-  const report = scope(run.hour);
+  const report = scope(run.window);
   if (input.action !== "bind" && provider === "testril" && !run.bound)
     throw failure("INVALID_REQUEST");
   if (
     input.action === "transactions" &&
-    (!Number.isSafeInteger(input.page) || input.page < 1 || input.page > 20)
+    (!Number.isSafeInteger(input.page) ||
+      input.page < 1 ||
+      input.page > maxPages)
   )
     throw failure("INVALID_REQUEST");
   if (input.action === "job" && !run.job) throw failure("INVALID_REQUEST");
@@ -153,7 +157,7 @@ export async function execute(run, input, { providers, persist }) {
   let result;
   try {
     if (provider === "nansen")
-      result = await providers.nansen(run.hour, input.page, input.payment);
+      result = await providers.nansen(run.window, input.page, input.payment);
     else {
       const requests = {
         bind: [
@@ -293,7 +297,7 @@ export async function execute(run, input, { providers, persist }) {
             if (
               !Array.isArray(value.blocks) ||
               value.bound_function_id !== run.bound ||
-              value.blocks.length > 1000 ||
+              value.blocks.length > report.to_block - report.from_block ||
               value.chain_id !== 1 ||
               value.from_block !== report.from_block ||
               value.to_block !== report.to_block ||

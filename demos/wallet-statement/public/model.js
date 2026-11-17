@@ -1,28 +1,32 @@
 export const paymentNetwork = "eip155:8453";
 export const usdc = "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913";
-export const chargeCap = "250000";
-export const depositCap = "20000";
+export const chargeCap = "2000000";
+export const depositCap = "1000000";
 export const address = "0x88e6a0c2ddd26feeb64f039a2c41296fcb3f5640";
 export const token = "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48";
 const addr = /^0x[0-9a-f]{40}$/;
 const tx = /^0x[0-9a-f]{64}$/;
 
-export function scope(hour = 12) {
-  if (![12, 13].includes(hour))
-    throw new Error("Choose the 12:00 or 13:00 report.");
+// Numeric windows are retained for the archived hourly reports.
+export function scope(window = "day") {
+  if (!["day", 12, 13].includes(window))
+    throw new Error("Choose the full day or an archived hourly report.");
+  const day = window === "day";
   return {
-    hour,
+    window,
     chain_id: 1,
     decimals: 6,
     wallet: address,
     token,
     function_slug: "erc20.wallet_transfers",
-    from_time: `2026-11-10T${hour}:00:00Z`,
-    to_time: `2026-11-10T${hour + 1}:00:00Z`,
-    from_block: hour === 12 ? 26384371 : 26384670,
-    to_block: hour === 12 ? 26384670 : 26384969,
+    from_time: day ? "2026-11-10T00:00:00Z" : `2026-11-10T${window}:00:00Z`,
+    to_time: day ? "2026-11-11T00:00:00Z" : `2026-11-10T${window + 1}:00:00Z`,
+    from_block: day ? 26380784 : window === 12 ? 26384371 : 26384670,
+    to_block: day ? 26387957 : window === 12 ? 26384670 : 26384969,
   };
 }
+export const maxRows = 20000;
+export const maxPages = 100;
 export function atoms(value) {
   if (typeof value !== "string" || !/^(0|[1-9]\d*)$/.test(value))
     throw new Error("Expected an exact integer amount.");
@@ -54,7 +58,7 @@ export function decimalAtoms(value) {
   return raw.toString();
 }
 export function validateRows(rows, report, provider) {
-  if (!Array.isArray(rows) || rows.length > 3000)
+  if (!Array.isArray(rows) || rows.length > maxRows)
     throw new Error("Invalid transfer list.");
   return rows.map((r) => {
     const row = {

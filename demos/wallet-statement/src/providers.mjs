@@ -128,8 +128,8 @@ export function createProviders({
         }
       }
     },
-    async nansen(hour, page, payment) {
-      const report = scope(hour);
+    async nansen(window, page, payment) {
+      const report = scope(window);
       let response;
       try {
         response = await fetcher(
