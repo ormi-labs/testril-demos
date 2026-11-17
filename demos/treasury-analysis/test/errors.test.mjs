@@ -105,7 +105,7 @@ test("a failed binding transport preserves its classification and never suggests
       code: "TESTRIL_REQUEST_FAILED",
       details: {
         operation: "bind",
-        transportCode: "unknown",
+        transportCode: "FETCH_FAILED",
         functionSlug: "erc20.token_balance",
         walletId: "treasury",
       },
