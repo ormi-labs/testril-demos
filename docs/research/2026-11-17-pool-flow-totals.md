@@ -2,6 +2,13 @@
 
 17 November 2026. [Recorded measurements and public receipts](2026-11-17-pool-flow-totals.json).
 
+**Scope warning:** this exploratory trial compared Nansen's counterparty summary
+with Testril's complete transfer read counted locally. It is not a comparison of
+equivalent retrieved datasets and does not replace the complete-ledger benchmark.
+The current demo will retrieve every transfer from both providers. A separate
+[aggregate Function proposal](../proposals/2026-11-17-wallet-transfer-totals.md)
+describes the Testril work needed for a future summary-to-summary comparison.
+
 Question: **How many USDC transfers involved Ethereum pool
 `0x88e6a0c2ddd26feeb64f039a2c41296fcb3f5640` on 10 November 2026 UTC?**
 

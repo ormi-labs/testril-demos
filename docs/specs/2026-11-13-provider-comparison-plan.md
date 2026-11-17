@@ -1,5 +1,23 @@
 # Three provider comparisons: trial and build plan
 
+## Current decision: 17 November
+
+Pool Flows will compare complete USDC transfer ledgers for the same full UTC day:
+Testril's `erc20.wallet_transfers` against every required page of Nansen's address
+transaction history. Compare every normalized transfer and exact amount before
+publishing cost/time ratios. Keep the earlier hourly recording until the daily
+run is complete and verified. The prior Nansen attempt stopped with an uncertain
+payment; it must not be replayed or treated as a completed recording.
+
+The [exploratory totals trial](../research/2026-11-17-pool-flow-totals.md) uses
+different result detail on the two sides and is not the ledger benchmark.
+A separate [Testril aggregate Function proposal](../proposals/2026-11-17-wallet-transfer-totals.md)
+would support a future comparison of complete per-counterparty summaries.
+It does not block the current ledger demo. Earlier findings and wallet balances
+below describe their stated dates, not today's state.
+
+## Earlier plan and trials
+
 Updated 13 November 2026. Paul authorized paid trials and implementation after feasibility is established. The wallet-statement trial now passes paid data-equivalence checks. Counterparties failed the hour-window comparison; Dune still needs Tempo funding. [Paid trial results and evidence](../research/2026-11-13-wallet-statement-paid-trial.md)
 
 **14 November follow-up:** [complete two-hour checks](../research/2026-11-14-two-hour-comparison.md) establish that Nansen transaction history matches Testril for 292 and 503 transfers, while the complete counterparties responses are identical and match neither hour, even with labels swapped. Current accounting is 0.582717 USDC in service charges, 0.408240 in the wallet and 0.009043 unspent in escrow. The counterparty demo remains blocked; timestamp loss/cache behavior is suspected but not confirmed.

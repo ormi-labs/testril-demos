@@ -2,6 +2,12 @@
 
 **Proposed requirements · 3 October 2026**
 
+**17 November follow-up:** [Wallet transfer totals](proposals/2026-11-17-wallet-transfer-totals.md)
+proposes a separate period/counterparty aggregate over `erc20.wallet_transfers`.
+It supports a future summary comparison with Nansen; the current Pool Flows demo
+continues comparing complete transfer ledgers. It does not expand the original
+first-release assignment below.
+
 This document specifies the existing functions to verify and the new functions to implement. Proposed names may change to match the core catalog. See the [demo plan](demo-strategy.md) for their uses and the [research notes](research/baseline.md) for the inspected implementation.
 
 For the first-release backend assignment, hand the implementing agent the self-contained [build specification](specs/first-release-data-functions.md). It defines the transfer-edge contract, exact-balance verification, paid serving requirements, acceptance cases, and handover. The sections below summarize this and later function work.
