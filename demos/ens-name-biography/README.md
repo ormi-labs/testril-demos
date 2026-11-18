@@ -2,8 +2,9 @@
 
 The life of two famous ENS names on Ethereum since the registry was deployed:
 every owner, resolver and address change, and every registration and renewal
-with its cost in ETH. The page proves its numbers: each renewal must expire
-later than the one before, costs must be integer wei, a wrapped name's expiry
+with its cost in ETH. The page proves its numbers: no renewal may expire
+earlier than the one before (one may add no time, as vitalik.eth's renewal at
+block 15305008 did), costs must be integer wei, a wrapped name's expiry
 must equal the registrar expiry plus the 90-day grace period, registry rows
 must be in block order, and the address record must cover every month.
 

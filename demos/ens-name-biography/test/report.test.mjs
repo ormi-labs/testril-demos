@@ -15,7 +15,7 @@ const [vitalik, nick] = subjectsOf(fixtureBinds);
 test("check passes on the fixture and names the invariants", () => {
   const passed = check(fixtureFetched(rows()), fixtureBinds);
   assert.equal(passed.length, 6);
-  assert.match(passed[1], /5 renewals, each expiring later/);
+  assert.match(passed[1], /5 renewals, each expiring no earlier/);
 });
 
 test("check fails when a renewal expires before the previous one", () => {
@@ -27,7 +27,22 @@ test("check fails when a renewal expires before the previous one", () => {
   ];
   assert.throws(
     () => check(fixtureFetched(corrupted), fixtureBinds),
-    /not later than the previous/,
+    /earlier than the previous/,
+  );
+});
+
+test("check accepts a renewal that adds no time, as vitalik.eth's at block 15305008", () => {
+  const withZeroRenewal = rows();
+  const registration = withZeroRenewal[vitalik.binds.registration];
+  const [, previous] = registration;
+  registration.splice(2, 0, {
+    ...previous,
+    block: previous.block + 1,
+    cost: "0",
+  });
+  assert.match(
+    check(fixtureFetched(withZeroRenewal), fixtureBinds)[1],
+    /6 renewals/,
   );
 });
 
@@ -49,6 +64,19 @@ test("check fails when a cost is in gwei or 1000x too large", () => {
       /per year, outside/,
     );
   }
+});
+
+test("check prices a renewal shorter than a year by its seconds, as vitalik.eth's 4-day one at block 25497658", () => {
+  const withShortRenewal = rows();
+  const registration = withShortRenewal[vitalik.binds.registration];
+  const last = registration.at(-1);
+  registration.push({
+    ...last,
+    block: last.block + 1,
+    cost: "31756445700156",
+    expires: String(BigInt(last.expires) + 350212n),
+  });
+  assert.equal(check(fixtureFetched(withShortRenewal), fixtureBinds).length, 6);
 });
 
 test("check accepts a free renewal and a four-letter name priced at 1.2 ETH a year", () => {

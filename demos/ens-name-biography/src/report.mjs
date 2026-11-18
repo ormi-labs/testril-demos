@@ -231,10 +231,9 @@ function requireWei(subject, list) {
         `${subject.name}: cost "${row.cost}" at block ${row.block} is not a non-negative integer of wei.`,
       );
     if (i === 0) return;
-    const years =
-      (BigInt(row.expires) - BigInt(list[i - 1].expires)) / yearSeconds;
-    if (BigInt(row.cost) === 0n) return;
-    const perYear = BigInt(row.cost) / (years || 1n);
+    const seconds = BigInt(row.expires) - BigInt(list[i - 1].expires);
+    if (BigInt(row.cost) === 0n || seconds === 0n) return;
+    const perYear = (BigInt(row.cost) * yearSeconds) / seconds;
     if (perYear < weiPerYearBand[0] || perYear > weiPerYearBand[1])
       throw new Error(
         `${subject.name}: cost ${row.cost} at block ${row.block} is ${perYear} per year, outside ${weiPerYearBand.join(" to ")} wei per year; is it in wei?`,
@@ -242,11 +241,11 @@ function requireWei(subject, list) {
   });
 }
 
-function requireLaterExpiry(subject, list) {
+function requireExpiryNeverEarlier(subject, list) {
   list.forEach((row, i) => {
-    if (i > 0 && BigInt(row.expires) <= BigInt(list[i - 1].expires))
+    if (i > 0 && BigInt(row.expires) < BigInt(list[i - 1].expires))
       throw new Error(
-        `${subject.name}: the renewal at block ${row.block} expires at ${row.expires}, not later than the previous ${list[i - 1].expires}.`,
+        `${subject.name}: the renewal at block ${row.block} expires at ${row.expires}, earlier than the previous ${list[i - 1].expires}.`,
       );
   });
 }
@@ -313,7 +312,7 @@ export function check({ rows, reads }, binds) {
     requireAscendingBlocks(subject, subject.binds.domain, domain);
     requireAscendingBlocks(subject, subject.binds.registration, registration);
     requireAscendingBlocks(subject, subject.binds.wrapped, wrapped);
-    requireLaterExpiry(subject, registration);
+    requireExpiryNeverEarlier(subject, registration);
     requireGracePeriod(subject, registration, wrapped);
     requireWei(subject, registration);
     requireEveryMonth(subject, address, binds);
@@ -324,7 +323,7 @@ export function check({ rows, reads }, binds) {
     ]);
     return [
       `${subject.name}: ${domain.length} registry rows in ascending block order, ${changes(domain, "owner").length} owner changes`,
-      `${subject.name}: ${renewalsOf(registration).length} renewals, each expiring later than the one before, costs non-negative (${formatEth(totalCost(renewalsOf(registration)))} in total)`,
+      `${subject.name}: ${renewalsOf(registration).length} renewals, each expiring no earlier than the one before, costs non-negative (${formatEth(totalCost(renewalsOf(registration)))} in total)`,
       `${subject.name}: address record present for all ${monthsInWindow(binds).length} months`,
     ];
   });
