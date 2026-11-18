@@ -20,8 +20,6 @@ Mock mode simulates Arbitrum transactions, Testril reads, payment charges, and s
 
 Preview Pool Flows on [desktop](docs/screenshots/wallet-statement-desktop.png) and [mobile](docs/screenshots/wallet-statement-mobile.png), including the wallet tab on [desktop](docs/screenshots/wallet-statement-wallet-desktop.png) and [mobile](docs/screenshots/wallet-statement-wallet-mobile.png).
 
-## Recorded demos
-
 ## Data demos
 
 Each of these opens with a **Fetch from Testril** button and no data. Pressing it has the demo's server bind, index and read its functions on Testril, paid from the usage credits of the key in `TESTRIL_PAYER_KEY`, while the page shows a progress bar per bind. Then it draws the report and its cross-check. Nothing is saved: a restart starts empty and the next fetch reads again. Without the key the button is disabled.
