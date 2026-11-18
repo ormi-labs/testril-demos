@@ -1,7 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { check, hours, shape, zeroAddress } from "../src/report.mjs";
-import { fixture, fixtureFetched, hourStartBlock } from "./fixture.mjs";
+import { check, hours, shape } from "../src/report.mjs";
+import { fixture, fixtureFetched } from "./fixture.mjs";
 
 const rows = () => structuredClone(fixture());
 const fetched = (value = rows()) => fixtureFetched(value);
@@ -12,10 +12,10 @@ test("check proves each hour's supply change from mints and burns", () => {
 
 test("check fails when a burn is read as a mint", () => {
   const corrupted = rows();
-  const burn = corrupted["usdc-edges"].find(
-    (e) => e.to === zeroAddress && e.block >= hourStartBlock(1),
+  const burner = corrupted["usdc-mints-burns"].find(
+    (row) => row.received !== "0" && row.hour > hours[0],
   );
-  [burn.from, burn.to] = [zeroAddress, burn.from];
+  [burner.sent, burner.received] = [burner.received, burner.sent];
   assert.throws(() => check(fetched(corrupted)), /mints minus burns/);
 });
 
@@ -62,21 +62,11 @@ test("check fails when supply is read at an hour's first block instead of its la
   assert.throws(() => check(fetched(corrupted)), /mints minus burns/);
 });
 
-test("check places a transfer edge by its read's resolved blocks, not by the hour's even 300 blocks", () => {
+test("check fails when a mint and burn row falls outside the replay hours", () => {
   const input = fetched();
-  const [first] = input.rows["usdc-edges"].filter(
-    (edge) => edge.block >= hourStartBlock(5),
-  );
-  input.reads["usdc-edges"][4].to_block = first.block + 1;
-  input.reads["usdc-edges"][5].from_block = first.block + 1;
-  assert.throws(() => check(input), /mints minus burns/);
-});
-
-test("check fails when a transfer edge sits outside every hour", () => {
-  const input = fetched();
-  input.rows["usdc-edges"].push({
-    ...input.rows["usdc-edges"][0],
-    block: input.reads["usdc-edges"].at(-1).to_block,
+  input.rows["usdc-mints-burns"].push({
+    ...input.rows["usdc-mints-burns"][0],
+    hour: "2023-03-15T00",
   });
   assert.throws(() => check(input), /outside the replay hours/);
 });

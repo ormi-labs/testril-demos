@@ -3,8 +3,8 @@
 The Chainlink USDC/USD answer for every hour of 10–14 March 2023 on Ethereum,
 next to what USDC burned and minted in the same hours, and the addresses that
 burned the most. The page proves its numbers: in every hour the USDC supply
-change must equal mints minus burns from the transfer edges, and the Chainlink
-answer must stay between $0.80 and $1.02.
+change must equal mints minus burns from the zero address's transfers, and the
+Chainlink answer must stay between $0.80 and $1.02.
 
 Every number on the page comes live from Testril when you press **Fetch from
 Testril**. The first fetch has Testril index the data; later fetches only read
@@ -37,8 +37,10 @@ whole window (Testril charges only for what it has not indexed yet), follows the
 job, then `read`s the window. The page shows a bar per bind and overall from
 Testril's own job progress and the usage credits spent. Then it draws four
 headline numbers, a timeline of the answer above net burns per hour, a table of
-the biggest burning addresses, and three cross-checks. Nothing is saved:
-a restart starts empty and the next fetch reads again.
+the biggest burning addresses, and three cross-checks. Each bind is one read:
+120 supply rows, 120 answer rows and 122 mint and burn rows. Against production,
+a fetch of the indexed span took 5 seconds and $0.11. Nothing is saved: a
+restart starts empty and the next fetch reads again.
 
 Without `TESTRIL_PAYER_KEY` the button is disabled and the page says what to set.
 
@@ -54,8 +56,9 @@ npm run format:check
 
 `npm test` checks the cross-checks pass on the fixture and fail when a burn is
 read as a mint, when supply is in whole dollars instead of raw units, when the
-answer is read with the wrong decimals, or when an hour is missing, and that the
-server returns the shaped report.
+answer is read with the wrong decimals, when an hour is missing, or when a mint
+and burn row falls outside the replay, and that the server returns the shaped
+report.
 `npm test` also fetches from a fake Testril: the fetch pays with the payer's
 vouchers, reports Testril's job progress and keeps every row.
 `npm run test:browser` presses the button against the fake Testril and waits
@@ -69,26 +72,24 @@ for the report. The fixture lives in `test/` and is never shown on the page.
 - Hours: the fixed UTC hours `[2023-03-10T00:00:00Z, 2023-03-15T00:00:00Z)`,
   read at each hour's last block. The replay is history, so its windows do not
   follow the press.
-- Transfers: one `usdc-edges` bind over the whole span, read hour by hour (120
-  reads). A transfer edge carries only its block, so `check` puts it in the
-  hour whose read resolved to a block range holding it.
+- Mints and burns: the zero address's USDC transfers summed per counterparty
+  and hour. A mint is the zero address's `sent` to its recipient, a burn its
+  `received` from the burner; each row names its hour.
 
 The first hour has no earlier supply row, so 119 hours are cross-checked.
 
 USDC `burn()` emits a transfer from the caller to the zero address, and the
 caller is a Circle-controlled minter, so the burning-addresses table lists
-those minters, not the exchanges that sent USDC to Circle. The test fixture mints
-to Circle `0x55fe002aeff02f77364de339a1292923a15844b8`. Verify
-before fetching.
+those minters, not the exchanges that sent USDC to Circle. On the real replay,
+Circle `0x55fe002aeff02f77364de339a1292923a15844b8` burned 99.7% of the
+$6.20B.
 
 ## Binds (`src/report.mjs`)
 
 Windows are fixed; the end is not included.
 
-| Name            | Function                   | Chain | Params          | Window                        |
-| --------------- | -------------------------- | ----- | --------------- | ----------------------------- |
-| `supply`        | `erc20.token_supply`       | 1     | `tokens`, `by`  | 2023-03-10T00 → 2023-03-15T00 |
-| `usdc-edges`    | `erc20.transfer_edges`     | 1     | `token_address` | 2023-03-10T00 → 2023-03-15T00 |
-| `usdc-usd-feed` | `aggregator.latest_answer` | 1     | `feeds`, `by`   | 2023-03-10T00 → 2023-03-15T00 |
-
-`usdc-edges` is read in one-hour chunks.
+| Name               | Function                      | Chain | Params                                                       | Window                        |
+| ------------------ | ----------------------------- | ----- | ------------------------------------------------------------ | ----------------------------- |
+| `supply`           | `erc20.token_supply`          | 1     | `tokens`, `by: hour`                                         | 2023-03-10T00 → 2023-03-15T00 |
+| `usdc-mints-burns` | `erc20.wallet_counterparties` | 1     | `swap: { wallet: zero address, tokens: [USDC] }`, `by: hour` | 2023-03-10T00 → 2023-03-15T00 |
+| `usdc-usd-feed`    | `aggregator.latest_answer`    | 1     | `feeds`, `by: hour`                                          | 2023-03-10T00 → 2023-03-15T00 |

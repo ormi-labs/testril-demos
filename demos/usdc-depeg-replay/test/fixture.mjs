@@ -1,26 +1,12 @@
-import { readParts } from "../src/fetch.mjs";
-import {
-  binds,
-  feed,
-  hours,
-  mintsAndBurns,
-  usdc,
-  zeroAddress,
-} from "../src/report.mjs";
-import { blockAt, resolveWindow } from "./fake-testril.mjs";
+import { binds, feed, hours, mintsAndBurns, usdc } from "../src/report.mjs";
 
 export const fixtureNow = Date.parse("2026-11-02T12:00:00Z");
 export const fixtureBinds = binds;
-export const hourStartBlock = (hour) => blockAt(`${hours[hour]}:00:00Z`);
 
 const circle = "0x55fe002aeff02f77364de339a1292923a15844b8";
 const minters = Array.from(
   { length: 6 },
   (_, i) => `0x${String(i + 1).repeat(40)}`,
-);
-const holders = Array.from(
-  { length: 16 },
-  (_, i) => `0x${(i + 10).toString(16).padStart(2, "0").repeat(20)}`,
 );
 const startingSupply = 43900000000n;
 const dipStart = 36;
@@ -59,34 +45,37 @@ function feedRows(random) {
   });
 }
 
-function edgeRows(random) {
+function mintBurnRows(random) {
   const pickMinter = () => minters[Math.floor(random() ** 2 * minters.length)];
-  const edges = [];
-  const add = (hour, slot, from, to, dollars) =>
-    edges.push({
-      block: hourStartBlock(hour) + 40 + slot * 37,
-      from,
-      to,
-      amount: raw(dollars, random).toString(),
-      count: String(1 + Math.floor(random() * 4)),
-    });
+  const rows = new Map();
+  const move = (hour, counterparty, side, dollars) => {
+    const key = `${hour}:${counterparty}`;
+    const row = rows.get(key) ?? {
+      counterparty,
+      hour: hours[hour],
+      received: 0n,
+      sent: 0n,
+      token: usdc,
+      transfers: 0n,
+    };
+    row[side] += raw(dollars, random);
+    row.transfers += 1n;
+    rows.set(key, row);
+  };
   hours.forEach((_, hour) => {
     const depth = (1 - dollarPrice(hour)) / 0.12;
-    add(hour, 0, pickMinter(), zeroAddress, 2e6 + depth * 6e8 * random());
+    move(hour, pickMinter(), "received", 2e6 + depth * 6e8 * random());
     if (depth > 0.4)
-      add(hour, 1, pickMinter(), zeroAddress, depth * 3e8 * random());
+      move(hour, pickMinter(), "received", depth * 3e8 * random());
     if (hour >= mintStart)
-      add(hour, 2, zeroAddress, circle, 4e7 + ((hour - mintStart) / 60) * 3e8);
-    if (hour % 3 === 0)
-      add(
-        hour,
-        3,
-        holders[hour % 8],
-        holders[8 + (hour % 8)],
-        1e6 + random() * 5e7,
-      );
+      move(hour, circle, "sent", 4e7 + ((hour - mintStart) / 60) * 3e8);
   });
-  return edges;
+  return [...rows.values()].map((row) => ({
+    ...row,
+    received: row.received.toString(),
+    sent: row.sent.toString(),
+    transfers: row.transfers.toString(),
+  }));
 }
 
 function supplyRows(fetched, random) {
@@ -102,46 +91,30 @@ function supplyRows(fetched, random) {
 
 export function fixture() {
   const random = seeded(7);
-  const edges = edgeRows(random);
+  const mintsBurns = mintBurnRows(random);
   return {
-    supply: supplyRows(fixtureFetched({ "usdc-edges": edges }), random),
-    "usdc-edges": edges,
+    supply: supplyRows(
+      fixtureFetched({ "usdc-mints-burns": mintsBurns }),
+      random,
+    ),
+    "usdc-mints-burns": mintsBurns,
     "usdc-usd-feed": feedRows(random),
   };
 }
 
-const within = (rows, window) => {
-  const { from_block, to_block } = resolveWindow(window);
-  return rows.filter((row) => row.block >= from_block && row.block < to_block);
-};
-const edgesBind = binds.find((bind) => bind.read);
-
-export function fixtureFetched(rows = fixture()) {
-  const reads = {
-    [edgesBind.name]: readParts(edgesBind.window, edgesBind.read).map(
-      (part) => ({
-        ...part,
-        ...resolveWindow(part),
-        count: within(rows[edgesBind.name], part).length,
-      }),
-    ),
-  };
-  return { rows, reads };
-}
+export const fixtureFetched = (rows = fixture()) => ({ rows, reads: {} });
 
 const sameParams = (a, b) => JSON.stringify(a) === JSON.stringify(b);
 
 export function fixtureRows() {
   const rows = fixture();
-  return (bound, window) => {
-    const bind = binds.find(
-      (candidate) =>
-        candidate.function_slug === bound.function_slug &&
-        candidate.chain_id === bound.chain_id &&
-        sameParams(candidate.params, bound.params) &&
-        candidate.window.from_time <= window.from_time &&
-        candidate.window.to_time >= window.to_time,
-    );
-    return bind.read ? within(rows[bind.name], window) : rows[bind.name];
-  };
+  return (bound) =>
+    rows[
+      binds.find(
+        (candidate) =>
+          candidate.function_slug === bound.function_slug &&
+          candidate.chain_id === bound.chain_id &&
+          sameParams(candidate.params, bound.params),
+      ).name
+    ];
 }

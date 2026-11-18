@@ -138,7 +138,6 @@ function render(report) {
       const row = element("tr");
       row.append(
         element("td", burner.address),
-        element("td", burner.burns),
         element("td", burner.share),
         element("td", burner.amount),
       );
