@@ -33,15 +33,12 @@ test("check fails when the two tokens are swapped in a total", () => {
   );
 });
 
-test("check fails when an hour is missing", () => {
-  const corrupted = rows();
-  corrupted["okx-total"] = corrupted["okx-total"].filter(
-    (row) => row.hour !== "2026-10-28T09",
+test("a token with no row is a zero balance, as OKX 73's USDC", () => {
+  const withoutUsdc = rows();
+  withoutUsdc["okx-total"] = withoutUsdc["okx-total"].filter(
+    (row) => row.token !== usdc,
   );
-  assert.throws(
-    () => check({ rows: corrupted }, fixtureBinds),
-    /okx-total is missing .* at 2026-10-28T09/,
-  );
+  assert.equal(check({ rows: withoutUsdc }, fixtureBinds).length, 3);
 });
 
 test("check fails when a bind returns an unknown token", () => {
