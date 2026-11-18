@@ -26,14 +26,14 @@ test("check fails when a burn is read as a mint", () => {
 
 test("check fails when two named addresses disagree on the USDC between them", () => {
   const corrupted = rows();
-  const binance14 = "0x28c6c06298d514db089934071355e5743bf21d60";
+  const coinbase10 = "0xa9d1e08c7793af67e9d92fe308d5697fb81d3e43";
   const row = corrupted["usdc-circle"].find(
-    (r) => r.counterparty === binance14,
+    (r) => r.counterparty === coinbase10,
   );
   row.sent = (BigInt(row.sent) + 1n).toString();
   assert.throws(
     () => check(fetched(corrupted), fixtureBinds),
-    /reports sending .* but 0x28c6c06298d514db089934071355e5743bf21d60 reports/,
+    /reports sending .* but 0xa9d1e08c7793af67e9d92fe308d5697fb81d3e43 reports/,
   );
 });
 
@@ -64,13 +64,13 @@ test("shape nets mints against burns and names addresses from ENS", () => {
   assert.equal(view.pairs[0].toLabel, "Zero address");
   assert.equal(Math.round(view.pairs[0].millions), 370);
   assert.ok(
-    view.pairs.some((p) => [p.fromLabel, p.toLabel].includes("vitalik.eth")),
+    view.pairs.some((p) => [p.fromLabel, p.toLabel].includes("circle.eth")),
   );
 });
 
 test("an address takes the name of its last row, and no name when the last row is empty", () => {
   const changed = rows();
-  const [renamed, cleared] = ["ens-binance-14", "ens-binance-8"];
+  const [renamed, cleared] = ["ens-coinbase-10", "ens-bitfinex-2"];
   const addressOf = (name) => changed[name][0].address;
   const rowsOf = (name, names) =>
     names.map((value, index) => ({

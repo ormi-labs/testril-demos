@@ -6,7 +6,7 @@ test("the Fetch button shows progress, then the report and its cross-check", asy
   await page.goto("/");
   await expect(page.locator("#report")).toBeHidden();
   await page.getByRole("button", { name: "Fetch from Testril" }).click();
-  await expect(page.locator("#fetch-binds li")).toHaveCount(42);
+  await expect(page.locator("#fetch-binds li")).toHaveCount(28);
   await expect(page.locator("#report")).toBeVisible();
   await expect(page.locator("#fetch-overall")).toHaveJSProperty("value", 1);
   await expect(page.locator("#pairs tr")).not.toHaveCount(0);

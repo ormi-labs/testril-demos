@@ -117,7 +117,7 @@ export function fixture() {
           {
             block: blockAt(bind.window.to_time) - 1,
             address: bind.params.address,
-            name: bind.name === "ens-vitalik" ? "vitalik.eth" : "",
+            name: bind.name === "ens-circle" ? "circle.eth" : "",
           },
         ],
       ]),

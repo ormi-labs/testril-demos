@@ -3,11 +3,7 @@ const nameLookbackMs = 5 * 60000;
 const ensRegistry = "0x00000000000c2e074ec69a0dfb2997ba6c7d2e1e";
 const named = [
   ["circle", "0x55fe002aeff02f77364de339a1292923a15844b8"],
-  ["binance-14", "0x28c6c06298d514db089934071355e5743bf21d60"],
-  ["binance-8", "0xf977814e90da44bfa03b6295a0616a897441acec"],
   ["coinbase-10", "0xa9d1e08c7793af67e9d92fe308d5697fb81d3e43"],
-  ["kraken-4", "0x267be1c1d684f78cb4f6a176c4911b741e4ffdc0"],
-  ["okx-73", "0x6cc5f688a315f3dc28a7781717a9a798a59fda7b"],
   ["bitfinex-2", "0x77134cbc06cb00b66f4c7e623d5fdbf6777635ec"],
   ["uniswap-v3-usdc-weth", "0x88e6a0c2ddd26feeb64f039a2c41296fcb3f5640"],
   ["uniswap-v3-usdc-usdt", "0x3416cf6c708da44db2624d63ea0aaef7113527c6"],
@@ -16,12 +12,9 @@ const named = [
   ["curve-3pool", "0xbebc44782c7db0a1a60cb6fe97d0b483032ff1c7"],
   ["aave-v3-ausdc", "0x98c23e9d8f34fefb1b7bd6a91b7ff122f4e16f5c"],
   ["morpho-blue", "0xbbbbbbbbbb9cc5e90e3b3af64bdaf62c37eeffcb"],
-  ["maker-psm-usdc", "0x0a59649758aa4d66e25f08dd01271e891fe52199"],
   ["cow-settlement", "0x9008d19f58aabd9ed0d60971565aa8510560ab41"],
   ["1inch-v6-router", "0x111111125421ca6dc452d289314280a0f8842a65"],
-  ["0x-exchange-proxy", "0xdef1c0ded9bec7f1a1670819833240f027b25eff"],
   ["balancer-v2-vault", "0xba12222222228d8ba445958a75a0704d566bf2c8"],
-  ["vitalik", "0xd8da6bf26964af9d7eed9e03e53415d37aa96045"],
 ];
 export const zeroAddress = "0x0000000000000000000000000000000000000000";
 export const usdt = "0xdac17f958d2ee523a2206206994597c13d831ec7";
