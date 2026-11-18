@@ -120,7 +120,7 @@ function volumeRows(random, markets) {
       rows.push({
         day,
         market: markets[index].market,
-        trades: String(
+        fills: String(
           20 +
             Math.floor(
               (Number(quoteVolume / 10n ** 18n) / 900) * (0.5 + random()),

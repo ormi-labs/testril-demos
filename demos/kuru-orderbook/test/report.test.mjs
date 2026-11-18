@@ -101,11 +101,11 @@ test("shape sums volume of a market over all its days", () => {
   const [market] = data.markets;
   const total = data.volume
     .filter((row) => row.market === market.market)
-    .reduce((sum, row) => sum + BigInt(row.trades), 0n);
+    .reduce((sum, row) => sum + BigInt(row.fills), 0n);
   assert.equal(
     shape({ rows: data }, fixtureBinds).markets.find(
       (m) => m.market === market.market,
-    ).trades,
+    ).fills,
     total.toLocaleString("en-US"),
   );
 });

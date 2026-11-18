@@ -87,5 +87,5 @@ Windows end at 00:00 UTC on the day of the press; the end is not included.
 | `markets` | `kuru.market_list`   | 143   | `router`                     | chain start → today |
 | `volume`  | `kuru.market_volume` | 143   | `swap.market_list`, `by` day | 8 days → today      |
 
-`volume` depends on the router's `kuru.trade` rows, which depend on
+`volume` depends on the router's `kuru.order_fill` rows, which depend on
 `kuru.market_list`.

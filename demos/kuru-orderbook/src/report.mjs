@@ -137,14 +137,14 @@ function totalsByMarket(volume) {
     const key = row.market.toLowerCase();
     const total = totals.get(key) ?? {
       quoteVolume: 0n,
-      trades: 0n,
+      fills: 0n,
       baseFee: 0n,
       baseRebate: 0n,
       quoteFee: 0n,
       quoteRebate: 0n,
     };
     total.quoteVolume += BigInt(row.quote_volume);
-    total.trades += BigInt(row.trades);
+    total.fills += BigInt(row.fills);
     total.baseFee += BigInt(row.base_fee);
     total.baseRebate += BigInt(row.base_rebate);
     total.quoteFee += BigInt(row.quote_fee);
@@ -174,7 +174,7 @@ function marketView(market, total) {
     usdcQuoted: market.quote_asset === usdc,
     volume: `${formatTokens(quoteVolume)} ${quoteSymbol}`,
     amount: toFloat(quoteVolume),
-    trades: (total?.trades ?? 0n).toLocaleString("en-US"),
+    fills: (total?.fills ?? 0n).toLocaleString("en-US"),
     takerBps: market.taker_fee_bps,
     makerBps: market.maker_fee_bps,
     fees: amounts(
@@ -218,7 +218,7 @@ export function shape({ rows }, binds) {
     );
   const usdcEntries = entries.filter((entry) => entry.view.usdcQuoted);
   const usdcVolume = usdcEntries.reduce((sum, e) => sum + e.rawVolume, 0n);
-  const trades = [...totals.values()].reduce((sum, t) => sum + t.trades, 0n);
+  const fills = [...totals.values()].reduce((sum, t) => sum + t.fills, 0n);
   const top = usdcEntries[0];
   return {
     volumeDays: { first: days[0], last: days.at(-1), count: days.length },
@@ -226,7 +226,7 @@ export function shape({ rows }, binds) {
     registered: entries.length,
     active: totals.size,
     usdcVolume: `${formatTokens(usdcVolume, 0)} USDC`,
-    trades: trades.toLocaleString("en-US"),
+    fills: fills.toLocaleString("en-US"),
     topMarket: top && usdcVolume > 0n ? top.view.pair : "none",
     topShare: top ? share(top.rawVolume, usdcVolume) : "0.0%",
     bars: usdcEntries

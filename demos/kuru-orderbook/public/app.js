@@ -71,7 +71,7 @@ function render(report) {
         view.usdcVolume,
         `taker volume, ${days} days`,
       ),
-      metric("TRADES", view.trades, "all markets"),
+      metric("FILLS", view.fills, "all markets"),
       metric(
         "ACTIVE MARKETS",
         `${view.active} of ${view.registered}`,
@@ -94,7 +94,7 @@ function render(report) {
           `${market.market.slice(0, 6)}…${market.market.slice(-4)}`,
         ),
         element("td", market.volume),
-        element("td", market.trades),
+        element("td", market.fills),
         element("td", `${market.takerBps} / ${market.makerBps}`),
         element("td", market.fees),
         element("td", market.rebates),
