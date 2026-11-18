@@ -163,22 +163,26 @@ function render(report) {
   const view = report.view;
   document.querySelector("#supply-window").textContent =
     `${view.supplyDays.first} to ${view.supplyDays.last}`;
-  document.querySelector("#edges-window").textContent =
-    `${view.edgesDay}, 00:00 to 24:00 UTC`;
+  document.querySelector("#transfer-window").textContent =
+    `${view.transferDay}, 00:00 to 24:00 UTC`;
   document
     .querySelector("#headline")
     .replaceChildren(
       ...view.tokens.map((t) =>
         metric(`${t.symbol} SUPPLY`, t.latest, `${t.change} over the month`),
       ),
-      metric(`USDC MINTED · ${view.edgesDay}`, view.minted),
-      metric(`USDC BURNED · ${view.edgesDay}`, view.burned, `net ${view.net}`),
+      metric(`USDC MINTED · ${view.transferDay}`, view.minted),
+      metric(
+        `USDC BURNED · ${view.transferDay}`,
+        view.burned,
+        `net ${view.net}`,
+      ),
     );
   document
     .querySelector("#supply-chart")
     .replaceChildren(...view.tokens.map(lineChart));
   document.querySelector("#flow-note").textContent =
-    `the ${flowPairs} largest pairs on ${view.edgesDay}; mints and burns use the zero address`;
+    `the ${flowPairs} largest flows into or out of the named addresses on ${view.transferDay}; mints and burns use the zero address`;
   document.querySelector("#flow").replaceChildren(flowChart(view.pairs));
   document.querySelector("#pairs").replaceChildren(
     ...view.pairs.map((pair) => {
@@ -186,7 +190,6 @@ function render(report) {
       row.append(
         element("td", pair.fromLabel),
         element("td", pair.toLabel),
-        element("td", pair.transfers),
         element("td", pair.amount),
       );
       return row;

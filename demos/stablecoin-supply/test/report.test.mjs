@@ -1,11 +1,11 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { check, edgesDay, labels, shape, zeroAddress } from "../src/report.mjs";
+import { check, labels, shape, transferDay } from "../src/report.mjs";
 import { fixture, fixtureBinds } from "./fixture.mjs";
 
 const rows = () => structuredClone(fixture());
 const fetched = (value = rows()) => ({ rows: value });
-const day = edgesDay(fixtureBinds);
+const day = transferDay(fixtureBinds);
 
 test("check proves the fixture day's supply change from mints and burns", () => {
   assert.match(
@@ -16,11 +16,24 @@ test("check proves the fixture day's supply change from mints and burns", () => 
 
 test("check fails when a burn is read as a mint", () => {
   const corrupted = rows();
-  const burn = corrupted["usdc-edges"].find((e) => e.to === zeroAddress);
-  [burn.from, burn.to] = [zeroAddress, burn.from];
+  const burner = corrupted["usdc-mints-burns"].find((r) => r.received !== "0");
+  [burner.sent, burner.received] = [burner.received, burner.sent];
   assert.throws(
     () => check(fetched(corrupted), fixtureBinds),
     /mints minus burns/,
+  );
+});
+
+test("check fails when two named addresses disagree on the USDC between them", () => {
+  const corrupted = rows();
+  const binance14 = "0x28c6c06298d514db089934071355e5743bf21d60";
+  const row = corrupted["usdc-circle"].find(
+    (r) => r.counterparty === binance14,
+  );
+  row.sent = (BigInt(row.sent) + 1n).toString();
+  assert.throws(
+    () => check(fetched(corrupted), fixtureBinds),
+    /reports sending .* but 0x28c6c06298d514db089934071355e5743bf21d60 reports/,
   );
 });
 
@@ -49,6 +62,7 @@ test("shape nets mints against burns and names addresses from ENS", () => {
   assert.equal(view.burned, "$370.00M");
   assert.equal(view.net, "−$55.00M");
   assert.equal(view.pairs[0].toLabel, "Zero address");
+  assert.equal(Math.round(view.pairs[0].millions), 370);
   assert.ok(
     view.pairs.some((p) => [p.fromLabel, p.toLabel].includes("vitalik.eth")),
   );

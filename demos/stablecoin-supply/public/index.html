@@ -22,8 +22,8 @@
       <div class="eyebrow">ETHEREUM · USDT AND USDC</div>
       <h1>Where the dollars came from,<br />and where they went.</h1>
       <p class="intro">
-        Total supply per day for a month, then one day of USDC transfers: what
-        was minted, what was burned, and who moved the most.
+        Total supply per day for a month, then one day of USDC: what was minted,
+        what was burned, and where twenty well-known addresses moved it.
       </p>
       <section class="scope" aria-label="Report scope">
         <div>
@@ -32,11 +32,11 @@
         </div>
         <div>
           <span class="label">TRANSFERS · ONE DAY</span
-          ><strong id="edges-window">shown after fetch</strong>
+          ><strong id="transfer-window">shown after fetch</strong>
         </div>
         <div>
           <span class="label">FUNCTIONS</span
-          ><strong>erc20.token_supply · erc20.transfer_edges</strong>
+          ><strong>erc20.token_supply · erc20.wallet_counterparties</strong>
         </div>
         <div>
           <span class="label">NAMES</span><strong>ens.primary_name</strong>
@@ -72,7 +72,7 @@
         </section>
         <section class="results">
           <div class="section-heading">
-            <h2>Top sender → recipient pairs</h2>
+            <h2>Largest flows of the named addresses</h2>
             <span>names from each address's ENS primary name</span>
           </div>
           <div class="table-wrap">
@@ -81,7 +81,6 @@
                 <tr>
                   <th>From</th>
                   <th>To</th>
-                  <th>Transfers</th>
                   <th>Amount (USDC)</th>
                 </tr>
               </thead>

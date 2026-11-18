@@ -1,10 +1,11 @@
 # Stablecoin supply
 
 USDT and USDC total supply per day on Ethereum for a month, then one day of
-USDC transfers: what was minted, what was burned, and which sender → recipient
-pairs moved the most, with ENS names on the addresses. The page proves its
-numbers: the USDC supply change on the transfer day must equal mints minus
-burns over the same blocks.
+USDC: what was minted, what was burned, and the largest flows into and out of
+twenty well-known addresses, with ENS names on the addresses. The page proves
+its numbers: the USDC supply change that day must equal mints minus burns, and
+two named addresses that moved USDC to each other must report the same amounts
+from both ends.
 
 Every number on the page comes live from Testril when you press **Fetch from
 Testril**. The first fetch has Testril index the data; later fetches only read
@@ -39,13 +40,13 @@ whole window (Testril charges only for blocks it has not indexed yet), follows
 the job, then `read`s the window. The page shows a bar per bind and overall from
 Testril's own job progress (`blocks_done` of `blocks_total`, `days_done` of
 `days_total`) and the usage credits spent. Then it draws four headline numbers,
-supply per day for USDT and USDC, a flow of the ten largest USDC pairs, a table
-of the top 20 pairs, and the cross-check. The windows follow the moment you
-press the button, so each new UTC day adds one day to index. On dev, a first
-fetch of a month cost about $27.79 and 1.5 minutes; a fetch three days later,
-with three new days to index, cost $3.73 and 5 minutes; a fetch of indexed
-windows cost $0.23 and 57 seconds, all reads. Nothing is saved: a restart starts
-empty and the next fetch reads again.
+supply per day for USDT and USDC, a flow of the ten largest USDC flows of the
+named addresses, a table of the top 20, and the cross-checks. The windows follow
+the moment you press the button, so each new UTC day adds one day to index.
+Against production, a fetch of indexed windows is 502 reads and 32,223 rows:
+$0.38 and about 5 minutes, most of it the 480 hourly reads of the named
+addresses. Nothing is saved: a restart starts empty and the next fetch reads
+again.
 
 Without `TESTRIL_PAYER_KEY` the button is disabled and the page says what to set.
 
@@ -59,9 +60,10 @@ npm run lint
 npm run format:check
 ```
 
-`npm test` checks the cross-check passes on the fixture and fails when a burn
-is read as a mint, when supply is in whole dollars instead of raw units, or
-when a day is missing; that a fetch pays a fake Testril with the payer's
+`npm test` checks the cross-checks pass on the fixture and fail when a burn is
+read as a mint, when supply is in whole dollars instead of raw units, when a day
+is missing, or when two named addresses disagree on the USDC between them; that
+a flow sums every hour of the day; that a fetch pays a fake Testril with the payer's
 vouchers, reports its job progress and keeps every row; and that the server's
 fetch ends in the shaped report. `npm run test:browser` presses the button
 against the fake Testril and waits for the report. The fixture lives in `test/`
@@ -76,13 +78,21 @@ and is never shown on the page.
   after it.
 
 - Supply: the 31 complete UTC days before today, read at each day's last block.
-- Transfers: yesterday (UTC), so they match the supply rows for the last two
-  days.
+- Mints and burns: yesterday (UTC), so they match the supply rows for the last
+  two days. They are the zero address's USDC transfers summed per counterparty:
+  a mint is its `sent`, a burn its `received`.
+- Flows: each named address's USDC transfers summed per counterparty and hour
+  over yesterday, read an hour at a time and summed over the day. A busy address
+  has more counterparties in a day than one read serves (Coinbase 10 had 13,537
+  hourly rows on 2026-11-17, at most 1,064 in an hour).
 - ENS registry `0x00000000000c2e074ec69a0dfb2997ba6c7d2e1e`; each address's
   name is its last row in yesterday's last five minutes.
 
 The 20 named addresses are fixed in `src/report.mjs`, chosen as likely large
-USDC movers. Pairs between other addresses show shortened hex.
+USDC movers. Their counterparties show their own ENS name only when they are
+named addresses; the rest show shortened hex. On 2026-11-17, seven of them
+moved no USDC: Binance 14, Binance 8, Kraken 4, OKX 73, Maker PSM, the 0x
+Exchange Proxy and vitalik.eth.
 
 | Subject                         | Address                                      | Note   |
 | ------------------------------- | -------------------------------------------- | ------ |
@@ -111,29 +121,11 @@ USDC movers. Pairs between other addresses show shortened hex.
 
 Windows are half-open: the end is the first block or day not included.
 
-| Name                           | Function               | Chain | Params                | Window                 |
-| ------------------------------ | ---------------------- | ----- | --------------------- | ---------------------- |
-| `supply`                       | `erc20.token_supply`   | 1     | `tokens`, `by`        | 31 days before today   |
-| `usdc-edges`                   | `erc20.transfer_edges` | 1     | `token_address`       | yesterday              |
-| `ens-circle`                   | `ens.primary_name`     | 1     | `registry`, `address` | yesterday's last 5 min |
-| `ens-binance-14`               | `ens.primary_name`     | 1     | `registry`, `address` | yesterday's last 5 min |
-| `ens-binance-8`                | `ens.primary_name`     | 1     | `registry`, `address` | yesterday's last 5 min |
-| `ens-coinbase-10`              | `ens.primary_name`     | 1     | `registry`, `address` | yesterday's last 5 min |
-| `ens-kraken-4`                 | `ens.primary_name`     | 1     | `registry`, `address` | yesterday's last 5 min |
-| `ens-okx-73`                   | `ens.primary_name`     | 1     | `registry`, `address` | yesterday's last 5 min |
-| `ens-bitfinex-2`               | `ens.primary_name`     | 1     | `registry`, `address` | yesterday's last 5 min |
-| `ens-uniswap-v3-usdc-weth`     | `ens.primary_name`     | 1     | `registry`, `address` | yesterday's last 5 min |
-| `ens-uniswap-v3-usdc-usdt`     | `ens.primary_name`     | 1     | `registry`, `address` | yesterday's last 5 min |
-| `ens-uniswap-v4-pool-manager`  | `ens.primary_name`     | 1     | `registry`, `address` | yesterday's last 5 min |
-| `ens-uniswap-universal-router` | `ens.primary_name`     | 1     | `registry`, `address` | yesterday's last 5 min |
-| `ens-curve-3pool`              | `ens.primary_name`     | 1     | `registry`, `address` | yesterday's last 5 min |
-| `ens-aave-v3-ausdc`            | `ens.primary_name`     | 1     | `registry`, `address` | yesterday's last 5 min |
-| `ens-morpho-blue`              | `ens.primary_name`     | 1     | `registry`, `address` | yesterday's last 5 min |
-| `ens-maker-psm-usdc`           | `ens.primary_name`     | 1     | `registry`, `address` | yesterday's last 5 min |
-| `ens-cow-settlement`           | `ens.primary_name`     | 1     | `registry`, `address` | yesterday's last 5 min |
-| `ens-1inch-v6-router`          | `ens.primary_name`     | 1     | `registry`, `address` | yesterday's last 5 min |
-| `ens-0x-exchange-proxy`        | `ens.primary_name`     | 1     | `registry`, `address` | yesterday's last 5 min |
-| `ens-balancer-v2-vault`        | `ens.primary_name`     | 1     | `registry`, `address` | yesterday's last 5 min |
-| `ens-vitalik`                  | `ens.primary_name`     | 1     | `registry`, `address` | yesterday's last 5 min |
+| Name               | Function                      | Chain | Params                                                      | Window                  |
+| ------------------ | ----------------------------- | ----- | ----------------------------------------------------------- | ----------------------- |
+| `supply`           | `erc20.token_supply`          | 1     | `tokens`, `by: day`                                         | 31 days before today    |
+| `usdc-mints-burns` | `erc20.wallet_counterparties` | 1     | `swap: { wallet: zero address, tokens: [USDC] }`, `by: day` | yesterday               |
+| `usdc-<subject>`   | `erc20.wallet_counterparties` | 1     | `swap: { wallet: subject, tokens: [USDC] }`, `by: hour`     | yesterday, hour by hour |
+| `ens-<subject>`    | `ens.primary_name`            | 1     | `registry`, `address`                                       | yesterday's last 5 min  |
 
-`usdc-edges` is read in chunks of two hours.
+There is one `usdc-` and one `ens-` bind per named address, 42 binds in all.
