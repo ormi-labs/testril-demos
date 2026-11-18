@@ -58,6 +58,24 @@ export const tokenBalanceBinds = binds.filter(
   (bind) => bind.function_slug === "erc20.token_balance",
 );
 export const transfersOfWallet = (rows, key) => rows[`transfers-${key}`];
+
+export const edgeOf = (wallet, row) => ({
+  ...row,
+  from: row.direction === "in" ? row.counterparty : wallet,
+  to: row.direction === "out" ? row.counterparty : wallet,
+});
+
+export function withEdges(rows) {
+  return {
+    ...rows,
+    ...Object.fromEntries(
+      transferBinds.map((bind) => [
+        bind.name,
+        rows[bind.name].map((row) => edgeOf(bind.params.wallet, row)),
+      ]),
+    ),
+  };
+}
 const walletOf = (key) => trail.find(([name]) => name === key)[1];
 const source = walletOf("bybit-cold-wallet");
 const exploiter = walletOf("exploiter");
@@ -181,7 +199,8 @@ function walletTokens(entries, address) {
 
 const lastDay = isoSecond(Date.parse(windowEnd) - 1).slice(0, 10);
 
-export function shape({ rows }) {
+export function shape({ rows: walletRows }) {
+  const rows = withEdges(walletRows);
   const entries = [...uniqueTransfers(rows).values()].map((e) => e.row);
   const edges = sumEdges(entries);
   const hops = hopsFrom(source, edges);

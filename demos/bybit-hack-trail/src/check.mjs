@@ -12,11 +12,13 @@ import {
   uniqueTransfers,
   walletKeys,
   wallets,
+  withEdges,
 } from "./report.mjs";
 
 const stEth = "0xae7ab96520de3a18e5e111b5eaab095312d7fe84";
 const rebaseDriftDivisor = 5000n;
 const roundingWeiPerTransfer = 2n;
+const shareRoundingWeiPerHour = 1n;
 const rebaseHoursUtc = new Set(["12", "13"]);
 
 function checkTransferRows(rows) {
@@ -25,8 +27,6 @@ function checkTransferRows(rows) {
     const seen = new Set();
     for (const row of transfersOfWallet(rows, key)) {
       const where = `${label(wallet)} transfer ${transferKey(row)}`;
-      if (row.from !== wallet && row.to !== wallet)
-        throw new Error(`${where} does not involve the wallet.`);
       if (!tokens.includes(row.token))
         throw new Error(`${where} is a token outside the trail.`);
       if (seen.has(transferKey(row)))
@@ -106,7 +106,7 @@ function allowedDrift(token, hour, balance, transfers) {
   const rebase = rebaseHoursUtc.has(hour.slice(11))
     ? balance / rebaseDriftDivisor
     : 0n;
-  return rebase + roundingWeiPerTransfer * transfers;
+  return rebase + roundingWeiPerTransfer * transfers + shareRoundingWeiPerHour;
 }
 
 function checkBalancesFollowTransfers(rows, reads) {
@@ -144,7 +144,8 @@ function checkBalancesFollowTransfers(rows, reads) {
   }
 }
 
-export function check({ rows, reads }) {
+export function check({ rows: walletRows, reads }) {
+  const rows = withEdges(walletRows);
   checkTransferRows(rows);
   checkBothSidesAgree(rows);
   checkBalancesFollowTransfers(rows, reads);
@@ -154,7 +155,7 @@ export function check({ rows, reads }) {
   return [
     `${entries.length} transfers counted once each, ${readTwice} of them read from both wallets`,
     "Every transfer between two trail wallets appears, identical, on both sides",
-    "Every wallet's hourly token balance changes by exactly its transfers in that hour (stETH rebase drift of up to 0.02% only in the 12:00 and 13:00 UTC hours)",
+    "Every wallet's hourly token balance changes by exactly its transfers in that hour (stETH: rebase drift of up to 0.02% only in the 12:00 and 13:00 UTC hours, and 1 wei of share rounding in any hour)",
     `Balance rows sit only in the ${hoursInWindow().length} hours of the window`,
   ];
 }

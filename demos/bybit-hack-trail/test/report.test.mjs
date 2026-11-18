@@ -1,7 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { check } from "../src/check.mjs";
-import { hoursInWindow, shape, wallets } from "../src/report.mjs";
+import { edgeOf, hoursInWindow, shape, wallets } from "../src/report.mjs";
 import { fixture, fixtureFetched, hourOfBlock } from "./fixture.mjs";
 
 const rows = () => JSON.parse(JSON.stringify(fixture()));
@@ -22,7 +22,8 @@ test("check fails when a transfer is listed twice in one wallet", () => {
 test("check fails when two wallets disagree about one transfer", () => {
   const corrupted = rows();
   const row = corrupted["transfers-hop-a4b2"].find(
-    (transfer) => transfer.from === exploiter && transfer.to === walletA,
+    (transfer) =>
+      transfer.direction === "in" && transfer.counterparty === exploiter,
   );
   row.value = (BigInt(row.value) * 1000000n).toString();
   assert.throws(() => checkRows(corrupted), /disagree/);
@@ -36,10 +37,15 @@ test("check fails when a transfer between trail wallets is missing on one side",
 
 test("check fails when transfers are scaled but the balances are not", () => {
   const corrupted = rows();
-  for (const name of [exploiterBind, "transfers-hop-a4b2"])
-    for (const row of corrupted[name])
-      if (row.from === exploiter && row.to === walletA)
+  for (const [name, wallet] of [
+    [exploiterBind, exploiter],
+    ["transfers-hop-a4b2", walletA],
+  ])
+    for (const row of corrupted[name]) {
+      const edge = edgeOf(wallet, row);
+      if (edge.from === exploiter && edge.to === walletA)
         row.value = (BigInt(row.value) * 10n).toString();
+    }
   assert.throws(() => checkRows(corrupted), /balance moved/);
 });
 
@@ -54,6 +60,15 @@ test("check fails when one balance is off by a factor of 1e9", () => {
   const row = balanceRow(corrupted, "token-balance-hop-a4b2", 22, stEth);
   row.balance = (BigInt(row.balance) * 10n ** 9n).toString();
   assert.throws(() => checkRows(corrupted), /balance moved/);
+});
+
+test("check allows stETH a 1-wei share-rounding move with no transfer, as the cold wallet's at 2025-02-21T08", () => {
+  const withRounding = rows();
+  const from = hoursInWindow()[8];
+  for (const row of withRounding["token-balance-bybit-cold-wallet"])
+    if (row.token === stEth && row.hour >= from)
+      row.balance = (BigInt(row.balance) + 1n).toString();
+  assert.match(checkRows(withRounding)[0], /counted once each/);
 });
 
 test("check fails when one hour's balance change has the wrong sign", () => {
@@ -103,8 +118,8 @@ test("check fails when a transfer sits outside every read", () => {
   const fetched = fixtureFetched(rows());
   const stray = {
     ...fetched.rows[exploiterBind][0],
-    from: exploiter,
-    to: `0x${"9".repeat(40)}`,
+    counterparty: `0x${"9".repeat(40)}`,
+    direction: "out",
     log_index: "9999",
   };
   stray.block = fetched.reads[exploiterBind].at(-1).to_block;

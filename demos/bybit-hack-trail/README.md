@@ -87,7 +87,7 @@ A transfer row carries its block, not a time, so a transfer's hour is the hourly
 
 - A transfer is keyed by transaction and log index, so one read from both its sender's and recipient's wallet counts once; a repeat inside one wallet fails.
 - A transfer between two trail wallets must appear, identical, on both sides.
-- A wallet's token balance, read at the last block of each hour, changes from one hour to the next by exactly the wallet's transfers in the later hour (inflows minus outflows, per token). stETH may differ by 2 wei per transfer for share rounding, plus up to 0.02% of the balance in the 12:00 and 13:00 UTC hours, which hold the rebase. The first hour's balance is the starting point.
+- A wallet's token balance, read at the last block of each hour, changes from one hour to the next by exactly the wallet's transfers in the later hour (inflows minus outflows, per token). stETH may differ by 2 wei per transfer and 1 wei per hour for share rounding (other holders' deposits move a balance by a wei: the cold wallet gained 1 wei at 2025-02-21T08 with no transfer), plus up to 0.02% of the balance in the 12:00 and 13:00 UTC hours, which hold the rebase. The first hour's balance is the starting point.
 - A transfer's block must lie in one of its wallet's hourly reads.
 - Balance rows must lie inside the hour window, once per hour and token.
 

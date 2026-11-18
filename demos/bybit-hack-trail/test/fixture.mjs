@@ -91,13 +91,22 @@ function transferEvents(random) {
 
 const bindsOf = (slug) => binds.filter((bind) => bind.function_slug === slug);
 
+const walletRow = (wallet, { from, to, ...event }) => ({
+  ...event,
+  counterparty: from === wallet ? to : from,
+  direction: from === to ? "self" : from === wallet ? "out" : "in",
+});
+
 function transferRows(events) {
   return Object.fromEntries(
     walletKeys.map((key, index) => [
       `transfers-${key}`,
-      events.filter(
-        (event) => event.from === wallets[index] || event.to === wallets[index],
-      ),
+      events
+        .filter(
+          (event) =>
+            event.from === wallets[index] || event.to === wallets[index],
+        )
+        .map((event) => walletRow(wallets[index], event)),
     ]),
   );
 }
