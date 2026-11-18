@@ -2,8 +2,9 @@
 
 Pick a wallet and see its ENS name, ETH balance and the last seven days of
 ERC-20 transfers (USDC, USDT, DAI, WETH) on Ethereum. The page proves its
-numbers: every listed transfer must name the wallet as sender or recipient, and
-every wallet must have an ENS name and a balance.
+numbers: every listed transfer must fall inside the window, and every wallet
+must have an ENS name and a balance. Testril serves each transfer from the
+wallet's side, as `direction` (`in`, `out` or `self`) and `counterparty`.
 
 Every number on the page comes live from Testril when you press **Fetch from
 Testril**. The first fetch has Testril index the data; later fetches only read

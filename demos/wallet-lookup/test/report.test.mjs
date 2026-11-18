@@ -9,18 +9,6 @@ test("check passes for every wallet on the fixture", () => {
   assert.equal(check(fixtureFetched(rows()), fixtureBinds).length, 3);
 });
 
-test("check fails when a transfer does not involve the wallet", () => {
-  const corrupted = rows();
-  corrupted["transfers-nick"][0].from =
-    "0x3333333333333333333333333333333333333333";
-  corrupted["transfers-nick"][0].to =
-    "0x4444444444444444444444444444444444444444";
-  assert.throws(
-    () => check(fixtureFetched(corrupted), fixtureBinds),
-    /nick\.eth.*names neither/,
-  );
-});
-
 test("check fails when a recorded ENS name is empty", () => {
   const corrupted = rows();
   corrupted["ens-brantly"][0].name = "";

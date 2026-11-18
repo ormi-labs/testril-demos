@@ -59,16 +59,16 @@ function transferRows(wallet, random) {
       log_index: String(Math.floor(random() * 300)),
       tx: `0x${hex(random, 64)}`,
       token,
-      from: incoming ? other : wallet.address,
-      to: incoming ? wallet.address : other,
+      counterparty: other,
+      direction: incoming ? "in" : "out",
       value: (dollars * 10n ** BigInt(tokens[token].decimals)).toString(),
     };
   });
   if (wallet.key === "vitalik")
     rows.push({
       ...rows[0],
-      from: wallet.address,
-      to: wallet.address,
+      counterparty: wallet.address,
+      direction: "self",
       log_index: "301",
     });
   return rows.sort((a, b) => a.block - b.block);

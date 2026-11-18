@@ -85,15 +85,6 @@ const ensName = (rows, wallet) =>
     ?.name;
 const balanceOf = (rows, wallet) =>
   rows.balance.findLast((row) => row.owner === wallet.address)?.balance ?? "0";
-// Testril returns lowercase hex addresses, so plain equality is exact.
-const involves = (transfer, address) =>
-  transfer.from === address || transfer.to === address;
-const directionOf = (transfer, address) =>
-  transfer.from === transfer.to
-    ? "self"
-    : transfer.from === address
-      ? "out"
-      : "in";
 
 export function check({ rows, reads }) {
   const passed = [];
@@ -107,13 +98,8 @@ export function check({ rows, reads }) {
       throw new Error(
         `${label} has a transfer at block ${outside.block} outside the window.`,
       );
-    const stranger = transfers.find((t) => !involves(t, wallet.address));
-    if (stranger)
-      throw new Error(
-        `Transfer ${stranger.tx} in ${label}'s list names neither ${wallet.address} as sender nor as recipient.`,
-      );
     passed.push(
-      `${label}: ${transfers.length} transfers, each with the wallet as sender or recipient; ENS name present`,
+      `${label}: ${transfers.length} transfers, all inside the window; ENS name present`,
     );
   }
   return passed;
@@ -129,29 +115,26 @@ export function formatUnits(raw, decimals, places) {
 
 const shortAddress = (address) => `${address.slice(0, 6)}…${address.slice(-4)}`;
 
-function transferView(transfer, wallet) {
+function transferView(transfer) {
   const token = tokens[transfer.token];
-  const direction = directionOf(transfer, wallet.address);
   return {
     block: transfer.block,
-    direction,
-    counterparty: shortAddress(
-      direction === "in" ? transfer.from : transfer.to,
-    ),
+    direction: transfer.direction,
+    counterparty: shortAddress(transfer.counterparty),
     token: token.symbol,
     amount: formatUnits(transfer.value, token.decimals, 2),
     tx: shortAddress(transfer.tx),
   };
 }
 
-function dailyCounts(transfers, wallet, dayCount) {
+function dailyCounts(transfers, dayCount) {
   const days = Array.from({ length: dayCount }, () => ({
     in: 0,
     out: 0,
     self: 0,
   }));
   for (const transfer of transfers.filter((t) => t.day >= 0))
-    days[transfer.day][directionOf(transfer, wallet.address)] += 1;
+    days[transfer.day][transfer.direction] += 1;
   return days;
 }
 
@@ -166,11 +149,11 @@ export function shape({ rows, reads }, binds) {
         name: ensName(rows, wallet),
         balance: `${formatUnits(balanceOf(rows, wallet), ethDecimals, 4)} ETH`,
         transferCount: transfers.length,
-        daily: dailyCounts(transfers, wallet, week.days.length),
+        daily: dailyCounts(transfers, week.days.length),
         transfers: [...transfers]
           .sort((a, b) => b.block - a.block)
           .slice(0, shownTransfers)
-          .map((transfer) => transferView(transfer, wallet)),
+          .map(transferView),
       };
     }),
   };
