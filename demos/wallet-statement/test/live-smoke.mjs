@@ -10,6 +10,8 @@ import { createProviders } from "../src/providers.mjs";
 import { collector, escrow } from "../public/payments.js";
 import {
   compare,
+  compareCounterparties,
+  transferCount,
   usdc,
   maxPages,
   chargeCap,
@@ -25,7 +27,8 @@ if (
 const reportDate =
   process.env.PAID_SMOKE_DATE ??
   new Date(Date.now() - 86400000).toISOString().slice(0, 10);
-scope(reportDate);
+const method = process.env.PAID_SMOKE_METHOD ?? "transactions";
+scope(reportDate, method);
 function limit(name, fallback, maximum) {
   const value = process.env[name] ?? fallback;
   if (!/^[1-9]\d*$/.test(value) || BigInt(value) > BigInt(maximum))
@@ -75,13 +78,19 @@ if (!target) {
       ethereumRpcUrl: process.env.ETHEREUM_RPC_URL,
       async fetcher(url, options) {
         const response = await fetch(url, options);
-        if (new URL(url).pathname === "/api/v1/profiler/address/transactions") {
+        if (
+          [
+            "/api/v1/profiler/address/transactions",
+            "/api/v1/profiler/address/counterparties",
+          ].includes(new URL(url).pathname)
+        ) {
           // Metadata only: never log headers, signatures or provider bodies.
           try {
             await appendFile(
               join(directory, "provider-http.jsonl"),
               JSON.stringify({
                 provider: "nansen",
+                method,
                 page: JSON.parse(options.body).pagination.page,
                 paid: Boolean(options.headers["PAYMENT-SIGNATURE"]),
                 status: response.status,
@@ -112,6 +121,7 @@ console.log(
   JSON.stringify({
     target,
     date: reportDate,
+    method,
     payer: account.address,
     evidenceDirectory: directory,
     serviceCapAtoms: serviceCap.toString(),
@@ -211,6 +221,7 @@ try {
   await page.goto(target);
   if (page.url() !== target) throw new Error("Unexpected demo URL");
   await page.getByRole("tab", { name: "Run with your Wallet" }).click();
+  await page.selectOption("#comparison-method", method);
   await page.locator("#report-date").fill(reportDate);
   await page.locator("#report-date").blur();
   await page
@@ -284,10 +295,13 @@ try {
   );
   if (
     run.status !== "done" ||
-    !compare(run.providers.testril.rows, run.providers.nansen.rows).matches
+    !(method === "totals" ? compareCounterparties : compare)(
+      run.providers.testril.rows,
+      run.providers.nansen.rows,
+    ).matches
   )
     throw new Error("Paid comparison did not match");
-  if (run.scope.window !== reportDate)
+  if (run.scope.window !== reportDate || run.method !== method)
     throw new Error("The comparison used another day");
   const final = await page.evaluate(() =>
     localStorage.getItem("testril-wallet-statement:last-run"),
@@ -301,7 +315,7 @@ try {
       evidence: join(directory, "completed-run.json"),
       serviceChargeAtoms: charges.toString(),
       newDepositAtoms: deposits.toString(),
-      transfers: run.providers.testril.rows.length,
+      transfers: transferCount(run.providers.testril.rows, method),
     }),
   );
 } catch {

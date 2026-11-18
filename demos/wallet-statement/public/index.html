@@ -20,8 +20,18 @@
       <p class="intro">
         Compare the cost and time of tracking USDC entering and leaving
         Uniswap’s USDC/WETH liquidity pool on Ethereum. Testril and Nansen
-        retrieve transfers for the same period; we check that every transfer and
-        amount matches.
+        retrieve either every transfer or a daily summary for the same day. We
+        compare their answers, prices and retrieval times.
+      </p>
+      <div class="method-control date-control">
+        <label for="comparison-method">Retrieve</label>
+        <select id="comparison-method">
+          <option value="transactions">All transfers</option>
+          <option value="totals">Daily totals</option>
+        </select>
+      </div>
+      <p id="method-description" class="caption">
+        Both providers return every transfer; we compare the complete ledgers.
       </p>
       <div class="tabs" role="tablist" aria-label="Run mode">
         <button
@@ -157,7 +167,7 @@
           </div>
           <p id="agreement" role="status">Waiting for both complete answers</p>
           <details id="ledger">
-            <summary>View the full transfer ledger</summary>
+            <summary id="ledger-title">View the full transfer ledger</summary>
             <label class="ledger-choice" for="ledger-provider"
               >Provider
               <select id="ledger-provider">
@@ -168,7 +178,7 @@
             <div class="table-wrap">
               <table>
                 <caption id="ledger-caption"></caption>
-                <thead>
+                <thead id="ledger-head">
                   <tr>
                     <th>Transaction</th>
                     <th>Direction</th>

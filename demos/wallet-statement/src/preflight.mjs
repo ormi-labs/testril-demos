@@ -10,11 +10,12 @@ const peers = createProviders({
 const date =
   process.env.REPORT_DATE ??
   new Date(Date.now() - 86400000).toISOString().slice(0, 10);
+const method = process.env.COMPARISON_METHOD ?? "transactions";
 let report;
 const checks = {},
   blockers = [];
 try {
-  report = await peers.resolveScope(scope(date));
+  report = await peers.resolveScope(scope(date, method));
   checks.day = {
     from: report.from_time,
     to: report.to_time,
@@ -23,8 +24,11 @@ try {
   };
   const binding = await peers.testril("bind", {
     chain_id: 1,
-    function_slug: "erc20.wallet_transfers",
-    params: { wallet: report.wallet, tokens: [report.token] },
+    function_slug: report.function_slug,
+    params:
+      method === "totals"
+        ? { swap: { wallet: report.wallet, tokens: [report.token] }, by: "day" }
+        : { wallet: report.wallet, tokens: [report.token] },
   });
   if (binding.value?.outcome !== "success") throw new Error("Binding refused");
   const args = {
@@ -62,7 +66,7 @@ try {
   );
 }
 try {
-  const r = await peers.nansen(date, 1);
+  const r = await peers.nansen(date, 1, undefined, method);
   const a = selectOffer(r.challenge, "nansen");
   if (a.maxTimeoutSeconds < 150) throw new Error("Unsupported validity");
   checks.nansen = {
@@ -77,6 +81,7 @@ console.log(
   JSON.stringify(
     {
       checkedAt: new Date().toISOString(),
+      method,
       readyForWalletTrial: !blockers.length,
       paidExecutionVerified: false,
       checks,

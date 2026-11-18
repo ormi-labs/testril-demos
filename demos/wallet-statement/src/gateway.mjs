@@ -5,10 +5,12 @@ import {
   chargeCap,
   depositCap,
   validateRows,
+  validateCounterparties,
 } from "../public/model.js";
 import { selectOffer, paymentPlan } from "../public/payments.js";
 import { confirmedReceipt, nansenRows } from "./providers.mjs";
 import { failure, describeFailure } from "./errors.mjs";
+import { nansenCounterparties } from "./transfer-total.mjs";
 
 const actions = [
   "bind",
@@ -18,9 +20,16 @@ const actions = [
   "job",
   "provenance",
   "transactions",
+  "counterparties",
+  "source-provenance",
 ];
 const uuid = /^[0-9a-f]{8}-[0-9a-f-]{27}$/;
-export function newRun(payer, window = "day", id = crypto.randomUUID()) {
+export function newRun(
+  payer,
+  window = "day",
+  id = crypto.randomUUID(),
+  method = "transactions",
+) {
   if (
     typeof payer !== "string" ||
     !/^0x[0-9a-f]{40}$/i.test(payer) ||
@@ -28,7 +37,7 @@ export function newRun(payer, window = "day", id = crypto.randomUUID()) {
   )
     throw failure("INVALID_REQUEST");
   try {
-    scope(window);
+    scope(window, method);
   } catch {
     throw failure("INVALID_REQUEST");
   }
@@ -36,6 +45,7 @@ export function newRun(payer, window = "day", id = crypto.randomUUID()) {
     id,
     payer,
     window,
+    method,
     created: Date.now(),
     charges: "0",
     deposits: "0",
@@ -52,6 +62,7 @@ export function publicRun(run) {
     id: run.id,
     payer: run.payer,
     window: run.window,
+    method: run.method ?? "transactions",
     charges: run.charges,
     deposits: run.deposits,
     stopped: run.stopped,
@@ -61,7 +72,10 @@ export function publicRun(run) {
 }
 export async function execute(run, input, { providers, persist }) {
   if (!input || typeof input !== "object") throw failure("INVALID_REQUEST");
-  const provider = input.action === "transactions" ? "nansen" : "testril";
+  const totals = run.method === "totals";
+  const provider = ["transactions", "counterparties"].includes(input.action)
+    ? "nansen"
+    : "testril";
   const details = { provider, operation: input.action };
   if (
     !input ||
@@ -69,6 +83,9 @@ export async function execute(run, input, { providers, persist }) {
       (k) => !["action", "page", "payment", "id"].includes(k),
     ) ||
     !actions.includes(input.action) ||
+    (input.action === "transactions" && totals) ||
+    (["counterparties", "source-provenance"].includes(input.action) &&
+      !totals) ||
     !uuid.test(input.id)
   )
     throw failure("INVALID_REQUEST");
@@ -82,17 +99,19 @@ export async function execute(run, input, { providers, persist }) {
     throw failure("RUN_STOPPED");
   if (run.operations.some((o) => o.id === input.id))
     throw failure("RUN_STOPPED");
-  const report = run.report ?? scope(run.window);
+  const report = run.report ?? scope(run.window, run.method);
   if (input.action !== "bind" && provider === "testril" && !run.bound)
     throw failure("INVALID_REQUEST");
   if (
-    input.action === "transactions" &&
+    provider === "nansen" &&
     (!Number.isSafeInteger(input.page) ||
       input.page < 1 ||
       input.page > maxPages)
   )
     throw failure("INVALID_REQUEST");
   if (input.action === "job" && !run.job) throw failure("INVALID_REQUEST");
+  if (input.action === "source-provenance" && !run.sourceBound)
+    throw failure("INVALID_REQUEST");
   const args = {
     bound_function_id: run.bound,
     from_time: report.from_time,
@@ -157,15 +176,25 @@ export async function execute(run, input, { providers, persist }) {
   let result;
   try {
     if (provider === "nansen")
-      result = await providers.nansen(run.window, input.page, input.payment);
+      result = await providers.nansen(
+        run.window,
+        input.page,
+        input.payment,
+        run.method,
+      );
     else {
       const requests = {
         bind: [
           "bind",
           {
             chain_id: 1,
-            function_slug: "erc20.wallet_transfers",
-            params: { wallet: report.wallet, tokens: [report.token] },
+            function_slug: report.function_slug,
+            params: totals
+              ? {
+                  swap: { wallet: report.wallet, tokens: [report.token] },
+                  by: "day",
+                }
+              : { wallet: report.wallet, tokens: [report.token] },
           },
         ],
         coverage: [
@@ -176,6 +205,10 @@ export async function execute(run, input, { providers, persist }) {
         read: ["read", args],
         materialize: ["materialize", args],
         provenance: ["provenance", args],
+        "source-provenance": [
+          "provenance",
+          { ...args, bound_function_id: run.sourceBound },
+        ],
       };
       result = await providers.testril(
         ...requests[input.action],
@@ -236,7 +269,9 @@ export async function execute(run, input, { providers, persist }) {
       if (provider === "nansen") {
         if (result.status !== 200)
           throw new Error("Nansen refused the request");
-        value = nansenRows(result.text, report);
+        value = totals
+          ? nansenCounterparties(result.text, report, input.page)
+          : nansenRows(result.text, report);
         if (value.pagination.page !== input.page) throw new Error("Wrong page");
       } else {
         value = result.value;
@@ -250,7 +285,7 @@ export async function execute(run, input, { providers, persist }) {
           if (value?.outcome === "error") {
             if (input.action === "bind")
               throw failure("TESTRIL_BINDING_REJECTED", {
-                functionSlug: "erc20.wallet_transfers",
+                functionSlug: report.function_slug,
                 reason: [
                   "invalid_params",
                   "function_not_found",
@@ -270,7 +305,11 @@ export async function execute(run, input, { providers, persist }) {
             value = { bound_function_id: run.bound };
           }
           if (input.action === "read")
-            value = { rows: validateRows(value.values, report, provider) };
+            value = {
+              rows: totals
+                ? validateCounterparties(value.values, report)
+                : validateRows(value.values, report, provider),
+            };
           if (input.action === "materialize") {
             if (!/^job:\d+$/.test(value.job?.job_id))
               throw new Error("Invalid job");
@@ -278,6 +317,17 @@ export async function execute(run, input, { providers, persist }) {
             value = { job_id: run.job };
           }
           if (input.action === "coverage") {
+            if (totals) {
+              const dependencies = value.dependencies;
+              if (
+                !Array.isArray(dependencies) ||
+                dependencies.length !== 1 ||
+                dependencies[0].function_slug !== "erc20.wallet_transfers" ||
+                !/^sha256:[a-f0-9]{64}$/.test(dependencies[0].bound_function_id)
+              )
+                throw new Error("Invalid transfer dependency");
+              run.sourceBound = dependencies[0].bound_function_id;
+            }
             const jobs = (value.active_jobs ?? []).filter((id) =>
               /^job:\d+$/.test(id),
             );
@@ -293,10 +343,60 @@ export async function execute(run, input, { providers, persist }) {
               done: value.blocks_done,
               total: value.blocks_total,
             };
-          if (input.action === "provenance") {
+          if (input.action === "provenance" && totals) {
+            if (
+              value.bound_function_id !== run.bound ||
+              value.chain_id !== 1 ||
+              value.from_time !== report.from_time ||
+              value.to_time !== report.to_time ||
+              value.computation?.id !== "erc20.wallet_counterparties" ||
+              value.computation?.kind !== "function" ||
+              value.computation?.version !== 1 ||
+              value.orphaned?.length ||
+              !Array.isArray(value.sources) ||
+              value.sources.length !== 1
+            )
+              throw new Error("Invalid daily provenance");
+            const source = value.sources[0];
+            if (
+              source.kind !== "rows" ||
+              source.chain_id !== 1 ||
+              source.bound_function_id !== run.sourceBound ||
+              source.from_block !== report.from_block ||
+              source.to_block !== report.to_block
+            )
+              throw new Error("Invalid daily source range");
+            value = {
+              outcome: "success",
+              bound_function_id: run.bound,
+              chain_id: 1,
+              from_time: report.from_time,
+              to_time: report.to_time,
+              computation: {
+                kind: "function",
+                id: "erc20.wallet_counterparties",
+                version: 1,
+              },
+              sources: [
+                {
+                  kind: "rows",
+                  chain_id: 1,
+                  bound_function_id: run.sourceBound,
+                  from_block: source.from_block,
+                  to_block: source.to_block,
+                },
+              ],
+            };
+          } else if (
+            ["provenance", "source-provenance"].includes(input.action)
+          ) {
+            const bound =
+              input.action === "source-provenance"
+                ? run.sourceBound
+                : run.bound;
             if (
               !Array.isArray(value.blocks) ||
-              value.bound_function_id !== run.bound ||
+              value.bound_function_id !== bound ||
               value.blocks.length > report.to_block - report.from_block ||
               value.chain_id !== 1 ||
               value.from_block !== report.from_block ||
@@ -304,7 +404,8 @@ export async function execute(run, input, { providers, persist }) {
               value.block_count !== value.blocks.length ||
               !/^sha256:[a-f0-9]{64}$/.test(value.digest) ||
               value.computation?.id !== "erc20.wallet_transfers" ||
-              value.computation?.version !== 1 ||
+              value.computation?.kind !== "function" ||
+              ![1, 2].includes(value.computation?.version) ||
               value.orphaned?.length
             )
               throw new Error("Invalid provenance");
@@ -320,7 +421,7 @@ export async function execute(run, input, { providers, persist }) {
             });
             value = {
               outcome: "success",
-              bound_function_id: run.bound,
+              bound_function_id: bound,
               chain_id: 1,
               from_block: report.from_block,
               to_block: report.to_block,
@@ -330,7 +431,7 @@ export async function execute(run, input, { providers, persist }) {
               computation: {
                 kind: "function",
                 id: "erc20.wallet_transfers",
-                version: 1,
+                version: value.computation.version,
               },
             };
           }

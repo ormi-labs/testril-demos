@@ -7,7 +7,14 @@ export const token = "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48";
 const addr = /^0x[0-9a-f]{40}$/;
 const tx = /^0x[0-9a-f]{64}$/;
 
-export function dayScope(date, now = Date.now()) {
+export function functionSlug(method = "transactions") {
+  if (!["transactions", "totals"].includes(method))
+    throw new Error("Choose transfers or daily totals.");
+  return method === "totals"
+    ? "erc20.wallet_counterparties"
+    : "erc20.wallet_transfers";
+}
+export function dayScope(date, now = Date.now(), method = "transactions") {
   const from =
     typeof date === "string" && /^\d{4}-\d{2}-\d{2}$/.test(date)
       ? Date.parse(`${date}T00:00:00Z`)
@@ -25,14 +32,18 @@ export function dayScope(date, now = Date.now()) {
     decimals: 6,
     wallet: address,
     token,
-    function_slug: "erc20.wallet_transfers",
+    function_slug: functionSlug(method),
     from_time: new Date(from).toISOString().replace(".000Z", "Z"),
     to_time: new Date(from + 86400000).toISOString().replace(".000Z", "Z"),
   };
 }
 // Numeric windows are retained for the archived hourly reports.
-export function scope(window = "day") {
-  if (typeof window === "string" && window !== "day") return dayScope(window);
+export function scope(window = "day", method = "transactions") {
+  const slug = functionSlug(method);
+  if (typeof window === "string" && window !== "day")
+    return dayScope(window, Date.now(), method);
+  if (method === "totals" && window !== "day")
+    throw new Error("Daily totals require a complete UTC day.");
   if (!["day", 12, 13].includes(window))
     throw new Error("Choose the full day or an archived hourly report.");
   const day = window === "day";
@@ -42,7 +53,7 @@ export function scope(window = "day") {
     decimals: 6,
     wallet: address,
     token,
-    function_slug: "erc20.wallet_transfers",
+    function_slug: slug,
     from_time: day ? "2026-11-10T00:00:00Z" : `2026-11-10T${window}:00:00Z`,
     to_time: day ? "2026-11-11T00:00:00Z" : `2026-11-10T${window + 1}:00:00Z`,
     from_block: day ? 26380784 : window === 12 ? 26384371 : 26384670,
@@ -85,11 +96,31 @@ export function validateRows(rows, report, provider) {
   if (!Array.isArray(rows) || rows.length > maxRows)
     throw new Error("Invalid transfer list.");
   return rows.map((r) => {
+    // PR 386 serves wallet-relative directions. Archived recordings and the
+    // preceding production release use endpoints; normalize both to a ledger.
+    let from = r.from,
+      to = r.to;
+    if (provider === "testril" && r.direction !== undefined) {
+      const counterparty = r.counterparty?.toLowerCase();
+      if (
+        !["in", "out", "self"].includes(r.direction) ||
+        !addr.test(counterparty ?? "") ||
+        (r.direction === "self") !== (counterparty === report.wallet)
+      )
+        throw new Error("Invalid transfer direction.");
+      from = r.direction === "in" ? counterparty : report.wallet;
+      to = r.direction === "out" ? counterparty : report.wallet;
+      if (
+        (r.from !== undefined && r.from.toLowerCase() !== from) ||
+        (r.to !== undefined && r.to.toLowerCase() !== to)
+      )
+        throw new Error("Conflicting transfer endpoints.");
+    }
     const row = {
       tx: r.tx?.toLowerCase(),
       token: r.token?.toLowerCase(),
-      from: r.from?.toLowerCase(),
-      to: r.to?.toLowerCase(),
+      from: from?.toLowerCase(),
+      to: to?.toLowerCase(),
       value: r.value,
     };
     if (
@@ -120,8 +151,8 @@ export function summary(rows, wallet = address) {
   const partners = new Map();
   for (const row of rows) {
     const amount = atoms(row.value);
-    if (row.to === wallet) incoming += amount;
-    if (row.from === wallet) outgoing += amount;
+    if (row.to === wallet && row.from !== wallet) incoming += amount;
+    if (row.from === wallet && row.to !== wallet) outgoing += amount;
     const other = row.from === wallet ? row.to : row.from;
     const p = partners.get(other) ?? {
       address: other,
@@ -130,8 +161,8 @@ export function summary(rows, wallet = address) {
       outgoing: 0n,
     };
     p.transfers++;
-    if (row.to === wallet) p.incoming += amount;
-    if (row.from === wallet) p.outgoing += amount;
+    if (row.to === wallet && row.from !== wallet) p.incoming += amount;
+    if (row.from === wallet && row.to !== wallet) p.outgoing += amount;
     partners.set(other, p);
   }
   return {
@@ -147,6 +178,63 @@ export function summary(rows, wallet = address) {
         incoming: p.incoming.toString(),
         outgoing: p.outgoing.toString(),
       })),
+  };
+}
+export function validateCounterparties(rows, report) {
+  if (!Array.isArray(rows) || rows.length > maxRows)
+    throw new Error("Invalid daily totals.");
+  const seen = new Set();
+  return rows.map((r) => {
+    const address = r.counterparty?.toLowerCase();
+    if (
+      !addr.test(address ?? "") ||
+      seen.has(address) ||
+      r.token?.toLowerCase() !== report.token ||
+      r.day !== report.from_time.slice(0, 10) ||
+      atoms(r.transfers) === 0n ||
+      atoms(r.transfers) >= 1n << 256n ||
+      atoms(r.received) >= 1n << 256n ||
+      atoms(r.sent) >= 1n << 256n ||
+      (address === report.wallet && (r.received !== "0" || r.sent !== "0"))
+    )
+      throw new Error("Invalid counterparty total.");
+    seen.add(address);
+    return {
+      address,
+      transfers: r.transfers,
+      incoming: r.received,
+      outgoing: r.sent,
+    };
+  });
+}
+export function transferCount(rows, method = "transactions") {
+  return method === "totals"
+    ? rows.reduce((total, r) => total + atoms(r.transfers), 0n).toString()
+    : String(rows.length);
+}
+export function compareCounterparties(left, right) {
+  const sorted = (rows) =>
+    [...rows].sort((a, b) => a.address.localeCompare(b.address));
+  const a = sorted(left),
+    b = sorted(right);
+  const countsMatch =
+    a.length === b.length &&
+    a.every(
+      (r, i) => r.address === b[i].address && r.transfers === b[i].transfers,
+    );
+  const amountsAvailable = [...a, ...b].every(
+    (r) => r.incoming !== null && r.outgoing !== null,
+  );
+  const amountsMatch = amountsAvailable
+    ? countsMatch &&
+      a.every(
+        (r, i) => r.incoming === b[i].incoming && r.outgoing === b[i].outgoing,
+      )
+    : null;
+  return {
+    matches: countsMatch && amountsMatch !== false,
+    countsMatch,
+    amountsMatch,
   };
 }
 export function compare(left, right) {

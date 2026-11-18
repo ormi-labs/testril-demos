@@ -16,11 +16,12 @@ class Stop extends Error {
 const phaseFor = (action) =>
   ["bind", "coverage", "materialize", "job"].includes(action)
     ? "preparation"
-    : action === "provenance"
+    : ["provenance", "source-provenance"].includes(action)
       ? "provenance"
       : "query";
 export async function runComparison({
   window,
+  method = "transactions",
   payer,
   request,
   approve,
@@ -34,7 +35,8 @@ export async function runComparison({
     kind: "live",
     status: "running",
     createdAt: new Date().toISOString(),
-    scope: scope(window),
+    scope: scope(window, method),
+    method,
     payer,
     id: null,
     pending: null,
@@ -162,7 +164,7 @@ export async function runComparison({
   try {
     await save();
     const scopeStart = performance.now();
-    const created = await request("api/runs", { payer, window });
+    const created = await request("api/runs", { payer, window, method });
     run.id = created.id;
     if (
       !created.scope ||
@@ -228,13 +230,27 @@ export async function runComparison({
       throw new Stop("INVALID_RESULT", "Testril did not return transfers.");
     t.rows = read.rows;
     t.provenance = await action("testril", "provenance");
+    if (method === "totals")
+      t.sourceProvenance = await action("testril", "source-provenance");
     t.status = "done";
     t.timing.total = Math.round(performance.now() - tStart);
     await save();
     const n = run.providers.nansen,
       nStart = performance.now();
     for (let page = 1; page <= maxPages; page++) {
-      const value = await action("nansen", "transactions", page);
+      const value = await action(
+        "nansen",
+        method === "totals" ? "counterparties" : "transactions",
+        page,
+      );
+      if (method === "totals") {
+        const seen = new Set(n.rows.map((r) => r.address));
+        if (value.rows.some((r) => seen.has(r.address)))
+          throw new Stop(
+            "INVALID_RESULT",
+            "Nansen repeated a counterparty across pages.",
+          );
+      }
       n.rows.push(...value.rows);
       if (n.rows.length > maxRows)
         throw new Stop(

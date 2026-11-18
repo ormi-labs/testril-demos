@@ -90,7 +90,7 @@ export async function verifyWindow(input, rpc) {
   );
   check(
     p.computation?.id === "erc20.wallet_transfers" &&
-      p.computation.version === 1,
+      [1, 2].includes(p.computation.version),
     "Unexpected computation",
   );
   check(p.block_count === p.blocks.length, "Incorrect cited block count");

@@ -8,7 +8,16 @@ import { createApp, fileStore } from "../src/server.mjs";
 import { createProviders, nansenRows } from "../src/providers.mjs";
 import { runComparison } from "../public/runner.js";
 import { signPayment } from "../public/payments.js";
-import { scope, decimalAtoms, compare, summary } from "../public/model.js";
+import {
+  scope,
+  decimalAtoms,
+  compare,
+  compareCounterparties,
+  transferCount,
+  validateRows,
+  validateCounterparties,
+  summary,
+} from "../public/model.js";
 import { replay, verifyWindow } from "../public/verification.js";
 import { execute } from "../src/gateway.mjs";
 import { failure, describeFailure } from "../src/errors.mjs";
@@ -109,6 +118,169 @@ test("real HTTP/MCP adapters complete approvals, pagination, provenance and reco
   );
   assert.equal(checked.transfers, 292);
   assert.equal(checked.counterparties.length, 93);
+});
+
+test("daily totals compare paginated summaries without buying either provider's ledger", async (t) => {
+  const f = await fixture(t, { counterpartyPageSize: 50 });
+  const run = await runComparison({
+    window: "2026-11-09",
+    method: "totals",
+    payer: account.address,
+    request: f.request,
+    approve: async () => true,
+    sign: (q) =>
+      signPayment(wallet(), account.address, q.challenge, q.accepted, q.plan),
+    persist: () => {},
+    sleep: async () => {},
+  });
+  assert.equal(run.status, "done", run.error);
+  assert.equal(run.scope.function_slug, "erc20.wallet_counterparties");
+  const testril = run.providers.testril,
+    nansen = run.providers.nansen;
+  assert.equal(transferCount(testril.rows, "totals"), "292");
+  assert.equal(nansen.pages, 2);
+  assert.equal(
+    compareCounterparties(testril.rows, nansen.rows).amountsMatch,
+    true,
+  );
+  assert.equal(
+    f.calls.filter((r) => r.provider === "nansen" && r.name === "transactions")
+      .length,
+    0,
+  );
+  const binding = f.calls.find((r) => r.name === "bind");
+  assert.deepEqual(binding.args.params, {
+    swap: { wallet: run.scope.wallet, tokens: [run.scope.token] },
+    by: "day",
+  });
+  const reads = f.calls.filter((r) => r.name === "read");
+  assert.ok(
+    reads.every(
+      (r) => r.args.bound_function_id === run.scope.bound_function_id,
+    ),
+  );
+  assert.equal(
+    testril.provenance.sources[0].bound_function_id,
+    testril.sourceProvenance.bound_function_id,
+  );
+  assert.ok(
+    testril.payments.filter((p) => p.phase === "provenance").length === 2,
+  );
+  assert.doesNotMatch(JSON.stringify(run), /signature|channelConfig/);
+  const durable = await f.store.load(run.id);
+  assert.equal(durable.method, "totals");
+  await assert.rejects(
+    f.request(`api/runs/${run.id}/step`, {
+      action: "transactions",
+      page: 1,
+      id: crypto.randomUUID(),
+    }),
+  );
+});
+
+test("daily summaries stop on repeated counterparties and disclose unavailable token amounts", async (t) => {
+  for (const duplicate of [false, true]) {
+    const f = await fixture(t, {
+      counterpartyPageSize: 50,
+      duplicateCounterparty: duplicate,
+      missingTokenAmounts: true,
+    });
+    const run = await runComparison({
+      window: "2026-11-09",
+      method: "totals",
+      payer: account.address,
+      request: f.request,
+      approve: async () => true,
+      sign: (q) =>
+        signPayment(wallet(), account.address, q.challenge, q.accepted, q.plan),
+      persist: () => {},
+      sleep: async () => {},
+    });
+    assert.equal(run.status, duplicate ? "stopped" : "done", run.error);
+    if (!duplicate) {
+      const result = compareCounterparties(
+        run.providers.testril.rows,
+        run.providers.nansen.rows,
+      );
+      assert.equal(result.countsMatch, true);
+      assert.equal(result.amountsMatch, null);
+    }
+  }
+});
+
+test("a daily provenance reference to another source stops before Nansen and retains its confirmed purchase", async (t) => {
+  const f = await fixture(t, { invalidDailySource: true });
+  const run = await runComparison({
+    window: "2026-11-09",
+    method: "totals",
+    payer: account.address,
+    request: f.request,
+    approve: async () => true,
+    sign: (q) =>
+      signPayment(wallet(), account.address, q.challenge, q.accepted, q.plan),
+    persist: () => {},
+    sleep: async () => {},
+  });
+  assert.equal(run.status, "stopped");
+  assert.equal(run.pending, null);
+  assert.equal(f.calls.filter((r) => r.provider === "nansen").length, 0);
+  const saved = await f.store.load(run.id);
+  assert.equal(saved.stopped, true);
+  assert.ok(
+    saved.operations.some((o) => o.action === "provenance" && o.confirmed),
+  );
+});
+
+test("PR 386 directions preserve event identity and self-transfers count once without moving amounts", () => {
+  const report = scope("day");
+  const peer = "0x1111111111111111111111111111111111111111";
+  const seed = {
+    token: report.token,
+    tx: `0x${"aa".repeat(32)}`,
+    block: report.from_block,
+    value: "7",
+  };
+  const rows = validateRows(
+    ["in", "out", "self"].map((direction, i) => ({
+      ...seed,
+      direction,
+      counterparty: direction === "self" ? report.wallet : peer,
+      log_index: String(i),
+    })),
+    report,
+    "testril",
+  );
+  const result = summary(rows);
+  assert.equal(result.transfers, 3);
+  assert.equal(result.incoming, "7");
+  assert.equal(result.outgoing, "7");
+  assert.equal(
+    result.counterparties.find((r) => r.address === report.wallet).incoming,
+    "0",
+  );
+  assert.throws(() =>
+    validateRows(
+      [{ ...seed, log_index: "1", direction: "self", counterparty: peer }],
+      report,
+      "testril",
+    ),
+  );
+  const valid = {
+    token: report.token,
+    day: "2026-11-10",
+    counterparty: peer,
+    transfers: "2",
+    received: "7",
+    sent: "7",
+  };
+  for (const bad of [
+    { ...valid, day: "2026-11-09" },
+    { ...valid, transfers: "0" },
+    { ...valid, sent: "-1" },
+    { ...valid, counterparty: report.wallet },
+  ])
+    assert.throws(() => validateCounterparties([bad], report));
+  assert.throws(() => validateCounterparties([valid, valid], report));
 });
 
 test("both recorded hours replay real source evidence and reject an edited amount", async () => {

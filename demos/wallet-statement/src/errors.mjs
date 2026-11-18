@@ -4,7 +4,7 @@ export function failure(code, details = {}) {
     INVALID_REQUEST: "Choose a completed UTC day.",
     PROVIDER_UNAVAILABLE: "The data provider could not complete this request.",
     PROVIDER_REFUSED: "The data provider refused this operation.",
-    TESTRIL_BINDING_REJECTED: "Testril refused the wallet-transfer binding.",
+    TESTRIL_BINDING_REJECTED: "Testril refused the report binding.",
     PROVIDER_INVALID_RESPONSE:
       "The provider returned data this demo cannot verify.",
     PAYMENT_UNCERTAIN:

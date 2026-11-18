@@ -227,6 +227,72 @@ test("invalid days and a failed day lookup cannot reach wallet signing", async (
   );
   expect(await page.evaluate(() => window.testSignatures)).toBe(0);
 });
+
+test("daily totals use separate summaries, preserve the historical ledger and export source provenance", async ({
+  page,
+}, info) => {
+  await installWallet(page);
+  await page.goto("/");
+  await expect(page.locator("#testril-count")).toHaveText("7139");
+  await page.selectOption("#comparison-method", "totals");
+  await expect(page.locator("#method-description")).toContainText(
+    "daily totals",
+  );
+  await page.getByRole("tab", { name: "Run with your Wallet" }).click();
+  await expect(page.locator("#testril .query-cost")).toHaveText("—");
+  await page.locator("#report-date").fill("2026-11-09");
+  await page
+    .getByRole("button", { name: "Connect wallet", exact: true })
+    .click();
+  await page
+    .getByRole("button", { name: "Run comparison", exact: true })
+    .click();
+  for (let step = 0; step < 15; step++) {
+    await expect
+      .poll(
+        async () =>
+          (await page.locator("#notice").innerText()).startsWith(
+            "Run complete",
+          ) || (await page.getByRole("dialog").isVisible()),
+      )
+      .toBe(true);
+    if ((await page.locator("#notice").innerText()).startsWith("Run complete"))
+      break;
+    await expect(page.locator("#comparison-method")).toBeDisabled();
+    await page.getByRole("button", { name: "Approve and sign" }).click();
+  }
+  await expect(page.locator("#notice")).toContainText("Run complete");
+  await expect(page.locator("#agreement")).toHaveText(
+    "Every counterparty count and amount matches",
+  );
+  await expect(page.locator("#testril-count")).toHaveText("292");
+  await expect(page.locator("#nansen-count")).toHaveText("292");
+  await expect(page.locator("#nansen .provider-notes")).toHaveText(
+    "1 complete summary page",
+  );
+  await page.getByText("View the daily totals", { exact: true }).click();
+  await expect(page.locator("#transfers tr")).toHaveCount(93);
+  await expect(page.locator("#ledger-head")).toContainText("USDC received");
+  await page.screenshot({
+    path: info.outputPath("daily-totals.png"),
+    fullPage: true,
+  });
+  const [download] = await Promise.all([
+    page.waitForEvent("download"),
+    page.getByRole("button", { name: "Download this run" }).click(),
+  ]);
+  const run = JSON.parse(await readFile(await download.path(), "utf8"));
+  expect(run.method).toBe("totals");
+  expect(run.providers.testril.sourceProvenance.computation.id).toBe(
+    "erc20.wallet_transfers",
+  );
+  await page.getByRole("tab", { name: "Historical Run", exact: true }).click();
+  await page.selectOption("#comparison-method", "transactions");
+  await expect(page.locator("#testril-count")).toHaveText("7139");
+  await expect(page.locator("#agreement")).toHaveText(
+    "Every transfer and amount matches",
+  );
+});
 test("cancel stops without signing, and missing wallets are explained", async ({
   page,
 }) => {

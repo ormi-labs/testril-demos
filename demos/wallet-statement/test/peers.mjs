@@ -9,7 +9,7 @@ import {
   encodeAbiParameters,
 } from "viem";
 import { digest } from "../public/verification.js";
-import { scope, decimal, usdc } from "../public/model.js";
+import { scope, decimal, usdc, summary } from "../public/model.js";
 import {
   batchDomain,
   channelTypes,
@@ -75,6 +75,10 @@ export async function peers({
   omitReceipt = false,
   network = "eip155:8453",
   mismatch = false,
+  counterpartyPageSize = 1000,
+  duplicateCounterparty = false,
+  missingTokenAmounts = false,
+  invalidDailySource = false,
 } = {}) {
   const records = {};
   for (const h of [12, 13])
@@ -134,6 +138,7 @@ export async function peers({
     return daily.get(date);
   }
   const id = records[12].scope.bound_function_id;
+  const totalsId = `sha256:${"cc".repeat(32)}`;
   const calls = [],
     channels = [];
   let prepared = false;
@@ -246,7 +251,13 @@ export async function peers({
     if (name === "bind")
       return bindingRefusal
         ? { outcome: "error", kind: "invalid_params" }
-        : { outcome: "success", bound_function_id: id };
+        : {
+            outcome: "success",
+            bound_function_id:
+              args.function_slug === "erc20.wallet_counterparties"
+                ? totalsId
+                : id,
+          };
     if (name === "inspect")
       return args.subject === "channels"
         ? { outcome: "success", channels }
@@ -261,6 +272,15 @@ export async function peers({
               outcome: "success",
               materialized: prepared ? [[26384371, 26384969]] : [],
               active_jobs: [],
+              dependencies:
+                args.bound_function_id === totalsId
+                  ? [
+                      {
+                        function_slug: "erc20.wallet_transfers",
+                        bound_function_id: id,
+                      },
+                    ]
+                  : [],
             };
     if (name === "read" && !prepared)
       return { outcome: "error", kind: "range_unavailable", materializing: [] };
@@ -270,13 +290,69 @@ export async function peers({
     await batch(payment, amount);
     if (name === "materialize") prepared = true;
     const record = await reportRecord(args.from_time);
+    let value;
+    if (name === "materialize")
+      value = { outcome: "success", job: { job_id: "job:1" } };
+    else if (args.bound_function_id === totalsId) {
+      value =
+        name === "provenance"
+          ? {
+              outcome: "success",
+              bound_function_id: totalsId,
+              chain_id: 1,
+              from_time: args.from_time,
+              to_time: args.to_time,
+              computation: {
+                kind: "function",
+                id: "erc20.wallet_counterparties",
+                version: 1,
+              },
+              sources: [
+                {
+                  kind: "rows",
+                  chain_id: 1,
+                  bound_function_id: invalidDailySource
+                    ? `sha256:${"ff".repeat(32)}`
+                    : id,
+                  from_block: record.scope.from_block,
+                  to_block: record.scope.to_block,
+                },
+              ],
+            }
+          : {
+              outcome: "success",
+              values: summary(record.providers.testril.rows).counterparties.map(
+                (r) => ({
+                  day: args.from_time.slice(0, 10),
+                  token: record.scope.token,
+                  counterparty: r.address,
+                  transfers: String(r.transfers),
+                  received: r.incoming,
+                  sent: r.outgoing,
+                }),
+              ),
+            };
+    } else
+      value =
+        name === "provenance"
+          ? record.providers.testril.provenance
+          : {
+              outcome: "success",
+              values: record.providers.testril.rows.map(
+                ({ from, to, ...row }) => ({
+                  ...row,
+                  counterparty: from === record.scope.wallet ? to : from,
+                  direction:
+                    from === to
+                      ? "self"
+                      : from === record.scope.wallet
+                        ? "out"
+                        : "in",
+                }),
+              ),
+            };
     return {
-      value:
-        name === "materialize"
-          ? { outcome: "success", job: { job_id: "job:1" } }
-          : name === "provenance"
-            ? record.providers.testril.provenance
-            : { outcome: "success", values: record.providers.testril.rows },
+      value,
       receipt: omitReceipt ? null : receipt(amount),
     };
   }
@@ -351,9 +427,10 @@ export async function peers({
     for await (const part of req) text += part;
     const body = JSON.parse(text),
       encoded = req.headers["payment-signature"];
+    const totals = req.url.endsWith("/counterparties");
     calls.push({
       provider: "nansen",
-      name: "transactions",
+      name: totals ? "counterparties" : "transactions",
       body,
       paid: Boolean(encoded),
     });
@@ -385,6 +462,50 @@ export async function peers({
       );
       const record = await reportRecord(body.date.from),
         byTx = new Map();
+      if (totals) {
+        const rows = summary(record.providers.testril.rows).counterparties;
+        const page = body.pagination.page;
+        const selected = rows.slice(
+          (page - 1) * counterpartyPageSize,
+          page * counterpartyPageSize,
+        );
+        if (duplicateCounterparty && page > 1) selected[0] = rows[0];
+        if (!omitReceipt)
+          res.setHeader(
+            "payment-response",
+            Buffer.from(JSON.stringify(receipt("10000"))).toString("base64"),
+          );
+        res.writeHead(200, { "content-type": "application/json" });
+        res.end(
+          JSON.stringify({
+            pagination: {
+              page,
+              per_page: 1000,
+              is_last_page: page * counterpartyPageSize >= rows.length,
+            },
+            data: selected.map((r, index) => ({
+              counterparty_address: r.address,
+              tokens_info: [
+                {
+                  token_address: "0x0000000000000000000000000000000000000001",
+                  num_transfer: "999999",
+                },
+                {
+                  token_address: record.scope.token,
+                  num_transfer: String(
+                    r.transfers + (mismatch && index === 0 ? 1 : 0),
+                  ),
+                  ...(!missingTokenAmounts && {
+                    token_in_amount: decimal(r.incoming),
+                    token_out_amount: decimal(r.outgoing),
+                  }),
+                },
+              ],
+            })),
+          }),
+        );
+        return;
+      }
       for (const [index, row] of record.providers.testril.rows.entries()) {
         const tx = byTx.get(row.tx) ?? {
           chain: "ethereum",

@@ -1,4 +1,12 @@
-import { scope, dayScope, compare, decimal, evidenceCosts } from "./model.js";
+import {
+  scope,
+  dayScope,
+  compare,
+  compareCounterparties,
+  transferCount,
+  decimal,
+  evidenceCosts,
+} from "./model.js";
 import { signPayment } from "./payments.js";
 import { runComparison } from "./runner.js";
 
@@ -12,8 +20,12 @@ const stageText = {
   job: "Waiting for preparation",
   provenance: "Retrieving provenance",
   transactions: "Reading pages",
+  counterparties: "Reading daily totals",
+  "source-provenance": "Retrieving source provenance",
 };
 let current, baseline, payer, wallet, savedLive;
+const recordings = {};
+let method = "transactions";
 let busy = false,
   storageBlocked = false,
   mode = "recorded";
@@ -99,11 +111,30 @@ function renderLedger() {
     return;
   ledgerRows = rows;
   ledgerLength = rows.length;
-  $("#ledger-caption").textContent =
-    `${name === "testril" ? "Testril" : "Nansen"}: ${rows.length} transfers${p?.status === "done" ? " · complete ledger" : " received so far"}. Repeated transfers are preserved.`;
+  const totals = method === "totals";
+  $("#ledger-caption").textContent = totals
+    ? `${name === "testril" ? "Testril" : "Nansen"}: ${rows.length} counterparties. Counts cover USDC only; missing token amounts are shown as unavailable.`
+    : `${name === "testril" ? "Testril" : "Nansen"}: ${rows.length} transfers${p?.status === "done" ? " · complete ledger" : " received so far"}. Repeated transfers are preserved.`;
+  const head = document.createElement("tr");
+  for (const label of totals
+    ? ["Other address", "Transfers", "USDC received", "USDC sent"]
+    : ["Transaction", "Direction", "Other address", "USDC"])
+    text(head, "th", label);
+  $("#ledger-head").replaceChildren(head);
   const fragment = document.createDocumentFragment();
   for (const r of rows) {
     const tr = document.createElement("tr");
+    if (totals) {
+      const a = text(text(tr, "td", ""), "a", short(r.address));
+      a.href = `https://etherscan.io/address/${r.address}`;
+      a.target = "_blank";
+      a.rel = "noreferrer";
+      text(tr, "td", r.transfers);
+      text(tr, "td", r.incoming === null ? "Unavailable" : decimal(r.incoming));
+      text(tr, "td", r.outgoing === null ? "Unavailable" : decimal(r.outgoing));
+      fragment.append(tr);
+      continue;
+    }
     const a = text(text(tr, "td", ""), "a", short(r.tx));
     a.href = `https://etherscan.io/tx/${r.tx}#eventlog`;
     a.target = "_blank";
@@ -144,11 +175,15 @@ function render() {
       ? ""
       : p.status === "done"
         ? name === "nansen"
-          ? `${p.pages} complete pages`
-          : "Complete transfer history"
+          ? `${p.pages} complete ${method === "totals" ? "summary " : ""}page${p.pages === 1 ? "" : "s"}`
+          : method === "totals"
+            ? "Daily counterparty totals"
+            : "Complete transfer history"
         : "Run incomplete · figures shown so far";
     $(`#${name}-count`).textContent =
-      p && (p.rows.length || p.status === "done") ? String(p.rows.length) : "—";
+      p && (p.rows.length || p.status === "done")
+        ? transferCount(p.rows, method)
+        : "—";
     for (const phase of name === "testril"
       ? ["preparation", "query", "provenance"]
       : ["query"]) {
@@ -159,11 +194,22 @@ function render() {
   const t = current?.providers.testril,
     n = current?.providers.nansen;
   const complete = t?.status === "done" && n?.status === "done";
-  const matches = complete && compare(t.rows, n.rows).matches;
+  const comparison = complete
+    ? method === "totals"
+      ? compareCounterparties(t.rows, n.rows)
+      : compare(t.rows, n.rows)
+    : null;
+  const matches = comparison?.matches;
   $("#agreement").textContent = complete
     ? matches
-      ? "Every transfer and amount matches"
-      : "The returned transfers differ"
+      ? method === "totals"
+        ? comparison.amountsMatch === null
+          ? "Every counterparty’s transfer count matches; Nansen did not supply all token amounts"
+          : "Every counterparty count and amount matches"
+        : "Every transfer and amount matches"
+      : method === "totals"
+        ? "The returned daily totals differ"
+        : "The returned transfers differ"
     : "Waiting for both complete answers";
   const tc = evidenceCosts(t?.payments ?? [], "query"),
     nc = evidenceCosts(n?.payments ?? [], "query");
@@ -250,6 +296,16 @@ function render() {
     !validDate() ||
     Boolean(savedLive?.pending);
   $("#connect").disabled = busy;
+  $("#comparison-method").value = method;
+  $("#comparison-method").disabled = busy || Boolean(savedLive?.pending);
+  $("#method-description").textContent =
+    method === "totals"
+      ? "Both providers return daily totals per counterparty. We compare every USDC transfer count and the exact token amounts when supplied by both."
+      : "Both providers return every transfer; we compare the complete ledgers.";
+  $("#ledger-title").textContent =
+    method === "totals"
+      ? "View the daily totals"
+      : "View the full transfer ledger";
   $("#report-date").disabled = busy || Boolean(savedLive?.pending);
   $("#recorded-controls").hidden = mode !== "recorded";
   $("#live-controls").hidden = mode !== "live";
@@ -273,32 +329,39 @@ function clearLedger() {
   $("#transfers").replaceChildren();
 }
 async function loadRecording() {
-  baseline = await api("recordings/day-2026-11-10.json");
-  if (mode === "recorded") current = structuredClone(baseline);
-  render();
+  recordings.transactions = await api("recordings/day-2026-11-10.json");
+  recordings.totals = await api("recordings/totals-2026-11-10.json").catch(
+    () => null,
+  );
+  selectMode(mode);
 }
 function selectMode(next) {
   mode = next;
+  baseline = recordings[method];
   current =
     next === "recorded"
       ? baseline
         ? structuredClone(baseline)
         : null
-      : (savedLive ?? null);
-  if (next === "live" && savedLive?.scope.from_time)
+      : (savedLive?.method ?? "transactions") === method
+        ? (savedLive ?? null)
+        : null;
+  if (next === "live" && current?.scope.from_time)
     $("#report-date").value = savedLive.scope.from_time.slice(0, 10);
   clearLedger();
   $("#notice").textContent = storageBlocked
     ? "Saved browser state could not be read. Live purchases are blocked until the previous state has been reviewed."
     : next === "live"
       ? (savedLive?.error ?? "Choose a day and connect your wallet.")
-      : "";
+      : method === "totals" && !baseline
+        ? "No daily-totals recording yet. Choose Run with your Wallet to retrieve a day."
+        : "";
   render();
 }
 function approve(quote) {
   const dialog = $("#payment-dialog");
   $("#payment-summary").textContent =
-    `${quote.provider === "testril" ? "Testril" : "Nansen"}: ${{ read: "retrieve transfers", materialize: "prepare this day", provenance: "retrieve source evidence", transactions: "retrieve one transaction page" }[quote.action]} · ${decimal(quote.amount)} USDC service charge.`;
+    `${quote.provider === "testril" ? "Testril" : "Nansen"}: ${{ read: method === "totals" ? "retrieve daily totals" : "retrieve transfers", materialize: "prepare this day", provenance: "retrieve source evidence", "source-provenance": "retrieve transfer-source evidence", transactions: "retrieve one transaction page", counterparties: "retrieve one daily-totals page" }[quote.action]} · ${decimal(quote.amount)} USDC service charge.`;
   $("#payment-recipient").textContent = `Recipient: ${quote.payTo}`;
   $("#deposit-note").textContent = BigInt(quote.deposit)
     ? `A separate ${decimal(quote.deposit)} USDC escrow deposit is needed. The service charge is deducted from the channel; the deposit is not a second fee.`
@@ -342,6 +405,7 @@ $("#run").addEventListener("click", async () => {
   try {
     current = await runComparison({
       window: $("#report-date").value,
+      method,
       payer,
       request: api,
       approve,
@@ -364,6 +428,10 @@ $("#run").addEventListener("click", async () => {
 });
 $("#recorded").addEventListener("click", () => selectMode("recorded"));
 $("#live").addEventListener("click", () => selectMode("live"));
+$("#comparison-method").addEventListener("change", () => {
+  method = $("#comparison-method").value;
+  selectMode(mode);
+});
 $(".tabs").addEventListener("keydown", (event) => {
   if (!busy && ["ArrowLeft", "ArrowRight", "Home", "End"].includes(event.key)) {
     event.preventDefault();
@@ -423,7 +491,7 @@ function downloadRun(value) {
   const url = URL.createObjectURL(blob),
     a = document.createElement("a");
   a.href = url;
-  a.download = `wallet-statement-${value.scope.window ?? value.scope.hour}-${value.status === "done" ? "run" : "attempt"}.json`;
+  a.download = `pool-flows-${value.method ?? "transactions"}-${value.scope.window ?? value.scope.hour}-${value.status === "done" ? "run" : "attempt"}.json`;
   a.click();
   setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
@@ -444,7 +512,7 @@ try {
       )
     )
       throw new Error("Invalid saved run");
-    scope(savedLive.scope.window ?? savedLive.scope.hour);
+    scope(savedLive.scope.window ?? savedLive.scope.hour, savedLive.method);
     if (savedLive.status === "running") {
       savedLive.status = "stopped";
       savedLive.error =
@@ -452,6 +520,7 @@ try {
     }
     if (savedLive.pending) {
       mode = "live";
+      method = savedLive.method ?? "transactions";
     }
   }
 } catch {

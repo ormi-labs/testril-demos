@@ -1,12 +1,41 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { nansenTotal } from "../src/transfer-total.mjs";
-import { token } from "../public/model.js";
+import { nansenTotal, nansenCounterparties } from "../src/transfer-total.mjs";
+import { token, scope, compareCounterparties } from "../public/model.js";
 
 const address = (n) => "0x" + n.toString(16).padStart(40, "0");
 const entry = (n, count, other = []) => ({
   counterparty_address: address(n),
   tokens_info: [...other, { token_address: token, num_transfer: count }],
+});
+
+test("daily token amounts preserve original decimal digits and missing amounts remain unknown", () => {
+  const json = `{"pagination":{"page":1,"per_page":1000,"is_last_page":true},"data":[{"counterparty_address":"${address(1)}","tokens_info":[{"token_address":"${token}","num_transfer":"17","token_in_amount":9000000000.000001,"token_out_amount":0.000002}]}]}`;
+  const result = nansenCounterparties(json, scope("day"), 1);
+  assert.equal(result.rows[0].incoming, "9000000000000001");
+  assert.equal(result.rows[0].outgoing, "2");
+  const unknown = nansenCounterparties(
+    JSON.stringify(response([entry(1, "17")])),
+    scope("day"),
+    1,
+  );
+  assert.equal(unknown.rows[0].incoming, null);
+  assert.equal(
+    compareCounterparties(result.rows, unknown.rows).amountsMatch,
+    null,
+  );
+  assert.equal(
+    compareCounterparties(result.rows, [{ ...result.rows[0], outgoing: "3" }])
+      .matches,
+    false,
+  );
+  assert.throws(() =>
+    nansenCounterparties(
+      json.replace("9000000000.000001", "1.0000001"),
+      scope("day"),
+      1,
+    ),
+  );
 });
 const response = (data) => ({
   pagination: { page: 1, per_page: 1000, is_last_page: true },

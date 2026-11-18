@@ -133,12 +133,14 @@ export function createProviders({
         }
       }
     },
-    async nansen(window, page, payment) {
+    async nansen(window, page, payment, method = "transactions") {
       const report = scope(window);
+      const totals = method === "totals";
+      const operation = totals ? "counterparties" : "transactions";
       let response;
       try {
         response = await fetcher(
-          new URL("/api/v1/profiler/address/transactions", nansenUrl),
+          new URL(`/api/v1/profiler/address/${operation}`, nansenUrl),
           {
             method: "POST",
             redirect: "manual",
@@ -163,16 +165,20 @@ export function createProviders({
                   .toISOString()
                   .replace(".000Z", "Z"),
               },
-              filters: { token_address: report.token },
-              hide_spam_token: false,
-              pagination: { page, per_page: 100 },
+              ...(totals
+                ? { source_input: "Tokens", group_by: "wallet" }
+                : {
+                    filters: { token_address: report.token },
+                    hide_spam_token: false,
+                  }),
+              pagination: { page, per_page: totals ? 1000 : 100 },
             }),
           },
         );
       } catch {
         throw failure(payment ? "PAYMENT_UNCERTAIN" : "PROVIDER_UNAVAILABLE", {
           provider: "nansen",
-          operation: "transactions",
+          operation,
         });
       }
       const decode = (header) =>
@@ -191,7 +197,7 @@ export function createProviders({
       } catch {
         throw failure(
           payment ? "PAYMENT_UNCERTAIN" : "PROVIDER_INVALID_RESPONSE",
-          { provider: "nansen", operation: "transactions" },
+          { provider: "nansen", operation },
         );
       }
     },

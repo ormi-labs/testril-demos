@@ -1,6 +1,14 @@
 # Proposal for Vineet: return wallet transfer totals
 
-17 November 2026 · Proposed Testril Function, not implemented
+17 November 2026 · Implemented by [PR 386](https://github.com/ormi-labs/testril/pull/386)
+
+**Accepted API:** `erc20.wallet_counterparties`, with
+`params: {swap: {wallet, tokens: [token]}, by: "day"}`. The implementation calls the
+source parameter `swap`, rather than `transfers` in the original proposal below.
+PR 386 also changes `erc20.wallet_transfers` to version 2 with `counterparty` and
+`direction` fields. Bind again after rollout; old-version prepared rows are not
+carried forward. The Pool Flows demo now supports both ledger and daily-summary
+comparisons. This document retains the original proposal and acceptance criteria.
 
 ## What we need
 

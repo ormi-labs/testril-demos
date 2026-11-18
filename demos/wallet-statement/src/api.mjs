@@ -73,11 +73,18 @@ export function createApi({
         if (
           !value ||
           !Object.hasOwn(value, "window") ||
-          Object.keys(value).some((k) => !["payer", "window"].includes(k))
+          Object.keys(value).some(
+            (k) => !["payer", "window", "method"].includes(k),
+          )
         )
           throw failure("INVALID_REQUEST");
-        const run = newRun(value.payer, value.window, createId?.(request));
-        const report = scope(run.window);
+        const run = newRun(
+          value.payer,
+          value.window,
+          createId?.(request),
+          value.method,
+        );
+        const report = scope(run.window, run.method);
         run.report = Number.isSafeInteger(report.from_block)
           ? report
           : await providers.resolveScope(report);
