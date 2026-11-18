@@ -78,33 +78,27 @@ export function ladders(rows, chain) {
 }
 
 function checkChain(rows, chain) {
-  const questionIds = new Set(
+  const asked = new Set(
     rows[`${chain.key}-questions`].map((q) => q.question_id),
   );
-  const byQuestion = ladders(rows, chain);
-  for (const [questionId, ladder] of byQuestion) {
-    if (!questionIds.has(questionId))
-      throw new Error(
-        `${chain.name} answer at block ${ladder[0].block} is for question ${questionId}, which is not among its questions.`,
-      );
-    for (let i = 1; i < ladder.length; i++)
-      if (BigInt(ladder[i].bond) < 2n * BigInt(ladder[i - 1].bond))
+  let toEarlierQuestions = 0;
+  for (const [questionId, ladder] of ladders(rows, chain)) {
+    if (!asked.has(questionId)) toEarlierQuestions += ladder.length;
+    const bonded = ladder.filter((answer) => answer.is_ruling !== true);
+    for (let i = 1; i < bonded.length; i++)
+      if (BigInt(bonded[i].bond) < 2n * BigInt(bonded[i - 1].bond))
         throw new Error(
-          `${chain.name} question ${questionId}: bond ${ladder[i].bond} at block ${ladder[i].block} is under double the previous bond ${ladder[i - 1].bond}.`,
+          `${chain.name} question ${questionId}: bond ${bonded[i].bond} at block ${bonded[i].block} is under double the previous bond ${bonded[i - 1].bond}.`,
         );
   }
-  return {
-    answers: rows[`${chain.key}-answers`].length,
-    questions: questionIds.size,
-  };
+  const answers = rows[`${chain.key}-answers`].length;
+  return { answers, asked: asked.size, toEarlierQuestions };
 }
 
 export function check({ rows }) {
-  return chains.flatMap((chain) => {
-    const { answers, questions } = checkChain(rows, chain);
-    return [
-      `${chain.name}: all ${answers} answers belong to one of the ${questions} questions asked in the window, and every bond is at least double the one before it`,
-    ];
+  return chains.map((chain) => {
+    const { answers, asked, toEarlierQuestions } = checkChain(rows, chain);
+    return `${chain.name}: ${answers} answers, ${answers - toEarlierQuestions} to the ${asked} questions asked in the window and ${toEarlierQuestions} to questions asked before it; every bond is at least double the one before it, an arbitrator's ruling aside`;
   });
 }
 

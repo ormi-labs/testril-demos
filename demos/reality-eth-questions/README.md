@@ -4,16 +4,18 @@ Questions asked on Reality.eth v3 on Ethereum and Gnosis over the last 30 days,
 and the answers given to them. Each new answer must stake at least double the
 bond of the one before, so a disputed question climbs a ladder of bonds. The
 page shows the most disputed question's ladder and a table of the 20 questions
-with the most answers. It proves its numbers: every answer must belong to a
-question asked in the window, and every bond must be at least double the
-previous bond on the same question.
+with the most answers. It proves its numbers: every bond must be at least
+double the previous bond on the same question. An arbitrator's ruling carries
+no bond (`realitio.answer` serves it with `is_ruling` true and bond 0) and is
+left out of that rule. Answers to questions asked before the window are counted
+but not listed: on Gnosis, where Omen markets resolve weeks after they open,
+33 of 73 answers in the 30 days to 2026-11-17 were for older questions.
 
 Every number on the page comes live from Testril when you press **Fetch from
 Testril**. The first fetch has Testril index the data; later fetches only read
 what Testril already indexed. A real fetch can fail the cross-check, and the
 page then shows the failure instead of the passed checks, when:
 
-- an answer in the window belongs to a question asked before it;
 - an answer does not beat the previous bond, because `realitio.answer` keeps a
   row for a bond that does not beat the question's bond;
 - an answer was revealed from a commitment: its row sits at the reveal block,
@@ -62,9 +64,9 @@ npm run format:check
 ```
 
 `npm test` checks the cross-check passes on the fixture (also when answers
-arrive out of order, and for a bond of exactly double), fails on an answer to an
-unknown question and on a bond raised by only 1.5 times, and that the server
-returns the shaped report.
+arrive out of order, for a bond of exactly double, for an answer to a question
+asked before the window and for an arbitrator's bond-0 ruling), fails on a bond
+raised by only 1.5 times, and that the server returns the shaped report.
 `npm test` also fetches from a fake Testril: the fetch pays with the payer's
 vouchers, reports Testril's job progress and keeps every row.
 `npm run test:browser` presses the button against the fake Testril and waits

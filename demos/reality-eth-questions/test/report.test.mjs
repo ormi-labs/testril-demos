@@ -15,17 +15,26 @@ test("check passes on the fixture, whatever order the answers arrive in", () => 
   assert.equal(check({ rows: shuffled }).length, 2);
 });
 
-test("check fails on an answer to a question that was not asked", () => {
-  const corrupted = rows();
-  corrupted["gnosis-answers"][0].question_id = `0x${"ab".repeat(32)}`;
-  assert.throws(() => check({ rows: corrupted }), /Gnosis answer .* not among/);
+test("an answer to a question asked before the window is counted, not refused", () => {
+  const withEarlierQuestion = rows();
+  withEarlierQuestion["gnosis-answers"][0].question_id = `0x${"ab".repeat(32)}`;
+  assert.match(
+    check({ rows: withEarlierQuestion })[1],
+    /and 1 to questions asked before it/,
+  );
 });
 
-test("check scopes question ids per chain", () => {
-  const corrupted = rows();
-  corrupted["gnosis-answers"][0].question_id =
-    corrupted["ethereum-questions"][0].question_id;
-  assert.throws(() => check({ rows: corrupted }), /Gnosis answer .* not among/);
+test("an arbitrator's ruling settles a question without a bond", () => {
+  const withRuling = rows();
+  const ladder = longestLadder(withRuling["ethereum-answers"]);
+  const last = ladder.at(-1);
+  withRuling["ethereum-answers"].push({
+    ...last,
+    block: last.block + 1,
+    bond: "0",
+    is_ruling: true,
+  });
+  assert.equal(check({ rows: withRuling }).length, 2);
 });
 
 test("check fails when a bond is raised by less than double", () => {
