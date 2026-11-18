@@ -51,6 +51,6 @@ export function succeeded(answer, tool) {
       `Testril still asks payment for ${tool}: the payer's usage credits may be used up.`,
     );
   throw new Error(
-    `Testril ${tool}: ${answer.kind ?? answer.outcome}${answer.message ? ` — ${answer.message}` : ""}`,
+    `Testril ${tool}: ${answer.kind ?? answer.error ?? answer.outcome}${answer.message ? ` — ${answer.message}` : ""}`,
   );
 }
