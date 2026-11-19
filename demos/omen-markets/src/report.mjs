@@ -1,6 +1,5 @@
 const dayMs = 86400000;
 const windowDays = 30;
-const chainStart = "1970-01-01T00:00:00Z";
 const chunkHours = 24;
 const isoSecond = (ms) => new Date(ms).toISOString().replace(".000Z", "Z");
 export const factory = "0x9083a2b699c0a4ad06f63580bde2635d26a3eef0";
@@ -18,7 +17,8 @@ export function bindsAt(now = Date.now()) {
       function_slug: "omen.market_list",
       chain_id: 100,
       params: marketList,
-      window: { from_time: chainStart, to_time: isoSecond(today) },
+      window,
+      read: { chunk_hours: chunkHours },
     },
     {
       name: "trades",
@@ -143,25 +143,24 @@ function checkPoolReconciles(market, states, trades, funding) {
   }
 }
 
-export const createdInWindow = (markets, reads) => {
-  const { from_block } = reads.trades[0];
-  const { to_block } = reads.trades.at(-1);
-  return markets.filter(
-    (market) => market.block >= from_block && market.block < to_block,
-  );
-};
+const marketRows = ["trades", "liquidity", "market_state"];
 
-export function check({ rows }) {
+function onListedMarkets(rows) {
+  const listed = new Set(rows.markets.map((market) => market.market));
+  const kept = { ...rows };
+  const leftOut = {};
+  for (const kind of marketRows) {
+    kept[kind] = rows[kind].filter((row) => listed.has(row.market));
+    leftOut[kind] = rows[kind].length - kept[kind].length;
+  }
+  return { rows: kept, leftOut };
+}
+
+export function check({ rows: fetchedRows }) {
+  const { rows, leftOut } = onListedMarkets(fetchedRows);
   const markets = new Map(
     rows.markets.map((market) => [market.market, market]),
   );
-  const unlisted = [
-    ...rows.trades,
-    ...rows.liquidity,
-    ...rows.market_state,
-  ].find((row) => !markets.has(row.market));
-  if (unlisted)
-    throw new Error(`Market ${unlisted.market} is not in market_list.`);
 
   const early = [...rows.trades, ...rows.liquidity, ...rows.market_state].find(
     (row) => row.block < markets.get(row.market).block,
@@ -206,7 +205,7 @@ export function check({ rows }) {
     );
 
   return [
-    `All ${rows.trades.length} trades, ${rows.liquidity.length} funding events and ${rows.market_state.length} pool balances are on a market in market_list`,
+    `${rows.trades.length} trades, ${rows.liquidity.length} funding events and ${rows.market_state.length} pool balances on the ${rows.markets.length} markets created in the window are checked; ${leftOut.trades} trades, ${leftOut.liquidity} funding events and ${leftOut.market_state} pool balances on markets created before the window are left out`,
     "Every trade's fee is the market's fee on its collateral, and no pool holds fewer outcome tokens than its trades leave (tokens sent straight to a market may add more)",
     `All ${rows.answers.length} answers finalize within a year after they were given`,
   ];
@@ -286,7 +285,8 @@ function settlingAnswers(answers) {
 const utcDay = (time) => time.slice(0, 10);
 const lastDay = (time) => utcDay(isoSecond(Date.parse(time) - dayMs));
 
-export function shape({ rows, reads }, binds) {
+export function shape({ rows: fetchedRows }, binds) {
+  const { rows } = onListedMarkets(fetchedRows);
   const { window } = binds.find((bind) => bind.name === "trades");
   const summaries = wxdaiSummaries(rows);
   const volume = summaries.reduce((sum, market) => sum + market.volume, 0n);
@@ -296,7 +296,7 @@ export function shape({ rows, reads }, binds) {
     window: { first: utcDay(window.from_time), last: lastDay(window.to_time) },
     factory,
     realitio,
-    marketCount: String(createdInWindow(rows.markets, reads).length),
+    marketCount: String(rows.markets.length),
     tradeCount: String(rows.trades.length),
     volume: formatAmount(volume, "wxDAI"),
     otherCollateral: others,

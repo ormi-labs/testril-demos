@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { check, createdInWindow, shape } from "../src/report.mjs";
+import { check, shape } from "../src/report.mjs";
 import { fixture, fixtureBinds, fixtureFetched } from "./fixture.mjs";
 
 const rows = () => structuredClone(fixture());
@@ -9,17 +9,19 @@ test("check passes on the fixture", () => {
   assert.equal(check({ rows: rows() }).length, 3);
 });
 
-test("check fails when a trade is on a market that is not listed", () => {
-  const corrupted = rows();
-  corrupted.trades[0].market = `0x${"1".repeat(40)}`;
-  assert.throws(() => check({ rows: corrupted }), /not in market_list/);
+test("a trade on a market created before the window is counted and left out", () => {
+  const withOlderMarket = rows();
+  withOlderMarket.trades[0].market = `0x${"1".repeat(40)}`;
+  assert.match(
+    check({ rows: withOlderMarket })[0],
+    /1 trades, 0 funding events and 0 pool balances on markets created before the window are left out/,
+  );
 });
 
 test("check fails when a trade is dated before its market was created", () => {
   const corrupted = rows();
-  const [created] = createdInWindow(
-    corrupted.markets,
-    fixtureFetched(corrupted).reads,
+  const created = corrupted.markets.find((market) =>
+    corrupted.trades.some((t) => t.market === market.market),
   );
   const trade = corrupted.trades.find((t) => t.market === created.market);
   trade.block = created.block - 1;
@@ -93,18 +95,6 @@ test("shape ranks wxDAI markets by volume and lists other collateral apart", () 
   assert.equal(view.markets[0].trades, "3");
   assert.equal(view.otherCollateral[0].rawVolume, "350000000");
   assert.ok(view.markets.every((market) => market.cents < 1e8));
-});
-
-test("shape counts only markets created in the window", () => {
-  const data = rows();
-  const fetched = fixtureFetched(data);
-  const created = createdInWindow(data.markets, fetched.reads);
-  assert.ok(created.length > 0);
-  assert.ok(created.length < data.markets.length);
-  assert.equal(
-    shape(fetched, fixtureBinds).marketCount,
-    String(created.length),
-  );
 });
 
 test("shape skips a trade on an unlisted market instead of throwing", () => {

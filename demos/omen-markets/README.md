@@ -1,14 +1,14 @@
 # Omen markets
 
-Prediction markets on Gnosis Chain for 30 days: every market the Omen factory
-has created (so trades on older markets are listed too), the buys and sells on
-each, the funding added, the outcome tokens each market's pool holds, and the
-Reality.eth answers that settle questions. The page counts the markets created
-in the window and ranks wxDAI markets by trade volume; markets on other
+Prediction markets on Gnosis Chain for 30 days: the markets the Omen factory
+created in the window, the buys and sells on each, the funding added, the
+outcome tokens each market's pool holds, and the Reality.eth answers that settle
+questions. Activity on markets created before the window is counted and left
+out: on the 30 days to 2026-11-19 that was 731 of 25,969 trades (1,093 of
+44,839 xDAI). The page ranks wxDAI markets by trade volume; markets on other
 collateral (for example USDC, 6 decimals) are listed apart, never summed into
 the wxDAI total. Reality.eth bonds are in native xDAI. It proves its numbers:
-every trade, funding event and pool balance must be on a listed market, every
-trade's fee must equal the market's fee on its collateral, no answer may
+every trade's fee must equal the market's fee on its collateral, no answer may
 finalize before it was given, and no pool may hold negative outcome tokens. A
 pool's balance must also follow its trades: at a block with trades and no
 funding, each outcome moves by the collateral less fee paid in (buy) or the
@@ -68,11 +68,12 @@ npm run lint
 npm run format:check
 ```
 
-`npm test` checks the cross-check passes on the fixture and fails on a trade
-for an unlisted market, buys read as sells, a fee off by 10^2, a pool balance
+`npm test` checks the cross-check passes on the fixture and fails on buys read
+as sells, a fee off by 10^2, a pool balance
 that holds fewer tokens than its trades leave or is negative, and an answer that finalizes
-before it was given; that the report counts only window markets, keeps
-non-wxDAI collateral out of the wxDAI total and survives an unlisted market;
+before it was given; that a trade on a market created before the window is
+counted and left out; that the report keeps non-wxDAI collateral out of the
+wxDAI total;
 and that the server returns the shaped report.
 `npm test` also fetches from a fake Testril: the fetch pays with the payer's
 vouchers, reports Testril's job progress and keeps every row.
@@ -82,11 +83,9 @@ for the report. The fixture lives in `test/` and is never shown on the page.
 ## Subjects and window
 
 Window: the 30 UTC days before the day of the press (`from_time` 30 days before
-today 00:00 UTC, `to_time` today 00:00 UTC). `markets` reads the factory
-list from the start of the chain (`from_time` 1970-01-01T00:00:00Z, the timestamp of
-Gnosis block 0) so every market that can trade in the window is listed. The
-markets created in the window are the listed ones whose block lies inside the
-resolved block range of the `trades` reads.
+today 00:00 UTC, `to_time` today 00:00 UTC). Every bind, `markets` included,
+reads the window one day at a time. A real fetch was 150 reads and 84,278
+rows; the largest read was 2,766 pool balances.
 
 | Subject                              | Address                                      | Note   |
 | ------------------------------------ | -------------------------------------------- | ------ |
@@ -103,13 +102,13 @@ unconfirmed as the instance Omen uses.
 
 Windows end at 00:00 UTC on the day of the press; the end is not included.
 
-| Name           | Function            | Chain | Params                          | Window              |
-| -------------- | ------------------- | ----- | ------------------------------- | ------------------- |
-| `markets`      | `omen.market_list`  | 100   | `factory`, `conditional_tokens` | chain start → today |
-| `trades`       | `omen.trade`        | 100   | `market_list`                   | 30 days → today     |
-| `liquidity`    | `omen.liquidity`    | 100   | `market_list`                   | 30 days → today     |
-| `market_state` | `omen.market_state` | 100   | `market_list`                   | 30 days → today     |
-| `answers`      | `realitio.answer`   | 100   | `realitio`                      | 30 days → today     |
+| Name           | Function            | Chain | Params                          | Window          |
+| -------------- | ------------------- | ----- | ------------------------------- | --------------- |
+| `markets`      | `omen.market_list`  | 100   | `factory`, `conditional_tokens` | 30 days → today |
+| `trades`       | `omen.trade`        | 100   | `market_list`                   | 30 days → today |
+| `liquidity`    | `omen.liquidity`    | 100   | `market_list`                   | 30 days → today |
+| `market_state` | `omen.market_state` | 100   | `market_list`                   | 30 days → today |
+| `answers`      | `realitio.answer`   | 100   | `realitio`                      | 30 days → today |
 
 `market_state` is a bind the first plan did not list; the check that no pool
 holds negative or too few outcome tokens needs it, at the cost of its credits.
