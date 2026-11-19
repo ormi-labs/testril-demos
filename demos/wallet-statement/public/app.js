@@ -228,7 +228,9 @@ function renderSummary(which) {
       : "";
   $(`#${prefix}time-comparison`).textContent =
     matches && t.timing.query > 0 && n.timing.query > 0
-      ? `Nansen took ${ratio(n.timing.query, t.timing.query)}× as long as Testril.`
+      ? n.timing.query >= t.timing.query
+        ? `Nansen took ${ratio(n.timing.query, t.timing.query)}× as long as Testril.`
+        : `Testril took ${ratio(t.timing.query, n.timing.query)}× as long as Nansen.`
       : "";
 }
 function render() {

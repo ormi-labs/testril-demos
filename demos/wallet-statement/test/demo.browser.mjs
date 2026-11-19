@@ -65,17 +65,31 @@ test("historical layout gives cost and time equal prominence and exposes both fu
   await expect(page.locator("#price-comparison")).toContainText("95.9×");
   await expect(page.locator("#testril-count")).toHaveText("7139");
   await expect(page.locator("#nansen-count")).toHaveText("7139");
-  await expect(page.locator("#totals-testril .status")).toHaveText(
-    "Not recorded",
+  await expect(page.locator("#totals-testril .status")).toHaveText("Complete");
+  await expect(page.locator("#totals-testril .query-cost")).toHaveText(
+    "0.007193",
   );
   await expect(page.locator("#totals-nansen .query-cost")).toHaveText(
-    "Not measured",
+    "0.050000",
+  );
+  await expect(page.locator("#totals-testril .query-time")).toHaveText(
+    "6.33 s",
+  );
+  await expect(page.locator("#totals-nansen .query-time")).toHaveText("2.03 s");
+  await expect(page.locator("#totals-time-comparison")).toHaveText(
+    "Testril took 3.1× as long as Nansen.",
   );
   await page.selectOption("#comparison-method", "totals");
   await expect(page.locator("#testril .query-cost")).toHaveText("0.007193");
-  await expect(page.locator("#totals-testril .status")).toHaveText(
-    "Not recorded",
+  await expect(page.locator("#agreement")).toHaveText(
+    "Every counterparty count and amount matches",
   );
+  await expect(page.locator("#testril-count")).toHaveText("7139");
+  await page.getByText("View the daily totals", { exact: true }).click();
+  await expect(page.locator("#transfers tr")).toHaveCount(787);
+  await page.selectOption("#ledger-provider", "nansen");
+  await expect(page.locator("#transfers tr")).toHaveCount(787);
+  await page.selectOption("#ledger-provider", "testril");
   await page.selectOption("#comparison-method", "transactions");
   await expect(page.locator("#report-window")).toHaveText(
     "2026-11-10 · full UTC day",
@@ -531,4 +545,25 @@ test("unavailable browser journals block both methods without a purchase", async
   await expect(page.locator('[data-run-method="totals"]')).toBeDisabled();
   expect(posts).toEqual([]);
   expect(await page.evaluate(() => window.testSignatures)).toBe(0);
+});
+
+test("a missing summary recording is explicit and preserves the transaction benchmark", async ({
+  page,
+}) => {
+  await page.route("**/recordings/totals-2026-11-10.json", (route) =>
+    route.fulfill({ contentType: "application/json", body: "null" }),
+  );
+  await page.goto("/");
+  await expect(page.locator("#testril .query-cost")).toHaveText("0.007193");
+  await expect(page.locator("#totals-testril .status")).toHaveText(
+    "Not recorded",
+  );
+  await expect(page.locator("#totals-nansen .query-cost")).toHaveText(
+    "Not measured",
+  );
+  await page.selectOption("#comparison-method", "totals");
+  await expect(page.locator("#agreement")).toContainText(
+    "No recording for this method",
+  );
+  await expect(page.locator("#testril .query-cost")).toHaveText("0.007193");
 });
