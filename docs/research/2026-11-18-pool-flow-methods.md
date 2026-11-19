@@ -57,6 +57,10 @@ recording or financial authorization was submitted during this implementation.
 The historical totals view explicitly shows that it has no recording until a
 measured run is saved; old ledger prices/times are never relabelled as totals.
 
-Production publishing remains subject to the harness’s existing Cloudflare
-Workers Paid requirement. This update does not change the Move Money sandbox
-pool, its quarantines, or its maintenance state.
+Update, 19 November: Paul confirmed the configured account is Ormi’s intended
+account. Cloudflare accepted the candidate upload after removing the explicit
+request-limit override and using the running Worker’s account defaults. No
+subscription was changed; billing access remains unavailable to the CLI login.
+The earlier rejection did not justify asserting that Ormi must upgrade. This
+update does not change the Move Money sandbox pool or resolve its observed
+request-limit failures.
