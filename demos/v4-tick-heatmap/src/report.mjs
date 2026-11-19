@@ -1,6 +1,6 @@
 const dayMs = 86400000;
 const managerCreatedAt = "2025-01-23T16:16:47Z";
-const tickChunkHours = 672;
+const tickChunkHours = 168;
 const isoSecond = (ms) => new Date(ms).toISOString().replace(".000Z", "Z");
 export const manager = "0x000000000004444c5dc75cb358380d2e3de08a90";
 export const pool =
