@@ -14,6 +14,7 @@ export function bindsAt(now = Date.now()) {
       chain_id: 4663,
       params: { factory: "0x7ed598bcef8bd9edd8c97a195c6d13f40801ec7e" },
       window: untilToday(91 * dayMs),
+      read: { chunk_hours: 24 },
     },
     {
       name: "graduations",
@@ -24,6 +25,7 @@ export function bindsAt(now = Date.now()) {
         pool_manager: "0x58daec3116aae6d93017baaea7749052e8a04fa7",
       },
       window: untilToday(91 * dayMs),
+      read: { chunk_hours: 24 },
     },
     {
       name: "curve-volume",
@@ -36,6 +38,7 @@ export function bindsAt(now = Date.now()) {
         by: "day",
       },
       window: untilToday(91 * dayMs),
+      read: { chunk_hours: 24 },
     },
     {
       name: "pool-fees",
@@ -52,6 +55,7 @@ export function bindsAt(now = Date.now()) {
         by: "day",
       },
       window: untilToday(91 * dayMs),
+      read: { chunk_hours: 24 },
     },
     {
       name: "pool-fee-sweep",
@@ -65,6 +69,7 @@ export function bindsAt(now = Date.now()) {
         },
       },
       window: untilToday(91 * dayMs),
+      read: { chunk_hours: 24 },
     },
   ];
 }

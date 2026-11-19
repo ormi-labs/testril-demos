@@ -106,6 +106,17 @@ export function fixture() {
 
 const sameParams = (a, b) => JSON.stringify(a) === JSON.stringify(b);
 
+const inWindow = (row, window) => {
+  const period = row.day ?? row.hour;
+  if (period === undefined)
+    return (
+      row.block >= blockAt(window.from_time) &&
+      row.block < blockAt(window.to_time)
+    );
+  const at = (time) => time.slice(0, period.length);
+  return period >= at(window.from_time) && period < at(window.to_time);
+};
+
 export function fixtureRows() {
   const rows = fixture();
   return (bound, window) => {
@@ -116,11 +127,7 @@ export function fixtureRows() {
         sameParams(candidate.params, bound.params),
     );
     return bind.read
-      ? rows[bind.name].filter(
-          (row) =>
-            row.block >= blockAt(window.from_time) &&
-            row.block < blockAt(window.to_time),
-        )
+      ? rows[bind.name].filter((row) => inWindow(row, window))
       : rows[bind.name];
   };
 }

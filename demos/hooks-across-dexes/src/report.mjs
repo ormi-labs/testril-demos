@@ -18,6 +18,7 @@ export function bindsAt(now = Date.now()) {
         by: "day",
       },
       window: untilToday(8 * dayMs),
+      read: { chunk_hours: 24 },
     },
     {
       name: "cl-pools",
@@ -39,6 +40,7 @@ export function bindsAt(now = Date.now()) {
         by: "day",
       },
       window: untilToday(8 * dayMs),
+      read: { chunk_hours: 24 },
     },
     {
       name: "bin-pools",
@@ -60,6 +62,7 @@ export function bindsAt(now = Date.now()) {
         by: "day",
       },
       window: untilToday(8 * dayMs),
+      read: { chunk_hours: 24 },
     },
     {
       name: "v4-pools",

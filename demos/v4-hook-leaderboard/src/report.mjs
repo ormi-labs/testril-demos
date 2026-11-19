@@ -1,6 +1,6 @@
 const dayMs = 86400000;
 const managerCreatedAt = "2025-01-23T16:16:47Z";
-const listChunkHours = 336;
+const listChunkHours = 168;
 const isoSecond = (ms) => new Date(ms).toISOString().replace(".000Z", "Z");
 
 export function bindsAt(now = Date.now()) {
@@ -27,6 +27,7 @@ export function bindsAt(now = Date.now()) {
         by: "day",
       },
       window: untilToday(8 * dayMs),
+      read: { chunk_hours: 24 },
     },
     {
       name: "arrakis-hooks",

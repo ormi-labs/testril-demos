@@ -17,6 +17,7 @@ export function bindsAt(now = Date.now()) {
         by: "day",
       },
       window: untilToday(8 * dayMs),
+      read: { chunk_hours: 24 },
     },
     {
       name: "trades",

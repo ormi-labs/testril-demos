@@ -3,10 +3,13 @@ import { blockAt } from "./fake-testril.mjs";
 
 export const fixtureNow = Date.parse("2026-11-02T12:00:00Z");
 export const fixtureBinds = bindsAt(fixtureNow);
-const blocksPerDay = 823950;
-const factoryDeploymentBlock = 26841846;
+const dayMs = 86400000;
 const dayStartBlock = (dayIndex) =>
-  blockAt(fixtureBinds[0].window.from_time) + dayIndex * blocksPerDay;
+  blockAt(
+    new Date(
+      Date.parse(fixtureBinds[0].window.from_time) + dayIndex * dayMs,
+    ).toISOString(),
+  );
 
 const launchCount = 48;
 const graduatedCount = 14;
@@ -37,10 +40,11 @@ const milliEth = (thousandths) =>
 
 function launchRows(random) {
   const { factory } = fixtureBinds[0].params;
+  const start = dayStartBlock(0);
   const end = dayStartBlock(feeDays(fixtureBinds).length);
-  const step = Math.floor((end - factoryDeploymentBlock) / launchCount);
+  const step = Math.floor((end - start) / launchCount);
   return Array.from({ length: launchCount }, (_, i) => ({
-    block: factoryDeploymentBlock + i * step + Math.floor(random() * step),
+    block: start + i * step + Math.floor(random() * step),
     curve: address(random),
     factory,
     token: address(random),
@@ -146,9 +150,20 @@ export function fixture() {
 
 const sameParams = (a, b) => JSON.stringify(a) === JSON.stringify(b);
 
+const inWindow = (row, window) => {
+  const period = row.day ?? row.hour;
+  if (period === undefined)
+    return (
+      row.block >= blockAt(window.from_time) &&
+      row.block < blockAt(window.to_time)
+    );
+  const at = (time) => time.slice(0, period.length);
+  return period >= at(window.from_time) && period < at(window.to_time);
+};
+
 export function fixtureRows() {
   const rows = fixture();
-  return (bound) =>
+  return (bound, window) =>
     rows[
       fixtureBinds.find(
         (candidate) =>
@@ -156,5 +171,5 @@ export function fixtureRows() {
           candidate.chain_id === bound.chain_id &&
           sameParams(candidate.params, bound.params),
       ).name
-    ];
+    ].filter((row) => inWindow(row, window));
 }
