@@ -26,7 +26,7 @@ Optional configuration: copy `.env.example` to `.env`. Defaults use production `
 
 ## Historical and wallet runs
 
-**Historical Run** plays the full UTC day of 10 November 2026: **7,139 matching transfers**, including all 69 Nansen transaction-history pages. It was recorded on 17 November using the same local browser client against both production APIs, with automated wallet approval. Read service charges were 0.007193 USDC for Testril and 0.690000 for Nansen; read times were 3.578 and 150.528 seconds respectively. These measure provider retrieval from that client, not Cloudflare gateway latency or a repeated latency study. The saved ledger sample makes no provider requests or payments. The daily-totals recording is separate: if it has not been recorded, that selection shows no historical prices or timings and directs visitors to the wallet run. The old ledger’s timings are never presented as an aggregate query. Both original hourly recordings remain in the source archive.
+**Historical Run** plays the full UTC day of 10 November 2026: **7,139 matching transfers**, including all 69 Nansen transaction-history pages. It was recorded on 17 November using the same local browser client against both production APIs, with automated wallet approval. Read service charges were 0.007193 USDC for Testril and 0.690000 for Nansen; read times were 3.578 and 150.528 seconds respectively. These measure provider retrieval from that client, not Cloudflare gateway latency or a repeated latency study. The saved ledger sample makes no provider requests or payments. The daily-totals recording is separate: if it has not been recorded, its summary says “Not recorded” and shows no historical prices or timings. The old ledger’s timings are never presented as an aggregate query. Both original hourly recordings remain in the source archive.
 
 **Run with your Wallet** lets visitors select a completed UTC day. The initial selection is yesterday. The report address remains Ethereum pool `0x88e6a0c2ddd26feeb64f039a2c41296fcb3f5640`; the token remains Ethereum USDC. The connected wallet pays for data in Base mainnet USDC and does not change the pool address.
 
@@ -79,7 +79,9 @@ The daily recording’s `verification` object links the independently retrieved 
 
 The local gateway stores metadata in ignored `runtime/` files using atomic replacement. Use one server process for that directory. Each run’s operations are serialized. Repeated paid request IDs are refused. Do not delete journals to retry purchases.
 
-The browser keeps its most recent live run in local storage. **Check saved payment status** can recover a known confirmation without another purchase; it does not repeat the data request. An uncertain outcome keeps new runs disabled. Retain the attempt and inspect wallet/provider evidence. A fresh purchase after a known confirmation is an explicit new run, not automatic recovery. This demo does not implement unattended settlement reconciliation.
+The page shows separate cost and time summaries for all transfers and the daily summary. “Details for” selects the output ledger and cost breakdown without hiding either summary. Each live method has its own Run button and spending limits; running one does not purchase the other. Missing historical measurements are labelled “Not recorded”.
+
+The browser keeps the latest live run for each method in IndexedDB, displaying results for the selected day. The previous single-run local-storage journal is migrated automatically; unresolved purchases remain protected across both methods. **Check saved payment status** can recover a known confirmation without another purchase; it does not repeat the data request. An uncertain outcome keeps new runs disabled. Retain the attempt and inspect wallet/provider evidence. A fresh purchase after a known confirmation is an explicit new run, not automatic recovery. This demo does not implement unattended settlement reconciliation.
 
 ## Checks
 

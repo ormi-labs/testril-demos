@@ -1,5 +1,5 @@
 // Opt-in operator check. Never included in `npm test` or the browser test suite.
-import { chromium } from "@playwright/test";
+import { chromium, expect } from "@playwright/test";
 import { mkdtemp, writeFile, appendFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
@@ -28,6 +28,26 @@ const reportDate =
   process.env.PAID_SMOKE_DATE ??
   new Date(Date.now() - 86400000).toISOString().slice(0, 10);
 const method = process.env.PAID_SMOKE_METHOD ?? "transactions";
+async function readBrowserRun(which) {
+  return new Promise((resolve, reject) => {
+    const request = indexedDB.open("testril-pool-flows", 1);
+    request.onerror = () => reject(request.error);
+    request.onsuccess = () => {
+      const db = request.result;
+      const tx = db.transaction("runs");
+      const get = tx.objectStore("runs").get(which);
+      tx.oncomplete = () => {
+        db.close();
+        resolve(get.result);
+      };
+      tx.onabort = () => {
+        db.close();
+        reject(tx.error);
+      };
+    };
+  });
+}
+
 scope(reportDate, method);
 function limit(name, fallback, maximum) {
   const value = process.env[name] ?? fallback;
@@ -228,19 +248,22 @@ try {
     .getByRole("button", { name: "Connect wallet", exact: true })
     .click();
   await page
-    .getByRole("button", { name: "Run comparison", exact: true })
+    .getByRole("button", {
+      name: method === "totals" ? "Run daily summary" : "Run all transfers",
+      exact: true,
+    })
     .click();
   for (let i = 0; i < maxPages + 10; i++) {
-    await page.waitForFunction(
-      () =>
-        document.querySelector("#payment-dialog").open ||
-        ["done", "stopped", "cancelled"].includes(
-          JSON.parse(localStorage.getItem("testril-wallet-statement:last-run"))
-            ?.status,
-        ),
-      null,
-      { timeout: 240000 },
-    );
+    await expect
+      .poll(
+        async () =>
+          (await page.getByRole("dialog").isVisible()) ||
+          ["done", "stopped", "cancelled"].includes(
+            (await page.evaluate(readBrowserRun, method))?.status,
+          ),
+        { timeout: 240000 },
+      )
+      .toBe(true);
     if (!(await page.getByRole("dialog").isVisible())) break;
     if (
       !currentQuote ||
@@ -288,11 +311,7 @@ try {
       () => !document.querySelector("#payment-dialog").open,
     );
   }
-  const run = JSON.parse(
-    await page.evaluate(() =>
-      localStorage.getItem("testril-wallet-statement:last-run"),
-    ),
-  );
+  const run = await page.evaluate(readBrowserRun, method);
   if (
     run.status !== "done" ||
     !(method === "totals" ? compareCounterparties : compare)(
@@ -303,9 +322,7 @@ try {
     throw new Error("Paid comparison did not match");
   if (run.scope.window !== reportDate || run.method !== method)
     throw new Error("The comparison used another day");
-  const final = await page.evaluate(() =>
-    localStorage.getItem("testril-wallet-statement:last-run"),
-  );
+  const final = JSON.stringify(await page.evaluate(readBrowserRun, method));
   await writeFile(join(directory, "completed-run.json"), final, {
     mode: 0o600,
   });
@@ -319,11 +336,11 @@ try {
     }),
   );
 } catch {
-  const attempt = await page
-    .evaluate(() => localStorage.getItem("testril-wallet-statement:last-run"))
-    .catch(() => null);
+  const attempt = await page.evaluate(readBrowserRun, method).catch(() => null);
   if (attempt)
-    await writeFile(join(directory, "attempt.json"), attempt, { mode: 0o600 });
+    await writeFile(join(directory, "attempt.json"), JSON.stringify(attempt), {
+      mode: 0o600,
+    });
   console.error(
     `Paid smoke stopped. Review safe evidence in ${directory}; do not automatically rerun.`,
   );

@@ -23,16 +23,6 @@
         retrieve either every transfer or a daily summary for the same day. We
         compare their answers, prices and retrieval times.
       </p>
-      <div class="method-control date-control">
-        <label for="comparison-method">Retrieve</label>
-        <select id="comparison-method">
-          <option value="transactions">All transfers</option>
-          <option value="totals">Daily totals</option>
-        </select>
-      </div>
-      <p id="method-description" class="caption">
-        Both providers return every transfer; we compare the complete ledgers.
-      </p>
       <div class="tabs" role="tablist" aria-label="Run mode">
         <button
           id="recorded"
@@ -93,8 +83,7 @@
             </details>
           </div>
           <div class="actions">
-            <button id="connect">Connect wallet</button
-            ><button id="run" disabled>Run comparison</button>
+            <button id="connect">Connect wallet</button>
           </div>
         </section>
         <p id="notice" class="notice" role="status" aria-live="polite">
@@ -114,6 +103,12 @@
         </div>
         <section class="summary" aria-labelledby="summary-title">
           <h2 id="summary-title">Summary</h2>
+          <div class="heading method-heading">
+            <h3>All transfers</h3>
+            <button id="run" data-run-method="transactions" hidden disabled>
+              Run all transfers
+            </button>
+          </div>
           <div class="comparison">
             <article class="provider" id="testril">
               <div class="heading">
@@ -153,12 +148,74 @@
           <div class="ratios">
             <p id="price-comparison"></p>
             <p id="time-comparison"></p>
+            <p id="summary-agreement" class="caption"></p>
+          </div>
+          <div class="heading method-heading">
+            <h3>Daily summary</h3>
+            <button data-run-method="totals" hidden disabled>
+              Run daily summary
+            </button>
+          </div>
+          <p class="caption">
+            Daily totals per counterparty, compared by USDC transfer count and
+            exact token amounts when both providers supply them.
+          </p>
+          <div class="comparison">
+            <article class="provider" id="totals-testril">
+              <div class="heading">
+                <h3>Testril</h3>
+                <span class="status">—</span>
+              </div>
+              <div class="summary-metrics">
+                <div>
+                  <span class="label">Read cost · USDC</span
+                  ><strong class="query-cost">—</strong>
+                </div>
+                <div>
+                  <span class="label">Read time</span
+                  ><strong class="query-time">—</strong>
+                </div>
+              </div>
+              <p class="provider-notes"></p>
+            </article>
+            <article class="provider" id="totals-nansen">
+              <div class="heading">
+                <h3>Nansen</h3>
+                <span class="status">—</span>
+              </div>
+              <div class="summary-metrics">
+                <div>
+                  <span class="label">Read cost · USDC</span
+                  ><strong class="query-cost">—</strong>
+                </div>
+                <div>
+                  <span class="label">Read time</span
+                  ><strong class="query-time">—</strong>
+                </div>
+              </div>
+              <p class="provider-notes"></p>
+            </article>
+          </div>
+          <div class="ratios">
+            <p id="totals-price-comparison"></p>
+            <p id="totals-time-comparison"></p>
+            <p id="totals-summary-agreement" class="caption"></p>
           </div>
           <p class="caption">
             Read time includes negotiation and complete retrieval. Preparation,
             provenance and wallet approval are separate.
           </p>
         </section>
+        <div class="method-control date-control">
+          <label for="comparison-method">Details for</label>
+          <select id="comparison-method">
+            <option value="transactions">All transfers</option>
+            <option value="totals">Daily totals</option>
+          </select>
+        </div>
+        <p id="method-description" class="caption">
+          Both providers return every transfer; we compare the complete ledgers.
+        </p>
         <section class="output" aria-labelledby="output-title">
           <h2 id="output-title">Output</h2>
           <div class="output-counts">

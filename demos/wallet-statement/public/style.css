@@ -442,3 +442,11 @@ dialog .actions {
     font-size: 10px;
   }
 }
+
+.method-heading {
+  margin: 24px 0 14px;
+}
+.provider.unmeasured .summary-metrics strong {
+  font-size: 18px;
+  color: var(--muted);
+}

@@ -9,6 +9,7 @@ import {
 } from "./model.js";
 import { signPayment } from "./payments.js";
 import { runComparison } from "./runner.js";
+import { openRunJournal } from "./run-journal.js";
 
 const $ = (selector) => document.querySelector(selector);
 const journalKey = "testril-wallet-statement:last-run";
@@ -23,7 +24,16 @@ const stageText = {
   counterparties: "Reading daily totals",
   "source-provenance": "Retrieving source provenance",
 };
-let current, baseline, payer, wallet, savedLive;
+let current, baseline, payer, wallet, journal;
+const liveRuns = {};
+const pendingRun = () => Object.values(liveRuns).find((run) => run.pending);
+function reportFor(which) {
+  const run = mode === "recorded" ? recordings[which] : liveRuns[which];
+  return mode === "recorded" ||
+    run?.scope.from_time.slice(0, 10) === $("#report-date").value
+    ? run
+    : null;
+}
 const recordings = {};
 let method = "transactions";
 let busy = false,
@@ -96,9 +106,9 @@ async function api(path, body) {
   }
   return value;
 }
-function persist(run) {
-  localStorage.setItem(journalKey, JSON.stringify(run));
-  savedLive = run;
+async function persist(run) {
+  await journal.save(run);
+  liveRuns[run.method] = run;
 }
 function renderLedger() {
   const name = $("#ledger-provider").value;
@@ -156,12 +166,17 @@ function renderLedger() {
   }
   $("#transfers").replaceChildren(fragment);
 }
-function render() {
+function renderSummary(which) {
+  const run = reportFor(which);
+  const prefix = which === "totals" ? "totals-" : "";
   for (const name of ["testril", "nansen"]) {
-    const p = current?.providers[name],
-      panel = $(`#${name}`);
+    const p = run?.providers[name],
+      panel = $(`#${prefix}${name}`);
+    panel.classList.toggle("unmeasured", !p);
     panel.querySelector(".status").textContent = !p
-      ? "Ready"
+      ? mode === "recorded"
+        ? "Not recorded"
+        : "Ready"
       : ({
           done: "Complete",
           waiting: "Waiting",
@@ -169,17 +184,59 @@ function render() {
           stopped: "Stopped",
           running: stageText[p.stage] ?? "Running",
         }[p.status] ?? p.status);
-    panel.querySelector(".query-cost").textContent = phaseCost(p, "query");
-    panel.querySelector(".query-time").textContent = phaseTime(p, "query");
+    panel.querySelector(".query-cost").textContent = p
+      ? phaseCost(p, "query")
+      : "Not measured";
+    panel.querySelector(".query-time").textContent = p
+      ? phaseTime(p, "query")
+      : "Not measured";
     panel.querySelector(".provider-notes").textContent = !p
-      ? ""
+      ? mode === "recorded"
+        ? "No saved measurement for this method yet."
+        : "Choose a day and run this method."
       : p.status === "done"
         ? name === "nansen"
-          ? `${p.pages} complete ${method === "totals" ? "summary " : ""}page${p.pages === 1 ? "" : "s"}`
-          : method === "totals"
-            ? "Daily counterparty totals"
-            : "Complete transfer history"
+          ? `${transferCount(p.rows, which)} transfers · ${p.pages} complete ${which === "totals" ? "summary " : ""}page${p.pages === 1 ? "" : "s"}`
+          : which === "totals"
+            ? `${transferCount(p.rows, which)} transfers · daily counterparty totals`
+            : `${p.rows.length} transfers · complete ledger`
         : "Run incomplete · figures shown so far";
+  }
+  const t = run?.providers.testril,
+    n = run?.providers.nansen;
+  const complete = t?.status === "done" && n?.status === "done";
+  const matches =
+    complete &&
+    (which === "totals"
+      ? compareCounterparties(t.rows, n.rows)
+      : compare(t.rows, n.rows)
+    ).matches;
+  $(`#${prefix}summary-agreement`).textContent = complete
+    ? matches
+      ? "Answers match"
+      : "The returned answers differ"
+    : "";
+  const tc = evidenceCosts(t?.payments ?? [], "query"),
+    nc = evidenceCosts(n?.payments ?? [], "query");
+  $(`#${prefix}price-comparison`).textContent =
+    matches &&
+    tc.confirmed &&
+    nc.confirmed &&
+    BigInt(tc.amount) > 0n &&
+    BigInt(nc.amount) > 0n
+      ? `Nansen’s read cost was ${ratio(nc.amount, tc.amount)}× Testril’s.`
+      : "";
+  $(`#${prefix}time-comparison`).textContent =
+    matches && t.timing.query > 0 && n.timing.query > 0
+      ? `Nansen took ${ratio(n.timing.query, t.timing.query)}× as long as Testril.`
+      : "";
+}
+function render() {
+  current = reportFor(method);
+  baseline = recordings[method];
+  for (const which of ["transactions", "totals"]) renderSummary(which);
+  for (const name of ["testril", "nansen"]) {
+    const p = current?.providers[name];
     $(`#${name}-count`).textContent =
       p && (p.rows.length || p.status === "done")
         ? transferCount(p.rows, method)
@@ -210,21 +267,9 @@ function render() {
       : method === "totals"
         ? "The returned daily totals differ"
         : "The returned transfers differ"
-    : "Waiting for both complete answers";
-  const tc = evidenceCosts(t?.payments ?? [], "query"),
-    nc = evidenceCosts(n?.payments ?? [], "query");
-  $("#price-comparison").textContent =
-    matches &&
-    tc.confirmed &&
-    nc.confirmed &&
-    BigInt(tc.amount) > 0n &&
-    BigInt(nc.amount) > 0n
-      ? `Nansen’s read cost was ${ratio(nc.amount, tc.amount)}× Testril’s.`
-      : "";
-  $("#time-comparison").textContent =
-    matches && t.timing.query > 0 && n.timing.query > 0
-      ? `Nansen took ${ratio(n.timing.query, t.timing.query)}× as long as Testril.`
-      : "";
+    : !current && mode === "recorded"
+      ? "No recording for this method yet. No prices or timings have been measured."
+      : "Waiting for both complete answers";
   const prep = t?.payments.some((p) => p.phase === "preparation");
   if (t && !prep) {
     $("#testril-preparation-cost").textContent =
@@ -282,22 +327,23 @@ function render() {
       }
     }
   }
-  const report = current?.scope;
+  const report =
+    current?.scope ??
+    (mode === "recorded" ? recordings.transactions?.scope : null);
   $("#report-window").textContent = report
     ? `${report.from_time.slice(0, 10)} · ${report.from_time.slice(0, 10) === report.to_time.slice(0, 10) ? `${report.from_time.slice(11, 16)}–${report.to_time.slice(11, 16)} UTC` : "full UTC day"}`
     : mode === "live"
       ? `${$("#report-date").value || "Choose a day"} · full UTC day`
       : "";
   $("#download").disabled = !current;
-  $("#run").disabled =
-    busy ||
-    storageBlocked ||
-    !payer ||
-    !validDate() ||
-    Boolean(savedLive?.pending);
+  for (const button of document.querySelectorAll("[data-run-method]")) {
+    button.hidden = mode !== "live";
+    button.disabled =
+      busy || storageBlocked || !payer || !validDate() || Boolean(pendingRun());
+  }
   $("#connect").disabled = busy;
   $("#comparison-method").value = method;
-  $("#comparison-method").disabled = busy || Boolean(savedLive?.pending);
+  $("#comparison-method").disabled = busy || Boolean(pendingRun());
   $("#method-description").textContent =
     method === "totals"
       ? "Both providers return daily totals per counterparty. We compare every USDC transfer count and the exact token amounts when supplied by both."
@@ -306,10 +352,10 @@ function render() {
     method === "totals"
       ? "View the daily totals"
       : "View the full transfer ledger";
-  $("#report-date").disabled = busy || Boolean(savedLive?.pending);
+  $("#report-date").disabled = busy || Boolean(pendingRun());
   $("#recorded-controls").hidden = mode !== "recorded";
   $("#live-controls").hidden = mode !== "live";
-  $("#recovery").hidden = !savedLive?.pending;
+  $("#recovery").hidden = !pendingRun();
   $("#run-panel").setAttribute(
     "aria-labelledby",
     mode === "recorded" ? "recorded" : "live",
@@ -337,25 +383,15 @@ async function loadRecording() {
 }
 function selectMode(next) {
   mode = next;
-  baseline = recordings[method];
-  current =
-    next === "recorded"
-      ? baseline
-        ? structuredClone(baseline)
-        : null
-      : (savedLive?.method ?? "transactions") === method
-        ? (savedLive ?? null)
-        : null;
-  if (next === "live" && current?.scope.from_time)
-    $("#report-date").value = savedLive.scope.from_time.slice(0, 10);
+  current = reportFor(method);
   clearLedger();
   $("#notice").textContent = storageBlocked
     ? "Saved browser state could not be read. Live purchases are blocked until the previous state has been reviewed."
     : next === "live"
-      ? (savedLive?.error ?? "Choose a day and connect your wallet.")
-      : method === "totals" && !baseline
-        ? "No daily-totals recording yet. Choose Run with your Wallet to retrieve a day."
-        : "";
+      ? (pendingRun()?.error ??
+        current?.error ??
+        "Choose a day and connect your wallet. Run each method separately below.")
+      : "";
   render();
 }
 function approve(quote) {
@@ -396,36 +432,41 @@ $("#connect").addEventListener("click", async () => {
   }
   render();
 });
-$("#run").addEventListener("click", async () => {
-  if (busy || storageBlocked || !payer || !validDate() || savedLive?.pending)
-    return;
-  busy = true;
-  clearLedger();
-  render();
-  try {
-    current = await runComparison({
-      window: $("#report-date").value,
-      method,
-      payer,
-      request: api,
-      approve,
-      sign: (q) => signPayment(wallet, payer, q.challenge, q.accepted, q.plan),
-      persist,
-      onChange: (run) => {
-        current = run;
-        $("#notice").textContent =
-          run.error ??
-          (run.status === "done"
-            ? "Run complete."
-            : "Running your selected day. Each purchase requires approval.");
-        render();
-      },
-    });
-  } finally {
-    busy = false;
+for (const button of document.querySelectorAll("[data-run-method]"))
+  button.addEventListener("click", async () => {
+    if (busy || storageBlocked || !payer || !validDate() || pendingRun())
+      return;
+    method = button.dataset.runMethod;
+    busy = true;
+    $("#notice").textContent = "Starting comparison…";
+    clearLedger();
     render();
-  }
-});
+    try {
+      current = await runComparison({
+        window: $("#report-date").value,
+        method,
+        payer,
+        request: api,
+        approve,
+        sign: (q) =>
+          signPayment(wallet, payer, q.challenge, q.accepted, q.plan),
+        persist,
+        onChange: (run) => {
+          liveRuns[run.method] = run;
+          current = run;
+          $("#notice").textContent =
+            run.error ??
+            (run.status === "done"
+              ? "Run complete."
+              : "Running your selected day. Each purchase requires approval.");
+          render();
+        },
+      });
+    } finally {
+      busy = false;
+      render();
+    }
+  });
 $("#recorded").addEventListener("click", () => selectMode("recorded"));
 $("#live").addEventListener("click", () => selectMode("live"));
 $("#comparison-method").addEventListener("change", () => {
@@ -458,6 +499,8 @@ $("#report-date").addEventListener("change", () => {
 $("#ledger").addEventListener("toggle", renderLedger);
 $("#ledger-provider").addEventListener("change", renderLedger);
 $("#check-status").addEventListener("click", async () => {
+  if (!pendingRun()) return;
+  const savedLive = structuredClone(pendingRun());
   try {
     const state = await api(`api/runs/${savedLive.id}`);
     if (!state.pending) {
@@ -472,7 +515,7 @@ $("#check-status").addEventListener("click", async () => {
       }
       savedLive.pending = null;
       savedLive.status = "stopped";
-      persist(savedLive);
+      await persist(savedLive);
       $("#notice").textContent =
         "The server has a completed payment record. The interrupted data request was not repeated. Download the attempt before explicitly starting another comparison.";
     } else
@@ -496,40 +539,69 @@ function downloadRun(value) {
   setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
 $("#download").addEventListener("click", () => downloadRun(current));
-$("#download-pending").addEventListener("click", () => downloadRun(savedLive));
-try {
-  const saved = localStorage.getItem(journalKey);
-  if (saved) {
-    savedLive = JSON.parse(saved);
-    if (
-      savedLive?.schemaVersion !== 1 ||
-      savedLive.kind !== "live" ||
-      !["testril", "nansen"].every(
-        (name) =>
-          Array.isArray(savedLive.providers?.[name]?.rows) &&
-          Array.isArray(savedLive.providers[name].payments) &&
-          savedLive.providers[name].timing,
+$("#download-pending").addEventListener("click", () =>
+  downloadRun(pendingRun()),
+);
+async function restoreRuns() {
+  try {
+    journal = await openRunJournal();
+    const runs = await journal.load();
+    const legacy = localStorage.getItem(journalKey);
+    const oldRun = legacy ? JSON.parse(legacy) : null;
+    if (oldRun) {
+      const stored = runs.find(
+        (run) => run.method === (oldRun.method ?? "transactions"),
+      );
+      if (stored && stored.id !== oldRun.id)
+        throw new Error("Conflicting saved runs");
+      if (!stored) runs.push(oldRun);
+    }
+    for (const run of runs) {
+      if (
+        run?.schemaVersion !== 1 ||
+        run.kind !== "live" ||
+        !["testril", "nansen"].every(
+          (name) =>
+            Array.isArray(run.providers?.[name]?.rows) &&
+            Array.isArray(run.providers[name].payments) &&
+            run.providers[name].timing,
+        )
       )
-    )
-      throw new Error("Invalid saved run");
-    scope(savedLive.scope.window ?? savedLive.scope.hour, savedLive.method);
-    if (savedLive.status === "running") {
-      savedLive.status = "stopped";
-      savedLive.error =
-        "This run was interrupted. Check any pending purchase before another run.";
+        throw new Error("Invalid saved run");
+      run.method ??= "transactions";
+      scope(run.scope.window ?? run.scope.hour, run.method);
+      if (run.status === "running") {
+        run.status = "stopped";
+        run.error =
+          "This run was interrupted. Check any pending purchase before another run.";
+      }
+      liveRuns[run.method] = run;
     }
-    if (savedLive.pending) {
+    if (legacy) {
+      await journal.save(liveRuns[oldRun.method ?? "transactions"]);
+      localStorage.removeItem(journalKey);
+    }
+    storageBlocked = false;
+    const pending = pendingRun();
+    if (pending) {
       mode = "live";
-      method = savedLive.method ?? "transactions";
+      method = pending.method;
     }
+    const latest =
+      pending ??
+      Object.values(liveRuns).sort((a, b) =>
+        b.createdAt.localeCompare(a.createdAt),
+      )[0];
+    if (latest) $("#report-date").value = latest.scope.from_time.slice(0, 10);
+  } catch {
+    storageBlocked = true;
   }
-} catch {
-  storageBlocked = true;
-  savedLive = undefined;
-  $("#notice").textContent =
-    "Saved browser state could not be read. Live runs require working browser storage.";
 }
+storageBlocked = true;
 selectMode(mode);
+restoreRuns().then(() => {
+  selectMode(mode);
+});
 loadRecording().catch(() => {
   $("#notice").textContent =
     "The recorded report could not be loaded. No paid requests were made.";

@@ -65,6 +65,18 @@ test("historical layout gives cost and time equal prominence and exposes both fu
   await expect(page.locator("#price-comparison")).toContainText("95.9×");
   await expect(page.locator("#testril-count")).toHaveText("7139");
   await expect(page.locator("#nansen-count")).toHaveText("7139");
+  await expect(page.locator("#totals-testril .status")).toHaveText(
+    "Not recorded",
+  );
+  await expect(page.locator("#totals-nansen .query-cost")).toHaveText(
+    "Not measured",
+  );
+  await page.selectOption("#comparison-method", "totals");
+  await expect(page.locator("#testril .query-cost")).toHaveText("0.007193");
+  await expect(page.locator("#totals-testril .status")).toHaveText(
+    "Not recorded",
+  );
+  await page.selectOption("#comparison-method", "transactions");
   await expect(page.locator("#report-window")).toHaveText(
     "2026-11-10 · full UTC day",
   );
@@ -109,7 +121,7 @@ test("historical layout gives cost and time equal prominence and exposes both fu
   ).toBe(true);
   await page.getByRole("tab", { name: "Run with your Wallet" }).click();
   await expect(page.locator("#report-date")).toBeVisible();
-  await expect(page.locator("#testril .query-cost")).toHaveText("—");
+  await expect(page.locator("#testril .query-cost")).toHaveText("Not measured");
   await expect(page.locator("#price-comparison")).toBeEmpty();
   await expect(page.locator("#transfers")).toBeEmpty();
   const walletScreenshot = await access(screenshots)
@@ -148,7 +160,7 @@ test("choosing another day completes real HTTP peers, paid pages and a dated exp
     .getByRole("button", { name: "Connect wallet", exact: true })
     .click();
   await page
-    .getByRole("button", { name: "Run comparison", exact: true })
+    .getByRole("button", { name: "Run all transfers", exact: true })
     .click();
   for (let step = 0; step < 15; step++) {
     await expect
@@ -171,7 +183,7 @@ test("choosing another day completes real HTTP peers, paid pages and a dated exp
     "2026-11-09 · full UTC day",
   );
   await expect(page.locator("#nansen .provider-notes")).toHaveText(
-    "3 complete pages",
+    "292 transfers · 3 complete pages",
   );
   await expect(page.locator("#testril-provenance-cost")).toHaveText("0.000017");
   expect(starts).toHaveLength(1);
@@ -186,10 +198,60 @@ test("choosing another day completes real HTTP peers, paid pages and a dated exp
   expect(run.scope.window).toBe("2026-11-09");
   expect(run.scope.from_block).toBe(26373611);
   expect(value).not.toMatch(/signature|PAYMENT-SIGNATURE|channelConfig/);
+  const transactionCost = await page
+    .locator("#testril .query-cost")
+    .innerText();
+  await expect(page.locator("#totals-testril .query-cost")).toHaveText(
+    "Not measured",
+  );
+  await page
+    .getByRole("button", { name: "Run daily summary", exact: true })
+    .click();
+  for (let step = 0; step < 15; step++) {
+    await expect
+      .poll(
+        async () =>
+          (await page.locator("#notice").innerText()).startsWith(
+            "Run complete",
+          ) || (await page.getByRole("dialog").isVisible()),
+      )
+      .toBe(true);
+    if ((await page.locator("#notice").innerText()).startsWith("Run complete"))
+      break;
+    await page.getByRole("button", { name: "Approve and sign" }).click();
+  }
+  await expect(page.locator("#totals-testril .status")).toHaveText("Complete");
+  await expect(page.locator("#testril .query-cost")).toHaveText(
+    transactionCost,
+  );
+  const summaryCost = await page
+    .locator("#totals-testril .query-cost")
+    .innerText();
+  expect(starts.map((run) => run.method)).toEqual(["transactions", "totals"]);
+  await page.reload();
+  await page.getByRole("tab", { name: "Run with your Wallet" }).click();
+  await expect(page.locator("#report-date")).toHaveValue("2026-11-09");
+  await expect(page.locator("#testril .query-cost")).toHaveText(
+    transactionCost,
+  );
+  await expect(page.locator("#totals-testril .query-cost")).toHaveText(
+    summaryCost,
+  );
+  await page.selectOption("#comparison-method", "totals");
+  await expect(page.locator("#agreement")).toHaveText(
+    "Every counterparty count and amount matches",
+  );
+  await page.selectOption("#comparison-method", "transactions");
+  await expect(page.locator("#agreement")).toHaveText(
+    "Every transfer and amount matches",
+  );
   await page.locator("#report-date").fill("2026-11-10");
   await page.locator("#report-date").blur();
-  await expect(page.locator("#testril .query-time")).toHaveText("—");
+  await expect(page.locator("#testril .query-time")).toHaveText("Not measured");
   await expect(page.locator("#testril-count")).toHaveText("—");
+  await expect(page.locator("#totals-testril .query-cost")).toHaveText(
+    "Not measured",
+  );
 });
 
 test("invalid days and a failed day lookup cannot reach wallet signing", async ({
@@ -204,6 +266,7 @@ test("invalid days and a failed day lookup cannot reach wallet signing", async (
   await page.locator("#report-date").fill("2099-01-01");
   await page.locator("#report-date").blur();
   await expect(page.locator("#run")).toBeDisabled();
+  await expect(page.locator('[data-run-method="totals"]')).toBeDisabled();
   await page.locator("#report-date").fill("2026-11-09");
   await page.locator("#report-date").blur();
   await page.route("**/api/runs", (route) =>
@@ -217,7 +280,7 @@ test("invalid days and a failed day lookup cannot reach wallet signing", async (
     }),
   );
   await page
-    .getByRole("button", { name: "Run comparison", exact: true })
+    .getByRole("button", { name: "Run all transfers", exact: true })
     .click();
   await expect(page.locator("#notice")).toContainText(
     "No data purchases were submitted",
@@ -239,13 +302,13 @@ test("daily totals use separate summaries, preserve the historical ledger and ex
     "daily totals",
   );
   await page.getByRole("tab", { name: "Run with your Wallet" }).click();
-  await expect(page.locator("#testril .query-cost")).toHaveText("—");
+  await expect(page.locator("#testril .query-cost")).toHaveText("Not measured");
   await page.locator("#report-date").fill("2026-11-09");
   await page
     .getByRole("button", { name: "Connect wallet", exact: true })
     .click();
   await page
-    .getByRole("button", { name: "Run comparison", exact: true })
+    .getByRole("button", { name: "Run daily summary", exact: true })
     .click();
   for (let step = 0; step < 15; step++) {
     await expect
@@ -267,8 +330,8 @@ test("daily totals use separate summaries, preserve the historical ledger and ex
   );
   await expect(page.locator("#testril-count")).toHaveText("292");
   await expect(page.locator("#nansen-count")).toHaveText("292");
-  await expect(page.locator("#nansen .provider-notes")).toHaveText(
-    "1 complete summary page",
+  await expect(page.locator("#totals-nansen .provider-notes")).toHaveText(
+    "292 transfers · 1 complete summary page",
   );
   await page.getByText("View the daily totals", { exact: true }).click();
   await expect(page.locator("#transfers tr")).toHaveCount(93);
@@ -309,7 +372,7 @@ test("cancel stops without signing, and missing wallets are explained", async ({
     .getByRole("button", { name: "Connect wallet", exact: true })
     .click();
   await page
-    .getByRole("button", { name: "Run comparison", exact: true })
+    .getByRole("button", { name: "Run all transfers", exact: true })
     .click();
   await page.getByRole("button", { name: "Cancel run" }).click();
   await expect(page.locator("#notice")).toContainText("Run cancelled");
@@ -334,13 +397,29 @@ test("a lost paid browser response stops and preserves the known confirmation", 
     .getByRole("button", { name: "Connect wallet", exact: true })
     .click();
   await page
-    .getByRole("button", { name: "Run comparison", exact: true })
+    .getByRole("button", { name: "Run all transfers", exact: true })
     .click();
   await page.getByRole("button", { name: "Approve and sign" }).click();
   await expect(page.locator("#notice")).toContainText("could not finish");
-  const saved = await page.evaluate(() =>
-    JSON.parse(localStorage.getItem("testril-wallet-statement:last-run")),
-  );
+  const saved = await page.evaluate(async () => {
+    return new Promise((resolve, reject) => {
+      const request = indexedDB.open("testril-pool-flows", 1);
+      request.onerror = () => reject(request.error);
+      request.onsuccess = () => {
+        const db = request.result;
+        const tx = db.transaction("runs");
+        const get = tx.objectStore("runs").get("transactions");
+        tx.oncomplete = () => {
+          db.close();
+          resolve(get.result);
+        };
+        tx.onabort = () => {
+          db.close();
+          reject(tx.error);
+        };
+      };
+    });
+  });
   expect(saved.status).toBe("stopped");
   expect(saved.providers.testril.payments[0].confirmed).toBe(true);
   expect(saved.pending).toBeNull();
@@ -372,7 +451,7 @@ test("hosted failures retain a safe request reference without exposing arbitrary
     .getByRole("button", { name: "Connect wallet", exact: true })
     .click();
   await page
-    .getByRole("button", { name: "Run comparison", exact: true })
+    .getByRole("button", { name: "Run all transfers", exact: true })
     .click();
   await expect(page.locator("#notice")).toContainText(ref);
   await expect(page.locator("#notice")).not.toContainText(
@@ -414,6 +493,7 @@ test("an old hourly pending purchase survives the daily UI upgrade without anoth
   await page.goto("/");
   await expect(page.locator("#recovery")).toBeVisible();
   await expect(page.locator("#run")).toBeDisabled();
+  await expect(page.locator('[data-run-method="totals"]')).toBeDisabled();
   await expect(page.locator("#report-date")).toBeDisabled();
   await expect(page.locator("#report-window")).toContainText("12:00–13:00");
   const [download] = await Promise.all([
@@ -424,4 +504,31 @@ test("an old hourly pending purchase survives the daily UI upgrade without anoth
   expect(saved.pending).toEqual(old.pending);
   expect(saved.scope.hour).toBe(12);
   expect(posts).toEqual([]);
+});
+
+test("unavailable browser journals block both methods without a purchase", async ({
+  page,
+}) => {
+  await installWallet(page);
+  await page.addInitScript(() => {
+    Object.defineProperty(window, "indexedDB", {
+      get() {
+        throw new Error("Storage unavailable");
+      },
+    });
+  });
+  const posts = [];
+  page.on("request", (r) => {
+    if (r.method() === "POST") posts.push(r.url());
+  });
+  await page.goto("/");
+  await expect(page.locator("#testril .query-cost")).toHaveText("0.007193");
+  await page.getByRole("tab", { name: "Run with your Wallet" }).click();
+  await page
+    .getByRole("button", { name: "Connect wallet", exact: true })
+    .click();
+  await expect(page.locator("#run")).toBeDisabled();
+  await expect(page.locator('[data-run-method="totals"]')).toBeDisabled();
+  expect(posts).toEqual([]);
+  expect(await page.evaluate(() => window.testSignatures)).toBe(0);
 });
