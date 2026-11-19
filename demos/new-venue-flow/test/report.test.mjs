@@ -6,7 +6,7 @@ import { fixture, fixtureBinds } from "./fixture.mjs";
 const rows = () => structuredClone(fixture());
 
 test("check passes on the fixture for every venue", () => {
-  assert.equal(check({ rows: rows() }, fixtureBinds).length, 3);
+  assert.equal(check({ rows: rows() }, fixtureBinds).length, 2);
 });
 
 test("check fails when an amount is negative", () => {
@@ -20,7 +20,7 @@ test("check fails when an amount is negative", () => {
 
 test("check fails when a day is counted twice", () => {
   const corrupted = rows();
-  corrupted["tessera-base"].push({ ...corrupted["tessera-base"][0] });
+  corrupted["aqua-base"].push({ ...corrupted["aqua-base"][0] });
   assert.throws(
     () => check({ rows: corrupted }, fixtureBinds),
     /appears twice/,
@@ -53,7 +53,7 @@ test("check fails on a row where nothing moved", () => {
 
 test("check fails when an amount is in decimal units instead of raw", () => {
   const corrupted = rows();
-  corrupted["tessera-base"][0].amount_in = "0.04";
+  corrupted["aqua-ethereum"][0].amount = "0.04";
   assert.throws(() => check({ rows: corrupted }, fixtureBinds), /non-integer/);
 });
 

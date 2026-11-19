@@ -17,11 +17,6 @@ const traded = {
     ["0x833589fcd6edb6e08f4c7c32d4f71b54bda02913", 6, 20_000],
     ["0x4200000000000000000000000000000000000006", 18, 6],
   ],
-  "tessera-base": [
-    ["0x833589fcd6edb6e08f4c7c32d4f71b54bda02913", 6, 3_000],
-    ["0xcbb7c0000ab88b473b1f5afd9ef808440eed33bf", 8, 0.04],
-    ["0x4200000000000000000000000000000000000006", 18, 1.2],
-  ],
 };
 
 function seeded(seed) {
@@ -33,7 +28,6 @@ function seeded(seed) {
 }
 
 function venueRows(venue, random) {
-  const { token, count, amount } = venue.fields;
   return traded[venue.name].flatMap(([address, decimals, perPush]) =>
     windowDays(venue.window)
       .filter(() => random() > quietDayChance)
@@ -42,9 +36,9 @@ function venueRows(venue, random) {
         const units = BigInt(Math.round(perPush * n * (0.5 + random()) * 1e6));
         return {
           day,
-          [token]: address,
-          [count]: String(n),
-          [amount]: String((units * 10n ** BigInt(decimals)) / 1000000n),
+          token: address,
+          pushes: String(n),
+          amount: String((units * 10n ** BigInt(decimals)) / 1000000n),
         };
       }),
   );

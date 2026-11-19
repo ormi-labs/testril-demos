@@ -53,7 +53,7 @@ test("the button's fetch ends in the shaped report and its passed cross-check", 
   } while (run.state === "running");
   assert.equal(run.state, "done", run.error);
   assert.equal(run.report.checks.ok, true);
-  assert.equal(run.report.view.venues[2].title, "Tessera · Base");
+  assert.equal(run.report.view.venues[1].title, "1inch Aqua · Base");
   assert.ok(BigInt(run.spentAtoms) > 0n);
 
   const page = await fetch(base);

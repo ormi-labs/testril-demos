@@ -1,8 +1,7 @@
 # New venue flow
 
-Daily volume per token for two newer venues over eight days: the 1inch Aqua
-registry on Ethereum and Base, and a Tessera swap contract on Base. Each venue
-gets one bar chart per token (small multiples, because token amounts have
+Daily volume per token for 1inch Aqua, a newer venue, over eight days, on
+Ethereum and Base. Each chain gets one bar chart per token (small multiples, because token amounts have
 different scales and cannot share an axis), with a table of window totals. The page proves
 its numbers: counts and amounts are non-negative integers, no token-day is
 counted twice, every day lies in the window, and every row has a positive count
@@ -71,15 +70,13 @@ for the report. The fixture lives in `test/` and is never shown on the page.
   Tokens missing from the table in `src/report.mjs` show as a shortened address
   in raw units.
 
-| Subject                                   | Address                                      | Note                                                                                      |
-| ----------------------------------------- | -------------------------------------------- | ----------------------------------------------------------------------------------------- |
-| 1inch Aqua registry (same on both chains) | `0x499943e74fb0ce105688beee8ef2abec5d936d31` | verify                                                                                    |
-| Tessera swap contract on Base             | `0x55555522005bcae1c2424d474bfd5ed477749e3e` | same address on Base, BNB and Robinhood; not on Ethereum, so Tessera has no Ethereum bind |
+| Subject                                   | Address                                      | Note                                            |
+| ----------------------------------------- | -------------------------------------------- | ----------------------------------------------- |
+| 1inch Aqua registry (same on both chains) | `0x1111113ccf1426a8e30e2bff5e005d929bf6a90a` | the public-launch registry in 1inch's Aqua docs |
 
 ## Binds (`src/report.mjs`)
 
-| Name            | Function                 | Chain | Params                    | Window         |
-| --------------- | ------------------------ | ----- | ------------------------- | -------------- |
-| `aqua-ethereum` | `aqua.push_volume`       | 1     | `swap.registry`, `by`     | 8 days → today |
-| `aqua-base`     | `aqua.push_volume`       | 8453  | `swap.registry`, `by`     | 8 days → today |
-| `tessera-base`  | `tessera_v.token_volume` | 8453  | `swap.swap_address`, `by` | 8 days → today |
+| Name            | Function           | Chain | Params                | Window         |
+| --------------- | ------------------ | ----- | --------------------- | -------------- |
+| `aqua-ethereum` | `aqua.push_volume` | 1     | `swap.registry`, `by` | 8 days → today |
+| `aqua-base`     | `aqua.push_volume` | 8453  | `swap.registry`, `by` | 8 days → today |

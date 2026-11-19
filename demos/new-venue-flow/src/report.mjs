@@ -1,4 +1,5 @@
 const dayMs = 86400000;
+const aquaRegistry = "0x1111113ccf1426a8e30e2bff5e005d929bf6a90a";
 const isoSecond = (ms) => new Date(ms).toISOString().replace(".000Z", "Z");
 
 export function bindsAt(now = Date.now()) {
@@ -7,58 +8,19 @@ export function bindsAt(now = Date.now()) {
     from_time: isoSecond(today - ms),
     to_time: isoSecond(today),
   });
-  return [
-    {
-      name: "aqua-ethereum",
-      function_slug: "aqua.push_volume",
-      chain_id: 1,
-      params: {
-        swap: { registry: "0x499943e74fb0ce105688beee8ef2abec5d936d31" },
-        by: "day",
-      },
-      window: untilToday(8 * dayMs),
-    },
-    {
-      name: "aqua-base",
-      function_slug: "aqua.push_volume",
-      chain_id: 8453,
-      params: {
-        swap: { registry: "0x499943e74fb0ce105688beee8ef2abec5d936d31" },
-        by: "day",
-      },
-      window: untilToday(8 * dayMs),
-    },
-    {
-      name: "tessera-base",
-      function_slug: "tessera_v.token_volume",
-      chain_id: 8453,
-      params: {
-        swap: { swap_address: "0x55555522005bcae1c2424d474bfd5ed477749e3e" },
-        by: "day",
-      },
-      window: untilToday(8 * dayMs),
-    },
-  ];
+  const aqua = (name, chain_id) => ({
+    name,
+    function_slug: "aqua.push_volume",
+    chain_id,
+    params: { swap: { registry: aquaRegistry }, by: "day" },
+    window: untilToday(8 * dayMs),
+  });
+  return [aqua("aqua-ethereum", 1), aqua("aqua-base", 8453)];
 }
 
-const fieldsBySlug = {
-  "aqua.push_volume": {
-    token: "token",
-    count: "pushes",
-    amount: "amount",
-    unit: "pushes",
-  },
-  "tessera_v.token_volume": {
-    token: "token_in",
-    count: "trades",
-    amount: "amount_in",
-    unit: "trades",
-  },
-};
 const venueNames = {
   "aqua-ethereum": "1inch Aqua · Ethereum",
   "aqua-base": "1inch Aqua · Base",
-  "tessera-base": "Tessera · Base",
 };
 const tokens = {
   1: {
@@ -77,7 +39,6 @@ export const venuesOf = (binds) =>
   binds.map((bind) => ({
     ...bind,
     title: venueNames[bind.name],
-    fields: fieldsBySlug[bind.function_slug],
   }));
 const integer = /^[0-9]+$/;
 
@@ -95,20 +56,19 @@ export function windowDays({ from_time, to_time }) {
   return days;
 }
 
-function cells(venue, rows) {
-  const { token, count, amount } = venue.fields;
+function cells(rows) {
   return rows.map((row) => ({
     day: row.day,
-    token: row[token].toLowerCase(),
-    count: row[count],
-    amount: row[amount],
+    token: row.token.toLowerCase(),
+    count: row.pushes,
+    amount: row.amount,
   }));
 }
 
 function checkVenue(venue, rows) {
   const days = windowDays(venue.window);
   const seen = new Set();
-  for (const cell of cells(venue, rows)) {
+  for (const cell of cells(rows)) {
     const where = `${venue.title}, ${cell.token} on ${cell.day}`;
     if (!days.includes(cell.day))
       throw new Error(`${where} is outside the window.`);
@@ -144,7 +104,7 @@ function tokenSummary(venue, rows, address, days) {
     shortAddress(address),
     0,
   ];
-  const mine = cells(venue, rows).filter((cell) => cell.token === address);
+  const mine = cells(rows).filter((cell) => cell.token === address);
   const byDay = new Map(mine.map((cell) => [cell.day, cell]));
   const total = mine.reduce((sum, cell) => sum + BigInt(cell.amount), 0n);
   const count = mine.reduce((sum, cell) => sum + BigInt(cell.count), 0n);
@@ -174,7 +134,7 @@ export function shape({ rows }, binds) {
       const venueRows = rows[venue.name];
       const days = windowDays(venue.window);
       const addresses = [
-        ...new Set(cells(venue, venueRows).map((cell) => cell.token)),
+        ...new Set(cells(venueRows).map((cell) => cell.token)),
       ];
       const summaries = addresses.map((address) =>
         tokenSummary(venue, venueRows, address, days),
@@ -184,7 +144,7 @@ export function shape({ rows }, binds) {
         title: venue.title,
         chainId: venue.chain_id,
         functionSlug: venue.function_slug,
-        unit: venue.fields.unit,
+        unit: "pushes",
         count: summaries
           .reduce((sum, token) => sum + BigInt(token.count), 0n)
           .toString(),
