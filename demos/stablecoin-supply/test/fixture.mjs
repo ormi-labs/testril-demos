@@ -7,7 +7,6 @@ import {
   usdt,
   zeroAddress,
 } from "../src/report.mjs";
-import { blockAt } from "./fake-testril.mjs";
 
 export const fixtureNow = Date.parse("2026-11-02T12:00:00Z");
 export const fixtureBinds = bindsAt(fixtureNow);
@@ -108,27 +107,12 @@ export function fixture() {
         counterpartyRows(moves, bind.params.swap.wallet, bind.params.by),
       ]),
   );
-  const ensRows = Object.fromEntries(
-    fixtureBinds
-      .filter((bind) => bind.function_slug === "ens.primary_name")
-      .map((bind) => [
-        bind.name,
-        [
-          {
-            block: blockAt(bind.window.to_time) - 1,
-            address: bind.params.address,
-            name: bind.name === "ens-circle" ? "circle.eth" : "",
-          },
-        ],
-      ]),
-  );
   return {
     supply: [
       ...supplyRows(random, usdt, 96.4e9, raw(3.1e8, random)),
       ...supplyRows(random, usdc, 43.8e9, net),
     ],
     ...flowRows,
-    ...ensRows,
   };
 }
 

@@ -2,7 +2,7 @@
 
 USDT and USDC total supply per day on Ethereum for a month, then one day of
 USDC: what was minted, what was burned, and the largest flows into and out of
-thirteen well-known addresses, with ENS names on the addresses. The page proves
+thirteen well-known addresses, labelled by hand in this demo. The page proves
 its numbers: the USDC supply change that day must equal mints minus burns, and
 two named addresses that moved USDC to each other must report the same amounts
 from both ends.
@@ -43,9 +43,9 @@ Testril's own job progress (`blocks_done` of `blocks_total`, `days_done` of
 supply per day for USDT and USDC, a flow of the ten largest USDC flows of the
 named addresses, a table of the top 20, and the cross-checks. The windows follow
 the moment you press the button, so each new UTC day adds one day to index.
-Against production, a fetch of indexed windows is 327 reads and 32,048 rows:
-$0.33 and about 6 minutes, most of it the 312 hourly reads of the named
-addresses. Nothing is saved: a restart starts empty and the next fetch reads
+Against production, a fetch is 314 reads and about 32,000 rows, most of them
+the 312 hourly reads of the named addresses; one that indexed a new day took
+232 seconds and $13.26. Nothing is saved: a restart starts empty and the next fetch reads
 again.
 
 Without `TESTRIL_PAYER_KEY` the button is disabled and the page says what to set.
@@ -85,12 +85,10 @@ and is never shown on the page.
   over yesterday, read an hour at a time and summed over the day. A busy address
   has more counterparties in a day than one read serves (Coinbase 10 had 13,537
   hourly rows on 2026-11-17, at most 1,064 in an hour).
-- ENS registry `0x00000000000c2e074ec69a0dfb2997ba6c7d2e1e`; each address's
-  name is its last row in yesterday's last five minutes.
 
-The 13 named addresses are fixed in `src/report.mjs`: each moved USDC on
-2026-11-17. Their counterparties show their own ENS name only when they are
-named addresses; the rest show shortened hex.
+The 13 named addresses are fixed in `src/report.mjs`, each with a label this
+demo assigns by hand (Testril serves no names for them: none has an ENS primary
+name). Each moved USDC on 2026-11-17. Any other address shows shortened hex.
 
 | Subject                         | Address                                      | Note   |
 | ------------------------------- | -------------------------------------------- | ------ |
@@ -117,6 +115,5 @@ Windows are half-open: the end is the first block or day not included.
 | `supply`           | `erc20.token_supply`          | 1     | `tokens`, `by: day`                                         | 31 days before today    |
 | `usdc-mints-burns` | `erc20.wallet_counterparties` | 1     | `swap: { wallet: zero address, tokens: [USDC] }`, `by: day` | yesterday               |
 | `usdc-<subject>`   | `erc20.wallet_counterparties` | 1     | `swap: { wallet: subject, tokens: [USDC] }`, `by: hour`     | yesterday, hour by hour |
-| `ens-<subject>`    | `ens.primary_name`            | 1     | `registry`, `address`                                       | yesterday's last 5 min  |
 
-There is one `usdc-` and one `ens-` bind per named address, 28 binds in all.
+There is one `usdc-` bind per named address, 15 binds in all.

@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { check, labels, shape, transferDay } from "../src/report.mjs";
+import { check, shape, transferDay } from "../src/report.mjs";
 import { fixture, fixtureBinds } from "./fixture.mjs";
 
 const rows = () => structuredClone(fixture());
@@ -56,7 +56,7 @@ test("check fails when a supply day is missing", () => {
   );
 });
 
-test("shape nets mints against burns and names addresses from ENS", () => {
+test("shape nets mints against burns and labels named addresses from the demo's list", () => {
   const view = shape(fetched(), fixtureBinds);
   assert.equal(view.minted, "$315.00M");
   assert.equal(view.burned, "$370.00M");
@@ -64,23 +64,8 @@ test("shape nets mints against burns and names addresses from ENS", () => {
   assert.equal(view.pairs[0].toLabel, "Zero address");
   assert.equal(Math.round(view.pairs[0].millions), 370);
   assert.ok(
-    view.pairs.some((p) => [p.fromLabel, p.toLabel].includes("circle.eth")),
+    view.pairs.some((p) =>
+      [p.fromLabel, p.toLabel].includes("Circle (USDC issuer)"),
+    ),
   );
-});
-
-test("an address takes the name of its last row, and no name when the last row is empty", () => {
-  const changed = rows();
-  const [renamed, cleared] = ["ens-coinbase-10", "ens-bitfinex-2"];
-  const addressOf = (name) => changed[name][0].address;
-  const rowsOf = (name, names) =>
-    names.map((value, index) => ({
-      block: index,
-      address: addressOf(name),
-      name: value,
-    }));
-  changed[renamed] = rowsOf(renamed, ["old.eth", "new.eth"]);
-  changed[cleared] = rowsOf(cleared, ["gone.eth", ""]);
-  const label = labels(changed, fixtureBinds);
-  assert.equal(label(addressOf(renamed)), "new.eth");
-  assert.match(label(addressOf(cleared)), /^0x[0-9a-f]{4}…[0-9a-f]{4}$/);
 });

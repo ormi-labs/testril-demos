@@ -1,20 +1,54 @@
 const dayMs = 86400000;
-const nameLookbackMs = 5 * 60000;
-const ensRegistry = "0x00000000000c2e074ec69a0dfb2997ba6c7d2e1e";
 const named = [
-  ["circle", "0x55fe002aeff02f77364de339a1292923a15844b8"],
-  ["coinbase-10", "0xa9d1e08c7793af67e9d92fe308d5697fb81d3e43"],
-  ["bitfinex-2", "0x77134cbc06cb00b66f4c7e623d5fdbf6777635ec"],
-  ["uniswap-v3-usdc-weth", "0x88e6a0c2ddd26feeb64f039a2c41296fcb3f5640"],
-  ["uniswap-v3-usdc-usdt", "0x3416cf6c708da44db2624d63ea0aaef7113527c6"],
-  ["uniswap-v4-pool-manager", "0x000000000004444c5dc75cb358380d2e3de08a90"],
-  ["uniswap-universal-router", "0x66a9893cc07d91d95644aedd05d03f95e1dba8af"],
-  ["curve-3pool", "0xbebc44782c7db0a1a60cb6fe97d0b483032ff1c7"],
-  ["aave-v3-ausdc", "0x98c23e9d8f34fefb1b7bd6a91b7ff122f4e16f5c"],
-  ["morpho-blue", "0xbbbbbbbbbb9cc5e90e3b3af64bdaf62c37eeffcb"],
-  ["cow-settlement", "0x9008d19f58aabd9ed0d60971565aa8510560ab41"],
-  ["1inch-v6-router", "0x111111125421ca6dc452d289314280a0f8842a65"],
-  ["balancer-v2-vault", "0xba12222222228d8ba445958a75a0704d566bf2c8"],
+  [
+    "circle",
+    "0x55fe002aeff02f77364de339a1292923a15844b8",
+    "Circle (USDC issuer)",
+  ],
+  ["coinbase-10", "0xa9d1e08c7793af67e9d92fe308d5697fb81d3e43", "Coinbase 10"],
+  ["bitfinex-2", "0x77134cbc06cb00b66f4c7e623d5fdbf6777635ec", "Bitfinex 2"],
+  [
+    "uniswap-v3-usdc-weth",
+    "0x88e6a0c2ddd26feeb64f039a2c41296fcb3f5640",
+    "Uniswap v3 USDC/WETH 0.05%",
+  ],
+  [
+    "uniswap-v3-usdc-usdt",
+    "0x3416cf6c708da44db2624d63ea0aaef7113527c6",
+    "Uniswap v3 USDC/USDT 0.01%",
+  ],
+  [
+    "uniswap-v4-pool-manager",
+    "0x000000000004444c5dc75cb358380d2e3de08a90",
+    "Uniswap v4 PoolManager",
+  ],
+  [
+    "uniswap-universal-router",
+    "0x66a9893cc07d91d95644aedd05d03f95e1dba8af",
+    "Uniswap Universal Router",
+  ],
+  ["curve-3pool", "0xbebc44782c7db0a1a60cb6fe97d0b483032ff1c7", "Curve 3pool"],
+  [
+    "aave-v3-ausdc",
+    "0x98c23e9d8f34fefb1b7bd6a91b7ff122f4e16f5c",
+    "Aave v3 aEthUSDC",
+  ],
+  ["morpho-blue", "0xbbbbbbbbbb9cc5e90e3b3af64bdaf62c37eeffcb", "Morpho Blue"],
+  [
+    "cow-settlement",
+    "0x9008d19f58aabd9ed0d60971565aa8510560ab41",
+    "CoW Protocol settlement",
+  ],
+  [
+    "1inch-v6-router",
+    "0x111111125421ca6dc452d289314280a0f8842a65",
+    "1inch v6 router",
+  ],
+  [
+    "balancer-v2-vault",
+    "0xba12222222228d8ba445958a75a0704d566bf2c8",
+    "Balancer v2 Vault",
+  ],
 ];
 export const zeroAddress = "0x0000000000000000000000000000000000000000";
 export const usdt = "0xdac17f958d2ee523a2206206994597c13d831ec7";
@@ -52,13 +86,6 @@ export function bindsAt(now = Date.now()) {
       ...usdcCounterparties(address, "hour"),
       window: untilToday(dayMs),
       read: { chunk_hours: 1 },
-    })),
-    ...named.map(([slug, address]) => ({
-      name: `ens-${slug}`,
-      function_slug: "ens.primary_name",
-      chain_id: 1,
-      params: { registry: ensRegistry, address },
-      window: untilToday(nameLookbackMs),
     })),
   ];
 }
@@ -195,18 +222,12 @@ export function formatCompact(raw, signed = false) {
 
 const shortAddress = (address) => `${address.slice(0, 6)}…${address.slice(-4)}`;
 
-export function labels(rows, binds) {
-  const names = new Map(
-    binds
-      .filter((bind) => bind.function_slug === "ens.primary_name")
-      .flatMap((bind) => rows[bind.name] ?? [])
-      .map((row) => [row.address.toLowerCase(), row.name]),
-  );
-  return (address) =>
-    address === zeroAddress
-      ? "Zero address"
-      : names.get(address) || shortAddress(address);
-}
+const handLabels = new Map(named.map(([, address, label]) => [address, label]));
+
+export const labelOf = (address) =>
+  address === zeroAddress
+    ? "Zero address"
+    : (handLabels.get(address) ?? shortAddress(address));
 
 function tokenSummary(rows, days, token, symbol) {
   const supply = supplyByDay(rows, token);
@@ -259,6 +280,6 @@ export function shape({ rows }, binds) {
     minted: formatCompact(minted),
     burned: formatCompact(burned),
     net: formatCompact(minted - burned, true),
-    pairs: pairs(namedDayTotals(rows, binds), labels(rows, binds)),
+    pairs: pairs(namedDayTotals(rows, binds), labelOf),
   };
 }
