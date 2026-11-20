@@ -6,7 +6,7 @@ import { bindsAt, check, shape } from "./report.mjs";
 import { fetchRows, newRun } from "./fetch.mjs";
 import { connectTestril } from "./testril.mjs";
 
-const demo = "polymarket-tape";
+const demo = "polymarket-builders";
 const defaultUrl = "https://api.testril.si/mcp";
 const publicDir = fileURLToPath(new URL("../public", import.meta.url));
 const types = {

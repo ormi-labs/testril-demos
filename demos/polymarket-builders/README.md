@@ -28,7 +28,7 @@ what Testril already indexed.
 
 ## Run
 
-Working directory: `demos/polymarket-tape`
+Working directory: `demos/polymarket-builders`
 
 ```sh
 npm ci
