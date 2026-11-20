@@ -1,4 +1,6 @@
 const dayMs = 86400000;
+const windowDays = 7;
+const launchReadHours = 4;
 const isoSecond = (ms) => new Date(ms).toISOString().replace(".000Z", "Z");
 
 export function bindsAt(now = Date.now()) {
@@ -13,8 +15,8 @@ export function bindsAt(now = Date.now()) {
       function_slug: "pons.curve_list",
       chain_id: 4663,
       params: { factory: "0x7ed598bcef8bd9edd8c97a195c6d13f40801ec7e" },
-      window: untilToday(91 * dayMs),
-      read: { chunk_hours: 24 },
+      window: untilToday(windowDays * dayMs),
+      read: { chunk_hours: launchReadHours },
     },
     {
       name: "graduations",
@@ -24,7 +26,7 @@ export function bindsAt(now = Date.now()) {
         factory: "0x7ed598bcef8bd9edd8c97a195c6d13f40801ec7e",
         pool_manager: "0x58daec3116aae6d93017baaea7749052e8a04fa7",
       },
-      window: untilToday(91 * dayMs),
+      window: untilToday(windowDays * dayMs),
       read: { chunk_hours: 24 },
     },
     {
@@ -37,7 +39,7 @@ export function bindsAt(now = Date.now()) {
         },
         by: "day",
       },
-      window: untilToday(91 * dayMs),
+      window: untilToday(windowDays * dayMs),
       read: { chunk_hours: 24 },
     },
     {
@@ -54,7 +56,7 @@ export function bindsAt(now = Date.now()) {
         },
         by: "day",
       },
-      window: untilToday(91 * dayMs),
+      window: untilToday(windowDays * dayMs),
       read: { chunk_hours: 24 },
     },
     {
@@ -68,7 +70,7 @@ export function bindsAt(now = Date.now()) {
           pool_manager: "0x58daec3116aae6d93017baaea7749052e8a04fa7",
         },
       },
-      window: untilToday(91 * dayMs),
+      window: untilToday(windowDays * dayMs),
       read: { chunk_hours: 24 },
     },
   ];
@@ -132,27 +134,7 @@ const byTotalDesc = (a, b) =>
 
 const tokensOf = (rows) => new Set(rows.map((row) => row.token.toLowerCase()));
 
-function firstMissing(tokens, known) {
-  return [...tokens].find((token) => !known.has(token));
-}
-
 export function check({ rows }) {
-  const launched = tokensOf(rows.launches);
-  const graduated = tokensOf(rows.graduations);
-  const orphan = firstMissing(graduated, launched);
-  if (orphan)
-    throw new Error(`Token ${orphan} graduated but was never launched.`);
-  const sweptTokens = tokensOf(rows["pool-fees"]);
-  const unlisted = firstMissing(sweptTokens, graduated);
-  if (unlisted)
-    throw new Error(`Token ${unlisted} had fees swept but never graduated.`);
-  const curves = new Set(rows.launches.map((row) => row.curve.toLowerCase()));
-  const strayCurve = firstMissing(
-    new Set(rows["curve-volume"].map((row) => row.curve.toLowerCase())),
-    curves,
-  );
-  if (strayCurve)
-    throw new Error(`Curve ${strayCurve} traded but was never launched.`);
   const seen = new Set();
   for (const row of rows["pool-fees"]) {
     const key = `${row.day}/${row.token.toLowerCase()}`;
@@ -175,8 +157,6 @@ export function check({ rows }) {
   }
   const total = [...fromSweeps.values()].reduce((s, e) => s + totalOf(e), 0n);
   return [
-    `All ${graduated.size} graduated tokens are among the ${launched.size} launched tokens`,
-    `All ${sweptTokens.size} tokens with swept fees graduated, and every traded curve was launched`,
     `${formatEth(total)} swept: per token, the fee rows' sweep count and creator, buyback and protocol amounts equal the sums over its individual sweeps, one fee row per token per day`,
   ];
 }
@@ -206,7 +186,12 @@ const tokenFees = (feeRows) =>
 export function shape({ rows }, binds) {
   const days = feeDays(binds);
   const launched = rows.launches.length;
-  const graduated = tokensOf(rows.graduations).size;
+  const launchedTokens = tokensOf(rows.launches);
+  const graduatedTokens = tokensOf(rows.graduations);
+  const graduated = graduatedTokens.size;
+  const launchedAndGraduated = [...graduatedTokens].filter((token) =>
+    launchedTokens.has(token),
+  ).length;
   const sweptTokenCount = tokensOf(rows["pool-fees"]).size;
   const tokens = tokenFees(rows["pool-fees"]);
   const sum = (key) => tokens.reduce((s, t) => s + t[key], 0n);
@@ -228,7 +213,7 @@ export function shape({ rows }, binds) {
       { label: "Graduated", count: graduated },
       { label: "Fees swept", count: sweptTokenCount },
     ],
-    graduationRate: percent(BigInt(graduated), BigInt(launched)),
+    graduationRate: percent(BigInt(launchedAndGraduated), BigInt(launched)),
     volume: formatEth(volume),
     swept: formatEth(total),
     creator: formatEth(creator),
