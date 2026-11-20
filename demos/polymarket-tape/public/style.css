@@ -110,47 +110,15 @@ h2 {
   font-size: 13px;
   color: var(--accent);
 }
-.chart {
-  padding: 0 20px 20px;
-}
 svg {
   display: block;
   width: 100%;
   height: auto;
   background: var(--visual);
 }
-svg text {
-  font:
-    12px Arial,
-    Helvetica,
-    sans-serif;
-  fill: var(--muted);
-}
-svg .end {
-  text-anchor: end;
-}
-svg .series-label {
-  fill: var(--ink);
-  font-size: 14px;
-}
-svg .axis {
-  stroke: var(--line);
-}
-svg .line {
-  fill: none;
-  stroke: var(--accent);
-  stroke-width: 2;
-}
-svg .dot {
-  fill: var(--accent);
-}
 svg .bar {
   fill: var(--accent);
   opacity: 0.35;
-}
-svg .guide {
-  stroke: var(--warning);
-  stroke-dasharray: 4 4;
 }
 .table-wrap {
   overflow-x: auto;

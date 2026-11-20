@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <title>Polymarket Tape · Testril demos</title>
+    <title>Polymarket Builders · Testril demos</title>
     <link rel="icon" href="assets/favicon.svg" />
     <link rel="stylesheet" href="style.css" />
     <script type="module" src="app.js"></script>
@@ -16,14 +16,14 @@
           alt="Testril"
           width="115"
           height="38" /></a
-      ><span>Data demos / Polymarket tape</span>
+      ><span>Data demos / Polymarket builders</span>
     </header>
     <main class="measure">
       <div class="eyebrow">POLYGON · POLYMARKET ORDER BOOK</div>
-      <h1>One day of Polymarket,<br />fill by fill.</h1>
+      <h1>One day of Polymarket,<br />builder by builder.</h1>
       <p class="intro">
-        The biggest fills, the odds of the busiest market through the day, and
-        which builder codes brought the volume.
+        Which builder codes brought the order-book volume, and how the day's
+        resolved conditions paid out.
       </p>
       <section class="scope" aria-label="Report scope">
         <div>
@@ -31,13 +31,9 @@
           ><strong id="day">shown after fetch</strong>
         </div>
         <div>
-          <span class="label">FILLS · UTC HOURS</span
-          ><strong id="blocks">shown after fetch</strong>
-        </div>
-        <div>
           <span class="label">FUNCTIONS</span
           ><strong
-            >polymarket_clob.order_fill ·
+            >polymarket_clob.builder_volume ·
             conditional_tokens.condition_payouts</strong
           >
         </div>
@@ -62,38 +58,11 @@
         ></section>
         <section class="results">
           <div class="section-heading">
-            <h2>Whale tape</h2>
-            <span>the 12 largest fills by collateral</span>
-          </div>
-          <div class="table-wrap">
-            <table>
-              <thead>
-                <tr>
-                  <th>Hour (UTC)</th>
-                  <th class="left">Side</th>
-                  <th class="left">Maker</th>
-                  <th class="left">Taker</th>
-                  <th class="left">Market</th>
-                  <th>Price</th>
-                  <th>Tokens</th>
-                  <th>Collateral (USDC)</th>
-                </tr>
-              </thead>
-              <tbody id="tape"></tbody>
-            </table>
-          </div>
-        </section>
-        <section class="results">
-          <div class="section-heading">
-            <h2>Odds of the busiest market</h2>
-            <span id="odds-note"></span>
-          </div>
-          <div id="odds" class="chart"></div>
-        </section>
-        <section class="results">
-          <div class="section-heading">
             <h2>Builder leaderboard</h2>
-            <span>fill volume by builder code</span>
+            <span
+              >collateral each builder's orders filled, summed over the
+              exchanges</span
+            >
           </div>
           <div class="table-wrap">
             <table>
@@ -102,7 +71,8 @@
                   <th>Builder code</th>
                   <th class="left">Share</th>
                   <th>Fills</th>
-                  <th>Volume (USDC)</th>
+                  <th>Fees</th>
+                  <th>Volume (USD)</th>
                 </tr>
               </thead>
               <tbody id="builders"></tbody>
@@ -112,16 +82,16 @@
         <section class="results">
           <div class="section-heading">
             <h2>Conditions resolved that day</h2>
-            <span>payout numerators, outcome 0 first</span>
+            <span
+              >how each condition's payout split between its two outcomes</span
+            >
           </div>
           <div class="table-wrap">
             <table>
               <thead>
                 <tr>
-                  <th>Condition</th>
-                  <th>Block</th>
-                  <th>Payouts</th>
-                  <th>Denominator</th>
+                  <th class="left">Payout</th>
+                  <th>Conditions</th>
                 </tr>
               </thead>
               <tbody id="resolved"></tbody>

@@ -53,7 +53,7 @@ test("the button's fetch ends in the shaped report and its passed cross-check", 
   } while (run.state === "running");
   assert.equal(run.state, "done", run.error);
   assert.equal(run.report.checks.ok, true);
-  assert.equal(run.report.view.fills, "280");
+  assert.equal(run.report.view.fills, "502,239");
   assert.ok(BigInt(run.spentAtoms) > 0n);
 
   const page = await fetch(base);
@@ -63,5 +63,5 @@ test("the button's fetch ends in the shaped report and its passed cross-check", 
   );
   const html = await page.text();
   assert.match(html, /Fetch from Testril/);
-  assert.match(html, /Polymarket Tape/);
+  assert.match(html, /Polymarket Builders/);
 });

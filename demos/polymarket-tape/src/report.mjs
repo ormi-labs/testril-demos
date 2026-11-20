@@ -1,9 +1,12 @@
 const dayMs = 86400000;
 const isoSecond = (ms) => new Date(ms).toISOString().replace(".000Z", "Z");
 export const zeroWord = `0x${"0".repeat(64)}`;
-export const exchanges = [
+export const versionOneExchanges = [
   "0x4bfb41d5b3570defd03c39a9a4d8de6bd8b8982e",
   "0xc5d563a36ae78145c45a50134d48a1215220f80a",
+];
+export const exchanges = [
+  ...versionOneExchanges,
   "0xe2222d279d744050d28e00520010520000310f59",
 ];
 export const conditionalTokens = "0x4d97dcd97ec945f40cf65f87097ace5ea0476045";
@@ -16,12 +19,11 @@ export function bindsAt(now = Date.now()) {
   };
   return [
     {
-      name: "fills",
-      function_slug: "polymarket_clob.order_fill",
+      name: "builders",
+      function_slug: "polymarket_clob.builder_volume",
       chain_id: 137,
-      params: { exchanges },
+      params: { swap: { exchanges }, by: "day" },
       window,
-      read: { chunk_hours: 1 },
     },
     {
       name: "payouts",
@@ -29,43 +31,42 @@ export function bindsAt(now = Date.now()) {
       chain_id: 137,
       params: { conditional_tokens: conditionalTokens },
       window,
+      read: { chunk_hours: 1 },
     },
   ];
 }
 
 export const dayOf = (binds) =>
-  binds.find((bind) => bind.name === "fills").window.from_time.slice(0, 10);
+  binds.find((bind) => bind.name === "builders").window.from_time.slice(0, 10);
 
 const holdsBlock = (block) => (read) =>
   block >= read.from_block && block < read.to_block;
 
-export function fillsOf({ rows, reads }) {
-  return rows.fills.map((fill) => ({
-    ...fill,
-    hour: reads.fills.findIndex(holdsBlock(fill.block)),
-  }));
-}
-
 const outcomesPerCondition = 2;
-const tapeSize = 12;
 const leaderboardSize = 8;
-const priceScale = 10000n;
+const shareScale = 10000n;
 
 const byVolumeDescending = (a, b) =>
   b.volume > a.volume ? 1 : b.volume < a.volume ? -1 : 0;
 const shortHex = (hex) => `${hex.slice(0, 8)}…${hex.slice(-4)}`;
+const sumOf = (entries, field) =>
+  entries.reduce((sum, entry) => sum + entry[field], 0n);
 
-const volumeOf = (fill) => BigInt(fill.collateral_amount);
-const totalVolume = (fills) => fills.reduce((sum, f) => sum + volumeOf(f), 0n);
-
-export function builderVolumes(fills) {
-  const volumes = new Map();
-  for (const fill of fills)
-    volumes.set(
-      fill.builder,
-      (volumes.get(fill.builder) ?? 0n) + volumeOf(fill),
-    );
-  return volumes;
+export function builderTotals(rows) {
+  const totals = new Map();
+  for (const row of rows) {
+    const total = totals.get(row.builder) ?? {
+      builder: row.builder,
+      volume: 0n,
+      fills: 0n,
+      fee: 0n,
+    };
+    total.volume += BigInt(row.collateral_amount);
+    total.fills += BigInt(row.fills);
+    total.fee += BigInt(row.collateral_fee);
+    totals.set(row.builder, total);
+  }
+  return [...totals.values()].sort(byVolumeDescending);
 }
 
 function conditionsOf(payouts) {
@@ -73,8 +74,6 @@ function conditionsOf(payouts) {
   for (const row of payouts) {
     const condition = conditions.get(row.condition_id) ?? {
       id: row.condition_id,
-      block: row.block,
-      denominator: BigInt(row.payout_denominator),
       numerators: [],
       rows: [],
     };
@@ -87,56 +86,44 @@ function conditionsOf(payouts) {
   return [...conditions.values()];
 }
 
-const feeIsInRequiredAsset = (fill) => {
-  const feeInTokens = fill.exchange_version === "1" && fill.is_buy;
-  const unpaid = feeInTokens ? fill.collateral_fee : fill.token_fee;
-  return BigInt(unpaid) === 0n;
-};
-
-export function check({ rows, reads }) {
-  const { payouts } = rows;
-  const fills = fillsOf({ rows, reads });
-  const outside = fills.find((fill) => fill.hour < 0);
+function checkBuilders(rows, day) {
+  const outside = rows.find((row) => row.day !== day);
   if (outside)
-    throw new Error(`Fill at block ${outside.block} is outside the window.`);
-  const stranger = fills.find((fill) => !exchanges.includes(fill.exchange));
+    throw new Error(`Builder row for ${outside.day} is outside the window.`);
+  const stranger = rows.find((row) => !exchanges.includes(row.exchange));
   if (stranger)
-    throw new Error(`Fill from ${stranger.exchange} is not a named exchange.`);
-  const keys = new Set(fills.map((fill) => `${fill.tx}:${fill.log_index}`));
-  if (keys.size !== fills.length)
-    throw new Error("Two fills share a transaction and log index.");
-  for (const fill of fills) {
-    const collateral = BigInt(fill.collateral_amount);
-    const tokens = BigInt(fill.token_amount);
-    if (collateral <= 0n || collateral > tokens)
-      throw new Error(
-        `Fill ${shortHex(fill.tx)} moves ${collateral} collateral for ${tokens} tokens, a price outside (0, 1].`,
-      );
-  }
-  const feeProblem = fills.find((fill) => !feeIsInRequiredAsset(fill));
-  if (feeProblem)
     throw new Error(
-      `Fill ${shortHex(feeProblem.tx)} books its fee in the wrong asset: collateral_fee ${feeProblem.collateral_fee}, token_fee ${feeProblem.token_fee} for a version ${feeProblem.exchange_version} ${feeProblem.is_buy ? "buy" : "sell"}.`,
+      `Builder row from ${stranger.exchange} is not a named exchange.`,
     );
-  const uncoded = fills.find((fill) => !/^0x[0-9a-f]{64}$/.test(fill.builder));
+  const keys = new Set(rows.map((row) => `${row.builder}:${row.exchange}`));
+  if (keys.size !== rows.length)
+    throw new Error("Two builder rows share a builder code and exchange.");
+  const uncoded = rows.find((row) => !/^0x[0-9a-f]{64}$/.test(row.builder));
   if (uncoded)
-    throw new Error(
-      `Fill ${shortHex(uncoded.tx)} has no 32-byte builder word: ${uncoded.builder}.`,
-    );
-  const versionOne = fills.filter((fill) => fill.exchange_version === "1");
-  const coded = versionOne.find(
-    (fill) => fill.builder !== zeroWord || fill.metadata !== zeroWord,
+    throw new Error(`Builder ${uncoded.builder} is not a 32-byte code.`);
+  const coded = rows.find(
+    (row) =>
+      versionOneExchanges.includes(row.exchange) && row.builder !== zeroWord,
   );
   if (coded)
     throw new Error(
-      `Version 1 fill ${shortHex(coded.tx)} carries a builder or metadata, but version 1 emits none.`,
+      `Version 1 exchange ${shortHex(coded.exchange)} credits builder ${shortHex(coded.builder)}, but version 1 emits no builder codes.`,
     );
-  const total = totalVolume(fills);
-  assertLeaderboardAddsUp(leaderboardEntries(fills), total);
-  const conditions = conditionsOf(payouts);
+  const odd = rows.find(
+    (row) =>
+      BigInt(row.fills) === 0n ||
+      BigInt(row.collateral_fee) > BigInt(row.collateral_amount),
+  );
+  if (odd)
+    throw new Error(
+      `Builder ${shortHex(odd.builder)} has ${odd.fills} fills and a fee of ${odd.collateral_fee} on ${odd.collateral_amount} collateral.`,
+    );
+}
+
+function checkConditions(conditions, reads) {
   for (const condition of conditions) {
     const stray = condition.rows.find(
-      (row) => !reads.payouts.some(holdsBlock(row.block)),
+      (row) => !reads.some(holdsBlock(row.block)),
     );
     if (stray)
       throw new Error(
@@ -160,10 +147,19 @@ export function check({ rows, reads }) {
         `Condition ${shortHex(condition.id)} pays numerators summing to ${sum}, not its denominator.`,
       );
   }
+}
+
+export function check({ rows, reads }, binds) {
+  checkBuilders(rows.builders, dayOf(binds));
+  const totals = builderTotals(rows.builders);
+  const volume = sumOf(totals, "volume");
+  assertLeaderboardAddsUp(leaderboardEntries(totals), volume);
+  const conditions = conditionsOf(rows.payouts);
+  checkConditions(conditions, reads.payouts);
   return [
-    `All ${fills.length} fills price within (0, 1]: collateral never exceeds outcome tokens`,
-    `Every fee is booked in the asset its version and side require`,
-    `Every fill carries a builder word, and the leaderboard (top ${leaderboardSize} plus other builders) adds up to the ${formatUsd(total)} total`,
+    `All ${rows.builders.length} builder rows are for ${dayOf(binds)} on a named exchange, once per builder code and exchange, each with a fill and a fee no larger than its collateral`,
+    `Version 1 exchanges credit only the zero code, as they emit no builder codes`,
+    `The leaderboard (top ${leaderboardSize} plus other builders) adds up to the ${formatUsd(volume)} total`,
     `${conditions.length} resolved conditions each list both of their outcomes once and pay a non-zero denominator equal to the sum of their numerators`,
   ];
 }
@@ -181,137 +177,76 @@ export function formatCompact(raw) {
   return `$${(dollars / scale).toFixed(scale === 1 ? 0 : 2)}${suffix}`;
 }
 
-export function priceText(fill) {
-  const scaled =
-    (BigInt(fill.collateral_amount) * priceScale) / BigInt(fill.token_amount);
-  return `${scaled / priceScale}.${String(scaled % priceScale).padStart(4, "0")}`;
-}
-
-const tokensText = (raw) => (BigInt(raw) / 10n ** 6n).toLocaleString("en-US");
 const builderLabel = (builder) =>
   builder === zeroWord ? "No builder code" : shortHex(builder);
 
-function tape(fills) {
-  return [...fills]
-    .map((fill) => ({ fill, volume: volumeOf(fill) }))
-    .sort(byVolumeDescending)
-    .slice(0, tapeSize)
-    .map(({ fill, volume }) => ({
-      hour: fill.hour,
-      block: fill.block,
-      side: fill.is_buy ? "Maker buys" : "Maker sells",
-      maker: shortHex(fill.maker),
-      taker: shortHex(fill.taker),
-      market: `…${fill.token_id.slice(-8)}`,
-      price: priceText(fill),
-      tokens: tokensText(fill.token_amount),
-      volume: formatUsd(volume),
-    }));
-}
-
-function busiestMarket(fills) {
-  const volumes = new Map();
-  for (const fill of fills)
-    volumes.set(
-      fill.token_id,
-      (volumes.get(fill.token_id) ?? 0n) + volumeOf(fill),
-    );
-  return [...volumes].sort((a, b) =>
-    byVolumeDescending({ volume: a[1] }, { volume: b[1] }),
-  )[0][0];
-}
-
-function oddsLine(fills) {
-  const tokenId = busiestMarket(fills);
-  const hourly = new Map();
-  for (const fill of fills.filter((f) => f.token_id === tokenId)) {
-    const hour = fill.hour;
-    const bucket = hourly.get(hour) ?? { collateral: 0n, tokens: 0n, fills: 0 };
-    bucket.collateral += BigInt(fill.collateral_amount);
-    bucket.tokens += BigInt(fill.token_amount);
-    bucket.fills += 1;
-    hourly.set(hour, bucket);
-  }
-  return {
-    market: `…${tokenId.slice(-8)}`,
-    points: [...hourly]
-      .sort((a, b) => a[0] - b[0])
-      .map(([hour, { collateral, tokens, fills: count }]) => ({
-        hour,
-        fills: count,
-        price: Number((collateral * priceScale) / tokens) / Number(priceScale),
-      })),
-  };
-}
-
-export function leaderboardEntries(fills) {
-  const counts = new Map();
-  for (const fill of fills)
-    counts.set(fill.builder, (counts.get(fill.builder) ?? 0) + 1);
-  const ranked = [...builderVolumes(fills)]
-    .map(([builder, volume]) => ({
-      label: builderLabel(builder),
-      volume,
-      fills: counts.get(builder),
-    }))
-    .sort(byVolumeDescending);
+export function leaderboardEntries(totals) {
+  const ranked = totals.map((total) => ({
+    ...total,
+    label: builderLabel(total.builder),
+  }));
   const rest = ranked.slice(leaderboardSize);
   if (rest.length === 0) return ranked;
   return [
     ...ranked.slice(0, leaderboardSize),
     {
-      label: "Other builders",
-      volume: rest.reduce((sum, e) => sum + e.volume, 0n),
-      fills: rest.reduce((sum, e) => sum + e.fills, 0),
+      label: `${rest.length} other builders`,
+      volume: sumOf(rest, "volume"),
+      fills: sumOf(rest, "fills"),
+      fee: sumOf(rest, "fee"),
     },
   ];
 }
 
 export function assertLeaderboardAddsUp(entries, total) {
-  const shown = entries.reduce((sum, entry) => sum + entry.volume, 0n);
+  const shown = sumOf(entries, "volume");
   if (shown !== total)
     throw new Error(
       `Leaderboard rows sum to ${shown}, not the total ${total}.`,
     );
 }
 
-function leaderboard(fills) {
-  const total = totalVolume(fills);
-  return leaderboardEntries(fills).map(({ label, volume, fills: count }) => ({
-    label,
-    volume: formatUsd(volume),
-    fills: String(count),
-    share: `${Number((volume * 1000n) / total) / 10}%`,
-    fraction: Number((volume * priceScale) / total) / Number(priceScale),
+function leaderboard(totals) {
+  const volume = sumOf(totals, "volume");
+  return leaderboardEntries(totals).map((entry) => ({
+    label: entry.label,
+    volume: formatUsd(entry.volume),
+    fills: entry.fills.toLocaleString("en-US"),
+    fee: formatUsd(entry.fee),
+    share: `${Number((entry.volume * 1000n) / volume) / 10}%`,
+    fraction: Number((entry.volume * shareScale) / volume) / Number(shareScale),
   }));
 }
 
-function resolved(payouts) {
-  return conditionsOf(payouts).map((condition) => ({
-    condition: shortHex(condition.id),
-    block: condition.block,
-    payouts: condition.numerators.join(" · "),
-    denominator: String(condition.denominator),
-  }));
+function resolutionOf({ numerators }) {
+  const winners = numerators.flatMap((n, outcome) => (n > 0n ? [outcome] : []));
+  return winners.length === 1 ? `Outcome ${winners[0]} paid in full` : "Split";
 }
 
-export function shape({ rows, reads }, binds) {
-  const { payouts } = rows;
-  const fills = fillsOf({ rows, reads });
-  const total = totalVolume(fills);
-  const largest = fills.reduce((a, b) => (volumeOf(b) > volumeOf(a) ? b : a));
-  const builders = builderVolumes(fills);
-  builders.delete(zeroWord);
+function resolutions(conditions) {
+  const counts = new Map();
+  for (const condition of conditions) {
+    const kind = resolutionOf(condition);
+    counts.set(kind, (counts.get(kind) ?? 0) + 1);
+  }
+  return [...counts]
+    .sort(([a], [b]) => a.localeCompare(b))
+    .map(([kind, count]) => ({ kind, count: count.toLocaleString("en-US") }));
+}
+
+export function shape({ rows }, binds) {
+  const totals = builderTotals(rows.builders);
+  const conditions = conditionsOf(rows.payouts);
   return {
     day: dayOf(binds),
     exchanges,
-    fills: String(fills.length),
-    volume: formatCompact(total),
-    largest: formatUsd(volumeOf(largest)),
-    builderCount: String(builders.size),
-    tape: tape(fills),
-    odds: oddsLine(fills),
-    builders: leaderboard(fills),
-    resolved: resolved(payouts),
+    fills: sumOf(totals, "fills").toLocaleString("en-US"),
+    volume: formatCompact(sumOf(totals, "volume")),
+    builderCount: String(
+      totals.filter((total) => total.builder !== zeroWord).length,
+    ),
+    conditionCount: conditions.length.toLocaleString("en-US"),
+    builders: leaderboard(totals),
+    resolutions: resolutions(conditions),
   };
 }
