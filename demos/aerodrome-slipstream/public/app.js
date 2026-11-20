@@ -86,13 +86,21 @@ function render(report) {
   const view = report.view;
   document.querySelector("#window").textContent =
     `${view.window.first} to ${view.window.last}`;
-  document.querySelector("#factory").textContent = view.factory;
+  document.querySelector("#factories").textContent = view.factories.length;
   document
     .querySelector("#headline")
     .replaceChildren(
-      metric("POOLS TRADED", String(view.poolCount)),
+      metric(
+        "POOLS TRADED",
+        String(view.poolCount),
+        `of ${view.listedCount} the factories created`,
+      ),
       metric("SWAPS", view.totalSwaps),
-      metric("RANKED DOLLAR VOLUME", view.totalDollars),
+      metric(
+        "USDC VOLUME",
+        view.totalDollars,
+        `${view.rankedSwapShare} of swaps, in pools with USDC on one side`,
+      ),
       view.leader
         ? metric("TOP POOL", view.leader.volume, view.leader.pair)
         : metric("TOP POOL", "—"),
@@ -100,6 +108,10 @@ function render(report) {
   document
     .querySelector("#chart")
     .replaceChildren(...view.charts.map(lineChart));
+  document.querySelector("#ranked-note").textContent =
+    `top ${view.rankedPools.length} of ${view.rankedCount}; USDC paid in plus paid out`;
+  document.querySelector("#unranked-note").textContent =
+    `top ${view.unrankedPools.length} of ${view.unrankedCount}; not ranked, as no side is priced in dollars`;
   document
     .querySelector("#pools")
     .replaceChildren(

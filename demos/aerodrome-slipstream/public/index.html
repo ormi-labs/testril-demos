@@ -22,8 +22,8 @@
       <div class="eyebrow">BASE · AERODROME SLIPSTREAM</div>
       <h1>Which concentrated-liquidity<br />pools trade the most.</h1>
       <p class="intro">
-        Every pool the Slipstream factory created, with its swaps and volume per
-        day for eight days, ranked by dollars traded.
+        Every pool the four Slipstream factories created, with its swaps and
+        volume per day for eight days, ranked by the USDC it traded.
       </p>
       <section class="scope" aria-label="Report scope">
         <div>
@@ -31,8 +31,8 @@
           ><strong id="window">shown after fetch</strong>
         </div>
         <div>
-          <span class="label">FACTORY</span
-          ><strong id="factory">shown after fetch</strong>
+          <span class="label">SLIPSTREAM FACTORIES</span
+          ><strong id="factories">shown after fetch</strong>
         </div>
         <div>
           <span class="label">FUNCTION</span
@@ -55,18 +55,18 @@
         ></section>
         <section class="results">
           <div class="section-heading">
-            <h2>Dollar volume per day</h2>
-            <span>millions of dollars, each on its own scale</span>
+            <h2>USDC volume per day</h2>
+            <span
+              >the four leading pools, millions of dollars, each on its own
+              scale</span
+            >
           </div>
           <div id="chart" class="charts"></div>
         </section>
         <section class="results">
           <div class="section-heading">
-            <h2>Pools ranked by dollar volume</h2>
-            <span
-              >known pools only; volume counts dollars paid in plus paid
-              out</span
-            >
+            <h2>Pools ranked by USDC volume</h2>
+            <span id="ranked-note"></span>
           </div>
           <div class="table-wrap">
             <table>
@@ -76,7 +76,7 @@
                   <th>Pool</th>
                   <th>Pair</th>
                   <th>Swaps</th>
-                  <th>Dollar volume</th>
+                  <th>USDC volume</th>
                 </tr>
               </thead>
               <tbody id="pools"></tbody>
@@ -85,8 +85,8 @@
         </section>
         <section class="results">
           <div class="section-heading">
-            <h2>By swaps, dollar side unknown</h2>
-            <span>not ranked: these pools' dollar token is not known</span>
+            <h2>Pools without USDC, by swaps</h2>
+            <span id="unranked-note"></span>
           </div>
           <div class="table-wrap">
             <table>

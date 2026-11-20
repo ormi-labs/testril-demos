@@ -62,7 +62,7 @@ Each of these opens with a **Fetch from Testril** button and no data. Pressing i
 | [Pons graduations](demos/pons-graduations/README.md)           | Pons launch funnel on Robinhood Chain: curve launches, graduations and fee sweeps          | `cd demos/pons-graduations && npm ci && npm start`      |
 | [Kuru order book](demos/kuru-orderbook/README.md)              | Kuru markets on Monad ranked by taker volume, with taker fees and maker rebates            | `cd demos/kuru-orderbook && npm ci && npm start`        |
 | [Hooks across DEXes](demos/hooks-across-dexes/README.md)       | Hooked vs hookless daily volume on PancakeSwap Infinity CL/Bin and Uniswap v4 on BSC       | `cd demos/hooks-across-dexes && npm ci && npm start`    |
-| [Aerodrome Slipstream](demos/aerodrome-slipstream/README.md)   | Every Aerodrome Slipstream pool on Base ranked by daily volume                             | `cd demos/aerodrome-slipstream && npm ci && npm start`  |
+| [Aerodrome Slipstream](demos/aerodrome-slipstream/README.md)   | Every Aerodrome Slipstream pool on Base, those trading against USDC ranked by USDC volume  | `cd demos/aerodrome-slipstream && npm ci && npm start`  |
 
 ## Plans
 

@@ -1,121 +1,143 @@
 const dayMs = 86400000;
 const windowDays = 8;
-export const factory = "0x5e7bb104d84c7cb9b682aac2f3d509f5f406809a";
+const listReadHours = 720;
+export const factories = [
+  ["0x9592cd9b267748cbfbde90ac9f7df3c437a6d51b", "2024-04-23T03:47:43Z"],
+  ["0x5e7bb104d84c7cb9b682aac2f3d509f5f406809a", "2024-04-30T11:32:35Z"],
+  ["0xade65c38cd4849adba595a4323a8c7ddfe89716a", "2025-10-17T10:33:03Z"],
+  ["0xf8f2eb4940cfe7d13603dddd87f123820fc061ef", "2026-04-07T16:19:55Z"],
+];
+export const usdc = "0x833589fcd6edb6e08f4c7c32d4f71b54bda02913";
+export const weth = "0x4200000000000000000000000000000000000006";
 const isoSecond = (ms) => new Date(ms).toISOString().replace(".000Z", "Z");
 
+const listPrefix = "pools-";
+const volumePrefix = "volume-";
+
 export function bindsAt(now = Date.now()) {
-  const today = Math.floor(now / dayMs) * dayMs;
-  return [
+  const today = isoSecond(Math.floor(now / dayMs) * dayMs);
+  const volumeWindow = {
+    from_time: isoSecond(Date.parse(today) - windowDays * dayMs),
+    to_time: today,
+  };
+  return factories.flatMap(([factory, createdAt]) => [
     {
-      name: "pool-volume",
+      name: `${listPrefix}${factory.slice(0, 6)}`,
+      function_slug: "uniswap_v3.pool_list",
+      chain_id: 8453,
+      params: { factory },
+      window: { from_time: createdAt, to_time: today },
+      read: { chunk_hours: listReadHours },
+    },
+    {
+      name: `${volumePrefix}${factory.slice(0, 6)}`,
       function_slug: "uniswap_v3.pool_volume",
       chain_id: 8453,
       params: { swap: { pool_list: { factory } }, by: "day" },
-      window: {
-        from_time: isoSecond(today - windowDays * dayMs),
-        to_time: isoSecond(today),
-      },
+      window: volumeWindow,
     },
-  ];
+  ]);
 }
-const dollarDecimals = 6n;
-const dollar = 10n ** dollarDecimals;
 
-export const knownPools = {
-  "0xb2cc224c1c9fee385f8ad6a55b4d94e92359dc59": {
-    pair: "WETH / USDC",
-    dollarSide: "volume1",
-    otherSide: "volume0",
-    otherDecimals: 18,
-    otherToken: "WETH",
-    priceBand: [500, 20000],
-  },
-  "0xfbb6eed8e7aa03b138556eedaf5d271a5e1e43ef": {
-    pair: "USDC / cbBTC",
-    dollarSide: "volume0",
-    otherSide: "volume1",
-    otherDecimals: 8,
-    otherToken: "cbBTC",
-    priceBand: [10000, 500000],
-  },
-};
+const rowsNamed = (rows, prefix) =>
+  Object.entries(rows)
+    .filter(([name]) => name.startsWith(prefix))
+    .flatMap(([, bindRows]) => bindRows);
+
+const dollar = 10n ** 6n;
+const wethPriceBand = [500n, 20000n];
+const chartCount = 4;
+const rankedShown = 20;
+const unrankedShown = 10;
+const tokenLabels = new Map([
+  [usdc, "USDC"],
+  [weth, "WETH"],
+  ["0xcbb7c0000ab88b473b1f5afd9ef808440eed33bf", "cbBTC"],
+]);
+
+const shortAddress = (address) => `${address.slice(0, 6)}…${address.slice(-4)}`;
+const tokenLabel = (token) => tokenLabels.get(token) ?? shortAddress(token);
+
+export function sidesOf(listed) {
+  const usdcSide =
+    listed.token0 === usdc ? 0 : listed.token1 === usdc ? 1 : null;
+  if (usdcSide === null) return null;
+  const otherToken = usdcSide === 0 ? listed.token1 : listed.token0;
+  return {
+    dollarSide: `volume${usdcSide}`,
+    otherSide: `volume${1 - usdcSide}`,
+    otherToken,
+    pair: `USDC / ${tokenLabel(otherToken)}`,
+  };
+}
 
 const nextDay = (day) =>
   new Date(Date.parse(`${day}T00:00:00Z`) + dayMs).toISOString().slice(0, 10);
 
-const utcDay = (time) => time.slice(0, 10);
-
 export function days(binds) {
-  const { window } = binds[0];
+  const { window } = binds.find((bind) => bind.name.startsWith(volumePrefix));
   const all = [];
   for (
-    let d = utcDay(window.from_time);
-    d < utcDay(window.to_time);
+    let d = window.from_time.slice(0, 10);
+    d < window.to_time.slice(0, 10);
     d = nextDay(d)
   )
     all.push(d);
   return all;
 }
 
-const dollarVolume = (row) => {
-  const known = knownPools[row.pool];
-  return known ? BigInt(row[known.dollarSide]) : null;
-};
+export function poolSides(listRows) {
+  return new Map(listRows.map((listed) => [listed.pool, sidesOf(listed)]));
+}
 
-export function totalsByPool(rows) {
+export function leaderboard(poolRows, sides) {
   const totals = new Map();
-  for (const row of rows) {
-    const total = totals.get(row.pool) ?? { swaps: 0n, dollars: null };
+  for (const row of poolRows) {
+    const side = sides.get(row.pool);
+    const total = totals.get(row.pool) ?? {
+      pool: row.pool,
+      swaps: 0n,
+      dollars: side ? 0n : null,
+    };
     total.swaps += BigInt(row.swaps);
-    const dollars = dollarVolume(row);
-    if (dollars !== null) total.dollars = (total.dollars ?? 0n) + dollars;
+    if (side) total.dollars += BigInt(row[side.dollarSide]);
     totals.set(row.pool, total);
   }
-  return totals;
+  const bySizeDescending = (field) => (a, b) =>
+    b[field] > a[field] ? 1 : b[field] < a[field] ? -1 : 0;
+  const pools = [...totals.values()];
+  return {
+    ranked: pools
+      .filter((entry) => entry.dollars !== null)
+      .sort(bySizeDescending("dollars")),
+    unranked: pools
+      .filter((entry) => entry.dollars === null)
+      .sort(bySizeDescending("swaps")),
+  };
 }
 
-const bySizeDescending = (a, b) => (b > a ? 1 : b < a ? -1 : 0);
-
-export function leaderboard(rows) {
-  const pools = [...totalsByPool(rows)].map(([pool, total]) => ({
-    pool,
-    ...total,
-  }));
-  const ranked = pools
-    .filter((entry) => entry.dollars !== null)
-    .sort((a, b) => bySizeDescending(a.dollars, b.dollars));
-  const unranked = pools
-    .filter((entry) => entry.dollars === null)
-    .sort((a, b) => bySizeDescending(a.swaps, b.swaps));
-  return { ranked, unranked };
-}
-
-const priceOutsideBand = (row, known) => {
-  const [low, high] = known.priceBand;
-  const scaledDollars =
-    BigInt(row[known.dollarSide]) * 10n ** BigInt(known.otherDecimals);
-  const otherVolume = BigInt(row[known.otherSide]);
+const wethPriceOutsideBand = (row, side) => {
+  const [low, high] = wethPriceBand;
+  const dollars = BigInt(row[side.dollarSide]) * 10n ** 18n;
+  const wethVolume = BigInt(row[side.otherSide]);
   return (
-    scaledDollars < BigInt(low) * dollar * otherVolume ||
-    scaledDollars > BigInt(high) * dollar * otherVolume
+    dollars < low * dollar * wethVolume || dollars > high * dollar * wethVolume
   );
 };
 
-export function checkLeaderboard(poolRows, ranked) {
-  const knownWithRows = new Set(
-    poolRows.map((row) => row.pool).filter((pool) => knownPools[pool]),
+export function checkLeaderboard(poolRows, sides, ranked) {
+  const usdcPoolsWithRows = new Set(
+    poolRows.map((row) => row.pool).filter((pool) => sides.get(pool)),
   );
-  if (ranked.length !== knownWithRows.size)
+  if (ranked.length !== usdcPoolsWithRows.size)
     throw new Error(
-      `${ranked.length} pools are ranked but ${knownWithRows.size} known pools have rows.`,
+      `${ranked.length} pools are ranked but ${usdcPoolsWithRows.size} USDC pools have rows.`,
     );
   ranked.forEach((entry, index) => {
+    const { dollarSide } = sides.get(entry.pool);
     const summed = poolRows
       .filter((row) => row.pool === entry.pool)
-      .reduce(
-        (sum, row) => sum + BigInt(row[knownPools[entry.pool].dollarSide]),
-        0n,
-      );
+      .reduce((sum, row) => sum + BigInt(row[dollarSide]), 0n);
     if (entry.dollars !== summed)
       throw new Error(
         `${entry.pool} is ranked with ${entry.dollars} but its rows sum to ${summed}.`,
@@ -125,38 +147,50 @@ export function checkLeaderboard(poolRows, ranked) {
   });
 }
 
+function checkList(listRows) {
+  const pools = new Set(listRows.map((listed) => listed.pool));
+  if (pools.size !== listRows.length)
+    throw new Error("The pool list names a pool twice.");
+  return pools;
+}
+
 export function check({ rows }, binds) {
   const window = days(binds);
-  const poolRows = rows["pool-volume"];
+  const listRows = rowsNamed(rows, listPrefix);
+  const listed = checkList(listRows);
+  const sides = poolSides(listRows);
+  const poolRows = rowsNamed(rows, volumePrefix);
   if (!poolRows.length) throw new Error("No pool volume rows.");
   const seen = new Set();
+  let wethDays = 0;
   for (const row of poolRows) {
     if (!window.includes(row.day))
       throw new Error(
         `Row for ${row.pool} on ${row.day} is outside the window.`,
       );
+    if (!listed.has(row.pool))
+      throw new Error(`${row.pool} traded but is not in the pool list.`);
     if (BigInt(row.swaps) <= 0n)
       throw new Error(`${row.pool} has ${row.swaps} swaps on ${row.day}.`);
     const key = `${row.pool}@${row.day}`;
     if (seen.has(key))
       throw new Error(`Two rows for ${row.pool} on ${row.day}.`);
     seen.add(key);
-    const known = knownPools[row.pool];
-    if (known && priceOutsideBand(row, known)) {
-      const [low, high] = known.priceBand;
+    const side = sides.get(row.pool);
+    if (side?.otherToken !== weth) continue;
+    wethDays += 1;
+    if (wethPriceOutsideBand(row, side))
       throw new Error(
-        `${known.pair} on ${row.day} implies a price outside ${low} to ${high} dollars per ${known.otherToken}: the dollar side is misread.`,
+        `USDC / WETH pool ${shortAddress(row.pool)} on ${row.day} implies a price outside $${wethPriceBand[0]} to $${wethPriceBand[1]} per WETH: the dollar side is misread.`,
       );
-    }
   }
-
-  const { ranked } = leaderboard(poolRows);
-  checkLeaderboard(poolRows, ranked);
+  const { ranked } = leaderboard(poolRows, sides);
+  checkLeaderboard(poolRows, sides, ranked);
   const total = ranked.reduce((sum, entry) => sum + entry.dollars, 0n);
   return [
-    `Every one of the ${poolRows.length} pool-day rows has at least one swap`,
-    `Each known pool's dollar side implies a sane token price on every day, so no wei side was read as dollars`,
-    `${ranked.length} ranked pools cover every known pool that traded, are in descending order of dollar volume, and each matches the sum of its rows, ${formatUsd(total)} in total`,
+    `Every one of the ${poolRows.length} pool-day rows has at least one swap, and every pool that traded is in the ${factories.length} factories' lists of ${listed.size} pools`,
+    `All ${wethDays} USDC / WETH pool-days imply a WETH price between $${wethPriceBand[0]} and $${wethPriceBand[1]}, so the USDC side is the one read as dollars`,
+    `${ranked.length} ranked pools cover every pool with USDC on one side that traded, are in descending order of USDC volume, and each matches the sum of its rows, ${formatUsd(total)} in total`,
   ];
 }
 
@@ -172,13 +206,14 @@ export function formatCompact(raw) {
   return `$${(dollars / scale).toFixed(2)}${suffix}`;
 }
 
-const shortAddress = (address) => `${address.slice(0, 6)}…${address.slice(-4)}`;
+const percentOf = (part, whole) =>
+  `${whole ? Number((part * 1000n) / whole) / 10 : 0}%`;
 
-function series(rows, days, pool) {
+function series(poolRows, days, pool, dollarSide) {
   const perDay = new Map(
-    rows
+    poolRows
       .filter((row) => row.pool === pool)
-      .map((row) => [row.day, dollarVolume(row)]),
+      .map((row) => [row.day, BigInt(row[dollarSide])]),
   );
   return days.map((day) => ({
     day,
@@ -188,33 +223,44 @@ function series(rows, days, pool) {
 
 export function shape({ rows }, binds) {
   const window = days(binds);
-  const poolRows = rows["pool-volume"];
-  const { ranked, unranked } = leaderboard(poolRows);
-  const board = [...ranked, ...unranked];
-  const totalSwaps = board.reduce((sum, entry) => sum + entry.swaps, 0n);
+  const poolRows = rowsNamed(rows, volumePrefix);
+  const listRows = rowsNamed(rows, listPrefix);
+  const sides = poolSides(listRows);
+  const { ranked, unranked } = leaderboard(poolRows, sides);
+  const swapsOf = (entries) => entries.reduce((sum, e) => sum + e.swaps, 0n);
+  const totalSwaps = swapsOf(ranked) + swapsOf(unranked);
   const totalDollars = ranked.reduce((sum, entry) => sum + entry.dollars, 0n);
   return {
     window: { first: window[0], last: window.at(-1) },
-    factory,
-    poolCount: board.length,
+    factories: factories.map(([factory]) => factory),
+    listedCount: listRows.length,
+    poolCount: ranked.length + unranked.length,
     totalSwaps: totalSwaps.toLocaleString("en-US"),
     totalDollars: formatCompact(totalDollars),
+    rankedCount: ranked.length,
+    rankedSwapShare: percentOf(swapsOf(ranked), totalSwaps),
     leader: ranked[0] && {
-      pair: knownPools[ranked[0].pool].pair,
+      pair: sides.get(ranked[0].pool).pair,
       volume: formatCompact(ranked[0].dollars),
     },
-    charts: ranked.map((entry) => ({
-      symbol: knownPools[entry.pool].pair,
-      series: series(poolRows, window, entry.pool),
+    charts: ranked.slice(0, chartCount).map((entry) => ({
+      symbol: sides.get(entry.pool).pair,
+      series: series(
+        poolRows,
+        window,
+        entry.pool,
+        sides.get(entry.pool).dollarSide,
+      ),
     })),
-    rankedPools: ranked.map((entry, index) => ({
+    rankedPools: ranked.slice(0, rankedShown).map((entry, index) => ({
       rank: String(index + 1),
       pool: shortAddress(entry.pool),
-      pair: knownPools[entry.pool].pair,
+      pair: sides.get(entry.pool).pair,
       swaps: entry.swaps.toLocaleString("en-US"),
       volume: formatUsd(entry.dollars),
     })),
-    unrankedPools: unranked.map((entry) => ({
+    unrankedCount: unranked.length,
+    unrankedPools: unranked.slice(0, unrankedShown).map((entry) => ({
       pool: shortAddress(entry.pool),
       swaps: entry.swaps.toLocaleString("en-US"),
     })),
