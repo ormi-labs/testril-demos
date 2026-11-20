@@ -71,8 +71,8 @@ for the report. The fixture lives in `test/` and is never shown on the page.
 
 - Window: the eight UTC days before the day of the press (`from_time` eight
   days before today 00:00 UTC, `to_time` today 00:00 UTC). Each pool function
-  is bound to its factory (or the v4 pool manager) and reads every pool; the
-  report picks the subject pools below.
+  is bound to the subject pools below by address, so a read returns rows only
+  for them.
 - Measure: the ETH side of each pool, paid in plus paid out, in raw 18-decimal
   units. Uniswap v2, v3 and Fluid sort tokens by address, so USDC and wstETH
   are token0 and WETH or the native-ETH sentinel (`0xEeee...`) is token1; v4
@@ -88,20 +88,19 @@ for the report. The fixture lives in `test/` and is never shown on the page.
 - Uniswap v4 and Fluid count native ETH, the others WETH; the demo treats both
   as ETH.
 - Shares are of the selected pools: four Uniswap v3 fee tiers, one pool each
-  for v2, v4, Curve and Fluid. Other v4 ETH/USDC pool ids are not included.
+  for v2, v4, Curve and Fluid. Other v4 ETH/USDC pool ids are not bound.
 - wstETH/ETH is a two-pool comparison of Fluid and Uniswap v3's 0.01% pool.
-  Curve stETH/ETH (`0xdc24316b9ae028f1497c275eb9192a3ea0f67022`) is not
-  deployed by the Tricrypto-NG factory, so the Curve bind cannot reach it, and
-  no Uniswap v4 wstETH/ETH pool is included.
+  Curve stETH/ETH (`0xdc24316b9ae028f1497c275eb9192a3ea0f67022`) is a
+  different pair from wstETH/ETH and would fail its price check, so it is
+  omitted, and no Uniswap v4 wstETH/ETH pool is included.
+- Fluid has two USDC/ETH dex pools; dex 12 carries the trading, while dex 5
+  (`0x2886a01a0645390872a9eb99dae1283664b0c524`) had no swap in the eight days
+  before 2026-11-20.
 - All addresses are lowercase.
 
 | Subject                      | Address                                                              | Note   |
 | ---------------------------- | -------------------------------------------------------------------- | ------ |
-| Uniswap v2 factory           | `0x5c69bee701ef814a2b6a3edd4b1652cb9cc5aa6f`                         |        |
-| Uniswap v3 factory           | `0x1f98431c8ad98523631ae4a59f267346ea31f984`                         |        |
 | Uniswap v4 PoolManager       | `0x000000000004444c5dc75cb358380d2e3de08a90`                         |        |
-| Curve Tricrypto-NG factory   | `0x0c0e5f2ff0ff18a3be9b835635039256dc4b4963`                         | verify |
-| Fluid DEX factory            | `0x91716c4eda1fb55e84bf8b4c7085f84285c19085`                         | verify |
 | Uniswap v2 USDC/WETH pair    | `0xb4e16d0168e52d35cacd2c6185b44281ec28c9dc`                         |        |
 | Uniswap v3 USDC/WETH 0.05%   | `0x88e6a0c2ddd26feeb64f039a2c41296fcb3f5640`                         |        |
 | Uniswap v3 USDC/WETH 0.3%    | `0x8ad599c3a0ff1de082011efddc58f1908eb6e6d8`                         |        |
@@ -109,9 +108,9 @@ for the report. The fixture lives in `test/` and is never shown on the page.
 | Uniswap v3 USDC/WETH 1%      | `0x7bea39867e4169dbe237d55c8242a8f2fcdcc387`                         | verify |
 | Uniswap v4 ETH/USDC pool id  | `0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27` | verify |
 | Curve TricryptoUSDC pool     | `0x7f86bf177dd4f3494b841a37e810a34dd56c829b`                         | verify |
-| Fluid ETH/USDC dex pool      | `0x2886a01a0645390872a9eb99dae1283664b0c524`                         | verify |
+| Fluid ETH/USDC dex pool      | `0x836951eb21f3df98273517b7249dceff270d34bf`                         | dex 12 |
 | Uniswap v3 wstETH/WETH 0.01% | `0x109830a1aaad605bbf02a9dfa7b0b92ec2fb7daa`                         | verify |
-| Fluid wstETH/ETH dex pool    | `0x0b1a513ee24972daef112bc777a5610d4325c9e7`                         | verify |
+| Fluid wstETH/ETH dex pool    | `0x0b1a513ee24972daef112bc777a5610d4325c9e7`                         | dex 1  |
 
 Also verify token0/token1 of both Fluid pools in `fluid_dex.pool_list` (the
 ETH/USDC pool's address and order are the least certain), that ETH is the
@@ -122,12 +121,13 @@ cross-check fails on a wrong side.
 
 Windows are half-open: the end is the first day not included.
 
-| Name         | Function                 | Chain | Params                         | Window         |
-| ------------ | ------------------------ | ----- | ------------------------------ | -------------- |
-| `uniswap-v2` | `uniswap_v2.pool_volume` | 1     | `swap.pool_list.factory`, `by` | 8 days → today |
-| `uniswap-v3` | `uniswap_v3.pool_volume` | 1     | `swap.pool_list.factory`, `by` | 8 days → today |
-| `uniswap-v4` | `uniswap_v4.pool_volume` | 1     | `swap.manager`, `by`           | 8 days → today |
-| `curve`      | `curve.pool_volume`      | 1     | `swap.pool_list.factory`, `by` | 8 days → today |
-| `fluid-dex`  | `fluid_dex.pool_volume`  | 1     | `swap.pool_list.factory`, `by` | 8 days → today |
+| Name         | Function                 | Chain | Params                                 | Window         |
+| ------------ | ------------------------ | ----- | -------------------------------------- | -------------- |
+| `uniswap-v2` | `uniswap_v2.pool_volume` | 1     | `swap.pool_list` (1 pool), `by`        | 8 days → today |
+| `uniswap-v3` | `uniswap_v3.pool_volume` | 1     | `swap.pool_list` (5 pools), `by`       | 8 days → today |
+| `uniswap-v4` | `uniswap_v4.pool_volume` | 1     | `swap.manager`, `swap.pools` (1), `by` | 8 days → today |
+| `curve`      | `curve.pool_volume`      | 1     | `swap.pool_list` (1 pool), `by`        | 8 days → today |
+| `fluid-dex`  | `fluid_dex.pool_volume`  | 1     | `swap.pool_list` (2 pools), `by`       | 8 days → today |
 
-Each read returns every pool of the factory for each day.
+`pool_list` is the array of subject pool addresses, so Testril reads only those
+pools without walking a factory. Each read returns one row per pool per day.

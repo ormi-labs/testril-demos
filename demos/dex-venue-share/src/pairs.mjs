@@ -6,7 +6,7 @@ const usdcPools = {
   v3Fee10000: "0x7bea39867e4169dbe237d55c8242a8f2fcdcc387",
   v4: "0x21c67e77068de97969ba93d4aab21826d33ca12bb9f565d8496e8fda8a82ca27",
   curve: "0x7f86bf177dd4f3494b841a37e810a34dd56c829b",
-  fluid: "0x2886a01a0645390872a9eb99dae1283664b0c524",
+  fluid: "0x836951eb21f3df98273517b7249dceff270d34bf",
 };
 const wstethPools = {
   v3: "0x109830a1aaad605bbf02a9dfa7b0b92ec2fb7daa",

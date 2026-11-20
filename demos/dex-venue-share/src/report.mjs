@@ -9,65 +9,32 @@ export function bindsAt(now = Date.now()) {
     from_time: isoSecond(today - ms),
     to_time: isoSecond(today),
   });
+  const poolsOf = (bind) =>
+    pairs.flatMap((pair) =>
+      pair.subjects.filter((s) => s.bind === bind).map((s) => s.pool),
+    );
+  const bind = (name, function_slug, swap) => ({
+    name,
+    function_slug,
+    chain_id: 1,
+    params: { swap, by: "day" },
+    window: untilToday(8 * dayMs),
+  });
   return [
-    {
-      name: "uniswap-v2",
-      function_slug: "uniswap_v2.pool_volume",
-      chain_id: 1,
-      params: {
-        swap: {
-          pool_list: { factory: "0x5c69bee701ef814a2b6a3edd4b1652cb9cc5aa6f" },
-        },
-        by: "day",
-      },
-      window: untilToday(8 * dayMs),
-    },
-    {
-      name: "uniswap-v3",
-      function_slug: "uniswap_v3.pool_volume",
-      chain_id: 1,
-      params: {
-        swap: {
-          pool_list: { factory: "0x1f98431c8ad98523631ae4a59f267346ea31f984" },
-        },
-        by: "day",
-      },
-      window: untilToday(8 * dayMs),
-    },
-    {
-      name: "uniswap-v4",
-      function_slug: "uniswap_v4.pool_volume",
-      chain_id: 1,
-      params: {
-        swap: { manager: "0x000000000004444c5dc75cb358380d2e3de08a90" },
-        by: "day",
-      },
-      window: untilToday(8 * dayMs),
-    },
-    {
-      name: "curve",
-      function_slug: "curve.pool_volume",
-      chain_id: 1,
-      params: {
-        swap: {
-          pool_list: { factory: "0x0c0e5f2ff0ff18a3be9b835635039256dc4b4963" },
-        },
-        by: "day",
-      },
-      window: untilToday(8 * dayMs),
-    },
-    {
-      name: "fluid-dex",
-      function_slug: "fluid_dex.pool_volume",
-      chain_id: 1,
-      params: {
-        swap: {
-          pool_list: { factory: "0x91716c4eda1fb55e84bf8b4c7085f84285c19085" },
-        },
-        by: "day",
-      },
-      window: untilToday(8 * dayMs),
-    },
+    bind("uniswap-v2", "uniswap_v2.pool_volume", {
+      pool_list: poolsOf("uniswap-v2"),
+    }),
+    bind("uniswap-v3", "uniswap_v3.pool_volume", {
+      pool_list: poolsOf("uniswap-v3"),
+    }),
+    bind("uniswap-v4", "uniswap_v4.pool_volume", {
+      manager: "0x000000000004444c5dc75cb358380d2e3de08a90",
+      pools: poolsOf("uniswap-v4"),
+    }),
+    bind("curve", "curve.pool_volume", { pool_list: poolsOf("curve") }),
+    bind("fluid-dex", "fluid_dex.pool_volume", {
+      pool_list: poolsOf("fluid-dex"),
+    }),
   ];
 }
 
