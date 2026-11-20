@@ -33,12 +33,20 @@ test("check fails when the two tokens are swapped in a total", () => {
   );
 });
 
-test("a token with no row is a zero balance, as OKX 73's USDC", () => {
-  const withoutUsdc = rows();
-  withoutUsdc["okx-total"] = withoutUsdc["okx-total"].filter(
-    (row) => row.token !== usdc,
+test("a zero balance is a row, as OKX 73's USDC", () => {
+  const emptyUsdc = rows();
+  for (const row of emptyUsdc["okx-total"])
+    if (row.token === usdc) row.balance = "0";
+  assert.equal(check({ rows: emptyUsdc }, fixtureBinds).length, 3);
+});
+
+test("check fails when an hour has no row", () => {
+  const corrupted = rows();
+  corrupted["kraken-native"].splice(5, 1);
+  assert.throws(
+    () => check({ rows: corrupted }, fixtureBinds),
+    /kraken-native has no row for .* at /,
   );
-  assert.equal(check({ rows: withoutUsdc }, fixtureBinds).length, 3);
 });
 
 test("check fails when a bind returns an unknown token", () => {
@@ -57,15 +65,6 @@ test("check fails when a bind returns two rows for one hour", () => {
   assert.throws(
     () => check({ rows: corrupted }, fixtureBinds),
     /okx-total has two rows for .* at /,
-  );
-});
-
-test("check fails when a gap is filled with zero", () => {
-  const corrupted = rows();
-  corrupted["kraken-native"][5].balance = "0";
-  assert.throws(
-    () => check({ rows: corrupted }, fixtureBinds),
-    /kraken-native has a zero or negative balance/,
   );
 });
 

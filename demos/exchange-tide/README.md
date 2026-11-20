@@ -4,8 +4,8 @@ USDT, USDC and ETH held by listed wallets of six exchanges on Ethereum, hour
 by hour for a week: a stacked chart of stablecoins per exchange and a table of
 the hours when the most money moved in or out. The page proves its numbers:
 for every exchange with several wallets, the total Testril returns must equal
-the sum of its wallets in every hour, with no out-of-window hours. Testril
-serves no row for a zero balance, so an hour with no row holds zero: OKX 73
+the sum of its wallets in every hour, with a row in every hour and none outside
+the window. A zero balance is a row: OKX 73
 `0x6cc5f688a315f3dc28a7781717a9a798a59fda7b` held no USDC in November 2026.
 
 Every number on the page comes live from Testril when you press **Fetch from
@@ -55,9 +55,9 @@ npm run format:check
 ```
 
 `npm test` checks the cross-check passes on the fixture and fails when a total
-is only its first wallet, when the two tokens are swapped, when a served row is
-zero and when an hour is outside the window; that a token with no row counts
-as zero; and that the biggest hours are ranked by size and direction.
+is only its first wallet, when the two tokens are swapped, when an hour has no
+row and when an hour is outside the window; that a zero balance passes; and
+that the biggest hours are ranked by size and direction.
 `npm test` also fetches from a fake Testril: the fetch pays with the payer's
 vouchers, reports Testril's job progress and keeps every row.
 `npm run test:browser` presses the button against the fake Testril and waits

@@ -339,17 +339,15 @@ function balancesByHour(rows, expected, bindName, keyField, keys) {
       throw new Error(`${bindName} has two rows for ${key} at ${row.hour}.`);
     series.get(key).set(row.hour, row);
   }
-  for (const row of bind)
-    if (BigInt(row.balance) <= 0n)
-      throw new Error(
-        `${bindName} has a zero or negative balance for ${row[keyField]} at ${row.hour}.`,
-      );
-  // Testril serves no row for an hour whose balance is zero.
   return new Map(
     [...series].map(([key, byHour]) => [
       key,
       new Map(
-        expected.map((hour) => [hour, BigInt(byHour.get(hour)?.balance ?? 0)]),
+        expected.map((hour) => {
+          if (!byHour.has(hour))
+            throw new Error(`${bindName} has no row for ${key} at ${hour}.`);
+          return [hour, BigInt(byHour.get(hour).balance)];
+        }),
       ),
     ]),
   );
@@ -393,9 +391,9 @@ export function check({ rows }, binds) {
   }
   const wallets = exchanges.reduce((n, e) => n + e.owners.length, 0);
   return [
-    `${expected.length} contiguous hours, from ${expected[0]} to ${expected.at(-1)}, for every exchange total in USDT and USDC; an hour with no row holds zero`,
+    `${expected.length} contiguous hours, from ${expected[0]} to ${expected.at(-1)}, for every exchange total in USDT and USDC, with a row in every hour`,
     `${split.map((e) => e.name).join(", ")}: the total equals the sum of its listed owners in every hour, for both tokens`,
-    `Native ETH balance for all ${wallets} wallets in every hour; an hour with no row holds zero`,
+    `Native ETH balance for all ${wallets} wallets, with a row in every hour`,
   ];
 }
 
