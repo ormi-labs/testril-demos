@@ -1,7 +1,45 @@
 const dayMs = 86400000;
+const aavePool = "0x87870bca3f3fd6335c3f4ce8392d69350b4fa4e2";
 const aaveProviderCreatedAt = "2022-12-29T14:25:47Z";
 const isoSecond = (ms) => new Date(ms).toISOString().replace(".000Z", "Z");
 
+export const assets = [
+  {
+    symbol: "USDC",
+    decimals: 6,
+    address: "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+  },
+  {
+    symbol: "USDT",
+    decimals: 6,
+    address: "0xdac17f958d2ee523a2206206994597c13d831ec7",
+  },
+  {
+    symbol: "WETH",
+    decimals: 18,
+    address: "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+  },
+  {
+    symbol: "WBTC",
+    decimals: 8,
+    address: "0x2260fac5e5542a773aa44fbcfedf7c193bc2c599",
+  },
+  {
+    symbol: "DAI",
+    decimals: 18,
+    address: "0x6b175474e89094c44da98b954eedeac495271d0f",
+  },
+  {
+    symbol: "wstETH",
+    decimals: 18,
+    address: "0x7f39c581f595b53c5cb19bd0b3f8da6c935e2ca0",
+  },
+  {
+    symbol: "LINK",
+    decimals: 18,
+    address: "0x514910771af9ca656af840dff83e8264ecf986ca",
+  },
+];
 export function bindsAt(now = Date.now()) {
   const today = Math.floor(now / dayMs) * dayMs;
   const untilToday = (ms) => ({
@@ -25,15 +63,8 @@ export function bindsAt(now = Date.now()) {
       function_slug: "aave_v3.reserve_state",
       chain_id: 1,
       params: {
-        proxy_list: {
-          pool_addresses_provider: "0x2f39d218133afab8f2b819b1066c7e434ad94e9e",
-        },
-        reserve_list: {
-          proxy_list: {
-            pool_addresses_provider:
-              "0x2f39d218133afab8f2b819b1066c7e434ad94e9e",
-          },
-        },
+        pool: aavePool,
+        assets: assets.map((asset) => asset.address),
         by: "hour",
       },
       window: untilToday(7 * dayMs),
@@ -75,43 +106,6 @@ const windowOf = (binds, name) =>
   binds.find((bind) => bind.name === name).window;
 const hourOf = (time) => time.slice(0, 13);
 
-export const assets = [
-  {
-    symbol: "USDC",
-    decimals: 6,
-    address: "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
-  },
-  {
-    symbol: "USDT",
-    decimals: 6,
-    address: "0xdac17f958d2ee523a2206206994597c13d831ec7",
-  },
-  {
-    symbol: "WETH",
-    decimals: 18,
-    address: "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
-  },
-  {
-    symbol: "WBTC",
-    decimals: 8,
-    address: "0x2260fac5e5542a773aa44fbcfedf7c193bc2c599",
-  },
-  {
-    symbol: "DAI",
-    decimals: 18,
-    address: "0x6b175474e89094c44da98b954eedeac495271d0f",
-  },
-  {
-    symbol: "wstETH",
-    decimals: 18,
-    address: "0x7f39c581f595b53c5cb19bd0b3f8da6c935e2ca0",
-  },
-  {
-    symbol: "LINK",
-    decimals: 18,
-    address: "0x514910771af9ca656af840dff83e8264ecf986ca",
-  },
-];
 const usdc = assets[0];
 const rawAmount = /^[0-9]+$/;
 const basisPointsPerPercent = 100n;

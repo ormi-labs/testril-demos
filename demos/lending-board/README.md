@@ -67,6 +67,7 @@ for the report. The fixture lives in `test/` and is never shown on the page.
 | Subject                                | Address                                                 | Note   |
 | -------------------------------------- | ------------------------------------------------------- | ------ |
 | Aave v3 Ethereum PoolAddressesProvider | `0x2f39d218133afab8f2b819b1066c7e434ad94e9e`            |        |
+| Aave v3 Ethereum Pool (proxy)          | `0x87870bca3f3fd6335c3f4ce8392d69350b4fa4e2`            |        |
 | Morpho Blue                            | `0xbbbbbbbbbb9cc5e90e3b3af64bdaf62c37eeffcb`            |        |
 | MetaMorpho factory v1.0                | `0xa9c3d3a366466fa809d1ae982fb2c46e5fc41101`            | verify |
 | MetaMorpho factory v1.1                | `0x1897a8997241c1cd4bd0698647e4eb7213535c24`            | verify |
@@ -79,7 +80,7 @@ for the report. The fixture lives in `test/` and is never shown on the page.
 | wstETH (18)                            | `0x7f39c581f595b53c5cb19bd0b3f8da6c935e2ca0`            |        |
 | LINK (18)                              | `0x514910771af9ca656af840dff83e8264ecf986ca`            |        |
 
-The page shows the seven assets above; a real read returns every Aave reserve.
+The page shows the seven assets above; `reserve-state` names them, and the reserve list counts every Aave reserve.
 
 - Aave state: the 168 UTC hours before 00:00 UTC on the day of the press, read at
   each hour's last block. Rates are APR (the daemon's per-year ray), shown to
@@ -100,6 +101,6 @@ Windows end at 00:00 UTC on the day of the press; the end is not included.
 | Name              | Function                     | Chain | Params                                           | Window            |
 | ----------------- | ---------------------------- | ----- | ------------------------------------------------ | ----------------- |
 | `reserves`        | `aave_v3.reserve_list`       | 1     | `proxy_list`                                     | creation → today  |
-| `reserve-state`   | `aave_v3.reserve_state`      | 1     | `proxy_list`, `reserve_list`, `by`               | 168 hours → today |
+| `reserve-state`   | `aave_v3.reserve_state`      | 1     | `pool`, `assets`, `by`                           | 168 hours → today |
 | `reserve-totals`  | `aave_v3.reserve_totals`     | 1     | `proxy_list`                                     | 1 day → today     |
 | `morpho-holdings` | `morpho_blue.token_holdings` | 1     | `morpho_blue`, `market_list`, `vault_list`, `by` | 7 days → today    |
